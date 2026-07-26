@@ -1,0 +1,2734 @@
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, HostListener } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { AuthService, User } from '../../services/auth.service';
+import { ComplaintService } from '../../services/complaint.service';
+import { SocketService, LiveNotification } from '../../services/socket.service';
+import { MessService } from '../../services/mess.service';
+import { AttendanceService } from '../../services/attendance.service';
+import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service';
+
+
+
+
+@Component({
+  selector: 'app-student-dashboard',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  template: `
+    <div class="dashboard-container">
+      <!-- Toast Alert for Live Notifications -->
+      <div class="toast-alert" *ngIf="activeToast" (click)="clearToast()">
+        <div class="toast-content">
+          <span class="toast-bell">🔔</span>
+          <div class="toast-text">
+            <strong>Notification</strong>
+            <p>{{ activeToast.message }}</p>
+          </div>
+          <span class="toast-close">✕</span>
+        </div>
+      </div>
+
+      <!-- Photo Zoom Modal -->
+      <div class="photo-modal" *ngIf="zoomPhotoUrl" (click)="closePhotoModal()">
+        <div class="modal-wrapper" (click)="$event.stopPropagation()">
+          <button class="close-modal" (click)="closePhotoModal()">&times;</button>
+          <img [src]="zoomPhotoUrl" alt="Zoomed view" class="zoomed-image"/>
+        </div>
+      </div>
+
+      <!-- Detailed Notice Modal -->
+      <div class="notice-modal-overlay" *ngIf="selectedNotice" (click)="closeNoticeModal()">
+        <div class="notice-modal-dialog animate-fade" (click)="$event.stopPropagation()">
+          <div class="notice-modal-header">
+            <span class="notice-modal-badge">📢 NOTICE</span>
+            <button class="notice-modal-close" (click)="closeNoticeModal()">✕</button>
+          </div>
+          <h3 class="notice-modal-title">{{ selectedNotice.title }}</h3>
+          <div class="notice-modal-meta">
+            <span>👨‍💼 {{ selectedNotice.creator?.name || 'Warden' }}</span>
+            <span>{{ selectedNotice.createdAt | date:'d MMM, h:mm a' }}</span>
+          </div>
+          <div class="notice-modal-body">{{ selectedNotice.content }}</div>
+          <button class="btn btn-primary" style="width:100%;margin-top:4px" (click)="closeNoticeModal()">Close</button>
+        </div>
+      </div>
+
+      <!-- HEADER -->
+      <div class="header">
+        <div class="user-info">
+          <div class="avatar-ring">
+            <span class="avatar" *ngIf="!user?.profilePicUrl">🎓</span>
+            <img *ngIf="user?.profilePicUrl" [src]="'http://localhost:5000' + user.profilePicUrl" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
+          </div>
+          <div>
+            <h3>{{ user?.name }}</h3>
+            <p class="user-meta">{{ user?.hostelBlock }} · Room {{ user?.roomNumber }}</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="theme-toggle-btn" (click)="toggleDarkMode()" [title]="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+            {{ isDarkMode ? '☀️' : '🌙' }}
+          </button>
+          <button class="logout-btn" (click)="logout()">
+            <span>Logout</span>
+            <span>🚪</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- MAIN TABS CONTAINER -->
+      <div class="tab-content-area">
+
+        <!-- TAB 0: HOME / NOTICES -->
+        <div *ngIf="activeTab === 'home'" class="tab-panel animate-fade">
+          
+          <!-- 1. Student Profile Card (Top Widget) -->
+          <div class="card student-profile-card">
+            <div class="profile-card-pattern"></div>
+            <div class="profile-card-content">
+              <div class="profile-user-img-wrapper">
+                <span class="profile-avatar-emoji" *ngIf="!user?.profilePicUrl">🎓</span>
+                <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" class="profile-user-img" />
+              </div>
+              <div class="profile-user-details">
+                <div class="welcome-tag">Welcome back,</div>
+                <h4 class="profile-user-name">{{ user?.name }}</h4>
+                <div class="profile-pills">
+                  <span class="profile-pill block-pill">🏢 Block {{ user?.hostelBlock || 'N/A' }}</span>
+                  <span class="profile-pill room-pill">🔑 Room {{ user?.roomNumber || 'N/A' }}</span>
+                  <span class="profile-pill batch-pill">🎓 {{ user?.batch || 'Batch 2025' }}</span>
+                </div>
+              </div>
+              <div class="profile-quick-stats">
+                <div class="stat-item clickable" (click)="switchTab('my-complaints')">
+                  <span class="stat-count">{{ complaints.length }}</span>
+                  <span class="stat-label">Total Tickets</span>
+                </div>
+                <div class="stat-item resolved clickable" (click)="switchTab('my-complaints')">
+                  <span class="stat-count">{{ getResolvedCount() }}</span>
+                  <span class="stat-label">Resolved</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- 2. Dynamic Warden Section -->
+          <div class="section-header" style="margin-top: 32px;">
+            <h4>👨‍💼 Your Hostel Wardens</h4>
+            <p class="section-subtitle">Reach out to wardens assigned to your block for support and approvals.</p>
+          </div>
+
+          <div *ngIf="isLoadingWardens" class="skeleton-list">
+            <div class="skeleton skeleton-card"></div>
+            <div class="skeleton skeleton-card"></div>
+          </div>
+
+          <div class="warden-grid" *ngIf="!isLoadingWardens && wardens.length > 0">
+            <div class="card warden-card animate-hover" *ngFor="let warden of wardens">
+              <div class="warden-header">
+                <div class="warden-avatar-wrapper">
+                  <span class="warden-default-avatar" *ngIf="!warden.profilePicUrl">👨‍💼</span>
+                  <img *ngIf="warden.profilePicUrl" [src]="getImageUrl(warden.profilePicUrl)" class="warden-img" />
+                </div>
+                <div class="warden-name-block">
+                  <h5 class="warden-name">{{ warden.name }}</h5>
+                  <span class="warden-tag">Block {{ warden.hostelBlock || 'All' }} Warden</span>
+                </div>
+              </div>
+              <p class="warden-bio">{{ warden.bio || 'Available for hostel administration, mess regulations, and student support.' }}</p>
+              <div class="warden-contact-list">
+                <a [href]="'tel:' + warden.phone" class="warden-contact-link phone">
+                  <span>📞 {{ warden.phone }}</span>
+                </a>
+                <a [href]="'mailto:' + warden.email" class="warden-contact-link email">
+                  <span>✉️ {{ warden.email }}</span>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="!isLoadingWardens && wardens.length === 0" class="empty-state">
+            <span class="empty-icon">👥</span>
+            <p>No wardens registered in the system yet.</p>
+          </div>
+
+          <!-- 3. Dynamic Developer Team Section -->
+          <div class="section-header" style="margin-top: 32px;">
+            <h4>🚀 Meet the Developer Team</h4>
+            <p class="section-subtitle">The creative minds behind the design, architecture, and maintenance of HostelHub.</p>
+          </div>
+
+          <div *ngIf="isLoadingPublicSettings" class="skeleton-list">
+            <div class="skeleton skeleton-card"></div>
+          </div>
+
+          <div class="developer-grid" *ngIf="!isLoadingPublicSettings && publicSettings.developer_team?.length > 0">
+            <div class="card developer-card animate-hover" *ngFor="let dev of publicSettings.developer_team">
+              <div class="dev-avatar-wrapper">
+                <img [src]="getImageUrl(dev.pic)" class="dev-img" />
+                <div class="dev-role-badge">{{ dev.role }}</div>
+              </div>
+              <h5 class="dev-name">{{ dev.name }}</h5>
+              <p class="dev-desc">{{ dev.description }}</p>
+            </div>
+          </div>
+
+          <!-- 4. App Info/Description Section -->
+          <div class="card app-info-card" style="margin-top: 32px;">
+            <div class="app-info-grid">
+              <div class="app-info-about">
+                <div class="info-tag">Overview</div>
+                <h4>What is HostelHub?</h4>
+                <p>{{ publicSettings.app_about }}</p>
+              </div>
+              <div class="app-info-works">
+                <div class="info-tag">Process</div>
+                <h4>How It Works</h4>
+                <div class="work-steps">
+                  <div class="step-item" *ngFor="let step of splitLines(publicSettings.app_how_it_works)">
+                    <div class="step-bullet">✓</div>
+                    <p class="step-text">{{ step }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+
+
+        <!-- TAB 1: RAISE COMPLAINT -->
+        <div *ngIf="activeTab === 'raise'" class="tab-panel animate-fade">
+          <h4 class="page-title">📝 Raise a New Ticket</h4>
+          <div class="form-container">
+            <form (ngSubmit)="onRaiseSubmit()" #raiseForm="ngForm">
+              <div *ngIf="raiseError" class="alert alert-danger">{{ raiseError }}</div>
+              <div *ngIf="raiseSuccess" class="alert alert-success">{{ raiseSuccess }}</div>
+
+              <div class="form-group">
+                <label class="form-label" for="title">Complaint Title</label>
+                <input
+                  type="text"
+                  id="title"
+                  name="title"
+                  class="form-input"
+                  placeholder="e.g. Fan Regulator not working"
+                  [(ngModel)]="newComplaint.title"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Category</label>
+                <div class="category-grid">
+                  <div class="category-card" [class.selected]="newComplaint.category === 'electrical'" (click)="selectCategory('electrical')">
+                    <span class="cat-icon">⚡</span>
+                    <span class="cat-name">Electrical</span>
+                  </div>
+                  <div class="category-card" [class.selected]="newComplaint.category === 'plumbing'" (click)="selectCategory('plumbing')">
+                    <span class="cat-icon">🚰</span>
+                    <span class="cat-name">Plumbing</span>
+                  </div>
+                  <div class="category-card" [class.selected]="newComplaint.category === 'carpentry'" (click)="selectCategory('carpentry')">
+                    <span class="cat-icon">🪚</span>
+                    <span class="cat-name">Carpentry</span>
+                  </div>
+                  <div class="category-card" [class.selected]="newComplaint.category === 'cleaning'" (click)="selectCategory('cleaning')">
+                    <span class="cat-icon">🧹</span>
+                    <span class="cat-name">Cleaning</span>
+                  </div>
+                  <div class="category-card" [class.selected]="newComplaint.category === 'wifi'" (click)="selectCategory('wifi')">
+                    <span class="cat-icon">📶</span>
+                    <span class="cat-name">Internet</span>
+                  </div>
+                  <div class="category-card" [class.selected]="newComplaint.category === 'others'" (click)="selectCategory('others')">
+                    <span class="cat-icon">⚙️</span>
+                    <span class="cat-name">Others</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="description">Detailed Description</label>
+                <textarea
+                  id="description"
+                  name="description"
+                  class="form-input"
+                  rows="4"
+                  placeholder="Tell us exactly what the issue is and where..."
+                  [(ngModel)]="newComplaint.description"
+                  required
+                ></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Priority Level</label>
+                <div class="priority-selector">
+                  <div class="priority-option" [class.selected]="newComplaint.priority === 'low'" (click)="newComplaint.priority = 'low'">
+                    <span>🟢</span><span>Low</span>
+                  </div>
+                  <div class="priority-option" [class.selected]="newComplaint.priority === 'medium'" (click)="newComplaint.priority = 'medium'">
+                    <span>🟡</span><span>Medium</span>
+                  </div>
+                  <div class="priority-option" [class.selected]="newComplaint.priority === 'high'" (click)="newComplaint.priority = 'high'">
+                    <span>🟠</span><span>High</span>
+                  </div>
+                  <div class="priority-option" [class.selected]="newComplaint.priority === 'urgent'" (click)="newComplaint.priority = 'urgent'">
+                    <span>🔴</span><span>Urgent</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Upload Photo (Optional)</label>
+
+                <div class="upload-area" *ngIf="!imagePreviewUrl">
+                  <input type="file" (change)="onFileChange($event)" accept="image/*" class="file-input" id="photoFile"/>
+                  <label for="photoFile" class="file-input-label">
+                    <span class="upload-icon">📸</span>
+                    <span class="upload-text">Select Image File</span>
+                    <span class="upload-subtext">JPEG, PNG up to 5MB</span>
+                  </label>
+                </div>
+
+                <div class="preview-area animate-fade" *ngIf="imagePreviewUrl">
+                  <img [src]="imagePreviewUrl" alt="File preview" class="preview-thumbnail"/>
+                  <div class="preview-info">
+                    <span class="preview-name">{{ selectedFile?.name }}</span>
+                    <button type="button" class="btn-remove-file" (click)="removeSelectedFile()">Remove ❌</button>
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-submit" [disabled]="!raiseForm.form.valid || !newComplaint.category || raising || justSubmitted">
+                <span *ngIf="raising">Submitting...</span>
+                <span *ngIf="!raising && justSubmitted">Submitted ✓</span>
+                <span *ngIf="!raising && !justSubmitted">Submit Ticket ⚡</span>
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- TAB 2: MY COMPLAINTS -->
+        <div *ngIf="activeTab === 'my-complaints'" class="tab-panel animate-fade">
+
+          <!-- Quick Actions Row -->
+          <div class="my-tickets-header">
+            <h4 class="page-title" style="margin-bottom:0">📋 My Tickets</h4>
+            <button class="btn-raise-shortcut" (click)="activeTab = 'raise'">
+              ➕ Raise New
+            </button>
+          </div>
+
+          <!-- Filter Pills -->
+          <div class="filter-pills">
+            <button class="pill-btn" [class.active]="filterStatus === 'all'" (click)="filterStatus = 'all'">
+              All ({{ complaints.length }})
+            </button>
+            <button class="pill-btn" [class.active]="filterStatus === 'pending'" (click)="filterStatus = 'pending'">
+              Active ({{ getPendingCount() }})
+            </button>
+            <button class="pill-btn" [class.active]="filterStatus === 'resolved'" (click)="filterStatus = 'resolved'">
+              Resolved ({{ getResolvedCount() }})
+            </button>
+          </div>
+
+          <!-- Skeleton Loading -->
+          <div *ngIf="isLoadingComplaints" class="skeleton-list">
+            <div class="skeleton skeleton-card"></div>
+            <div class="skeleton skeleton-card"></div>
+            <div class="skeleton skeleton-card"></div>
+          </div>
+
+          <div *ngIf="!isLoadingComplaints">
+            <div *ngIf="filteredComplaints.length > 0">
+              <div class="card complaint-card" *ngFor="let comp of filteredComplaints" [class.expanded]="expandedComplaintId === comp.id">
+                <div class="comp-summary" (click)="toggleExpand(comp.id)">
+                  <div class="comp-header">
+                    <span class="badge" [class]="'badge-' + comp.status">{{ comp.status | titlecase }}</span>
+                    <span class="comp-date">{{ comp.createdAt | date:'short' }}</span>
+                  </div>
+                  <h4 class="comp-title">{{ comp.title }}</h4>
+                  <div class="comp-category-tag">
+                    <span class="cat-tag-icon">{{ getCategoryIcon(comp.category) }}</span>
+                    <span>{{ comp.category | titlecase }}</span>
+                  </div>
+                  <p class="comp-desc-short" *ngIf="expandedComplaintId !== comp.id">
+                    {{ comp.description | slice:0:80 }}{{ comp.description.length > 80 ? '...' : '' }}
+                  </p>
+                  <div class="tap-hint" *ngIf="expandedComplaintId !== comp.id">Tap to view details 👇</div>
+                </div>
+
+                <!-- Expanded Details -->
+                <div class="comp-details animate-fade" *ngIf="expandedComplaintId === comp.id">
+
+                  <!-- Progress Timeline -->
+                  <div class="timeline-container">
+                    <div class="timeline-step completed">
+                      <div class="step-marker">✓</div>
+                      <div class="step-content">
+                        <span class="step-title">Ticket Raised</span>
+                        <span class="step-date">{{ comp.createdAt | date:'mediumDate' }}</span>
+                      </div>
+                    </div>
+                    <div class="timeline-step" [class.completed]="comp.status !== 'pending'">
+                      <div class="step-marker">{{ comp.status !== 'pending' ? '✓' : '2' }}</div>
+                      <div class="step-content">
+                        <span class="step-title">Staff Assignment</span>
+                        <span class="step-desc" *ngIf="comp.staff">{{ comp.staff.name }} Assigned</span>
+                        <span class="step-desc" *ngIf="!comp.staff">Awaiting Warden Assignment</span>
+                      </div>
+                    </div>
+                    <div class="timeline-step" [class.completed]="comp.status === 'in_progress' || comp.status === 'resolved'">
+                      <div class="step-marker">{{ (comp.status === 'in_progress' || comp.status === 'resolved') ? '✓' : '3' }}</div>
+                      <div class="step-content">
+                        <span class="step-title">Work In Progress</span>
+                        <span class="step-desc" *ngIf="comp.status === 'in_progress' || comp.status === 'resolved'">Staff working on it</span>
+                        <span class="step-desc" *ngIf="comp.status === 'pending' || comp.status === 'assigned'">Awaiting start</span>
+                      </div>
+                    </div>
+                    <div class="timeline-step" [class.completed]="comp.status === 'resolved'">
+                      <div class="step-marker">{{ comp.status === 'resolved' ? '✓' : '4' }}</div>
+                      <div class="step-content">
+                        <span class="step-title">Resolved</span>
+                        <span class="step-desc" *ngIf="comp.status === 'resolved'">✅ Job Completed</span>
+                        <span class="step-desc" *ngIf="comp.status !== 'resolved'">Awaiting Resolution</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p class="comp-desc-full"><strong>Details:</strong><br/>{{ comp.description }}</p>
+
+                  <!-- Attachment -->
+                  <div class="attachment-view" *ngIf="comp.photoUrl">
+                    <p class="section-label">📸 Original Attachment:</p>
+                    <div class="image-container" (click)="openPhotoModal('http://localhost:5000' + comp.photoUrl)">
+                      <img [src]="'http://localhost:5000' + comp.photoUrl" class="comp-img" alt="Attachment"/>
+                      <div class="image-overlay">🔍 Tap to Zoom</div>
+                    </div>
+                  </div>
+
+                  <!-- Assigned Staff -->
+                  <div class="staff-assignment" *ngIf="comp.staff">
+                    <div class="staff-header">🛠️ Assigned Service Staff</div>
+                    <div class="staff-body">
+                      <p class="staff-name">Name: <strong>{{ comp.staff.name }}</strong></p>
+                      <div class="staff-contact">
+                        <a [href]="'tel:' + comp.staff.phone" class="staff-call-btn">
+                          📞 Call {{ comp.staff.phone }}
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Completion Proof -->
+                  <div class="completion-view" *ngIf="comp.completionPhotoUrl">
+                    <div class="completion-header">✅ Resolution Work Proof</div>
+                    <div class="image-container" (click)="openPhotoModal('http://localhost:5000' + comp.completionPhotoUrl)">
+                      <img [src]="'http://localhost:5000' + comp.completionPhotoUrl" class="completion-img" alt="Work completion proof"/>
+                      <div class="image-overlay">🔍 Tap to Zoom</div>
+                    </div>
+                  </div>
+
+                  <!-- Feedback -->
+                  <div class="feedback-section" *ngIf="comp.status === 'resolved'">
+                    <div *ngIf="!comp.feedbackRating; else ratedState">
+                      <p class="feedback-prompt">Rate this resolution:</p>
+                      <div class="stars">
+                        <span *ngFor="let star of [1,2,3,4,5]"
+                              (click)="selectRating(comp.id, star)"
+                              [class.active]="(tempRating[comp.id] || 0) >= star"
+                              class="star">★</span>
+                      </div>
+                      <div class="feedback-comment-box animate-fade" *ngIf="tempRating[comp.id]">
+                        <textarea
+                          class="form-input feedback-textarea"
+                          [(ngModel)]="tempComment[comp.id]"
+                          placeholder="Add comments/suggestions (Optional)..."
+                          rows="2">
+                        </textarea>
+                        <button class="btn btn-primary submit-feedback-btn" (click)="submitComplaintFeedback(comp.id)">
+                          Submit Rating & Feedback
+                        </button>
+                      </div>
+                    </div>
+                    <ng-template #ratedState>
+                      <div class="rated-display">
+                        <p class="rated-stars">⭐ Rated: <strong>{{ comp.feedbackRating }}/5</strong></p>
+                        <p class="rated-comment" *ngIf="comp.feedbackComment">
+                          💬 <em>"{{ comp.feedbackComment }}"</em>
+                        </p>
+                      </div>
+                    </ng-template>
+                  </div>
+
+                  <button class="btn btn-secondary btn-collapse" (click)="toggleExpand(null)">Collapse ↑</button>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="filteredComplaints.length === 0" class="empty-state">
+              <span class="empty-icon">📭</span>
+              <p>No tickets matching this filter.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: ALERTS -->
+        <div *ngIf="activeTab === 'profile'" class="tab-panel animate-fade">
+          <div class="notif-header-row">
+            <h4 class="page-title">🔔 Alerts</h4>
+            <div class="notif-header-btns" *ngIf="notifications.length > 0">
+              <button class="clear-notif-btn" (click)="clearAllNotifications()">
+                Mark all read ✓
+              </button>
+              <button class="delete-all-notif-btn" (click)="deleteAllNotifications()">
+                🗑️ Delete All
+              </button>
+            </div>
+          </div>
+
+          <div class="notifications-list" *ngIf="notifications.length > 0">
+            <div class="card notif-card clickable-notice" [class.unread]="!notif.isRead" *ngFor="let notif of notifications" (click)="onNotificationClick(notif)">
+              <div class="notif-meta">
+                <span class="notif-badge-icon">{{ getNotifIcon(notif.type) }}</span>
+                <span class="notif-time">{{ notif.createdAt | date:'shortTime' }}</span>
+                <button class="notif-delete-btn" (click)="deleteNotification(notif.id, $event)" title="Delete notification">🗑️</button>
+              </div>
+              <p class="notif-msg">{{ notif.message }}</p>
+              <div class="notice-tap-hint">Tap to view details 🔎</div>
+            </div>
+          </div>
+          <div *ngIf="notifications.length === 0" class="empty-state">
+            <span class="empty-icon">🔔</span>
+            <p>No notifications yet.</p>
+          </div>
+        </div>
+
+        <!-- TAB 4: EDIT PROFILE -->
+        <div *ngIf="activeTab === 'my-profile'" class="tab-panel animate-fade">
+          <h4 class="page-title">👤 Edit Profile</h4>
+          
+          <div class="form-container">
+            <form (ngSubmit)="onProfileSubmit()" #profileForm="ngForm">
+              <div *ngIf="profileError" class="alert alert-danger">{{ profileError }}</div>
+              <div *ngIf="profileSuccess" class="alert alert-success">{{ profileSuccess }}</div>
+
+              <!-- Profile Pic Section -->
+              <div class="form-group" style="text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 20px;">
+                <label class="form-label">Profile Picture</label>
+                <div class="profile-pic-container" style="position: relative; width: 100px; height: 100px; border-radius: 50%; border: 2px solid var(--primary); overflow: hidden; background: #f1f5f9; display: flex; justify-content: center; align-items: center; box-shadow: var(--shadow-md);">
+                  <img *ngIf="profilePreviewUrl" [src]="profilePreviewUrl" style="width: 100%; height: 100%; object-fit: cover;" />
+                  <span *ngIf="!profilePreviewUrl" style="font-size: 40px; color: #94a3b8;">🎓</span>
+                </div>
+                <input type="file" (change)="onProfilePicChange($event)" accept="image/*" class="file-input" id="profilePicFile" style="display: none;"/>
+                <label for="profilePicFile" class="btn btn-secondary" style="cursor: pointer; font-size: 12px; padding: 6px 12px;">
+                  📷 Choose Photo
+                </label>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="profileName">Full Name</label>
+                <input 
+                  type="text" 
+                  id="profileName" 
+                  name="profileName" 
+                  class="form-input" 
+                  [(ngModel)]="editUser.name" 
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="profilePhone">Phone Number</label>
+                <input 
+                  type="text" 
+                  id="profilePhone" 
+                  name="profilePhone" 
+                  class="form-input" 
+                  [(ngModel)]="editUser.phone" 
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="profileBio">Bio</label>
+                <textarea 
+                  id="profileBio" 
+                  name="profileBio" 
+                  class="form-input" 
+                  rows="3" 
+                  placeholder="Tell us about yourself..."
+                  [(ngModel)]="editUser.bio"
+                ></textarea>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-submit" [disabled]="!profileForm.form.valid || updatingProfile">
+                <span *ngIf="updatingProfile">Updating...</span>
+                <span *ngIf="!updatingProfile">Save Changes</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Attendance History Section -->
+          <div class="card mess-card" style="margin-top: 20px;">
+            <h5>📋 My Attendance History</h5>
+            
+            <div *ngIf="isLoadingAttendance" class="skeleton-list">
+              <div class="skeleton skeleton-card"></div>
+            </div>
+
+            <div *ngIf="!isLoadingAttendance && attendanceStats">
+              <!-- Attendance Stats Metrics -->
+              <div class="feedback-metrics" style="margin-bottom: 20px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;">
+                <div class="metric-box">
+                  <div class="metric-val" [style.color]="attendanceStats.percentage >= 75 ? '#22c55e' : '#ef4444'">
+                    {{ attendanceStats.percentage }}%
+                  </div>
+                  <div class="metric-lbl">Attendance</div>
+                </div>
+                <div class="metric-box">
+                  <div class="metric-val">{{ attendanceStats.total }}</div>
+                  <div class="metric-lbl">Total Days</div>
+                </div>
+                <div class="metric-box">
+                  <div class="metric-val" style="color: #22c55e;">{{ attendanceStats.present }}</div>
+                  <div class="metric-lbl">Present</div>
+                </div>
+                <div class="metric-box">
+                  <div class="metric-val" style="color: #ef4444;">{{ attendanceStats.absent }}</div>
+                  <div class="metric-lbl">Absent</div>
+                </div>
+                <div class="metric-box">
+                  <div class="metric-val" style="color: #eab308;">{{ attendanceStats.outing }}</div>
+                  <div class="metric-lbl">Outing</div>
+                </div>
+              </div>
+
+              <!-- Attendance History List -->
+              <h6 style="margin-top: 14px; margin-bottom: 8px;">Recent Days Roll Call</h6>
+              <div class="comments-list" *ngIf="attendanceHistory.length > 0; else noAttendance">
+                <div class="comment-item" *ngFor="let att of attendanceHistory" style="flex-direction: row; justify-content: space-between; align-items: center; padding: 10px 14px;">
+                  <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                    📅 {{ att.date | date:'EEEE, MMM d, y' }}
+                  </span>
+                  
+                  <span class="badge" [class]="'badge-' + att.status">
+                    {{ att.status | titlecase }}
+                  </span>
+                </div>
+              </div>
+              <ng-template #noAttendance>
+                <p style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 12px 0;">No attendance records found yet.</p>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- TAB 5: MESS MANAGEMENT -->
+        <div *ngIf="activeTab === 'mess'" class="tab-panel animate-fade">
+          <h4 class="page-title">🍴 Mess Management</h4>
+
+          <div *ngIf="messSuccess" class="alert alert-success">{{ messSuccess }}</div>
+          <div *ngIf="messError" class="alert alert-danger">{{ messError }}</div>
+
+          <div class="mess-container">
+            <!-- 1. Today's Skip Meal Switch Panel -->
+            <div class="card mess-card">
+              <h5>🚪 Waste Minimizer / Skip Meal</h5>
+              <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">
+                Leaving the campus or eating out? Let the mess know in advance to minimize food waste.
+              </p>
+              
+              <div class="skip-meal-grid">
+                <!-- Today's skips -->
+                <div class="skip-meal-day">
+                  <h6>Today ({{ getTodayDateString() | date:'EEEE, MMM d' }})</h6>
+                  <div class="skip-buttons">
+                    <button type="button" class="btn-skip" [class.skipped]="isMealSkipped('breakfast', getTodayDateString())" (click)="toggleSkip('breakfast', getTodayDateString())">
+                      🍳 Breakfast
+                    </button>
+                    <button type="button" class="btn-skip" [class.skipped]="isMealSkipped('lunch', getTodayDateString())" (click)="toggleSkip('lunch', getTodayDateString())">
+                      🍛 Lunch
+                    </button>
+                    <button type="button" class="btn-skip" [class.skipped]="isMealSkipped('dinner', getTodayDateString())" (click)="toggleSkip('dinner', getTodayDateString())">
+                      🍽️ Dinner
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Tomorrow's skips -->
+                <div class="skip-meal-day">
+                  <h6>Tomorrow ({{ getTomorrowDateString() | date:'EEEE, MMM d' }})</h6>
+                  <div class="skip-buttons">
+                    <button type="button" class="btn-skip" [class.skipped]="isMealSkipped('breakfast', getTomorrowDateString())" (click)="toggleSkip('breakfast', getTomorrowDateString())">
+                      🍳 Breakfast
+                    </button>
+                    <button type="button" class="btn-skip" [class.skipped]="isMealSkipped('lunch', getTomorrowDateString())" (click)="toggleSkip('lunch', getTomorrowDateString())">
+                      🍛 Lunch
+                    </button>
+                    <button type="button" class="btn-skip" [class.skipped]="isMealSkipped('dinner', getTomorrowDateString())" (click)="toggleSkip('dinner', getTomorrowDateString())">
+                      🍽️ Dinner
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. Today's Menu Display -->
+            <div class="card mess-card today-menu-card">
+              <div class="menu-header">
+                <h5>📅 Weekly Mess Menu</h5>
+                <span class="day-badge">Today: {{ getDayOfWeekName() }}</span>
+              </div>
+
+              <div *ngIf="isLoadingMess" class="skeleton-list">
+                <div class="skeleton skeleton-card"></div>
+                <div class="skeleton skeleton-card"></div>
+              </div>
+
+              <div class="menu-list" *ngIf="!isLoadingMess">
+                <div class="menu-day-row" *ngFor="let m of messMenu" [class.active-day]="m.dayOfWeek === getDayOfWeekName()">
+                  <div class="day-name">
+                    {{ m.dayOfWeek }}
+                    <span class="today-marker" *ngIf="m.dayOfWeek === getDayOfWeekName()">TODAY</span>
+                  </div>
+                  <div class="day-meals">
+                    <div class="meal-item">
+                      <span class="meal-label">🍳 Breakfast:</span>
+                      <span class="meal-text">{{ m.breakfast }}</span>
+                    </div>
+                    <div class="meal-item">
+                      <span class="meal-label">🍛 Lunch:</span>
+                      <span class="meal-text">{{ m.lunch }}</span>
+                    </div>
+                    <div class="meal-item">
+                      <span class="meal-label">🍽️ Dinner:</span>
+                      <span class="meal-text">{{ m.dinner }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Real-time Feedback Submission -->
+            <div class="card mess-card">
+              <h5>⭐ Daily Meal Quality Feedback</h5>
+              <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">
+                How was the food today? Share your thoughts to help us improve quality.
+              </p>
+
+              <form (ngSubmit)="submitMessFeedback()" #messFeedbackForm="ngForm">
+                <div class="form-group">
+                  <label class="form-label">Select Meal</label>
+                  <div class="custom-dropdown-container">
+                    <button type="button" class="form-input custom-dropdown-trigger" (click)="toggleMessMealDropdown($event)">
+                      <span class="selected-text">{{ getMessMealLabel() }}</span>
+                      <span class="dropdown-arrow">▼</span>
+                    </button>
+                    
+                    <div class="custom-dropdown-menu animate-fade" *ngIf="isMessMealDropdownOpen">
+                      <div class="custom-dropdown-item" [class.selected]="selectedMessMeal === 'breakfast'" (click)="selectMessMeal('breakfast')">
+                        Breakfast
+                      </div>
+                      <div class="custom-dropdown-item" [class.selected]="selectedMessMeal === 'lunch'" (click)="selectMessMeal('lunch')">
+                        Lunch
+                      </div>
+                      <div class="custom-dropdown-item" [class.selected]="selectedMessMeal === 'dinner'" (click)="selectMessMeal('dinner')">
+                        Dinner
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Rating</label>
+                  <div class="stars" style="margin-bottom: 8px;">
+                    <span *ngFor="let star of [1,2,3,4,5]"
+                          (click)="tempMessRating = star"
+                          [class.active]="tempMessRating >= star"
+                          class="star">★</span>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="messComment">Comments (Optional)</label>
+                  <textarea 
+                    id="messComment" 
+                    name="messComment" 
+                    class="form-input" 
+                    rows="2" 
+                    placeholder="Provide your feedback here..." 
+                    [(ngModel)]="tempMessComment">
+                  </textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary submit-feedback-btn">
+                  Submit Feedback
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 6: BATCH GROUP CHAT -->
+        <div *ngIf="activeTab === 'chat'" class="tab-panel animate-fade">
+          <h4 class="page-title">💬 Hostel Batch Chat</h4>
+
+          <!-- Group Room Selector Bar if multiple available -->
+          <div *ngIf="myChatGroups.length > 1" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; padding-bottom: 4px;">
+            <button 
+              type="button"
+              *ngFor="let g of myChatGroups"
+              class="pill-btn"
+              [class.active]="activeChatGroup?.id === g.id"
+              (click)="openChatGroup(g)"
+              style="white-space: nowrap; font-size: 12px; padding: 6px 14px; cursor: pointer; position: relative; display: inline-flex; align-items: center; gap: 6px;"
+            >
+              👥 {{ g.name }}
+              <span class="channel-badge animate-scale" *ngIf="unreadCounts[g.id] > 0">{{ unreadCounts[g.id] }}</span>
+            </button>
+          </div>
+
+          <!-- Group Room Card -->
+          <div class="card mess-card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; height: calc(100vh - 220px); min-height: 480px;">
+            
+            <!-- Room Header -->
+            <div style="background: var(--primary-light); padding: 12px 18px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; min-height: 54px;">
+              <div *ngIf="!isMultiSelectMode">
+                <strong style="font-size: 15px; color: var(--primary-dark); display: flex; align-items: center; gap: 6px;">
+                  👥 {{ activeChatGroup?.name || 'Batch Group Chat' }}
+                </strong>
+                <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
+                  🔒 Segregated for {{ user?.gender === 'female' ? 'Girls' : 'Boys' }} · {{ user?.batch || 'Batch 2025' }}
+                </div>
+              </div>
+
+              <!-- Normal Mode Right Actions -->
+              <div *ngIf="!isMultiSelectMode" style="display: flex; align-items: center; gap: 8px;">
+                <button type="button" class="btn" style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); font-size: 11.5px; padding: 4px 10px; border-radius: 6px; font-weight: 600; cursor: pointer;" (click)="toggleMultiSelectMode()">
+                  ☑️ Select
+                </button>
+                <span class="day-badge" style="background: var(--primary); color: white;">LIVE CHAT</span>
+              </div>
+
+              <!-- Multi-Select Action Bar -->
+              <div *ngIf="isMultiSelectMode" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                <span style="font-size: 13.5px; font-weight: 700; color: var(--primary-dark);">
+                  ☑️ {{ selectedMessageIds.size }} selected
+                </span>
+
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <button type="button" class="btn" style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); font-size: 12px; padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer;" (click)="bulkDeleteForMe()" [disabled]="selectedMessageIds.size === 0">
+                    🙈 Delete for Me ({{ selectedMessageIds.size }})
+                  </button>
+                  <button type="button" class="btn btn-primary" style="background: #ef4444; color: white; border: none; font-size: 12px; padding: 6px 12px; border-radius: 6px; font-weight: 700; cursor: pointer;" (click)="bulkDeleteForEveryone()" [disabled]="selectedMessageIds.size === 0">
+                    💥 Delete for Everyone ({{ selectedMessageIds.size }})
+                  </button>
+                  <button type="button" class="btn" style="background: transparent; border: none; color: var(--text-muted); font-size: 16px; padding: 4px 8px; cursor: pointer;" (click)="clearMessageSelection()">
+                    ✕
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Messages Stream Area -->
+            <div id="studentChatFeed" (scroll)="onChatStreamScroll()" style="flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: var(--bg-muted);">
+
+              <!-- Clean Spinner Loader -->
+              <div *ngIf="isLoadingChat" style="margin: auto; display: flex; flex-direction: column; align-items: center; gap: 10px; color: var(--text-muted); padding: 40px 0;">
+                <div style="width: 32px; height: 32px; border: 3px solid rgba(99, 102, 241, 0.2); border-top-color: #6366f1; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                <span style="font-size: 13px; font-weight: 600;">Loading chat messages...</span>
+              </div>
+
+              <div *ngIf="!isLoadingChat && chatMessages.length === 0" class="empty-state" style="margin: auto;">
+                <span class="empty-icon">💬</span>
+                <p>No messages yet in this group chat. Be the first to say hello!</p>
+              </div>
+
+              <div *ngFor="let msg of chatMessages; let i = index" [style.align-self]="msg.senderId === user?.id ? 'flex-end' : 'flex-start'" style="max-width: 78%; display: flex; flex-direction: column; position: relative;" (click)="isMultiSelectMode && !msg.isDeleted ? toggleMessageSelection(msg.id, $event) : null">
+                
+                <!-- Inline Delete Options Popover right at the message bubble -->
+                <div *ngIf="selectedMsgForDelete?.id === msg.id && !isMultiSelectMode" 
+                  [style.right]="msg.senderId === user?.id ? '0' : 'auto'"
+                  [style.left]="msg.senderId === user?.id ? 'auto' : '0'"
+                  [style.top]="i === 0 ? '100%' : 'auto'"
+                  [style.bottom]="i === 0 ? 'auto' : '100%'"
+                  [style.margin-top]="i === 0 ? '4px' : '0'"
+                  [style.margin-bottom]="i === 0 ? '0' : '4px'"
+                  style="position: absolute; z-index: 1000; background: #1e293b; color: white; border: 1px solid #334155; border-radius: 12px; padding: 6px; display: flex; flex-direction: column; gap: 4px; min-width: 175px; box-shadow: 0 10px 25px rgba(0,0,0,0.6);"
+                  (click)="$event.stopPropagation()"
+                >
+                  <button 
+                    type="button" 
+                    (click)="confirmDeleteForMe(); $event.stopPropagation()"
+                    style="background: transparent; border: none; color: white; text-align: left; padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;"
+                  >
+                    <span>🙈</span>
+                    <span>Delete for Me</span>
+                  </button>
+                  <button 
+                    type="button" 
+                    *ngIf="msg.senderId === user?.id || user?.role === 'warden' || user?.role === 'admin'"
+                    (click)="confirmDeleteForEveryone(); $event.stopPropagation()"
+                    style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; text-align: left; padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px;"
+                  >
+                    <span>💥</span>
+                    <span>Delete for Everyone</span>
+                  </button>
+                  <button 
+                    type="button" 
+                    (click)="startMultiSelectWithMsg(msg); $event.stopPropagation()"
+                    style="background: transparent; border: none; color: #94a3b8; text-align: left; padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;"
+                  >
+                    <span>☑️</span>
+                    <span>Select Messages</span>
+                  </button>
+                </div>
+
+                <!-- Sender Info for non-self messages -->
+                <div *ngIf="msg.senderId !== user?.id && !msg.isDeleted" style="font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                  <span *ngIf="isMultiSelectMode" style="font-size: 12px;">{{ isMessageSelected(msg.id) ? '☑️' : '🔲' }}</span>
+                  <span>{{ msg.sender?.name }}</span>
+                  <span *ngIf="msg.sender?.role === 'warden'" style="background: #ef4444; color: white; padding: 1px 6px; border-radius: 4px; font-size: 9px; font-weight: 800;">👨‍💼 WARDEN</span>
+                  <span *ngIf="msg.sender?.role === 'student'" style="color: var(--text-muted); font-size: 10px; font-weight: 500;">(Room {{ msg.sender?.roomNumber }})</span>
+                </div>
+
+                <!-- Normal Active Message Bubble -->
+                <div *ngIf="!msg.isDeleted"
+                  [style.background]="isMessageSelected(msg.id) ? 'rgba(99, 102, 241, 0.25)' : (msg.senderId === user?.id ? '#6366f1' : (msg.sender?.role === 'warden' ? 'rgba(239, 68, 68, 0.12)' : 'var(--bg-card)'))"
+                  [style.color]="msg.senderId === user?.id ? 'white' : 'var(--text-primary)'"
+                  [style.border]="isMessageSelected(msg.id) ? '2px solid #6366f1' : (msg.senderId === user?.id ? 'none' : (msg.sender?.role === 'warden' ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid var(--border-color)'))"
+                  [style.border-radius]="msg.senderId === user?.id ? '16px 16px 4px 16px' : '16px 16px 16px 4px'"
+                  style="padding: 12px 16px; font-size: 13.5px; line-height: 1.5; word-break: break-word; box-shadow: 0 2px 6px rgba(0,0,0,0.06); display: flex; flex-direction: column; gap: 6px; cursor: pointer;"
+                >
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span *ngIf="isMultiSelectMode && msg.senderId === user?.id" style="font-size: 12px;">{{ isMessageSelected(msg.id) ? '☑️' : '🔲' }}</span>
+                      <span *ngIf="msg.message">{{ msg.message }}</span>
+                    </div>
+                    <button 
+                      type="button"
+                      *ngIf="!isMultiSelectMode && msg.senderId === user?.id"
+                      (click)="openDeleteOptions(msg); $event.stopPropagation()"
+                      title="Delete message options"
+                      style="background: none; border: none; cursor: pointer; font-size: 11px; opacity: 0.6; line-height: 1; padding: 2px;"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+
+                  <!-- Attached Image View -->
+                  <div *ngIf="msg.attachmentUrl" style="margin-top: 4px;">
+                    <img 
+                      [src]="getImageUrl(msg.attachmentUrl)" 
+                      style="max-width: 240px; max-height: 200px; border-radius: 10px; cursor: pointer; object-fit: cover; box-shadow: 0 2px 8px rgba(0,0,0,0.2); display: block;" 
+                    />
+                  </div>
+                </div>
+
+                <!-- Deleted Message Placeholder Bubble -->
+                <div *ngIf="msg.isDeleted"
+                  style="background: var(--bg-card); color: var(--text-muted); border: 1px dashed var(--border-color); border-radius: 12px; padding: 10px 14px; font-size: 12px; font-style: italic; display: flex; align-items: center; gap: 6px;"
+                >
+                  <span>🚫 This message was deleted by {{ msg.deletedByName || 'User' }}</span>
+                </div>
+
+                <!-- Timestamp -->
+                <div [style.text-align]="msg.senderId === user?.id ? 'right' : 'left'" style="font-size: 9.5px; color: var(--text-muted); margin-top: 4px; font-weight: 600;">
+                  {{ msg.createdAt | date:'shortTime' }}
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- Chat Input Preview Box -->
+            <div *ngIf="chatFilePreviewUrl" style="padding: 10px 14px; background: var(--bg-muted); border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <img [src]="chatFilePreviewUrl" style="width: 42px; height: 42px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-color);" />
+                <span style="font-size: 12px; font-weight: 600; color: var(--text-primary);">📷 Photo attached</span>
+              </div>
+              <button type="button" (click)="clearChatFile()" style="background: none; border: none; color: #ef4444; font-size: 16px; cursor: pointer;">✕</button>
+            </div>
+
+            <!-- Chat Input Footer -->
+            <div style="padding: 14px; background: var(--bg-card); border-top: 1px solid var(--border-color); display: flex; gap: 10px; align-items: center; width: 100%;">
+              <input type="file" #chatFileInput (change)="onChatFileSelected($event)" accept="image/*" style="display: none;" />
+              <button 
+                type="button" 
+                class="btn" 
+                style="width: 44px !important; height: 44px; flex: none !important; flex-shrink: 0 !important; background: var(--bg-muted); border: 1px solid var(--border-color); font-size: 18px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; cursor: pointer;" 
+                (click)="chatFileInput.click()"
+                title="Attach image"
+              >
+                📷
+              </button>
+              <input 
+                type="text" 
+                id="studentChatInput"
+                class="form-input" 
+                style="flex: 1 !important; min-width: 0 !important; width: 100% !important; height: 44px; font-size: 14px; color: var(--text-primary); background: var(--bg-muted); border: 1px solid var(--border-color); padding: 0 16px; border-radius: var(--radius-md);"
+                placeholder="Type your message here..." 
+                [(ngModel)]="newChatMessageText" 
+                (keydown.enter)="sendStudentChatMessage(); $event.preventDefault()"
+              />
+              <button 
+                type="button" 
+                class="btn btn-primary" 
+                style="width: auto !important; flex: none !important; flex-shrink: 0 !important; height: 44px; padding: 0 20px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 13.5px; font-weight: 700; border-radius: var(--radius-md);"
+                [disabled]="(!newChatMessageText || !newChatMessageText.trim()) && !selectedChatFile"
+                (mousedown)="$event.preventDefault()"
+                (click)="sendStudentChatMessage()"
+              >
+                <span>Send</span>
+                <span>✈️</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom Tab Navigation (displayed as top-nav by global CSS) -->
+      <div class="bottom-tabs">
+        <button type="button" class="tab-item" [class.active]="activeTab === 'home'" (click)="switchTab('home')">
+          <span class="tab-icon">🏠</span>
+          <span>Home</span>
+        </button>
+        <button type="button" class="tab-item" [class.active]="activeTab === 'raise'" (click)="switchTab('raise')">
+          <span class="tab-icon">➕</span>
+          <span>Raise</span>
+        </button>
+        <button type="button" class="tab-item" [class.active]="activeTab === 'mess'" (click)="switchTab('mess')">
+          <span class="tab-icon">🍴</span>
+          <span>Mess</span>
+        </button>
+        <button type="button" class="tab-item" [class.active]="activeTab === 'chat'" (click)="switchTab('chat')">
+          <span class="tab-icon">
+            💬
+            <span class="tab-badge animate-scale" *ngIf="totalUnreadChatCount > 0">{{ totalUnreadChatCount }}</span>
+          </span>
+          <span>Chat</span>
+        </button>
+        <button type="button" class="tab-item" [class.active]="activeTab === 'my-complaints'" (click)="switchTab('my-complaints')">
+          <span class="tab-icon">📋</span>
+          <span>My Tickets</span>
+        </button>
+        <button type="button" class="tab-item" [class.active]="activeTab === 'profile'" (click)="switchTab('profile')">
+          <span class="tab-icon">
+            🔔
+            <span class="tab-badge animate-scale" *ngIf="getUnreadNotificationsCount() > 0">{{ getUnreadNotificationsCount() }}</span>
+          </span>
+          <span>Alerts</span>
+        </button>
+        <button type="button" class="tab-item" [class.active]="activeTab === 'my-profile'" (click)="switchTab('my-profile')">
+          <span class="tab-icon">👤</span>
+          <span>Profile</span>
+        </button>
+      </div>
+
+
+      <!-- Footer -->
+      <footer class="footer animate-fade" *ngIf="footerSettings">
+        <div class="footer-content">
+          <p class="footer-title">{{ footerSettings.footer_text }}</p>
+          <div class="footer-meta">
+            <span *ngIf="footerSettings.footer_email">📧 {{ footerSettings.footer_email }}</span>
+            <span *ngIf="footerSettings.footer_phone">📞 {{ footerSettings.footer_phone }}</span>
+          </div>
+          <p class="footer-copyright">{{ footerSettings.footer_copyright }}</p>
+        </div>
+      </footer>
+    </div>
+  `,
+  styles: [`
+    .dashboard-container {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background-color: var(--bg-body);
+    }
+
+    /* Header */
+    .header {
+      background: var(--bg-header);
+      color: #f8fafc;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+      box-shadow: 0 2px 20px rgba(0,0,0,0.2);
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    .user-info { display: flex; align-items: center; gap: 12px; }
+    .avatar-ring {
+      width: 42px;
+      height: 42px;
+      background: rgba(99, 102, 241, 0.2);
+      border: 1.5px solid rgba(99,102,241,0.6);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 0 14px rgba(99, 102, 241, 0.25);
+    }
+    .avatar { font-size: 20px; }
+    h3 { font-size: 15px; font-weight: 700; color: #f8fafc; letter-spacing: 0.1px; }
+    .user-meta { font-size: 11px; color: rgba(248,250,252,0.55); margin-top: 2px; }
+
+    .header-actions { display: flex; align-items: center; gap: 6px; }
+
+    .logout-btn {
+      background: rgba(239,68,68,0.15);
+      border: 1px solid rgba(239,68,68,0.35);
+      color: #f87171;
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all var(--transition-fast);
+      font-family: var(--font-sans);
+    }
+    .logout-btn:hover { background: rgba(239,68,68,0.85); color: white; }
+
+    /* Content area */
+    .tab-content-area {
+      flex: 1;
+      padding: 24px 20px 80px;
+      max-width: 760px;
+      width: 100%;
+      margin: 0 auto;
+      background-color: var(--bg-body);
+    }
+
+    .tab-panel { display: flex; flex-direction: column; }
+
+    /* My Tickets Header Row */
+    .my-tickets-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .btn-raise-shortcut {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: var(--transition-fast);
+      box-shadow: 0 4px 10px rgba(99,102,241,0.25);
+    }
+    .btn-raise-shortcut:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+    /* Skeleton */
+    .skeleton-list { display: flex; flex-direction: column; gap: 12px; }
+
+    /* Welcome Banner */
+    .welcome-card {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: white;
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 12px 28px rgba(79, 70, 229, 0.35);
+      position: relative;
+      overflow: hidden;
+    }
+    .welcome-card::before {
+      content: '';
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 50%;
+      top: -60px;
+      right: -60px;
+      pointer-events: none;
+    }
+    .welcome-card::after {
+      content: '';
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 50%;
+      bottom: -30px;
+      left: 20px;
+      pointer-events: none;
+    }
+    .welcome-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .welcome-card h4 { font-size: 18px; font-weight: 800; margin-bottom: 8px; color: white; }
+    .welcome-card p { font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.5; }
+    .btn-raise-cta {
+      background: rgba(255,255,255,0.95);
+      color: #4f46e5;
+      margin-top: 16px;
+      padding: 10px 20px;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      width: auto;
+      display: inline-flex;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      font-family: var(--font-sans);
+      font-size: 13.5px;
+      cursor: pointer;
+      border: none;
+      transition: all var(--transition-fast);
+      position: relative;
+      z-index: 5;
+    }
+    .btn-raise-cta:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+
+    /* Section Header */
+    .section-header {
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .section-header h4 { font-size: 14px; font-weight: 700; color: var(--text-secondary); }
+
+    /* Notice Cards */
+    .notice-card {
+      border-left: 4px solid var(--primary);
+      background-color: var(--bg-card);
+      cursor: pointer;
+    }
+    .notice-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10.5px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .notice-title { font-size: 13.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+    .notice-body { font-size: 12px; color: var(--text-secondary); line-height: 1.45; }
+    .notice-tap-hint { font-size: 10px; color: var(--primary); font-weight: 700; text-align: right; margin-top: 8px; }
+
+    /* Category Grid */
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .category-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 14px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      text-align: center;
+      transition: all var(--transition-fast);
+      box-shadow: var(--shadow-sm);
+    }
+    .category-card:hover { border-color: var(--primary); background-color: var(--primary-light); }
+    .category-card:active { transform: scale(0.95); }
+    .category-card.selected {
+      border-color: var(--primary);
+      background-color: var(--primary-light);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+    .cat-icon { font-size: 22px; margin-bottom: 5px; }
+    .cat-name { font-size: 11px; font-weight: 700; color: var(--text-secondary); }
+    .category-card.selected .cat-name { color: var(--primary-dark); }
+
+    /* Upload */
+    .upload-area { position: relative; width: 100%; }
+    .file-input-label {
+      border: 2px dashed var(--border-color);
+      border-radius: var(--radius-md);
+      background-color: var(--bg-muted);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      gap: 4px;
+    }
+    .file-input-label:hover { border-color: var(--primary); background-color: var(--primary-light); }
+    .upload-icon { font-size: 26px; }
+    .upload-text { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+    .upload-subtext { font-size: 10px; color: var(--text-muted); }
+    .file-input { display: none; }
+
+    .preview-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-md);
+    }
+    .preview-thumbnail { width: 60px; height: 60px; border-radius: var(--radius-sm); object-fit: cover; }
+    .preview-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+    .preview-name { font-size: 12px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+    .btn-remove-file { background: none; border: none; color: var(--danger); font-size: 11px; font-weight: 700; cursor: pointer; text-align: left; width: fit-content; padding: 2px 0; }
+    .btn-submit { margin-top: 12px; }
+
+    /* Filter Pills */
+    .filter-pills { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .pill-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 7px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+    }
+    .pill-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .pill-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      box-shadow: 0 4px 10px var(--primary-glow);
+    }
+
+    /* Complaint Card */
+    .complaint-card {
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+      overflow: hidden;
+      padding: 0;
+    }
+    .comp-summary { padding: 18px; }
+    .comp-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .comp-date { font-size: 10.5px; color: var(--text-muted); font-weight: 500; }
+    .comp-title { font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+    .comp-category-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      background-color: var(--bg-muted);
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      margin-bottom: 10px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+    }
+    .comp-desc-short { font-size: 12.5px; color: var(--text-muted); line-height: 1.45; }
+    .tap-hint { font-size: 10.5px; color: var(--primary); font-weight: 700; text-align: right; margin-top: 8px; }
+
+    /* Expanded Details */
+    .comp-details {
+      padding: 0 18px 18px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .comp-desc-full { font-size: 13px; color: var(--text-secondary); line-height: 1.55; padding-top: 12px; }
+    .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; letter-spacing: 0.5px; }
+
+    /* Images */
+    .image-container { position: relative; border-radius: var(--radius-md); overflow: hidden; cursor: zoom-in; }
+    .comp-img, .completion-img { width: 100%; max-height: 180px; object-fit: cover; display: block; border-radius: var(--radius-md); transition: transform 0.25s ease; }
+    .image-container:hover .comp-img, .image-container:hover .completion-img { transform: scale(1.02); }
+    .image-overlay { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.5); color: white; text-align: center; font-size: 10px; font-weight: 700; padding: 4px 0; backdrop-filter: blur(2px); }
+
+    /* Staff */
+    .staff-assignment {
+      background: var(--primary-light);
+      border: 1px solid rgba(99,102,241,0.2);
+      border-radius: var(--radius-md);
+      padding: 14px;
+    }
+    .staff-header { font-size: 11px; font-weight: 700; color: var(--primary-dark); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
+    .staff-body { display: flex; justify-content: space-between; align-items: center; }
+    .staff-name { font-size: 13px; color: var(--text-primary); }
+    .staff-call-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      transition: all var(--transition-fast);
+    }
+    .staff-call-btn:hover { background: var(--primary); color: white; }
+
+    /* Completion */
+    .completion-header { font-size: 11px; font-weight: 700; color: var(--success); text-transform: uppercase; margin-bottom: 6px; }
+
+    /* Stars */
+    .feedback-section { background: var(--bg-muted); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 14px; }
+    .feedback-prompt { font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+    .stars { display: flex; gap: 6px; }
+    .star { font-size: 28px; color: var(--neutral-300); cursor: pointer; transition: all 0.15s ease; }
+    .star.active { color: #fbbf24; }
+    .star:hover { transform: scale(1.2); color: #fbbf24; }
+    .feedback-comment-box { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+    .feedback-textarea { font-size: 13px; }
+    .submit-feedback-btn { padding: 9px 16px; font-size: 12px; align-self: flex-end; width: auto; }
+    .rated-display { display: flex; flex-direction: column; gap: 4px; }
+    .rated-stars { font-size: 13px; color: var(--success); font-weight: 700; }
+    .rated-comment { font-size: 12px; color: var(--text-secondary); background: var(--bg-card); border-radius: 8px; padding: 6px 10px; border: 1px solid var(--border-color); }
+    .btn-collapse { margin-top: 4px; }
+
+    /* Notifications */
+    .notif-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .notif-header-btns { display: flex; gap: 8px; align-items: center; }
+    .clear-notif-btn { background: var(--primary-light); border: none; color: var(--primary); font-size: 12px; font-weight: 700; cursor: pointer; padding: 6px 12px; border-radius: var(--radius-sm); transition: var(--transition-fast); font-family: var(--font-sans); }
+    .clear-notif-btn:hover { background: var(--primary); color: white; }
+    .delete-all-notif-btn { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #f87171; font-size: 12px; font-weight: 700; cursor: pointer; padding: 6px 12px; border-radius: var(--radius-sm); transition: var(--transition-fast); font-family: var(--font-sans); }
+    .delete-all-notif-btn:hover { background: #ef4444; color: white; }
+    .notif-card { border-left: 4px solid var(--border-color); padding: 14px 16px; }
+    .notif-card.unread { border-left-color: var(--primary); background: var(--primary-light); }
+    .notif-meta { display: flex; justify-content: space-between; align-items: center; font-size: 10.5px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600; }
+    .notif-delete-btn { margin-left: auto; background: none; border: none; cursor: pointer; font-size: 14px; padding: 2px 6px; border-radius: var(--radius-sm); opacity: 0.5; transition: opacity 0.2s; line-height: 1; }
+    .notif-delete-btn:hover { opacity: 1; background: rgba(239,68,68,0.15); }
+    .notif-msg { font-size: 13px; color: var(--text-primary); line-height: 1.45; }
+
+    /* Toast */
+    .toast-alert {
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 500px;
+      background: #0f172a;
+      color: white;
+      border-radius: var(--radius-lg);
+      padding: 14px 18px;
+      box-shadow: var(--shadow-xl);
+      z-index: 2000;
+      animation: slideDown 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .toast-content { display: flex; align-items: center; gap: 12px; }
+    .toast-bell { font-size: 22px; flex-shrink: 0; }
+    .toast-text { flex: 1; }
+    .toast-text strong { font-size: 10.5px; color: var(--primary-light); text-transform: uppercase; letter-spacing: 0.5px; }
+    .toast-text p { font-size: 12.5px; color: #e2e8f0; margin-top: 2px; line-height: 1.35; }
+    .toast-close { font-size: 14px; color: rgba(255,255,255,0.5); flex-shrink: 0; }
+    @keyframes slideDown {
+      from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+      to { transform: translateX(-50%) translateY(0); opacity: 1; }
+    }
+
+    /* Photo Modal */
+    .photo-modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.88);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 3000;
+      backdrop-filter: blur(8px);
+    }
+    .modal-wrapper { position: relative; max-width: 90%; max-height: 85%; display: flex; justify-content: center; align-items: center; }
+    .close-modal { position: absolute; top: -48px; right: 0; background: none; border: none; color: white; font-size: 36px; cursor: pointer; }
+    .zoomed-image { max-width: 100%; max-height: 75vh; border-radius: var(--radius-lg); box-shadow: 0 25px 50px rgba(0,0,0,0.5); object-fit: contain; }
+
+    /* Notice Modal */
+    .notice-modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .notice-modal-dialog {
+      background: var(--bg-card);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: var(--shadow-xl);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      border: 1px solid var(--border-color);
+    }
+    .notice-modal-header { display: flex; justify-content: space-between; align-items: center; }
+    .notice-modal-badge { font-size: 10px; font-weight: 700; color: var(--primary); background: var(--primary-light); padding: 4px 10px; border-radius: var(--radius-full); letter-spacing: 0.5px; }
+    .notice-modal-close { background: var(--bg-muted); border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 13px; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; transition: var(--transition-fast); }
+    .notice-modal-close:hover { background: var(--danger-light); color: var(--danger); }
+    .notice-modal-title { font-size: 16px; font-weight: 800; color: var(--text-primary); line-height: 1.35; }
+    .notice-modal-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); padding: 8px 12px; background: var(--bg-muted); border-radius: var(--radius-sm); }
+    .notice-modal-body { font-size: 13.5px; color: var(--text-secondary); line-height: 1.65; white-space: pre-wrap; padding-top: 4px; }
+
+    /* Notif dot */
+    .notif-dot {
+      position: absolute;
+      top: 6px;
+      right: 10px;
+      width: 7px;
+      height: 7px;
+      background: var(--danger);
+      border-radius: 50%;
+      border: 1.5px solid var(--bg-nav);
+    }
+    .tab-item { position: relative; }
+
+    /* Priority Selector */
+    .priority-selector { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .priority-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 10px 4px;
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: var(--transition-fast);
+      background: var(--bg-card);
+    }
+    .priority-option span:first-child { font-size: 18px; }
+    .priority-option:hover { border-color: var(--primary); color: var(--primary); }
+    .priority-option.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary-dark); }
+
+    /* Clickable */
+    .clickable-notice { cursor: pointer; }
+    .clickable-notice:hover { border-color: rgba(99,102,241,0.3); }
+
+    /* Loading dots */
+    .loading-dots::after {
+      content: '...';
+      animation: dots 1.2s steps(4, end) infinite;
+    }
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60%, 100% { content: '...'; }
+    }
+
+    /* Form container */
+    .form-container {
+      background: var(--bg-card);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Footer Styling */
+    .footer {
+      order: 4;
+      margin-top: auto;
+      background-color: var(--bg-card);
+      border-top: 1px solid var(--border-color);
+      padding: 24px 16px;
+      text-align: center;
+      width: 100%;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+    }
+    .footer-content {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .footer-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .footer-meta {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .footer-copyright {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    /* Mess Management CSS */
+    .mess-container { display: flex; flex-direction: column; gap: 20px; }
+    .mess-card { border: 1px solid var(--border-color); background: var(--bg-card); border-radius: var(--radius-xl); padding: 20px; box-shadow: var(--shadow-sm); }
+    .skip-meal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 10px; }
+    @media (max-width: 500px) { .skip-meal-grid { grid-template-columns: 1fr; } }
+    .skip-meal-day h6 { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; border-left: 3px solid var(--primary); padding-left: 8px; }
+    .skip-buttons { display: flex; flex-direction: column; gap: 8px; }
+    .btn-skip {
+      background: var(--bg-muted);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      padding: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all var(--transition-fast);
+      font-family: var(--font-sans);
+    }
+    .btn-skip::after {
+      content: 'Eating';
+      font-size: 9px;
+      padding: 2px 6px;
+      background: rgba(34,197,94,0.15);
+      color: #22c55e;
+      border-radius: var(--radius-sm);
+    }
+    .btn-skip:hover { background: var(--primary-light); border-color: var(--primary); color: var(--primary-dark); }
+    .btn-skip.skipped {
+      border-color: rgba(239,68,68,0.4);
+      background: rgba(239,68,68,0.06);
+      color: #ef4444;
+    }
+    .btn-skip.skipped::after {
+      content: 'Skipping';
+      background: rgba(239,68,68,0.15);
+      color: #ef4444;
+    }
+
+    .today-menu-card { padding: 20px; }
+    .menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .day-badge { background: var(--primary-light); color: var(--primary-dark); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-full); }
+    .menu-list { display: flex; flex-direction: column; gap: 12px; }
+    .menu-day-row {
+      padding: 14px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      background: var(--bg-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: all var(--transition-fast);
+    }
+    .menu-day-row.active-day {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+    .day-name { font-size: 14px; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+    .today-marker { font-size: 9px; font-weight: 900; background: var(--primary); color: white; padding: 1px 5px; border-radius: 4px; }
+    .day-meals { display: flex; flex-direction: column; gap: 4px; }
+    .meal-item { font-size: 12.5px; display: flex; gap: 6px; }
+    .meal-label { font-weight: 700; color: var(--text-secondary); width: 85px; flex-shrink: 0; }
+    .meal-text { color: var(--text-primary); }
+
+    /* Attendance Badge CSS */
+    .badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      display: inline-block;
+    }
+    .badge-present { background: rgba(34,197,94,0.15); color: #22c55e; }
+    .badge-absent { background: rgba(239,68,68,0.15); color: #ef4444; }
+    .badge-outing { background: rgba(234,179,8,0.15); color: #eab308; }
+  `]
+})
+export class StudentDashboardComponent implements OnInit, OnDestroy {
+  user: User | null = null;
+  activeTab = 'home';
+  complaints: any[] = [];
+  announcements: any[] = [];
+  notifications: any[] = [];
+  isDarkMode = false;
+
+  isLoadingComplaints = true;
+  isLoadingAnnouncements = true;
+
+  // Dynamic Home Page Sections
+  wardens: any[] = [];
+  publicSettings: any = {
+    app_about: '',
+    app_how_it_works: '',
+    developer_team: []
+  };
+  isLoadingWardens = true;
+  isLoadingPublicSettings = true;
+
+  newComplaint = {
+    title: '',
+    category: '',
+    description: '',
+    priority: 'medium'
+  };
+  selectedFile: File | null = null;
+  imagePreviewUrl: string | null = null;
+
+  raising = false;
+  justSubmitted = false;
+  raiseError = '';
+  raiseSuccess = '';
+
+  filterStatus: 'all' | 'pending' | 'resolved' = 'all';
+  expandedComplaintId: number | null = null;
+  zoomPhotoUrl: string | null = null;
+  selectedNotice: any | null = null;
+
+  tempRating: { [id: number]: number } = {};
+  tempComment: { [id: number]: string } = {};
+
+  activeToast: LiveNotification | null = null;
+  private notifSub!: Subscription;
+  footerSettings: any = null;
+  editUser = { name: '', phone: '', bio: '' };
+  profilePreviewUrl: string | null = null;
+  selectedProfilePic: File | null = null;
+  updatingProfile = false;
+  profileError = '';
+  profileSuccess = '';
+
+  // Mess Management fields
+  messMenu: any[] = [];
+  mySkips: any[] = [];
+  isLoadingMess = false;
+  selectedMessMeal: 'breakfast' | 'lunch' | 'dinner' = 'breakfast';
+  isMessMealDropdownOpen = false;
+  tempMessRating = 5;
+  tempMessComment = '';
+  messSuccess = '';
+  messError = '';
+
+  // Attendance fields
+  attendanceStats: any = null;
+  attendanceHistory: any[] = [];
+  isLoadingAttendance = false;
+
+  // Chat fields
+  myChatGroups: any[] = [];
+  activeChatGroup: any = null;
+  chatMessages: any[] = [];
+  newChatMessageText = '';
+  isLoadingChat = false;
+  sendingChatMessage = false;
+  private chatSub!: Subscription;
+  unreadCounts: { [groupId: number]: number } = {};
+  get totalUnreadChatCount(): number {
+    return Object.values(this.unreadCounts).reduce((acc, val) => acc + val, 0);
+  }
+
+  constructor(
+    private authService: AuthService,
+    private complaintService: ComplaintService,
+    private socketService: SocketService,
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+    private messService: MessService,
+    private attendanceService: AttendanceService,
+    private chatService: ChatService
+  ) {}
+
+  switchTab(tab: string): void {
+    this.activeTab = tab;
+    if (tab === 'raise') {
+      this.raiseError = '';
+      this.raiseSuccess = '';
+    } else if (tab === 'mess') {
+      this.loadMessInfo();
+    } else if (tab === 'chat') {
+      this.loadMyChatGroups();
+      if (this.activeChatGroup) {
+        this.unreadCounts[this.activeChatGroup.id] = 0;
+      }
+    } else if (tab === 'my-complaints') {
+      this.loadComplaints();
+    } else if (tab === 'profile') {
+      this.clearAllNotifications();
+    } else if (tab === 'my-profile') {
+      this.initProfileEdit();
+      this.loadAttendanceStats();
+    }
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (e) {}
+    this.cdr.detectChanges();
+  }
+
+  ngOnInit(): void {
+    this.user = this.authService.currentUserValue;
+    this.loadAnnouncements();
+    this.loadComplaints();
+    this.loadNotifications();
+    this.loadFooterSettings();
+    this.loadMyChatGroups();
+    this.loadWardens();
+    this.loadPublicSettings();
+
+    // Restore dark mode preference
+    const saved = localStorage.getItem('hh_dark_mode');
+    if (saved === 'true') {
+      this.isDarkMode = true;
+      document.body.classList.add('dark-mode');
+    }
+
+
+    // Subscribe to live socket notifications
+    this.notifSub = this.socketService.notification$.subscribe(notif => {
+      if (notif) {
+        this.activeToast = notif;
+        this.loadNotifications();
+        this.loadComplaints();
+        setTimeout(() => { this.clearToast(); }, 3000);
+      }
+    });
+
+    // Subscribe to real-time group chat messages
+    this.chatSub = this.chatService.onNewMessage().subscribe(msg => {
+      if (this.activeChatGroup && msg.groupId === this.activeChatGroup.id && this.activeTab === 'chat') {
+        this.handleIncomingStudentChatMessage(msg);
+      } else {
+        // Increment unread count for the group
+        this.unreadCounts[msg.groupId] = (this.unreadCounts[msg.groupId] || 0) + 1;
+        this.cdr.detectChanges();
+
+        // Show toast notification for new messages in other chats or if not on the chat tab
+        if (this.user && msg.senderId !== this.user.id) {
+          const groupName = this.myChatGroups.find(g => g.id === msg.groupId)?.name || 'Group Chat';
+          this.activeToast = {
+            message: `💬 Message in "${groupName}" - ${msg.sender?.name || 'User'}: ${msg.message || 'sent an image'}`,
+            type: 'complaint_update',
+            createdAt: new Date()
+          } as any;
+          this.cdr.detectChanges();
+          setTimeout(() => this.clearToast(), 3000);
+        }
+      }
+    });
+
+    // Subscribe to real-time message deletion events
+    this.chatDeleteSub = this.chatService.onMessageDeletedEveryone().subscribe(data => {
+      if (this.activeChatGroup && data.groupId === this.activeChatGroup.id) {
+        const msg = this.chatMessages.find(m => m.id === data.messageId);
+        if (msg) {
+          msg.isDeleted = true;
+          msg.deletedByName = data.deletedByName;
+          this.cdr.detectChanges();
+        }
+      }
+    });
+
+    // Subscribe to real-time bulk message deletion events
+    this.bulkChatDeleteSub = this.chatService.onBulkMessagesDeletedEveryone().subscribe(data => {
+      if (this.activeChatGroup && data.groupId === this.activeChatGroup.id) {
+        data.messageIds.forEach(id => {
+          const msg = this.chatMessages.find(m => m.id === id);
+          if (msg) {
+            msg.isDeleted = true;
+            msg.deletedByName = data.deletedByName;
+          }
+        });
+        this.cdr.detectChanges();
+      }
+    });
+
+    // Handle real-time announcement deletion
+    this.socketService.onEvent('announcement_deleted', (announcementId: number) => {
+      this.announcements = this.announcements.filter(a => a.id !== announcementId);
+      if (this.selectedNotice && this.selectedNotice.id === announcementId) {
+        this.selectedNotice = null;
+      }
+      this.cdr.detectChanges();
+    });
+  }
+
+  loadWardens(): void {
+    this.isLoadingWardens = true;
+    this.complaintService.getWardenList().subscribe({
+      next: (res) => {
+        this.wardens = res;
+        this.isLoadingWardens = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Failed to load wardens:', err);
+        this.isLoadingWardens = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  loadPublicSettings(): void {
+    this.isLoadingPublicSettings = true;
+    this.complaintService.getPublicSettings().subscribe({
+      next: (res) => {
+        this.publicSettings = res;
+        this.isLoadingPublicSettings = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Failed to load public settings:', err);
+        this.isLoadingPublicSettings = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  splitLines(text: string): string[] {
+    if (!text) return [];
+    return text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  }
+
+  ngOnDestroy(): void {
+    if (this.notifSub) { this.notifSub.unsubscribe(); }
+  }
+
+  loadFooterSettings(): void {
+    this.complaintService.getFooterSettings().subscribe({
+      next: (res) => { this.footerSettings = res; this.cdr.detectChanges(); },
+      error: (err) => console.error(err)
+    });
+  }
+
+  toggleDarkMode(): void {
+    this.isDarkMode = !this.isDarkMode;
+    if (this.isDarkMode) {
+      document.body.classList.add('dark-mode');
+      localStorage.setItem('hh_dark_mode', 'true');
+    } else {
+      document.body.classList.remove('dark-mode');
+      localStorage.setItem('hh_dark_mode', 'false');
+    }
+  }
+
+  loadComplaints(): void {
+    this.isLoadingComplaints = true;
+    this.complaintService.getStudentComplaints().subscribe({
+      next: (res) => {
+        this.complaints = res;
+        this.isLoadingComplaints = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error(err);
+        this.isLoadingComplaints = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  loadAnnouncements(): void {
+    this.isLoadingAnnouncements = true;
+    this.complaintService.getAnnouncements().subscribe({
+      next: (res) => {
+        this.announcements = res;
+        this.isLoadingAnnouncements = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error(err);
+        this.isLoadingAnnouncements = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  loadNotifications(): void {
+    this.complaintService.getNotifications().subscribe({
+      next: (res) => { this.notifications = res; this.cdr.detectChanges(); },
+      error: (err) => console.error(err)
+    });
+  }
+
+  selectCategory(cat: string): void { this.newComplaint.category = cat; }
+
+  onFileChange(event: any): void {
+    if (event.target.files.length > 0) {
+      const file = event.target.files[0];
+      this.selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = () => { this.imagePreviewUrl = reader.result as string; };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  removeSelectedFile(): void {
+    this.selectedFile = null;
+    this.imagePreviewUrl = null;
+    const fi = document.getElementById('photoFile') as HTMLInputElement;
+    if (fi) fi.value = '';
+  }
+
+  onRaiseSubmit(): void {
+    this.raising = true;
+    this.raiseError = '';
+    this.raiseSuccess = '';
+
+    const safetyTimer = setTimeout(() => {
+      if (this.raising) {
+        this.raising = false;
+        this.raiseError = 'Request timed out. Please check your connection and try again.';
+      }
+    }, 15000);
+
+    const token = this.authService.token;
+    if (!token) {
+      clearTimeout(safetyTimer);
+      this.raising = false;
+      this.raiseError = 'Session expired! Please log out and log in again.';
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('title', this.newComplaint.title);
+    formData.append('category', this.newComplaint.category);
+    formData.append('description', this.newComplaint.description);
+    formData.append('priority', this.newComplaint.priority || 'medium');
+    if (this.selectedFile) { formData.append('photo', this.selectedFile); }
+
+    this.complaintService.raiseComplaint(formData).subscribe({
+      next: () => {
+        clearTimeout(safetyTimer);
+        this.raising = false;
+        this.justSubmitted = true;
+        this.raiseSuccess = '✅ Ticket raise ho gaya!';
+        // Show toast notification
+        this.activeToast = { message: '✅ Aapka ticket successfully submit ho gaya! Warden jald hi assign karega.', type: 'info', createdAt: new Date() } as any;
+        setTimeout(() => this.clearToast(), 3000);
+        // Reset form
+        this.newComplaint = { title: '', category: '', description: '', priority: 'medium' };
+        this.selectedFile = null;
+        this.imagePreviewUrl = null;
+        this.loadComplaints();
+        this.cdr.detectChanges();
+        setTimeout(() => {
+          this.justSubmitted = false;
+          this.activeTab = 'my-complaints';
+          this.filterStatus = 'all';
+          this.raiseSuccess = '';
+          this.cdr.detectChanges();
+        }, 2500);
+      },
+      error: (err) => {
+        clearTimeout(safetyTimer);
+        this.raising = false;
+        if (err.status === 401 || err.status === 403) {
+          this.raiseError = '❌ Session expired or access denied. Please log out and log in again.';
+        } else if (err.status === 0) {
+          this.raiseError = '❌ Cannot reach server. Please make sure the backend is running on port 5000.';
+        } else {
+          this.raiseError = '❌ ' + (err.error?.message || 'Error submitting ticket. Please try again.');
+        }
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  selectRating(complaintId: number, rating: number): void { this.tempRating[complaintId] = rating; }
+
+  submitComplaintFeedback(complaintId: number): void {
+    const rating = this.tempRating[complaintId];
+    const comment = this.tempComment[complaintId] || '';
+    this.complaintService.submitFeedback(complaintId, rating, comment).subscribe({
+      next: () => {
+        this.loadComplaints();
+        delete this.tempRating[complaintId];
+        delete this.tempComment[complaintId];
+        this.cdr.detectChanges();
+      },
+      error: (err) => { console.error(err); this.cdr.detectChanges(); }
+    });
+  }
+
+  clearAllNotifications(): void {
+    this.complaintService.markAllNotificationsRead().subscribe({
+      next: () => { this.loadNotifications(); this.cdr.detectChanges(); },
+      error: (err) => { console.error(err); this.cdr.detectChanges(); }
+    });
+  }
+
+  deleteNotification(notificationId: number, event: Event): void {
+    event.stopPropagation();
+    this.notifications = this.notifications.filter(n => n.id !== notificationId);
+    this.cdr.detectChanges();
+    this.complaintService.deleteNotification(notificationId).subscribe({
+      error: (err) => { this.loadNotifications(); console.error(err); }
+    });
+  }
+
+  deleteAllNotifications(): void {
+    this.notifications = [];
+    this.cdr.detectChanges();
+    this.complaintService.deleteAllNotifications().subscribe({
+      error: (err) => { this.loadNotifications(); console.error(err); }
+    });
+  }
+
+  hasUnreadNotifications(): boolean { return this.notifications.some(n => !n.isRead); }
+  getUnreadNotificationsCount(): number { return this.notifications.filter(n => !n.isRead).length; }
+  getPendingCount(): number { return this.complaints.filter(c => c.status !== 'resolved').length; }
+  getResolvedCount(): number { return this.complaints.filter(c => c.status === 'resolved').length; }
+
+  get filteredComplaints(): any[] {
+    if (this.filterStatus === 'all') return this.complaints;
+    if (this.filterStatus === 'pending') return this.complaints.filter(c => c.status !== 'resolved');
+    if (this.filterStatus === 'resolved') return this.complaints.filter(c => c.status === 'resolved');
+    return this.complaints;
+  }
+
+  toggleExpand(complaintId: number | null): void {
+    this.expandedComplaintId = this.expandedComplaintId === complaintId ? null : complaintId;
+  }
+
+  openPhotoModal(url: string): void { this.zoomPhotoUrl = url; }
+  closePhotoModal(): void { this.zoomPhotoUrl = null; }
+  openNoticeModal(notice: any): void { this.selectedNotice = notice; }
+  closeNoticeModal(): void { this.selectedNotice = null; }
+
+  onNotificationClick(notif: any): void {
+    notif.isRead = true;
+    if (notif.type === 'announcement') {
+      const match = notif.message.match(/New Announcement: "(.*)"/);
+      const title = match ? match[1] : '';
+      const announcement = this.announcements.find(a => a.title === title);
+      if (announcement) {
+        this.selectedNotice = announcement;
+      } else {
+        this.selectedNotice = { title: title || 'Hostel Announcement', content: notif.message, createdAt: notif.createdAt, creator: { name: 'Warden' } };
+      }
+    } else {
+      this.activeTab = 'my-complaints';
+      const match = notif.message.match(/complaint "(.*)"/i) || notif.message.match(/task assigned: "(.*)"/i);
+      if (match) {
+        const title = match[1];
+        const comp = this.complaints.find(c => c.title.toLowerCase() === title.toLowerCase());
+        if (comp) { this.expandedComplaintId = comp.id; }
+      }
+    }
+  }
+
+  getCategoryIcon(cat: string): string {
+    switch (cat) {
+      case 'electrical': return '⚡';
+      case 'plumbing': return '🚰';
+      case 'carpentry': return '🪚';
+      case 'cleaning': return '🧹';
+      case 'wifi': return '📶';
+      default: return '⚙️';
+    }
+  }
+
+  getNotifIcon(type: string): string {
+    switch (type) {
+      case 'complaint_update': return '🛠️';
+      case 'announcement': return '📢';
+      default: return '🔔';
+    }
+  }
+
+  clearToast(): void {
+    this.activeToast = null;
+    this.socketService.clearNotification();
+    this.cdr.detectChanges();
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/student/login']);
+  }
+
+  initProfileEdit(): void {
+    const u = this.authService.currentUserValue;
+    if (u) {
+      this.editUser = {
+        name: u.name,
+        phone: u.phone,
+        bio: u.bio || ''
+      };
+      this.profilePreviewUrl = u.profilePicUrl ? 'http://localhost:5000' + u.profilePicUrl : null;
+      this.selectedProfilePic = null;
+      this.profileError = '';
+      this.profileSuccess = '';
+    }
+  }
+
+  onProfilePicChange(event: any): void {
+    if (event.target.files.length > 0) {
+      const file = event.target.files[0];
+      this.selectedProfilePic = file;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.profilePreviewUrl = reader.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  onProfileSubmit(): void {
+    this.updatingProfile = true;
+    this.profileError = '';
+    this.profileSuccess = '';
+
+    const formData = new FormData();
+    formData.append('name', this.editUser.name);
+    formData.append('phone', this.editUser.phone);
+    formData.append('bio', this.editUser.bio);
+    if (this.selectedProfilePic) {
+      formData.append('profilePic', this.selectedProfilePic);
+    }
+
+    this.authService.updateProfile(formData).subscribe({
+      next: (res) => {
+        this.updatingProfile = false;
+        this.profileSuccess = '✅ Profile updated successfully!';
+        this.user = res.user;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.updatingProfile = false;
+        this.profileError = '❌ ' + (err.error?.message || 'Failed to update profile.');
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  // Load mess data
+  loadMessInfo(): void {
+    this.isLoadingMess = true;
+    this.messError = '';
+    this.messSuccess = '';
+    this.messService.getMenu().subscribe({
+      next: (menu) => {
+        this.messMenu = menu;
+        this.isLoadingMess = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.messError = 'Failed to load weekly menu.';
+        this.isLoadingMess = false;
+        this.cdr.detectChanges();
+      }
+    });
+
+    this.messService.getMySkippedMeals().subscribe({
+      next: (skips) => {
+        this.mySkips = skips;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Failed to load skipped meals:', err);
+      }
+    });
+  }
+
+  // Get date strings for today & tomorrow
+  getTodayDateString(): string {
+    const d = new Date();
+    return d.toISOString().split('T')[0];
+  }
+
+  getTomorrowDateString(): string {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    return d.toISOString().split('T')[0];
+  }
+
+  getDayOfWeekName(): string {
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    return days[new Date().getDay()];
+  }
+
+  // Skip meal logic
+  isMealSkipped(mealType: 'breakfast' | 'lunch' | 'dinner', date: string): boolean {
+    return this.mySkips.some(s => s.mealType === mealType && s.date === date);
+  }
+
+  toggleSkip(mealType: 'breakfast' | 'lunch' | 'dinner', date: string): void {
+    this.messError = '';
+    this.messSuccess = '';
+    this.messService.toggleSkipMeal(mealType, date).subscribe({
+      next: (res) => {
+        this.messSuccess = res.message;
+        // Refresh skip list
+        this.messService.getMySkippedMeals().subscribe(skips => {
+          this.mySkips = skips;
+          this.cdr.detectChanges();
+        });
+        setTimeout(() => { this.messSuccess = ''; this.cdr.detectChanges(); }, 3000);
+      },
+      error: (err) => {
+        this.messError = err.error?.message || 'Failed to update skip meal option.';
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  toggleMessMealDropdown(event: Event): void {
+    event.stopPropagation();
+    this.isMessMealDropdownOpen = !this.isMessMealDropdownOpen;
+    this.cdr.detectChanges();
+  }
+
+  selectMessMeal(meal: 'breakfast' | 'lunch' | 'dinner'): void {
+    this.selectedMessMeal = meal;
+    this.isMessMealDropdownOpen = false;
+    this.cdr.detectChanges();
+  }
+
+  getMessMealLabel(): string {
+    if (!this.selectedMessMeal) return 'Select Meal';
+    return this.selectedMessMeal.charAt(0).toUpperCase() + this.selectedMessMeal.slice(1);
+  }
+
+  // Submit Feedback
+  submitMessFeedback(): void {
+    this.messSuccess = '';
+    this.messError = '';
+    const date = this.getTodayDateString();
+    const feedbackData = {
+      mealType: this.selectedMessMeal,
+      date,
+      rating: this.tempMessRating,
+      comment: this.tempMessComment
+    };
+
+    this.messService.submitFeedback(feedbackData).subscribe({
+      next: (res) => {
+        this.messSuccess = '✅ ' + res.message;
+        this.tempMessComment = '';
+        this.tempMessRating = 5;
+        this.cdr.detectChanges();
+        setTimeout(() => { this.messSuccess = ''; this.cdr.detectChanges(); }, 3000);
+      },
+      error: (err) => {
+        this.messError = '❌ ' + (err.error?.message || 'Failed to submit feedback.');
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  // Load individual student attendance statistics
+  loadAttendanceStats(): void {
+    this.isLoadingAttendance = true;
+    this.attendanceService.getMyStats().subscribe({
+      next: (res) => {
+        this.attendanceStats = res.summary;
+        this.attendanceHistory = res.history;
+        this.isLoadingAttendance = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Failed to load attendance statistics:', err);
+        this.isLoadingAttendance = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  // Group Chat Methods
+  loadMyChatGroups(): void {
+    this.isLoadingChat = true;
+    const safetyTimer = setTimeout(() => {
+      if (this.isLoadingChat) {
+        this.isLoadingChat = false;
+        this.cdr.detectChanges();
+      }
+    }, 4000);
+
+    this.chatService.getMyGroups().subscribe({
+      next: (groups) => {
+        clearTimeout(safetyTimer);
+        this.myChatGroups = groups;
+        
+        // Join all group rooms to receive notifications
+        groups.forEach(g => this.chatService.joinGroupRoom(g.id));
+
+        if (groups.length > 0) {
+          this.openChatGroup(groups[0]);
+        } else {
+          this.isLoadingChat = false;
+          this.cdr.detectChanges();
+        }
+      },
+      error: (err) => {
+        clearTimeout(safetyTimer);
+        console.error('Failed to load chat groups:', err);
+        this.isLoadingChat = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  openChatGroup(group: any): void {
+    this.activeChatGroup = group;
+    this.unreadCounts[group.id] = 0;
+    this.isLoadingChat = true;
+    this.chatMessages = [];
+
+    const safetyTimer = setTimeout(() => {
+      if (this.isLoadingChat) {
+        this.isLoadingChat = false;
+        this.cdr.detectChanges();
+      }
+    }, 4000);
+
+    this.chatService.getGroupMessages(group.id).subscribe({
+      next: (res) => {
+        clearTimeout(safetyTimer);
+        this.chatMessages = res.messages;
+        this.isLoadingChat = false;
+        this.cdr.detectChanges();
+        this.scrollChatToBottom();
+      },
+      error: (err) => {
+        clearTimeout(safetyTimer);
+        console.error('Failed to load group messages:', err);
+        this.isLoadingChat = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  selectedChatFile: File | null = null;
+  chatFilePreviewUrl: string | null = null;
+  isUploadingImage: boolean = false;
+
+  onChatFileSelected(event: any): void {
+    const file = event.target.files?.[0];
+    if (file) {
+      this.selectedChatFile = file;
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.chatFilePreviewUrl = reader.result as string;
+        this.cdr.detectChanges();
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  clearChatFile(): void {
+    this.selectedChatFile = null;
+    this.chatFilePreviewUrl = null;
+    this.cdr.detectChanges();
+  }
+
+  onChatStreamScroll(): void {
+    const inputEl = document.getElementById('studentChatInput') as HTMLInputElement;
+    if (inputEl && document.activeElement === inputEl) {
+      inputEl.blur();
+    }
+  }
+
+  sendStudentChatMessage(): void {
+    if ((!this.newChatMessageText || !this.newChatMessageText.trim()) && !this.selectedChatFile) return;
+    if (!this.activeChatGroup) return;
+
+    const msgText = (this.newChatMessageText || '').trim();
+    const fileToSend = this.selectedChatFile;
+    const previewToSend = this.chatFilePreviewUrl;
+
+    this.newChatMessageText = '';
+    this.clearChatFile();
+
+    const refocus = () => {
+      const inputEl = document.getElementById('studentChatInput') as HTMLInputElement;
+      if (inputEl) {
+        inputEl.focus();
+      }
+    };
+    refocus();
+    setTimeout(refocus, 10);
+    setTimeout(refocus, 80);
+
+    if (fileToSend) {
+      this.isUploadingImage = true;
+      this.chatService.uploadChatImage(fileToSend).subscribe({
+        next: (uploadRes) => {
+          this.isUploadingImage = false;
+          this.postChatMessageWithUrl(msgText, uploadRes.attachmentUrl, previewToSend || undefined);
+        },
+        error: (err) => {
+          console.error('Failed to upload chat image:', err);
+          this.isUploadingImage = false;
+          this.postChatMessageWithUrl(msgText, previewToSend || undefined);
+        }
+      });
+    } else {
+      this.postChatMessageWithUrl(msgText);
+    }
+  }
+
+  private postChatMessageWithUrl(msgText: string, attachmentUrl?: string, previewUrl?: string): void {
+    const tempId = -Date.now();
+    const tempMsg: any = {
+      id: tempId,
+      groupId: this.activeChatGroup?.id,
+      senderId: this.user?.id,
+      message: msgText,
+      attachmentUrl: attachmentUrl || previewUrl,
+      createdAt: new Date().toISOString(),
+      sender: {
+        id: this.user?.id,
+        name: this.user?.name || 'Student',
+        role: this.user?.role || 'student',
+        roomNumber: this.user?.roomNumber
+      }
+    };
+
+    this.chatMessages.push(tempMsg);
+    this.cdr.detectChanges();
+    this.scrollChatToBottom();
+
+    if (!this.activeChatGroup) return;
+
+    this.chatService.sendMessage(this.activeChatGroup.id, msgText, attachmentUrl).subscribe({
+      next: (serverMsg) => {
+        this.handleIncomingStudentChatMessage(serverMsg, tempId);
+      },
+      error: (err) => {
+        console.error('Failed to send student message:', err);
+        this.chatMessages = this.chatMessages.filter(m => m.id !== tempId);
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  getImageUrl(url: string | null | undefined): string {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+      return url;
+    }
+    const cleanPath = url.startsWith('/') ? url : '/' + url;
+    return 'http://localhost:5000' + cleanPath;
+  }
+
+  private handleIncomingStudentChatMessage(msg: ChatMessage, tempId?: number): void {
+    if (tempId) {
+      const tempIdx = this.chatMessages.findIndex(m => m.id === tempId);
+      if (tempIdx !== -1) {
+        const tempAttachment = this.chatMessages[tempIdx]?.attachmentUrl;
+        const alreadyPresent = this.chatMessages.some(m => m.id === msg.id);
+        if (alreadyPresent) {
+          this.chatMessages.splice(tempIdx, 1);
+        } else {
+          if (!msg.attachmentUrl && tempAttachment) {
+            msg.attachmentUrl = tempAttachment;
+          }
+          this.chatMessages[tempIdx] = msg;
+        }
+        this.cdr.detectChanges();
+        this.scrollChatToBottom();
+        return;
+      }
+    }
+
+    if (this.chatMessages.some(m => m.id === msg.id)) {
+      return;
+    }
+
+    if (msg.senderId === this.user?.id) {
+      const tempIdx = this.chatMessages.findIndex(m => m.id < 0);
+      if (tempIdx !== -1) {
+        this.chatMessages[tempIdx] = msg;
+        this.cdr.detectChanges();
+        this.scrollChatToBottom();
+        return;
+      }
+    }
+
+    this.chatMessages.push(msg);
+    this.cdr.detectChanges();
+    this.scrollChatToBottom();
+  }
+
+  scrollChatToBottom(): void {
+    setTimeout(() => {
+      const feed = document.getElementById('studentChatFeed');
+      if (feed) {
+        feed.scrollTop = feed.scrollHeight;
+      }
+    }, 100);
+  }
+
+  // Chat Deletion & Multi-Select Options
+  selectedMsgForDelete: any = null;
+  showDeleteOptionsModal = false;
+  private chatDeleteSub!: Subscription;
+  private bulkChatDeleteSub!: Subscription;
+
+  isMultiSelectMode: boolean = false;
+  selectedMessageIds: Set<number> = new Set<number>();
+
+  toggleMultiSelectMode(): void {
+    this.isMultiSelectMode = !this.isMultiSelectMode;
+    if (!this.isMultiSelectMode) {
+      this.selectedMessageIds.clear();
+    }
+    this.selectedMsgForDelete = null;
+    this.cdr.detectChanges();
+  }
+
+  startMultiSelectWithMsg(msg: any): void {
+    this.isMultiSelectMode = true;
+    this.selectedMessageIds.clear();
+    this.selectedMessageIds.add(msg.id);
+    this.selectedMsgForDelete = null;
+    this.cdr.detectChanges();
+  }
+
+  toggleMessageSelection(msgId: number, event?: Event): void {
+    if (event) { event.stopPropagation(); }
+    if (this.selectedMessageIds.has(msgId)) {
+      this.selectedMessageIds.delete(msgId);
+    } else {
+      this.selectedMessageIds.add(msgId);
+    }
+    this.cdr.detectChanges();
+  }
+
+  isMessageSelected(msgId: number): boolean {
+    return this.selectedMessageIds.has(msgId);
+  }
+
+  clearMessageSelection(): void {
+    this.isMultiSelectMode = false;
+    this.selectedMessageIds.clear();
+    this.cdr.detectChanges();
+  }
+
+  bulkDeleteForMe(): void {
+    if (this.selectedMessageIds.size === 0) return;
+    this.chatMessages = this.chatMessages.filter(m => !this.selectedMessageIds.has(m.id));
+    this.clearMessageSelection();
+  }
+
+  bulkDeleteForEveryone(): void {
+    if (this.selectedMessageIds.size === 0) return;
+    const ids = Array.from(this.selectedMessageIds);
+    this.chatService.bulkDeleteMessagesForEveryone(ids).subscribe({
+      next: (res) => {
+        ids.forEach(id => {
+          const msg = this.chatMessages.find(m => m.id === id);
+          if (msg) {
+            msg.isDeleted = true;
+            msg.deletedByName = res.deletedByName || this.user?.name || 'User';
+          }
+        });
+        this.clearMessageSelection();
+      },
+      error: (err) => {
+        console.error('Failed to bulk delete messages:', err);
+      }
+    });
+  }
+
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    if (this.selectedMsgForDelete) {
+      this.selectedMsgForDelete = null;
+      this.cdr.detectChanges();
+    }
+    if (this.isMessMealDropdownOpen) {
+      this.isMessMealDropdownOpen = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  openDeleteOptions(msg: any): void {
+    if (this.selectedMsgForDelete && this.selectedMsgForDelete.id === msg.id) {
+      this.selectedMsgForDelete = null;
+    } else {
+      this.selectedMsgForDelete = msg;
+    }
+    this.cdr.detectChanges();
+  }
+
+  closeDeleteOptions(): void {
+    this.selectedMsgForDelete = null;
+    this.showDeleteOptionsModal = false;
+    this.cdr.detectChanges();
+  }
+
+  confirmDeleteForMe(): void {
+    if (!this.selectedMsgForDelete) return;
+    const targetId = this.selectedMsgForDelete.id;
+    this.chatMessages = this.chatMessages.filter(m => m.id !== targetId);
+    this.closeDeleteOptions();
+  }
+
+  confirmDeleteForEveryone(): void {
+    if (!this.selectedMsgForDelete) return;
+    const targetMsg = this.selectedMsgForDelete;
+    this.closeDeleteOptions();
+
+    if (targetMsg.id < 0) {
+      // Temp message not yet on server
+      this.chatMessages = this.chatMessages.filter(m => m.id !== targetMsg.id);
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.chatService.deleteMessageForEveryone(targetMsg.id).subscribe({
+      next: (res) => {
+        targetMsg.isDeleted = true;
+        targetMsg.deletedByName = res.deletedByName || this.user?.name || 'User';
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Failed to delete message for everyone:', err);
+      }
+    });
+  }
+}
+
+
+
