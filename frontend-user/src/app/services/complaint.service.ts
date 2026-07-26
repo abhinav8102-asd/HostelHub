@@ -24,13 +24,13 @@ export class ComplaintService {
 
   getStudentComplaints(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/complaints/student`, {
-      headers: this.authService.getNoCacheHeaders()
+      headers: this.authService.getAuthHeaders()
     });
   }
 
   getWardenComplaints(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/complaints/warden`, {
-      headers: this.authService.getAuthHeaders()
+      headers: this.authService.getNoCacheHeaders()
     });
   }
 
@@ -42,7 +42,7 @@ export class ComplaintService {
 
   assignComplaint(complaintId: number, staffId: number): Observable<any> {
     return this.http.put(`${this.apiUrl}/complaints/assign/${complaintId}`, { staffId }, {
-      headers: this.authService.getAuthHeaders()
+      headers: this.authService.getJsonHeaders()
     });
   }
 
@@ -90,9 +90,10 @@ export class ComplaintService {
 
   updateUserStatus(userId: number, status: string): Observable<any> {
     return this.http.put(`${this.apiUrl}/users/status/${userId}`, { status }, {
-      headers: this.authService.getAuthHeaders()
+      headers: this.authService.getJsonHeaders()
     });
   }
+
 
   createStaffOrWarden(userData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/users/create-staff-warden`, userData, {
@@ -107,11 +108,31 @@ export class ComplaintService {
     });
   }
 
-  createAnnouncement(announcement: { title: string; content: string; hostelBlock?: string }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/announcements/create`, announcement, {
+  createAnnouncement(announcement: { title: string; content: string; hostelBlock?: string }, photoFile?: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('title', announcement.title);
+    formData.append('content', announcement.content);
+    formData.append('hostelBlock', announcement.hostelBlock || 'All');
+    if (photoFile) {
+      formData.append('photo', photoFile);
+    }
+    return this.http.post(`${this.apiUrl}/announcements/create`, formData, {
       headers: this.authService.getAuthHeaders()
     });
   }
+
+  deleteAnnouncement(announcementId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/announcements/delete/${announcementId}`, {
+      headers: this.authService.getAuthHeaders()
+    });
+  }
+
+  getStaffWorkload(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/complaints/staff-workload`, {
+      headers: this.authService.getNoCacheHeaders()
+    });
+  }
+
 
   // Notifications History
   getNotifications(): Observable<any[]> {
@@ -156,6 +177,12 @@ export class ComplaintService {
     });
   }
 
+  updateFooterSettings(settings: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/settings/footer`, settings, {
+      headers: this.authService.getJsonHeaders()
+    });
+  }
+
   getWardenList(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/users/wardens`, {
       headers: this.authService.getAuthHeaders()
@@ -174,4 +201,3 @@ export class ComplaintService {
     });
   }
 }
-

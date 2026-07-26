@@ -2079,8 +2079,8 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
 
   loadStaffWorkload(): void {
     this.complaintService.getStaffWorkload().subscribe({
-      next: (res) => { this.staffWorkload = res; this.cdr.detectChanges(); },
-      error: (err) => { console.error(err); this.cdr.detectChanges(); }
+      next: (res: any) => { this.staffWorkload = res; this.cdr.detectChanges(); },
+      error: (err: any) => { console.error(err); this.cdr.detectChanges(); }
     });
   }
 
@@ -2110,7 +2110,7 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
       next: () => {
         this.showToast('✅ Announcement deleted.');
       },
-      error: (err) => {
+      error: (err: any) => {
         this.showToast('❌ Failed to delete. Reloading...');
         this.loadAnnouncements();
         console.error(err);

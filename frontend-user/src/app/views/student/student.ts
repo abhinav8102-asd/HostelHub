@@ -1893,12 +1893,12 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
   loadWardens(): void {
     this.isLoadingWardens = true;
     this.complaintService.getWardenList().subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.wardens = res;
         this.isLoadingWardens = false;
         this.cdr.detectChanges();
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Failed to load wardens:', err);
         this.isLoadingWardens = false;
         this.cdr.detectChanges();
@@ -1909,12 +1909,12 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
   loadPublicSettings(): void {
     this.isLoadingPublicSettings = true;
     this.complaintService.getPublicSettings().subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.publicSettings = res;
         this.isLoadingPublicSettings = false;
         this.cdr.detectChanges();
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Failed to load public settings:', err);
         this.isLoadingPublicSettings = false;
         this.cdr.detectChanges();
