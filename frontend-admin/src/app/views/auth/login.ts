@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -134,7 +134,8 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -150,11 +151,13 @@ export class LoginComponent implements OnInit {
         if (res.user.role !== this.role) {
           this.loading = false;
           this.error = `Access Denied: This login page is only for ${this.role} accounts.`;
+          this.cdr.detectChanges();
           this.authService.logout();
           return;
         }
         this.loading = false;
         this.success = 'Login Successful!';
+        this.cdr.detectChanges();
         // Redirect to matching role dashboard
         setTimeout(() => {
           this.router.navigate([`/${res.user.role}`]);
@@ -163,6 +166,7 @@ export class LoginComponent implements OnInit {
       error: (err) => {
         this.loading = false;
         this.error = err.error?.message || 'Login failed. Please check your credentials.';
+        this.cdr.detectChanges();
       }
     });
   }
