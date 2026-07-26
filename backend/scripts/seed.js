@@ -1,88 +1,46 @@
 const bcrypt = require('bcryptjs');
 const { User, sequelize } = require('../models');
+require('dotenv').config();
 
 const seedDB = async () => {
   try {
-    console.log('Seeding default users...');
+    console.log('Seeding database...');
     
     // Ensure connection
     await sequelize.authenticate();
 
-    // Create password hashes
-    const studentHash = await bcrypt.hash('student123', 10);
-    const wardenHash = await bcrypt.hash('warden123', 10);
-    const staffHash = await bcrypt.hash('staff123', 10);
-    const adminHash = await bcrypt.hash('admin123', 10);
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
 
-    const defaultUsers = [
-      {
-        name: 'Abhinav Admin',
-        email: 'admin@hostelhub.com',
-        password: adminHash,
-        role: 'admin',
-        phone: '9876543210',
-        status: 'active'
-      },
-      {
-        name: 'Rahul Student',
-        email: 'student@hostelhub.com',
-        password: studentHash,
-        role: 'student',
-        phone: '8765432109',
-        roomNumber: '102-B',
-        hostelBlock: 'Block-A',
-        status: 'active'
-      },
-      {
-        name: 'Sharma Warden',
-        email: 'warden@hostelhub.com',
-        password: wardenHash,
-        role: 'warden',
-        phone: '7654321098',
-        hostelBlock: 'Block-A',
-        status: 'active'
-      },
-      {
-        name: 'Amit Electrician',
-        email: 'electrician@hostelhub.com',
-        password: staffHash,
-        role: 'staff',
-        phone: '6543210987',
-        status: 'active'
-      },
-      {
-        name: 'Vijay Plumber',
-        email: 'plumber@hostelhub.com',
-        password: staffHash,
-        role: 'staff',
-        phone: '5432109876',
-        status: 'active'
-      },
-      {
-        name: 'Ramesh Cleaner',
-        email: 'cleaner@hostelhub.com',
-        password: staffHash,
-        role: 'staff',
-        phone: '4321098765',
-        status: 'active'
-      }
-    ];
-
-    // Bulk create
-    for (const u of defaultUsers) {
-      const existing = await User.findOne({ where: { email: u.email } });
-      if (!existing) {
-        await User.create(u);
-        console.log(`Created user: ${u.email}`);
-      } else {
-        console.log(`User already exists: ${u.email}`);
-      }
+    if (!adminEmail || !adminPassword) {
+      console.log('⚠️ Warning: ADMIN_EMAIL or ADMIN_PASSWORD not set in environment. Skipping admin account creation.');
+      process.exit(0);
     }
 
-    console.log('Database seeded successfully.');
+    // Create password hash for the custom Admin
+    const adminHash = await bcrypt.hash(adminPassword, 10);
+
+    const adminUser = {
+      name: 'Super Admin',
+      email: adminEmail.trim().toLowerCase(),
+      password: adminHash,
+      role: 'admin',
+      phone: '9999999999',
+      status: 'active'
+    };
+
+    const existing = await User.findOne({ where: { email: adminUser.email } });
+    if (!existing) {
+      await User.create(adminUser);
+      console.log(`✅ Secure Admin account created successfully for: ${adminUser.email}`);
+    } else {
+      console.log(`ℹ️ Admin account already exists for: ${adminUser.email}`);
+    }
+
+    console.log('Seeding process complete.');
     process.exit(0);
   } catch (error) {
-    console.error('Error seeding database:', error);
+    console.error('❌ Error seeding database:', error);
     process.exit(1);
   }
 };

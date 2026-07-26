@@ -58,13 +58,6 @@ import { AuthService } from '../../services/auth.service';
         <div class="auth-footer">
           Don't have an account? <a routerLink="/student/register">Register here</a>
         </div>
-
-        <div class="demo-accounts-box">
-          <p class="demo-title">🔑 Quick Demo Login</p>
-          <div class="demo-grid">
-            <button type="button" class="demo-btn" (click)="fillDemo('student')">Student</button>
-          </div>
-        </div>
       </div>
     </div>
   `,
@@ -129,42 +122,6 @@ import { AuthService } from '../../services/auth.service';
       text-decoration: none;
       font-weight: 600;
     }
-    .demo-accounts-box {
-      margin-top: 24px;
-      padding-top: 20px;
-      border-top: 1px dashed var(--neutral-200);
-    }
-    .demo-title {
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--neutral-400);
-      margin-bottom: 8px;
-      text-align: center;
-    }
-    .demo-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 6px;
-    }
-    .demo-btn {
-      background-color: var(--neutral-100);
-      border: 1px solid var(--neutral-200);
-      padding: 8px 12px;
-      font-family: var(--font-sans);
-      font-size: 13px;
-      font-weight: 600;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      text-align: center;
-      transition: var(--transition-fast);
-    }
-    .demo-btn:hover, .demo-btn:active {
-      background-color: var(--primary-light);
-      border-color: var(--primary);
-      color: var(--primary);
-    }
   `]
 })
 export class LoginComponent {
@@ -185,12 +142,6 @@ export class LoginComponent {
     
     this.authService.login({ email: this.email, password: this.password }).subscribe({
       next: (res) => {
-        if (res.user.role !== 'student') {
-          this.loading = false;
-          this.error = 'Access Denied: Only students are allowed on this portal.';
-          this.authService.logout();
-          return;
-        }
         this.loading = false;
         this.success = 'Login Successful!';
         // Redirect to matching role dashboard
@@ -203,12 +154,5 @@ export class LoginComponent {
         this.error = err.error?.message || 'Login failed. Please check your credentials.';
       }
     });
-  }
-
-  fillDemo(role: string): void {
-    if (role === 'student') {
-      this.email = 'student@hostelhub.com';
-      this.password = 'student123';
-    }
   }
 }
