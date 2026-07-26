@@ -43,7 +43,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
         <div class="user-info">
           <div class="avatar-ring">
             <span class="avatar" *ngIf="!user?.profilePicUrl">👨‍💼</span>
-            <img *ngIf="user?.profilePicUrl" [src]="'http://localhost:5000' + user.profilePicUrl" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
+            <img *ngIf="user?.profilePicUrl" [src]="'https://hostelhub-0cyi.onrender.com' + user.profilePicUrl" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
           </div>
           <div>
             <h3>Warden Portal</h3>
@@ -176,8 +176,8 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
                 <!-- Photo attached by student -->
                 <div class="photo-view" *ngIf="comp.photoUrl">
                   <p class="section-label">📸 Attachment from Student:</p>
-                  <div class="image-container" (click)="openPhotoModal('http://localhost:5000' + comp.photoUrl)">
-                    <img [src]="'http://localhost:5000' + comp.photoUrl" class="comp-img" alt="Student issue proof"/>
+                  <div class="image-container" (click)="openPhotoModal('https://hostelhub-0cyi.onrender.com' + comp.photoUrl)">
+                    <img [src]="'https://hostelhub-0cyi.onrender.com' + comp.photoUrl" class="comp-img" alt="Student issue proof"/>
                     <div class="image-overlay">🔍 Tap to Zoom</div>
                   </div>
                 </div>
@@ -198,8 +198,8 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
                   <!-- Work Proof Image -->
                   <div class="photo-view" *ngIf="comp.completionPhotoUrl">
                     <p class="section-label text-success">✅ Resolution Work Proof:</p>
-                    <div class="image-container" (click)="openPhotoModal('http://localhost:5000' + comp.completionPhotoUrl)">
-                      <img [src]="'http://localhost:5000' + comp.completionPhotoUrl" class="comp-img" alt="Work completion proof"/>
+                    <div class="image-container" (click)="openPhotoModal('https://hostelhub-0cyi.onrender.com' + comp.completionPhotoUrl)">
+                      <img [src]="'https://hostelhub-0cyi.onrender.com' + comp.completionPhotoUrl" class="comp-img" alt="Work completion proof"/>
                       <div class="image-overlay">🔍 Tap to Zoom</div>
                     </div>
                   </div>
@@ -2406,7 +2406,7 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
         phone: u.phone,
         bio: u.bio || ''
       };
-      this.profilePreviewUrl = u.profilePicUrl ? 'http://localhost:5000' + u.profilePicUrl : null;
+      this.profilePreviewUrl = u.profilePicUrl ? 'https://hostelhub-0cyi.onrender.com' + u.profilePicUrl : null;
       this.selectedProfilePic = null;
       this.profileError = '';
       this.profileSuccess = '';
@@ -2808,7 +2808,7 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
       return url;
     }
     const cleanPath = url.startsWith('/') ? url : '/' + url;
-    return 'http://localhost:5000' + cleanPath;
+    return 'https://hostelhub-0cyi.onrender.com' + cleanPath;
   }
 
   private handleIncomingWardenChatMessage(msg: ChatMessage, tempId?: number): void {
@@ -2989,6 +2989,7 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
     });
   }
 }
+
 
 
 

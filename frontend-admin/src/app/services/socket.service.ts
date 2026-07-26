@@ -34,7 +34,7 @@ export class SocketService {
       return;
     }
 
-    this.socket = io('http://localhost:5000');
+    this.socket = io('https://hostelhub-0cyi.onrender.com');
 
     this.socket.on('connect', () => {
       console.log('Socket client connected.');
@@ -72,3 +72,4 @@ export class SocketService {
     }
   }
 }
+

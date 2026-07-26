@@ -38,7 +38,7 @@ export interface AttendanceStats {
   providedIn: 'root'
 })
 export class AttendanceService {
-  private apiUrl = 'http://localhost:5000/api/attendance';
+  private apiUrl = 'https://hostelhub-0cyi.onrender.com/api/attendance';
 
   constructor(
     private http: HttpClient,
@@ -69,3 +69,4 @@ export class AttendanceService {
     });
   }
 }
+

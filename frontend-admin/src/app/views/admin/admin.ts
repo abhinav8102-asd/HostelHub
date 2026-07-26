@@ -16,7 +16,7 @@ import { ComplaintService } from '../../services/complaint.service';
         <div class="user-info">
           <div class="avatar-ring">
             <span class="avatar" *ngIf="!user?.profilePicUrl">👨‍💻</span>
-            <img *ngIf="user?.profilePicUrl" [src]="'http://localhost:5000' + user.profilePicUrl" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
+            <img *ngIf="user?.profilePicUrl" [src]="'https://hostelhub-0cyi.onrender.com' + user.profilePicUrl" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
           </div>
           <div>
             <h3>Admin Console</h3>
@@ -799,7 +799,7 @@ export class AdminDashboardComponent implements OnInit {
     if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
       return url;
     }
-    return `http://localhost:5000/${url}`;
+    return `https://hostelhub-0cyi.onrender.com/${url}`;
   }
 
 
@@ -929,7 +929,7 @@ export class AdminDashboardComponent implements OnInit {
         phone: u.phone,
         bio: u.bio || ''
       };
-      this.profilePreviewUrl = u.profilePicUrl ? 'http://localhost:5000' + u.profilePicUrl : null;
+      this.profilePreviewUrl = u.profilePicUrl ? 'https://hostelhub-0cyi.onrender.com' + u.profilePicUrl : null;
       this.selectedProfilePic = null;
       this.profileError = '';
       this.profileSuccess = '';
@@ -977,3 +977,4 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 }
+

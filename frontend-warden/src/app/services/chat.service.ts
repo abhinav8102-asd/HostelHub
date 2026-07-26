@@ -37,7 +37,7 @@ export interface ChatMessage {
   providedIn: 'root'
 })
 export class ChatService {
-  private apiUrl = 'http://localhost:5000/api/chat';
+  private apiUrl = 'https://hostelhub-0cyi.onrender.com/api/chat';
 
   constructor(
     private http: HttpClient,
@@ -130,3 +130,4 @@ export class ChatService {
     });
   }
 }
+

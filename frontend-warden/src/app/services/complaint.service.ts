@@ -7,7 +7,7 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class ComplaintService {
-  private apiUrl = 'http://localhost:5000/api';
+  private apiUrl = 'https://hostelhub-0cyi.onrender.com/api';
 
   constructor(
     private http: HttpClient,
@@ -182,3 +182,4 @@ export class ComplaintService {
     });
   }
 }
+

@@ -37,7 +37,7 @@ export interface MessSkip {
   providedIn: 'root'
 })
 export class MessService {
-  private apiUrl = 'http://localhost:5000/api/mess';
+  private apiUrl = 'https://hostelhub-0cyi.onrender.com/api/mess';
 
   constructor(
     private http: HttpClient,
@@ -86,3 +86,4 @@ export class MessService {
     });
   }
 }
+

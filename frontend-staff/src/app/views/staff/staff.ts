@@ -38,7 +38,7 @@ import { SocketService, LiveNotification } from '../../services/socket.service';
         <div class="user-info">
           <div class="avatar-ring">
             <span class="avatar" *ngIf="!user?.profilePicUrl">🔧</span>
-            <img *ngIf="user?.profilePicUrl" [src]="'http://localhost:5000' + user.profilePicUrl" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
+            <img *ngIf="user?.profilePicUrl" [src]="'https://hostelhub-0cyi.onrender.com' + user.profilePicUrl" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
           </div>
           <div>
             <h3>Staff Portal</h3>
@@ -131,8 +131,8 @@ import { SocketService, LiveNotification } from '../../services/socket.service';
                 <!-- Problem photo attached by student -->
                 <div class="photo-view" *ngIf="task.photoUrl">
                   <p class="section-label">📸 Issue Attachment:</p>
-                  <div class="image-container" (click)="openPhotoModal('http://localhost:5000' + task.photoUrl)">
-                    <img [src]="'http://localhost:5000' + task.photoUrl" class="comp-img" alt="Student issue photo"/>
+                  <div class="image-container" (click)="openPhotoModal('https://hostelhub-0cyi.onrender.com' + task.photoUrl)">
+                    <img [src]="'https://hostelhub-0cyi.onrender.com' + task.photoUrl" class="comp-img" alt="Student issue photo"/>
                     <div class="image-overlay">🔍 Tap to Zoom</div>
                   </div>
                 </div>
@@ -175,8 +175,8 @@ import { SocketService, LiveNotification } from '../../services/socket.service';
                   <p class="text-success">🎉 Job Completed Successfully!</p>
                   <div class="photo-view" *ngIf="task.completionPhotoUrl">
                     <p class="section-label">✅ Uploaded Work Proof:</p>
-                    <div class="image-container" (click)="openPhotoModal('http://localhost:5000' + task.completionPhotoUrl)">
-                      <img [src]="'http://localhost:5000' + task.completionPhotoUrl" class="comp-img" alt="Work completion proof"/>
+                    <div class="image-container" (click)="openPhotoModal('https://hostelhub-0cyi.onrender.com' + task.completionPhotoUrl)">
+                      <img [src]="'https://hostelhub-0cyi.onrender.com' + task.completionPhotoUrl" class="comp-img" alt="Work completion proof"/>
                       <div class="image-overlay">🔍 Tap to Zoom</div>
                     </div>
                   </div>
@@ -1099,7 +1099,7 @@ export class StaffDashboardComponent implements OnInit, OnDestroy {
         phone: u.phone,
         bio: u.bio || ''
       };
-      this.profilePreviewUrl = u.profilePicUrl ? 'http://localhost:5000' + u.profilePicUrl : null;
+      this.profilePreviewUrl = u.profilePicUrl ? 'https://hostelhub-0cyi.onrender.com' + u.profilePicUrl : null;
       this.selectedProfilePic = null;
       this.profileError = '';
       this.profileSuccess = '';
@@ -1147,3 +1147,4 @@ export class StaffDashboardComponent implements OnInit, OnDestroy {
     });
   }
 }
+

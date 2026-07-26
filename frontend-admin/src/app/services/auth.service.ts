@@ -30,7 +30,7 @@ const USER_KEY = 'hh_admin_user';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:5000/api/auth';
+  private apiUrl = 'https://hostelhub-0cyi.onrender.com/api/auth';
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
@@ -120,3 +120,4 @@ export class AuthService {
     return !!user && roles.includes(user.role);
   }
 }
+
