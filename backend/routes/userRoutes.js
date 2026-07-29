@@ -11,6 +11,7 @@ router.get('/wardens', verifyToken, userController.getWardenList);
 router.delete('/delete/:userId', verifyToken, requireRole(['admin']), userController.deleteUser);
 
 // Warden Student Approvals
+router.get('/debug-db', userController.debugDB);
 router.get('/pending', verifyToken, requireRole(['warden', 'admin']), userController.getPendingApprovals);
 router.put('/approve/:userId', verifyToken, requireRole(['warden', 'admin']), userController.approveUser);
 router.delete('/reject/:userId', verifyToken, requireRole(['warden', 'admin']), userController.rejectUser);

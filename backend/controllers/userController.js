@@ -196,4 +196,15 @@ exports.rejectUser = async (req, res) => {
   }
 };
 
+exports.debugDB = async (req, res) => {
+  try {
+    const users = await User.findAll({
+      attributes: ['id', 'name', 'email', 'role', 'status', 'hostelBlock', 'gender', 'batch', 'rollNumber', 'createdAt']
+    });
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ error: error.message, stack: error.stack });
+  }
+};
+
 
