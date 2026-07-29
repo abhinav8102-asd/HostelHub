@@ -145,7 +145,9 @@ exports.getPendingApprovals = async (req, res) => {
       if (!warden.hostelBlock) {
         return res.status(200).json([]);
       }
-      filter.hostelBlock = warden.hostelBlock;
+      if (warden.hostelBlock !== 'All') {
+        filter.hostelBlock = warden.hostelBlock;
+      }
     }
 
     const pending = await User.findAll({
