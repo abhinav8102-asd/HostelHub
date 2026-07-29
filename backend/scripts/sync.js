@@ -3,7 +3,7 @@ const { sequelize, Setting } = require('../models');
 const syncDB = async () => {
   try {
     console.log('Syncing database tables...');
-    await sequelize.sync({ alter: true }); 
+    await sequelize.sync({ force: true }); 
     console.log('Database synced successfully.');
 
     // Seed default footer settings
