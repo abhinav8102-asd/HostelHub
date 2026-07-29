@@ -150,7 +150,7 @@ import { SocketService, LiveNotification } from '../../services/socket.service';
                     
                     <div class="upload-area" *ngIf="!imagePreviewUrls[task.id]">
                       <input type="file" (change)="onFileChange($event, task.id)" accept="image/*" class="file-input" [id]="'proof_' + task.id" />
-                      <label [for]="'proof_' + task.id" class="file-input-label">
+                      <label [for]="'proof_' + task.id" class="file-input-label" (click)="selectPhoto('proof', task.id); $event.preventDefault()">
                         <span class="upload-icon">📸</span>
                         <span class="upload-text">Select Completion Image</span>
                       </label>
@@ -239,10 +239,10 @@ import { SocketService, LiveNotification } from '../../services/socket.service';
                   <img *ngIf="profilePreviewUrl" [src]="profilePreviewUrl" style="width: 100%; height: 100%; object-fit: cover;" />
                   <span *ngIf="!profilePreviewUrl" style="font-size: 40px; color: #94a3b8;">🔧</span>
                 </div>
-                <input type="file" (change)="onProfilePicChange($event)" accept="image/*" class="file-input" id="profilePicFile" style="display: none;"/>
-                <label for="profilePicFile" class="btn btn-secondary" style="cursor: pointer; font-size: 12px; padding: 6px 12px;">
-                  📷 Choose Photo
-                </label>
+                 <input type="file" (change)="onProfilePicChange($event)" accept="image/*" class="file-input" id="profilePicFile" style="display: none;"/>
+                 <button type="button" class="btn btn-secondary" style="cursor: pointer; font-size: 12px; padding: 6px 12px;" (click)="selectPhoto('profile')">
+                   📷 Choose Photo
+                 </button>
               </div>
 
               <div class="form-group">
@@ -1145,6 +1145,46 @@ export class StaffDashboardComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  async selectPhoto(type: 'proof' | 'profile', taskId?: number) {
+    try {
+      const { Camera, CameraResultType, CameraSource } = await import('@capacitor/camera');
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.Uri,
+        source: CameraSource.Prompt
+      });
+
+      if (image && image.webPath) {
+        const response = await fetch(image.webPath);
+        const blob = await response.blob();
+        const file = new File([blob], `photo-${Date.now()}.jpg`, { type: 'image/jpeg' });
+
+        const reader = new FileReader();
+        reader.onload = () => {
+          if (type === 'proof' && taskId !== undefined) {
+            this.selectedFiles[taskId] = file;
+            this.imagePreviewUrls[taskId] = reader.result as string;
+          } else if (type === 'profile') {
+            this.selectedProfilePic = file;
+            this.profilePreviewUrl = reader.result as string;
+          }
+          this.cdr.detectChanges();
+        };
+        reader.readAsDataURL(file);
+      }
+    } catch (err) {
+      console.log('Capacitor camera failed or cancelled, using standard browser input:', err);
+      if (type === 'proof' && taskId !== undefined) {
+        const el = document.getElementById('proof_' + taskId) as HTMLInputElement;
+        if (el) el.click();
+      } else if (type === 'profile') {
+        const el = document.getElementById('profilePicFile') as HTMLInputElement;
+        if (el) el.click();
+      }
+    }
   }
 }
 

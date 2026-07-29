@@ -48,9 +48,9 @@ const User = sequelize.define('User', {
     field: 'hostel_block'
   },
   status: {
-    type: DataTypes.ENUM('active', 'inactive'),
+    type: DataTypes.ENUM('active', 'inactive', 'pending_verification', 'blocked'),
     allowNull: false,
-    defaultValue: 'active'
+    defaultValue: 'pending_verification'
   },
   profilePicUrl: {
     type: DataTypes.STRING,
@@ -70,6 +70,12 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: false,
     defaultValue: 'Batch 2025'
+  },
+  rollNumber: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    unique: true,
+    field: 'roll_number'
   }
 }, {
   tableName: 'users'

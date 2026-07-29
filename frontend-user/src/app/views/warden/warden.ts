@@ -3,12 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import { AuthService, User } from '../../services/auth.service';
 import { ComplaintService } from '../../services/complaint.service';
 import { SocketService, LiveNotification } from '../../services/socket.service';
 import { MessService } from '../../services/mess.service';
 import { AttendanceService } from '../../services/attendance.service';
 import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service';
+import { API_CONFIG } from '../../config/api.config';
 
 
 
@@ -312,9 +314,9 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
                 <label class="form-label">📷 Attach Image (Optional)</label>
                 <div style="display: flex; align-items: center; gap: 12px;">
                   <input type="file" (change)="onNoticePhotoSelected($event)" accept="image/*" class="file-input" id="noticePhotoFile" style="display: none;"/>
-                  <label for="noticePhotoFile" class="btn btn-secondary" style="cursor: pointer; font-size: 12px; padding: 8px 14px; display: inline-flex; align-items: center; gap: 6px;">
+                  <button type="button" class="btn btn-secondary" style="cursor: pointer; font-size: 12px; padding: 8px 14px; display: inline-flex; align-items: center; gap: 6px;" (click)="selectPhoto('notice')">
                     📷 Choose Photo
-                  </label>
+                  </button>
                   <span *ngIf="noticePhotoFile" style="font-size: 12px; color: var(--primary); font-weight: 600;">
                     ✓ {{ noticePhotoFile.name }}
                   </span>
@@ -432,9 +434,9 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
                   <span *ngIf="!profilePreviewUrl" style="font-size: 40px; color: #94a3b8;">👨‍💼</span>
                 </div>
                 <input type="file" (change)="onProfilePicChange($event)" accept="image/*" class="file-input" id="profilePicFile" style="display: none;"/>
-                <label for="profilePicFile" class="btn btn-secondary" style="cursor: pointer; font-size: 12px; padding: 6px 12px;">
+                <button type="button" class="btn btn-secondary" style="cursor: pointer; font-size: 12px; padding: 6px 12px;" (click)="selectPhoto('profile')">
                   📷 Choose Photo
-                </label>
+                </button>
               </div>
 
               <div class="form-group">
@@ -919,7 +921,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
                 type="button" 
                 class="btn" 
                 style="width: 44px !important; height: 44px; flex: none !important; flex-shrink: 0 !important; background: var(--bg-muted); border: 1px solid var(--border-color); font-size: 18px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; cursor: pointer;" 
-                (click)="wardenChatFileInput.click()"
+                (click)="selectPhoto('chat')"
                 title="Attach image"
               >
                 📷
@@ -949,6 +951,64 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
           </div>
         </div>
 
+        <!-- TAB 8: REGISTRATION APPROVALS -->
+        <div *ngIf="activeTab === 'approvals'" class="tab-panel animate-fade">
+          <h4 class="page-title">🔍 Pending Student Registrations</h4>
+          <p class="page-subtitle" style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+            Verify and approve student registrations for {{ user?.hostelBlock || 'your hostel' }}.
+          </p>
+
+          <div *ngIf="pendingApprovals.length > 0; else noPending">
+            <div class="card" *ngFor="let student of pendingApprovals" style="margin-bottom: 14px; padding: 16px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); display: flex; flex-direction: column; gap: 12px; position: relative;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px dashed var(--border-color); padding-bottom: 8px;">
+                <div>
+                  <h4 style="margin: 0; font-size: 16px; color: var(--text-primary);">{{ student.name }}</h4>
+                  <span style="font-size: 11px; background: rgba(79, 70, 229, 0.1); color: var(--primary); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 4px; font-weight: 700;">
+                    {{ student.batch }}
+                  </span>
+                </div>
+                <span style="font-size: 12px; font-weight: 700; color: var(--text-primary);">Roll: {{ student.rollNumber }}</span>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; color: var(--text-muted);">
+                <div>📧 <strong>Email:</strong> {{ student.email }}</div>
+                <div>📞 <strong>Phone:</strong> {{ student.phone }}</div>
+                <div>🏢 <strong>Block:</strong> {{ student.hostelBlock }}</div>
+                <div>🔑 <strong>Room:</strong> Room {{ student.roomNumber }}</div>
+                <div>🚻 <strong>Gender:</strong> {{ student.gender | titlecase }}</div>
+                <div>📅 <strong>Applied:</strong> {{ student.createdAt | date:'shortDate' }}</div>
+              </div>
+
+              <div style="display: flex; gap: 10px; margin-top: 6px;">
+                <button 
+                  type="button" 
+                  class="btn btn-primary" 
+                  style="flex: 1; padding: 10px; background: #059669; font-weight: 700; font-size: 13px; cursor: pointer; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; gap: 6px;" 
+                  (click)="approveStudent(student.id)"
+                >
+                  <span>✓</span> Approve Student
+                </button>
+                <button 
+                  type="button" 
+                  class="btn" 
+                  style="flex: 1; padding: 10px; background: #dc2626; color: white; font-weight: 700; font-size: 13px; cursor: pointer; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; gap: 6px;" 
+                  (click)="rejectStudent(student.id)"
+                >
+                  <span>✕</span> Reject Request
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <ng-template #noPending>
+            <div class="empty-state" style="text-align: center; padding: 40px 20px;">
+              <span class="empty-icon" style="font-size: 48px; display: block; margin-bottom: 12px;">🎉</span>
+              <h4 style="color: var(--text-primary);">All Clear!</h4>
+              <p style="color: var(--text-muted); font-size: 13px;">There are no pending registration approval requests for your hostel.</p>
+            </div>
+          </ng-template>
+        </div>
+
       </div>
 
       <!-- Bottom Nav -->
@@ -975,6 +1035,13 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
             <span class="tab-badge animate-scale" *ngIf="totalUnreadChatCount > 0">{{ totalUnreadChatCount }}</span>
           </span>
           <span>Chat</span>
+        </button>
+        <button class="tab-item" [class.active]="activeTab === 'approvals'" (click)="activeTab = 'approvals'; loadPendingApprovals()">
+          <span class="tab-icon">
+            🔍
+            <span class="tab-badge animate-scale" *ngIf="pendingApprovals.length > 0" style="background:#ef4444;">{{ pendingApprovals.length }}</span>
+          </span>
+          <span>Approvals</span>
         </button>
         <button class="tab-item" [class.active]="activeTab === 'analytics'" (click)="activeTab = 'analytics'">
           <span class="tab-icon">📊</span>
@@ -1960,6 +2027,8 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
   sendingWardenChatMessage = false;
   private wardenChatSub!: Subscription;
 
+  pendingApprovals: any[] = [];
+
   constructor(
     private authService: AuthService,
     private complaintService: ComplaintService,
@@ -1968,7 +2037,8 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private messService: MessService,
     private attendanceService: AttendanceService,
-    private chatService: ChatService
+    private chatService: ChatService,
+    private http: HttpClient
   ) {}
 
 
@@ -1982,6 +2052,7 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
     this.loadStaffWorkload();
     this.loadFooterSettings();
     this.loadWardenChatGroups();
+    this.loadPendingApprovals();
 
     this.notifSub = this.socketService.notification$.subscribe(notif => {
       if (notif) {
@@ -2987,6 +3058,94 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
         console.error('Failed to delete warden message for everyone:', err);
       }
     });
+  }
+
+  loadPendingApprovals(): void {
+    this.http.get<any[]>(`${API_CONFIG.baseUrl}/api/users/pending`, {
+      headers: this.authService.getAuthHeaders()
+    }).subscribe({
+      next: (res) => {
+        this.pendingApprovals = res;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error loading pending approvals:', err);
+      }
+    });
+  }
+
+  approveStudent(studentId: number): void {
+    this.http.put(`${API_CONFIG.baseUrl}/api/users/approve/${studentId}`, {}, {
+      headers: this.authService.getAuthHeaders()
+    }).subscribe({
+      next: () => {
+        this.loadPendingApprovals();
+      },
+      error: (err) => {
+        alert(err.error?.message || 'Failed to approve student.');
+      }
+    });
+  }
+
+  rejectStudent(studentId: number): void {
+    if (confirm('Are you sure you want to reject and delete this registration request?')) {
+      this.http.delete(`${API_CONFIG.baseUrl}/api/users/reject/${studentId}`, {
+        headers: this.authService.getAuthHeaders()
+      }).subscribe({
+        next: () => {
+          this.loadPendingApprovals();
+        },
+        error: (err) => {
+          alert(err.error?.message || 'Failed to reject student request.');
+        }
+      });
+    }
+  }
+
+  async selectPhoto(type: 'notice' | 'profile' | 'chat') {
+    try {
+      const { Camera, CameraResultType, CameraSource } = await import('@capacitor/camera');
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.Uri,
+        source: CameraSource.Prompt
+      });
+
+      if (image && image.webPath) {
+        const response = await fetch(image.webPath);
+        const blob = await response.blob();
+        const file = new File([blob], `photo-${Date.now()}.jpg`, { type: 'image/jpeg' });
+
+        const reader = new FileReader();
+        reader.onload = () => {
+          if (type === 'notice') {
+            this.noticePhotoFile = file;
+            this.noticePhotoPreview = reader.result as string;
+          } else if (type === 'profile') {
+            this.selectedProfilePic = file;
+            this.profilePreviewUrl = reader.result as string;
+          } else if (type === 'chat') {
+            this.selectedChatFile = file;
+            this.chatFilePreviewUrl = reader.result as string;
+          }
+          this.cdr.detectChanges();
+        };
+        reader.readAsDataURL(file);
+      }
+    } catch (err) {
+      console.log('Capacitor camera failed or cancelled, using standard browser input:', err);
+      if (type === 'notice') {
+        const el = document.getElementById('noticePhotoFile') as HTMLInputElement;
+        if (el) el.click();
+      } else if (type === 'profile') {
+        const el = document.getElementById('profilePicFile') as HTMLInputElement;
+        if (el) el.click();
+      } else if (type === 'chat') {
+        const el = document.getElementById('wardenChatFileInput') as HTMLInputElement;
+        if (el) el.click();
+      }
+    }
   }
 }
 

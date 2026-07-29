@@ -52,6 +52,28 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
             <span>{{ selectedNotice.createdAt | date:'d MMM, h:mm a' }}</span>
           </div>
           <div class="notice-modal-body">{{ selectedNotice.content }}</div>
+          
+          <!-- Notice Photo Attachment with Download option -->
+          <div *ngIf="selectedNotice.photoUrl" style="margin-top: 14px; margin-bottom: 14px; text-align: center;">
+            <img 
+              [src]="getImageUrl(selectedNotice.photoUrl)" 
+              style="max-width: 100%; max-height: 220px; border-radius: 8px; object-fit: cover; box-shadow: var(--shadow-sm); cursor: pointer;"
+              alt="Notice Attachment"
+              (click)="openPhotoModal(getImageUrl(selectedNotice.photoUrl))"
+            />
+            <div style="margin-top: 10px;">
+              <a 
+                [href]="getImageUrl(selectedNotice.photoUrl)" 
+                target="_blank" 
+                download 
+                class="btn"
+                style="background: var(--neutral-100); color: var(--neutral-800); font-size: 12px; padding: 7px 14px; border-radius: 6px; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; border: 1px solid var(--neutral-200);"
+              >
+                📥 Download Image
+              </a>
+            </div>
+          </div>
+
           <button class="btn btn-primary" style="width:100%;margin-top:4px" (click)="closeNoticeModal()">Close</button>
         </div>
       </div>
@@ -288,7 +310,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
 
                 <div class="upload-area" *ngIf="!imagePreviewUrl">
                   <input type="file" (change)="onFileChange($event)" accept="image/*" class="file-input" id="photoFile"/>
-                  <label for="photoFile" class="file-input-label">
+                  <label for="photoFile" class="file-input-label" (click)="selectPhoto('complaint'); $event.preventDefault()">
                     <span class="upload-icon">📸</span>
                     <span class="upload-text">Select Image File</span>
                     <span class="upload-subtext">JPEG, PNG up to 5MB</span>
@@ -526,9 +548,9 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
                   <span *ngIf="!profilePreviewUrl" style="font-size: 40px; color: #94a3b8;">🎓</span>
                 </div>
                 <input type="file" (change)="onProfilePicChange($event)" accept="image/*" class="file-input" id="profilePicFile" style="display: none;"/>
-                <label for="profilePicFile" class="btn btn-secondary" style="cursor: pointer; font-size: 12px; padding: 6px 12px;">
+                <button type="button" class="btn btn-secondary" style="cursor: pointer; font-size: 12px; padding: 6px 12px;" (click)="selectPhoto('profile')">
                   📷 Choose Photo
-                </label>
+                </button>
               </div>
 
               <div class="form-group">
@@ -964,7 +986,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
                 type="button" 
                 class="btn" 
                 style="width: 44px !important; height: 44px; flex: none !important; flex-shrink: 0 !important; background: var(--bg-muted); border: 1px solid var(--border-color); font-size: 18px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; cursor: pointer;" 
-                (click)="chatFileInput.click()"
+                (click)="selectPhoto('chat')"
                 title="Attach image"
               >
                 📷
@@ -2727,6 +2749,52 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
         console.error('Failed to delete message for everyone:', err);
       }
     });
+  }
+
+  async selectPhoto(type: 'complaint' | 'profile' | 'chat') {
+    try {
+      const { Camera, CameraResultType, CameraSource } = await import('@capacitor/camera');
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.Uri,
+        source: CameraSource.Prompt
+      });
+
+      if (image && image.webPath) {
+        const response = await fetch(image.webPath);
+        const blob = await response.blob();
+        const file = new File([blob], `photo-${Date.now()}.jpg`, { type: 'image/jpeg' });
+
+        const reader = new FileReader();
+        reader.onload = () => {
+          if (type === 'complaint') {
+            this.selectedFile = file;
+            this.imagePreviewUrl = reader.result as string;
+          } else if (type === 'profile') {
+            this.selectedProfilePic = file;
+            this.profilePreviewUrl = reader.result as string;
+          } else if (type === 'chat') {
+            this.selectedChatFile = file;
+            this.chatFilePreviewUrl = reader.result as string;
+          }
+          this.cdr.detectChanges();
+        };
+        reader.readAsDataURL(file);
+      }
+    } catch (err) {
+      console.log('Capacitor camera failed or cancelled, using standard browser input:', err);
+      if (type === 'complaint') {
+        const el = document.getElementById('photoFile') as HTMLInputElement;
+        if (el) el.click();
+      } else if (type === 'profile') {
+        const el = document.getElementById('profilePicFile') as HTMLInputElement;
+        if (el) el.click();
+      } else if (type === 'chat') {
+        const el = document.getElementById('chatFileInput') as HTMLInputElement;
+        if (el) el.click();
+      }
+    }
   }
 }
 

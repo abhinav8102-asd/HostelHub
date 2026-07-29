@@ -10,4 +10,9 @@ router.post('/create-staff-warden', verifyToken, requireRole(['admin']), userCon
 router.get('/wardens', verifyToken, userController.getWardenList);
 router.delete('/delete/:userId', verifyToken, requireRole(['admin']), userController.deleteUser);
 
+// Warden Student Approvals
+router.get('/pending', verifyToken, requireRole(['warden', 'admin']), userController.getPendingApprovals);
+router.put('/approve/:userId', verifyToken, requireRole(['warden', 'admin']), userController.approveUser);
+router.delete('/reject/:userId', verifyToken, requireRole(['warden', 'admin']), userController.rejectUser);
+
 module.exports = router;

@@ -2,6 +2,7 @@ const { Complaint, User, Notification } = require('../models');
 const { Op } = require('sequelize');
 const fs = require('fs');
 const path = require('path');
+const { uploadFile } = require('../utils/storage');
 
 // Helper to create and send real-time notification
 const sendNotification = async (app, userId, message, type) => {
@@ -31,7 +32,7 @@ const sendNotification = async (app, userId, message, type) => {
 exports.raiseComplaint = async (req, res) => {
   try {
     const { title, description, category, priority } = req.body;
-    const photoUrl = req.file ? `/uploads/${req.file.filename}` : null;
+    const photoUrl = req.file ? await uploadFile(req.file) : null;
 
     const complaint = await Complaint.create({
       studentId: req.userId,

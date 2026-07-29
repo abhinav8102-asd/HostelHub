@@ -1,4 +1,5 @@
 const { Announcement, User, Notification } = require('../models');
+const { uploadFile } = require('../utils/storage');
 
 // Helper to create and send real-time notification
 const sendNotification = async (app, userId, message, type) => {
@@ -28,7 +29,7 @@ exports.createAnnouncement = async (req, res) => {
 
     let photoUrl = null;
     if (req.file) {
-      photoUrl = `/uploads/${req.file.filename}`;
+      photoUrl = await uploadFile(req.file);
     } else if (body.photoUrl) {
       photoUrl = body.photoUrl;
     }

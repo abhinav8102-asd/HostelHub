@@ -129,4 +129,69 @@ exports.getWardenList = async (req, res) => {
   }
 };
 
+exports.getPendingApprovals = async (req, res) => {
+  try {
+    const warden = await User.findByPk(req.userId);
+    if (!warden) {
+      return res.status(404).json({ message: 'Warden account not found.' });
+    }
+
+    let filter = {
+      role: 'student',
+      status: 'pending_verification'
+    };
+
+    if (warden.role === 'warden') {
+      if (!warden.hostelBlock) {
+        return res.status(200).json([]);
+      }
+      filter.hostelBlock = warden.hostelBlock;
+    }
+
+    const pending = await User.findAll({
+      where: filter,
+      attributes: ['id', 'name', 'email', 'phone', 'rollNumber', 'roomNumber', 'hostelBlock', 'batch', 'gender', 'createdAt']
+    });
+
+    res.status(200).json(pending);
+  } catch (error) {
+    console.error('Get Pending Approvals Error:', error);
+    res.status(500).json({ message: 'Internal server error retrieving pending approvals.' });
+  }
+};
+
+exports.approveUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    user.status = 'active';
+    await user.save();
+
+    res.status(200).json({ message: 'Student approved successfully!', userId: user.id });
+  } catch (error) {
+    console.error('Approve User Error:', error);
+    res.status(500).json({ message: 'Internal server error approving student.' });
+  }
+};
+
+exports.rejectUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    await user.destroy();
+    res.status(200).json({ message: 'Student registration request rejected and deleted.', userId });
+  } catch (error) {
+    console.error('Reject User Error:', error);
+    res.status(500).json({ message: 'Internal server error rejecting student.' });
+  }
+};
+
 

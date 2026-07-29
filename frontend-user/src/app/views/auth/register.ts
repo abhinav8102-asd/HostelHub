@@ -74,6 +74,41 @@ import { AuthService } from '../../services/auth.service';
             </div>
           </div>
 
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="rollNumber">Roll Number</label>
+              <input 
+                type="text" 
+                id="rollNumber" 
+                name="rollNumber" 
+                class="form-input" 
+                placeholder="e.g. 2301CS01"
+                [(ngModel)]="rollNumber" 
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="gender">Gender</label>
+              <select id="gender" name="gender" class="form-input" [(ngModel)]="gender" required>
+                <option value="" disabled selected>Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="batch">Academic Batch</label>
+            <select id="batch" name="batch" class="form-input" [(ngModel)]="batch" required>
+              <option value="" disabled selected>Select Batch</option>
+              <option value="Batch 2023-2027">Batch 2023-2027</option>
+              <option value="Batch 2024-2028">Batch 2024-2028</option>
+              <option value="Batch 2025-2029">Batch 2025-2029</option>
+              <option value="Batch 2026-2030">Batch 2026-2030</option>
+            </select>
+          </div>
+
           <div class="form-group">
             <label class="form-label" for="phone">Phone Number</label>
             <input 
@@ -188,6 +223,9 @@ export class RegisterComponent {
   email = '';
   hostelBlock = '';
   roomNumber = '';
+  rollNumber = '';
+  gender = '';
+  batch = '';
   phone = '';
   password = '';
   loading = false;
@@ -210,16 +248,19 @@ export class RegisterComponent {
       phone: this.phone,
       roomNumber: this.roomNumber,
       hostelBlock: this.hostelBlock,
+      rollNumber: this.rollNumber,
+      gender: this.gender,
+      batch: this.batch,
       password: this.password
     };
 
     this.authService.register(userData).subscribe({
       next: () => {
         this.loading = false;
-        this.success = 'Registration successful! Redirecting to login...';
+        this.success = 'Registration successful! Waiting for Warden verification...';
         setTimeout(() => {
           this.router.navigate(['/student/login']);
-        }, 1500);
+        }, 3000);
       },
       error: (err) => {
         this.loading = false;

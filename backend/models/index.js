@@ -10,6 +10,7 @@ const MessSkip = require('./MessSkip');
 const Attendance = require('./Attendance');
 const GroupChat = require('./GroupChat');
 const ChatMessage = require('./ChatMessage');
+const PasswordResetOTP = require('./PasswordResetOTP');
 
 // User & Complaints Relations
 User.hasMany(Complaint, { foreignKey: 'studentId', as: 'raisedComplaints' });
@@ -59,7 +60,6 @@ module.exports = {
   MessSkip,
   Attendance,
   GroupChat,
-  ChatMessage
+  ChatMessage,
+  PasswordResetOTP
 };
-
-
