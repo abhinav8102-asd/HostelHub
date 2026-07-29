@@ -3,6 +3,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { API_CONFIG } from '../config/api.config';
+import { Router } from '@angular/router';
+import { Preferences } from '@capacitor/preferences';
 
 export interface User {
   id: number;
@@ -25,7 +27,6 @@ export interface AuthResponse {
   user: User;
 }
 
-// Namespaced keys so student portal doesn't conflict with admin portal in same browser
 const TOKEN_KEY = 'hh_student_token';
 const USER_KEY = 'hh_student_user';
 
@@ -37,7 +38,8 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private router: Router) {
+    // 1. Web LocalStorage Load (Immediate/Synchronous)
     const savedUser = localStorage.getItem(USER_KEY);
     if (savedUser) {
       try {
@@ -45,6 +47,31 @@ export class AuthService {
       } catch {
         localStorage.removeItem(USER_KEY);
       }
+    }
+
+    // 2. Native SharedPreferences Load (Asynchronous, avoids Android WebView session resets)
+    this.initNativeStorage();
+  }
+
+  private async initNativeStorage() {
+    try {
+      const { value: token } = await Preferences.get({ key: TOKEN_KEY });
+      const { value: userStr } = await Preferences.get({ key: USER_KEY });
+
+      if (token && userStr) {
+        const user = JSON.parse(userStr);
+        localStorage.setItem(TOKEN_KEY, token);
+        localStorage.setItem(USER_KEY, userStr);
+        this.currentUserSubject.next(user);
+
+        // Auto redirect to correct page if currently stuck on login page
+        const currentUrl = window.location.pathname;
+        if (currentUrl.includes('/login')) {
+          this.router.navigate([`/${user.role}`]);
+        }
+      }
+    } catch (e) {
+      console.error('Failed to load native preferences:', e);
     }
   }
 
@@ -62,7 +89,6 @@ export class AuthService {
     });
   }
 
-  // For JSON POST/PUT requests — adds Content-Type so Express can parse req.body
   getJsonHeaders(): HttpHeaders {
     return new HttpHeaders({
       'Authorization': `Bearer ${this.token || ''}`,
@@ -70,7 +96,6 @@ export class AuthService {
     });
   }
 
-  // For GET requests that must NOT be cached
   getNoCacheHeaders(): HttpHeaders {
     return new HttpHeaders({
       'Authorization': `Bearer ${this.token || ''}`,
@@ -90,6 +115,10 @@ export class AuthService {
           localStorage.setItem(TOKEN_KEY, res.token);
           localStorage.setItem(USER_KEY, JSON.stringify(res.user));
           this.currentUserSubject.next(res.user);
+
+          // Async sync to preferences
+          Preferences.set({ key: TOKEN_KEY, value: res.token });
+          Preferences.set({ key: USER_KEY, value: JSON.stringify(res.user) });
         }
       })
     );
@@ -98,7 +127,10 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
+    Preferences.remove({ key: TOKEN_KEY });
+    Preferences.remove({ key: USER_KEY });
     this.currentUserSubject.next(null);
+    this.router.navigate(['/student/login']);
   }
 
   updateProfile(formData: FormData): Observable<any> {
@@ -109,6 +141,7 @@ export class AuthService {
         if (res && res.user) {
           localStorage.setItem(USER_KEY, JSON.stringify(res.user));
           this.currentUserSubject.next(res.user);
+          Preferences.set({ key: USER_KEY, value: JSON.stringify(res.user) });
         }
       })
     );

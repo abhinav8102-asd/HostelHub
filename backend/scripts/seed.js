@@ -37,6 +37,29 @@ const seedDB = async () => {
       console.log(`ℹ️ Admin account already exists for: ${adminUser.email}`);
     }
 
+    // Seed default batch groups
+    const { GroupChat } = require('../models');
+    const defaultGroups = [
+      { name: 'Boys - Batch 2023-2027', gender: 'male', batch: 'Batch 2023-2027', hostelBlock: 'All', description: 'Official Group Chat for Batch 2023-2027 Boys' },
+      { name: 'Girls - Batch 2023-2027', gender: 'female', batch: 'Batch 2023-2027', hostelBlock: 'All', description: 'Official Group Chat for Batch 2023-2027 Girls' },
+      { name: 'Boys - Batch 2024-2028', gender: 'male', batch: 'Batch 2024-2028', hostelBlock: 'All', description: 'Official Group Chat for Batch 2024-2028 Boys' },
+      { name: 'Girls - Batch 2024-2028', gender: 'female', batch: 'Batch 2024-2028', hostelBlock: 'All', description: 'Official Group Chat for Batch 2024-2028 Girls' },
+      { name: 'Boys - Batch 2025-2029', gender: 'male', batch: 'Batch 2025-2029', hostelBlock: 'All', description: 'Official Group Chat for Batch 2025-2029 Boys' },
+      { name: 'Girls - Batch 2025-2029', gender: 'female', batch: 'Batch 2025-2029', hostelBlock: 'All', description: 'Official Group Chat for Batch 2025-2029 Girls' },
+      { name: 'Boys - Batch 2026-2030', gender: 'male', batch: 'Batch 2026-2030', hostelBlock: 'All', description: 'Official Group Chat for Batch 2026-2030 Boys' },
+      { name: 'Girls - Batch 2026-2030', gender: 'female', batch: 'Batch 2026-2030', hostelBlock: 'All', description: 'Official Group Chat for Batch 2026-2030 Girls' }
+    ];
+
+    for (const group of defaultGroups) {
+      const [g, created] = await GroupChat.findOrCreate({
+        where: { name: group.name },
+        defaults: group
+      });
+      if (created) {
+        console.log(`✅ Seeded group room: ${group.name}`);
+      }
+    }
+
     console.log('Seeding process complete.');
     process.exit(0);
   } catch (error) {

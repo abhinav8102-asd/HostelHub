@@ -35,7 +35,7 @@ export class SocketService {
       return;
     }
 
-    this.socket = io(API_CONFIG.baseUrl);
+    this.socket = io(API_CONFIG.baseUrl, { transports: ['websocket', 'polling'] });
 
     this.socket.on('connect', () => {
       console.log('Socket client connected.');
