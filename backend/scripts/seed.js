@@ -37,6 +37,61 @@ const seedDB = async () => {
       console.log(`ℹ️ Admin account already exists for: ${adminUser.email}`);
     }
 
+    // Seed test accounts for Warden, Staff, and Student
+    const testHash = await bcrypt.hash('password', 10);
+
+    const defaultWarden = {
+      name: 'Warden Test',
+      email: 'warden@gmail.com',
+      password: testHash,
+      role: 'warden',
+      phone: '8888888888',
+      hostelBlock: 'All',
+      gender: 'male',
+      status: 'active'
+    };
+
+    const defaultStaff = {
+      name: 'Staff Test',
+      email: 'staff@gmail.com',
+      password: testHash,
+      role: 'staff',
+      phone: '7777777777',
+      status: 'active'
+    };
+
+    const defaultStudent = {
+      name: 'Student Test',
+      email: 'student@gmail.com',
+      password: testHash,
+      role: 'student',
+      phone: '6666666666',
+      hostelBlock: 'Block-A',
+      roomNumber: '101',
+      batch: 'Batch 2025-2029',
+      gender: 'male',
+      rollNumber: 'STU001',
+      status: 'active'
+    };
+
+    const existingWarden = await User.findOne({ where: { email: defaultWarden.email } });
+    if (!existingWarden) {
+      await User.create(defaultWarden);
+      console.log('✅ Default Warden account seeded.');
+    }
+
+    const existingStaff = await User.findOne({ where: { email: defaultStaff.email } });
+    if (!existingStaff) {
+      await User.create(defaultStaff);
+      console.log('✅ Default Staff account seeded.');
+    }
+
+    const existingStudent = await User.findOne({ where: { email: defaultStudent.email } });
+    if (!existingStudent) {
+      await User.create(defaultStudent);
+      console.log('✅ Default Student account seeded.');
+    }
+
     // Seed default batch groups
     const { GroupChat } = require('../models');
     const defaultGroups = [
