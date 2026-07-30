@@ -66,7 +66,7 @@ const seedDB = async () => {
       password: testHash,
       role: 'student',
       phone: '6666666666',
-      hostelBlock: 'Block-A',
+      hostelBlock: 'Boys Hostel 1',
       roomNumber: '101',
       batch: 'Batch 2025-2029',
       gender: 'male',
