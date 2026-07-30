@@ -930,9 +930,9 @@ import { API_CONFIG } from '../../config/api.config';
 
                 <!-- Normal Active Message Bubble -->
                 <div *ngIf="!msg.isDeleted"
-                  [style.background]="isMessageSelected(msg.id) ? 'rgba(99, 102, 241, 0.25)' : (msg.senderId === user?.id ? '#6366f1' : (msg.sender?.role === 'warden' ? 'rgba(239, 68, 68, 0.12)' : 'var(--bg-card)'))"
+                  [style.background]="isMessageSelected(msg.id) ? 'rgba(179, 16, 49, 0.25)' : (msg.senderId === user?.id ? '#b31031' : (msg.sender?.role === 'warden' ? 'rgba(239, 68, 68, 0.12)' : 'var(--bg-card)'))"
                   [style.color]="msg.senderId === user?.id ? 'white' : 'var(--text-primary)'"
-                  [style.border]="isMessageSelected(msg.id) ? '2px solid #6366f1' : (msg.senderId === user?.id ? 'none' : (msg.sender?.role === 'warden' ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid var(--border-color)'))"
+                  [style.border]="isMessageSelected(msg.id) ? '2px solid #b31031' : (msg.senderId === user?.id ? 'none' : (msg.sender?.role === 'warden' ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid var(--border-color)'))"
                   [style.border-radius]="msg.senderId === user?.id ? '16px 16px 4px 16px' : '16px 16px 16px 4px'"
                   style="padding: 12px 16px; font-size: 13.5px; line-height: 1.5; word-break: break-word; box-shadow: 0 2px 6px rgba(0,0,0,0.06); display: flex; flex-direction: column; gap: 6px; cursor: pointer;"
                 >
@@ -1157,8 +1157,8 @@ import { API_CONFIG } from '../../config/api.config';
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid rgba(99, 102, 241, 0.3);
-      box-shadow: 0 2px 20px rgba(0,0,0,0.2);
+      border-bottom: 1px solid rgba(179, 16, 49, 0.4);
+      box-shadow: 0 2px 20px rgba(179, 16, 49, 0.25);
       position: sticky;
       top: 0;
       z-index: 200;
@@ -1172,13 +1172,13 @@ import { API_CONFIG } from '../../config/api.config';
     .avatar-ring {
       width: 44px;
       height: 44px;
-      background: rgba(99, 102, 241, 0.2);
-      border: 1.5px solid var(--primary);
+      background: rgba(179, 16, 49, 0.25);
+      border: 2px solid rgba(255, 255, 255, 0.5);
       border-radius: 50%;
       display: flex;
       justify-content: center;
       align-items: center;
-      box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+      box-shadow: 0 0 10px rgba(179, 16, 49, 0.4);
     }
     .avatar {
       font-size: 22px;
@@ -1420,7 +1420,7 @@ import { API_CONFIG } from '../../config/api.config';
     /* Staff details */
     .assigned-staff-details {
       background-color: var(--primary-light);
-      border: 1px solid rgba(99, 102, 241, 0.25);
+      border: 1px solid rgba(179, 16, 49, 0.25);
       border-radius: var(--radius-md);
       padding: 12px;
       margin-top: 0;
@@ -1522,7 +1522,7 @@ import { API_CONFIG } from '../../config/api.config';
       width: auto;
       padding: 10px 18px;
       font-size: 13px;
-      box-shadow: 0 4px 6px rgba(99, 102, 241, 0.15);
+      box-shadow: 0 4px 6px rgba(179, 16, 49, 0.15);
     }
     @media (max-width: 767px) {
       .assign-row {
@@ -1541,7 +1541,7 @@ import { API_CONFIG } from '../../config/api.config';
 
     .btn-submit {
       margin-top: 10px;
-      box-shadow: 0 4px 10px rgba(99, 102, 241, 0.2);
+      box-shadow: 0 4px 10px rgba(179, 16, 49, 0.2);
     }
     .btn-collapse {
       margin-top: 4px;
@@ -1942,7 +1942,7 @@ import { API_CONFIG } from '../../config/api.config';
     }
     .comment-header { display: flex; gap: 10px; align-items: center; font-size: 11px; font-weight: 700; }
     .rating-stars { color: #fbbf24; }
-    .comment-meal { color: var(--text-secondary); background: rgba(99,102,241,0.1); padding: 1px 6px; border-radius: 4px; }
+    .comment-meal { color: var(--text-secondary); background: rgba(179,16,49,0.1); padding: 1px 6px; border-radius: 4px; }
     .comment-date { color: var(--text-muted); margin-left: auto; font-weight: 500; }
     .comment-text { font-size: 12.5px; color: var(--text-primary); line-height: 1.4; font-style: italic; }
     .comment-author { font-size: 10px; color: var(--text-muted); font-weight: 600; text-align: right; }

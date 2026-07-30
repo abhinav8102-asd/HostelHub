@@ -308,7 +308,7 @@ import { SocketService, LiveNotification } from '../../services/socket.service';
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+      border-bottom: 1px solid rgba(179, 16, 49, 0.4);
       box-shadow: 0 2px 20px rgba(0,0,0,0.2);
       position: sticky;
       top: 0;
@@ -323,13 +323,13 @@ import { SocketService, LiveNotification } from '../../services/socket.service';
     .avatar-ring {
       width: 44px;
       height: 44px;
-      background: rgba(99, 102, 241, 0.2);
-      border: 1.5px solid var(--primary);
+      background: rgba(179, 16, 49, 0.25);
+      border: 2px solid rgba(255, 255, 255, 0.5);
       border-radius: 50%;
       display: flex;
       justify-content: center;
       align-items: center;
-      box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+      box-shadow: 0 0 10px rgba(179, 16, 49, 0.4);
     }
     .avatar {
       font-size: 22px;
@@ -570,7 +570,7 @@ import { SocketService, LiveNotification } from '../../services/socket.service';
       padding-top: 12px;
     }
     .btn-start-job {
-      box-shadow: 0 4px 6px rgba(99, 102, 241, 0.15);
+      box-shadow: 0 4px 6px rgba(179, 16, 49, 0.15);
     }
     .btn-submit-resolved {
       margin-top: 12px;
@@ -828,7 +828,7 @@ import { SocketService, LiveNotification } from '../../services/socket.service';
     .notif-card.unread {
       border-left-color: var(--primary);
       background-color: var(--primary-light);
-      box-shadow: 0 2px 6px rgba(99, 102, 241, 0.05);
+      box-shadow: 0 2px 6px rgba(179, 16, 49, 0.05);
     }
     .notif-meta {
       display: flex;

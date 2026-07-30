@@ -1086,8 +1086,8 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid rgba(99, 102, 241, 0.3);
-      box-shadow: 0 2px 20px rgba(0,0,0,0.2);
+      border-bottom: 1px solid rgba(179, 16, 49, 0.4);
+      box-shadow: 0 2px 20px rgba(179, 16, 49, 0.25);
       position: sticky;
       top: 0;
       z-index: 200;
@@ -1096,13 +1096,13 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
     .avatar-ring {
       width: 42px;
       height: 42px;
-      background: rgba(99, 102, 241, 0.2);
-      border: 1.5px solid rgba(99,102,241,0.6);
+      background: rgba(179, 16, 49, 0.25);
+      border: 2px solid rgba(255, 255, 255, 0.5);
       border-radius: 50%;
       display: flex;
       justify-content: center;
       align-items: center;
-      box-shadow: 0 0 14px rgba(99, 102, 241, 0.25);
+      box-shadow: 0 0 14px rgba(179, 16, 49, 0.4);
     }
     .avatar { font-size: 20px; }
     h3 { font-size: 15px; font-weight: 700; color: #f8fafc; letter-spacing: 0.1px; }
@@ -1147,7 +1147,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
       margin-bottom: 16px;
     }
     .btn-raise-shortcut {
-      background: var(--primary);
+      background: var(--gradient-btn);
       color: #fff;
       border: none;
       border-radius: var(--radius-sm);
@@ -1160,7 +1160,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
       align-items: center;
       gap: 4px;
       transition: var(--transition-fast);
-      box-shadow: 0 4px 10px rgba(99,102,241,0.25);
+      box-shadow: 0 4px 10px rgba(179, 16, 49, 0.35);
     }
     .btn-raise-shortcut:hover { background: var(--primary-dark); transform: translateY(-1px); }
 
@@ -1169,12 +1169,12 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
 
     /* Welcome Banner */
     .welcome-card {
-      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      background: var(--gradient-brand);
       color: white;
       border-radius: var(--radius-xl);
       padding: 24px;
       margin-bottom: 24px;
-      box-shadow: 0 12px 28px rgba(79, 70, 229, 0.35);
+      box-shadow: 0 12px 28px rgba(179, 16, 49, 0.40);
       position: relative;
       overflow: hidden;
     }
@@ -1216,7 +1216,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
     .welcome-card p { font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.5; }
     .btn-raise-cta {
       background: rgba(255,255,255,0.95);
-      color: #4f46e5;
+      color: var(--primary-dark);
       margin-top: 16px;
       padding: 10px 20px;
       border-radius: var(--radius-md);
@@ -1224,7 +1224,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
       width: auto;
       display: inline-flex;
       gap: 6px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
       font-family: var(--font-sans);
       font-size: 13.5px;
       cursor: pointer;
@@ -1233,7 +1233,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
       position: relative;
       z-index: 5;
     }
-    .btn-raise-cta:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+    .btn-raise-cta:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,0,0,0.25); }
 
     /* Section Header */
     .section-header {
@@ -1402,7 +1402,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
     /* Staff */
     .staff-assignment {
       background: var(--primary-light);
-      border: 1px solid rgba(99,102,241,0.2);
+      border: 1px solid rgba(179, 16, 49, 0.2);
       border-radius: var(--radius-md);
       padding: 14px;
     }
@@ -1570,7 +1570,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
 
     /* Clickable */
     .clickable-notice { cursor: pointer; }
-    .clickable-notice:hover { border-color: rgba(99,102,241,0.3); }
+    .clickable-notice:hover { border-color: rgba(179, 16, 49, 0.3); }
 
     /* Loading dots */
     .loading-dots::after {
