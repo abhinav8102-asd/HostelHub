@@ -64,7 +64,124 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
       <!-- TAB AREA -->
       <div class="tab-content-area">
         
-        <!-- TAB 0: COMPLAINTS LIST -->
+        <!-- TAB 0: HOME DASHBOARD -->
+        <div *ngIf="activeTab === 'home'" class="tab-panel animate-fade">
+          
+          <!-- Animated Hero Welcome Card with Floating Elements & Shimmer -->
+          <div class="warden-hero-card">
+            <div class="hero-bg-glow"></div>
+            <div class="hero-content">
+              <span class="hero-badge animate-pulse-glow">⚡ Warden Command Center</span>
+              <h2 class="hero-title">Welcome back, <span class="typing-text">{{ user?.name || 'Warden' }}</span> 👋</h2>
+              <p class="hero-subtitle">Managing <strong>{{ user?.hostelBlock || 'All Hostel Blocks' }}</strong> · Real-time operational overview</p>
+              
+              <div class="hero-quick-actions">
+                <button class="hero-btn primary-glow" (click)="activeTab = 'announcements'">
+                  <span>📢 Post Notice</span>
+                </button>
+                <button class="hero-btn glass-btn" (click)="activeTab = 'complaints'; filterStatus = 'pending'">
+                  <span>🔔 New Complaints ({{ getPendingCount() }})</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Moving Live Marquee Ticker -->
+          <div class="live-marquee-container" *ngIf="announcements.length > 0">
+            <div class="marquee-tag">📢 LIVE NOTICE</div>
+            <div class="marquee-track">
+              <div class="marquee-content">
+                <span>{{ announcements[0]?.title }}: "{{ announcements[0]?.content | slice:0:90 }}"</span>
+                <span class="marquee-dot">•</span>
+                <span>Tap "Notices" tab to view all announcements & attachments</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2x2 Animated Grid Stats Cards with Floating Animation -->
+          <div class="dashboard-grid-2x2">
+            <div class="grid-card float-card-1" (click)="activeTab = 'complaints'; filterStatus = 'pending'">
+              <div class="card-icon-wrapper red-glow">🔍</div>
+              <div class="card-info">
+                <h3 class="card-value counter-anim">{{ getPendingCount() }}</h3>
+                <p class="card-label">Pending Approvals</p>
+              </div>
+              <div class="card-arrow">→</div>
+            </div>
+
+            <div class="grid-card float-card-2" (click)="activeTab = 'complaints'; filterStatus = 'all'">
+              <div class="card-icon-wrapper orange-glow">📋</div>
+              <div class="card-info">
+                <h3 class="card-value counter-anim">{{ complaints.length }}</h3>
+                <p class="card-label">Total Tickets</p>
+              </div>
+              <div class="card-arrow">→</div>
+            </div>
+
+            <div class="grid-card float-card-3" (click)="activeTab = 'announcements'">
+              <div class="card-icon-wrapper purple-glow">📣</div>
+              <div class="card-info">
+                <h3 class="card-value counter-anim">{{ announcements.length }}</h3>
+                <p class="card-label">Active Notices</p>
+              </div>
+              <div class="card-arrow">→</div>
+            </div>
+
+            <div class="grid-card float-card-4" (click)="activeTab = 'mess'">
+              <div class="card-icon-wrapper green-glow">🍽️</div>
+              <div class="card-info">
+                <h3 class="card-value counter-anim">Live</h3>
+                <p class="card-label">Mess Skip Stats</p>
+              </div>
+              <div class="card-arrow">→</div>
+            </div>
+          </div>
+
+          <!-- Quick Action Section Banner -->
+          <div class="quick-announcement-banner">
+            <div class="banner-text">
+              <h4>📢 Quick Announcement</h4>
+              <p>Announce water cut, mess scheduling changes, or urgent notices instantly to students.</p>
+            </div>
+            <button class="btn-post-quick" (click)="activeTab = 'announcements'">
+              <span>+ Write Notice</span>
+            </button>
+          </div>
+
+          <!-- Live Resolution Analytics Preview -->
+          <div class="home-analytics-preview">
+            <div class="preview-header">
+              <h5>📊 Resolution Overview</h5>
+              <button class="link-btn" (click)="activeTab = 'analytics'">Full Analytics →</button>
+            </div>
+            <div class="analytics-mini-bars">
+              <div class="mini-bar-item">
+                <div class="bar-top">
+                  <span>Pending</span>
+                  <strong>{{ getPendingCount() }}</strong>
+                </div>
+                <div class="bar-track"><div class="bar-fill red" [style.width.%]="complaints.length ? (getPendingCount() / complaints.length * 100) : 0"></div></div>
+              </div>
+              <div class="mini-bar-item">
+                <div class="bar-top">
+                  <span>In Progress</span>
+                  <strong>{{ getAssignedCount() }}</strong>
+                </div>
+                <div class="bar-track"><div class="bar-fill orange" [style.width.%]="complaints.length ? (getAssignedCount() / complaints.length * 100) : 0"></div></div>
+              </div>
+              <div class="mini-bar-item">
+                <div class="bar-top">
+                  <span>Resolved</span>
+                  <strong>{{ getResolvedCount() }}</strong>
+                </div>
+                <div class="bar-track"><div class="bar-fill green" [style.width.%]="complaints.length ? (getResolvedCount() / complaints.length * 100) : 0"></div></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- TAB 1: COMPLAINTS LIST -->
         <div *ngIf="activeTab === 'complaints'" class="tab-panel animate-fade">
           <h4 class="page-title">📋 Student Complaint Tickets</h4>
 
@@ -953,6 +1070,10 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
 
       <!-- Bottom Nav -->
       <div class="bottom-tabs">
+        <button class="tab-item" [class.active]="activeTab === 'home'" (click)="activeTab = 'home'">
+          <span class="tab-icon">🏠</span>
+          <span>Home</span>
+        </button>
         <button class="tab-item" [class.active]="activeTab === 'complaints'" (click)="activeTab = 'complaints'">
           <span class="tab-icon">📋</span>
           <span>Complaints</span>
@@ -1007,6 +1128,265 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
       flex-direction: column;
       height: 100%;
       position: relative;
+    }
+
+    /* ── WARDEN HOME DASHBOARD ANIMATED STYLES ── */
+    .warden-hero-card {
+      position: relative;
+      background: var(--gradient-brand);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      margin-bottom: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow-brand);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .hero-bg-glow {
+      position: absolute;
+      top: -50px;
+      right: -50px;
+      width: 180px;
+      height: 180px;
+      background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: pulseGlow 4s infinite alternate ease-in-out;
+    }
+    .hero-content { position: relative; z-index: 2; color: #ffffff; }
+    .hero-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(4px);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+    .hero-title {
+      font-size: 20px;
+      font-weight: 900;
+      margin-bottom: 4px;
+      letter-spacing: -0.3px;
+    }
+    .hero-subtitle {
+      font-size: 12.5px;
+      opacity: 0.9;
+      margin-bottom: 18px;
+    }
+    .hero-quick-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .hero-btn {
+      padding: 9px 16px;
+      font-size: 12.5px;
+      font-weight: 700;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      border: none;
+      transition: all var(--transition-fast);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .primary-glow {
+      background: #ffffff;
+      color: var(--primary-dark);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+    }
+    .primary-glow:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.3); }
+    .glass-btn {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .glass-btn:hover { background: rgba(255, 255, 255, 0.25); transform: translateY(-2px); }
+
+    /* Live Marquee Ticker */
+    .live-marquee-container {
+      display: flex;
+      align-items: center;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow-sm);
+    }
+    .marquee-tag {
+      background: var(--primary);
+      color: #ffffff;
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 8px 12px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      letter-spacing: 0.5px;
+    }
+    .marquee-track {
+      flex: 1;
+      overflow: hidden;
+      white-space: nowrap;
+      position: relative;
+      padding: 6px 0;
+    }
+    .marquee-content {
+      display: inline-block;
+      white-space: nowrap;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+      animation: marqueeScroll 18s linear infinite;
+      padding-left: 100%;
+    }
+    .marquee-content:hover { animation-play-state: paused; }
+    .marquee-dot { margin: 0 10px; color: var(--primary); font-weight: 900; }
+
+    /* 2x2 Grid Stats Cards with Floating Animation */
+    .dashboard-grid-2x2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .grid-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all var(--transition-normal);
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+    }
+    .grid-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary);
+      box-shadow: var(--shadow-md);
+    }
+    .float-card-1 { animation: floatSlow 6s ease-in-out infinite; }
+    .float-card-2 { animation: floatSlow 6s ease-in-out infinite 1.5s; }
+    .float-card-3 { animation: floatSlow 6s ease-in-out infinite 3s; }
+    .float-card-4 { animation: floatSlow 6s ease-in-out infinite 4.5s; }
+
+    .card-icon-wrapper {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .red-glow { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+    .orange-glow { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+    .purple-glow { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+    .green-glow { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+
+    .card-info { margin-left: 10px; flex: 1; }
+    .card-value {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--text-primary);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .card-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin: 0;
+    }
+    .card-arrow {
+      font-size: 16px;
+      color: var(--text-muted);
+      transition: transform var(--transition-fast);
+    }
+    .grid-card:hover .card-arrow { transform: translateX(3px); color: var(--primary); }
+
+    /* Quick Announcement Banner */
+    .quick-announcement-banner {
+      background: var(--bg-card);
+      border: 1px dashed var(--primary);
+      border-radius: var(--radius-xl);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .banner-text h4 { font-size: 14px; font-weight: 800; color: var(--text-primary); margin-bottom: 2px; }
+    .banner-text p { font-size: 11.5px; color: var(--text-muted); margin: 0; }
+    .btn-post-quick {
+      background: var(--gradient-btn);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 9px 15px;
+      border-radius: var(--radius-md);
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: 0 4px 10px rgba(179, 16, 49, 0.25);
+      transition: transform var(--transition-fast);
+    }
+    .btn-post-quick:hover { transform: scale(1.03); }
+
+    /* Home Analytics Preview */
+    .home-analytics-preview {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+    .preview-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .preview-header h5 { font-size: 14px; font-weight: 800; color: var(--text-primary); margin: 0; }
+    .link-btn {
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .analytics-mini-bars { display: flex; flex-direction: column; gap: 10px; }
+    .mini-bar-item { display: flex; flex-direction: column; gap: 4px; }
+    .bar-top { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--text-secondary); font-weight: 600; }
+    .bar-track { height: 7px; background: var(--bg-muted); border-radius: 10px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 10px; transition: width 0.8s ease-in-out; }
+    .bar-fill.red { background: #ef4444; }
+    .bar-fill.orange { background: #f97316; }
+    .bar-fill.green { background: #22c55e; }
+
+    /* ── KEYFRAME ANIMATIONS ── */
+    @keyframes marqueeScroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    @keyframes pulseGlow {
+      0% { opacity: 0.3; transform: scale(1); }
+      100% { opacity: 0.7; transform: scale(1.15); }
     }
 
     /* Premium Header */
@@ -1889,7 +2269,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
 })
 export class WardenDashboardComponent implements OnInit, OnDestroy {
   user: User | null = null;
-  activeTab: string = 'complaints';
+  activeTab: string = 'home';
   
   editUser = { name: '', phone: '', bio: '' };
   profilePreviewUrl: string | null = null;
