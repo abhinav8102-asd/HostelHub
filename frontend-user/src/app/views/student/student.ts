@@ -1057,15 +1057,46 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
       </div>
 
 
-      <!-- Footer -->
-      <footer class="footer animate-fade" *ngIf="footerSettings">
-        <div class="footer-content">
-          <p class="footer-title">{{ footerSettings.footer_text }}</p>
-          <div class="footer-meta">
-            <span *ngIf="footerSettings.footer_email">📧 {{ footerSettings.footer_email }}</span>
-            <span *ngIf="footerSettings.footer_phone">📞 {{ footerSettings.footer_phone }}</span>
+      <!-- Exact Clean Footer -->
+      <footer class="footer animate-fade">
+        <div class="footer-clean-container">
+          <div class="footer-header-row">
+            <span class="f-info-icon">ℹ️</span>
+            <h5 class="f-about-heading">About HostelHub</h5>
           </div>
-          <p class="footer-copyright">{{ footerSettings.footer_copyright }}</p>
+
+          <div class="f-brand-title">HostelHubPRO v2.4</div>
+          <div class="f-brand-subtitle">Smart Hostel Management System</div>
+
+          <div class="footer-detail-list">
+            <div class="f-list-item">
+              <span class="f-item-icon">📧</span>
+              <span class="f-item-label">Support:</span>
+              <a [href]="'mailto:' + (footerSettings?.footer_email || 'support@hostelhub.com')" class="f-item-link">{{ footerSettings?.footer_email || 'support@hostelhub.com' }}</a>
+            </div>
+
+            <div class="f-list-item">
+              <span class="f-item-icon">📞</span>
+              <span class="f-item-label">Warden Helpline:</span>
+              <span class="f-item-value">{{ footerSettings?.footer_phone || '+91 98765 43210' }}</span>
+            </div>
+
+            <div class="f-list-item">
+              <span class="f-item-icon">🛡️</span>
+              <span class="f-item-label">24×7 Security:</span>
+              <span class="f-item-value">+91 91234 56789</span>
+            </div>
+
+            <div class="f-list-item">
+              <span class="f-status-dot"></span>
+              <span class="f-item-label">Server Status:</span>
+              <span class="f-status-text">Online</span>
+            </div>
+          </div>
+
+          <div class="footer-copyright-text">
+            © 2026 HostelHub. All Rights Reserved.
+          </div>
         </div>
       </footer>
     </div>
@@ -1592,37 +1623,79 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
       box-shadow: var(--shadow-sm);
     }
 
-    /* Footer Styling */
+    /* Exact Clean List Footer Styling */
     .footer {
       order: 4;
-      margin-top: auto;
-      background-color: var(--bg-card);
+      background: var(--bg-card);
       border-top: 1px solid var(--border-color);
-      padding: 24px 16px;
-      text-align: center;
+      padding: 24px 20px 28px;
+      margin-top: auto;
       width: 100%;
-      box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.04);
     }
-    .footer-content {
+    .footer-clean-container {
+      max-width: 500px;
+      margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 12px;
+      text-align: left;
     }
-    .footer-title {
-      font-size: 12px;
-      font-weight: 700;
+    .footer-header-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 2px;
+    }
+    .f-info-icon { font-size: 16px; }
+    .f-about-heading {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin: 0;
+    }
+    .f-brand-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.2px;
+    }
+    .f-brand-subtitle {
+      font-size: 13px;
+      font-style: italic;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    .footer-detail-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .f-list-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
       color: var(--text-primary);
     }
-    .footer-meta {
-      display: flex;
-      justify-content: center;
-      gap: 14px;
-      font-size: 11px;
-      color: var(--text-muted);
+    .f-item-icon { font-size: 15px; flex-shrink: 0; }
+    .f-item-label { font-weight: 700; color: var(--text-primary); }
+    .f-item-link { color: var(--text-primary); text-decoration: underline; font-weight: 500; }
+    .f-item-value { color: var(--text-primary); font-weight: 500; }
+    .f-status-dot {
+      width: 12px;
+      height: 12px;
+      background: #22c55e;
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
     }
-    .footer-copyright {
-      font-size: 10px;
+    .f-status-text { color: var(--text-primary); font-weight: 600; }
+    .footer-copyright-text {
+      font-size: 12px;
       color: var(--text-muted);
+      margin-top: 10px;
+      font-weight: 500;
     }
 
     /* Mess Management CSS */

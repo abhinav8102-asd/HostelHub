@@ -1127,66 +1127,45 @@ import { API_CONFIG } from '../../config/api.config';
       </div><!-- /bottom-tabs -->
 
 
-      <!-- Enhanced Rich Footer -->
+      <!-- Exact Clean Footer -->
       <footer class="footer animate-fade">
-        <div class="footer-container">
-          <!-- Top Section: Brand & Tagline -->
-          <div class="footer-brand-section">
-            <div class="footer-brand-logo">
-              <span class="brand-icon">🏰</span>
-              <span class="brand-name">HostelHub</span>
-              <span class="brand-badge">PRO v2.4</span>
-            </div>
-            <p class="footer-tagline">
-              {{ footerSettings?.footer_text || 'Smart Hostel Administration & Resident Maintenance Ecosystem' }}
-            </p>
+        <div class="footer-clean-container">
+          <div class="footer-header-row">
+            <span class="f-info-icon">ℹ️</span>
+            <h5 class="f-about-heading">About HostelHub</h5>
           </div>
 
-          <!-- Quick Navigation Link Pills -->
-          <div class="footer-quick-nav">
-            <span class="nav-pill" (click)="activeTab = 'home'">🏠 Home</span>
-            <span class="nav-pill" (click)="activeTab = 'complaints'">📋 Tickets</span>
-            <span class="nav-pill" (click)="onAnnouncementsTab()">📢 Notices</span>
-            <span class="nav-pill" (click)="activeTab = 'mess'; loadMessData()">🍴 Mess Admin</span>
-            <span class="nav-pill" (click)="activeTab = 'attendance'; loadDailyRollCall()">📅 Roll Call</span>
-            <span class="nav-pill" (click)="selectChatTab()">💬 Chat</span>
-            <span class="nav-pill" (click)="activeTab = 'approvals'; loadPendingApprovals()">🔍 Approvals</span>
-          </div>
+          <div class="f-brand-title">HostelHubPRO v2.4</div>
+          <div class="f-brand-subtitle">Smart Hostel Management System</div>
 
-          <!-- Middle Section: Contact & Emergency Info Cards -->
-          <div class="footer-info-cards">
-            <div class="footer-card">
-              <span class="f-card-icon">📧</span>
-              <div>
-                <span class="f-card-label">Support Email</span>
-                <span class="f-card-val">{{ footerSettings?.footer_email || 'support@hostelhub.com' }}</span>
-              </div>
+          <div class="footer-detail-list">
+            <div class="f-list-item">
+              <span class="f-item-icon">📧</span>
+              <span class="f-item-label">Support:</span>
+              <a [href]="'mailto:' + (footerSettings?.footer_email || 'support@hostelhub.com')" class="f-item-link">{{ footerSettings?.footer_email || 'support@hostelhub.com' }}</a>
             </div>
-            <div class="footer-card">
-              <span class="f-card-icon">📞</span>
-              <div>
-                <span class="f-card-label">Warden Helpline</span>
-                <span class="f-card-val">{{ footerSettings?.footer_phone || '+91 98765 43210' }}</span>
-              </div>
+
+            <div class="f-list-item">
+              <span class="f-item-icon">📞</span>
+              <span class="f-item-label">Warden Helpline:</span>
+              <span class="f-item-value">{{ footerSettings?.footer_phone || '+91 98765 43210' }}</span>
             </div>
-            <div class="footer-card emergency-card">
-              <span class="f-card-icon">🚨</span>
-              <div>
-                <span class="f-card-label">24/7 Security Guard Desk</span>
-                <span class="f-card-val">+91 91234 56789</span>
-              </div>
+
+            <div class="f-list-item">
+              <span class="f-item-icon">🛡️</span>
+              <span class="f-item-label">24×7 Security:</span>
+              <span class="f-item-value">+91 91234 56789</span>
+            </div>
+
+            <div class="f-list-item">
+              <span class="f-status-dot"></span>
+              <span class="f-item-label">Server Status:</span>
+              <span class="f-status-text">Online</span>
             </div>
           </div>
 
-          <!-- Bottom Section: System Meta & Copyright -->
-          <div class="footer-bottom">
-            <div class="system-status">
-              <span class="status-dot"></span>
-              <span>HostelHub Cloud Server Online</span>
-            </div>
-            <p class="footer-copyright">
-              {{ footerSettings?.footer_copyright || '© 2026 HostelHub Management. All rights reserved.' }} · Encrypted & Secure Portal 🔒
-            </p>
+          <div class="footer-copyright-text">
+            © 2026 HostelHub. All Rights Reserved.
           </div>
         </div>
       </footer>
@@ -1892,40 +1871,79 @@ import { API_CONFIG } from '../../config/api.config';
     }
     .btn-delete-comp:hover { background: #ef4444; color: white; }
 
-    /* Footer Styling */
+    /* Exact Clean List Footer Styling */
     .footer {
       order: 4;
-      background-color: var(--bg-card);
+      background: var(--bg-card);
       border-top: 1px solid var(--border-color);
-      padding: 20px 20px 24px;
+      padding: 24px 20px 28px;
       margin-top: auto;
-      text-align: center;
       width: 100%;
-      box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.04);
     }
-    .footer-content {
-      max-width: 900px;
+    .footer-clean-container {
+      max-width: 500px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 12px;
+      text-align: left;
     }
-    .footer-title {
+    .footer-header-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 2px;
+    }
+    .f-info-icon { font-size: 16px; }
+    .f-about-heading {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin: 0;
+    }
+    .f-brand-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.2px;
+    }
+    .f-brand-subtitle {
       font-size: 13px;
-      font-weight: 700;
+      font-style: italic;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    .footer-detail-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .f-list-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
       color: var(--text-primary);
     }
-    .footer-meta {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      font-size: 11.5px;
-      color: var(--text-muted);
+    .f-item-icon { font-size: 15px; flex-shrink: 0; }
+    .f-item-label { font-weight: 700; color: var(--text-primary); }
+    .f-item-link { color: var(--text-primary); text-decoration: underline; font-weight: 500; }
+    .f-item-value { color: var(--text-primary); font-weight: 500; }
+    .f-status-dot {
+      width: 12px;
+      height: 12px;
+      background: #22c55e;
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
     }
-    .footer-copyright {
-      font-size: 10.5px;
+    .f-status-text { color: var(--text-primary); font-weight: 600; }
+    .footer-copyright-text {
+      font-size: 12px;
       color: var(--text-muted);
-      margin-top: 4px;
+      margin-top: 10px;
+      font-weight: 500;
     }
 
     /* Warden Mess Management CSS */
