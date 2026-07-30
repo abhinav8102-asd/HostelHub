@@ -37,6 +37,7 @@ import { API_CONFIG } from '../../config/api.config';
       <div class="photo-modal" *ngIf="zoomPhotoUrl" (click)="closePhotoModal()">
         <div class="modal-wrapper" (click)="$event.stopPropagation()">
           <button class="close-modal" (click)="closePhotoModal()">&times;</button>
+          <img [src]="zoomPhotoUrl" alt="Zoomed view" class="zoomed-image"/>
         </div>
       </div>
 
@@ -66,6 +67,100 @@ import { API_CONFIG } from '../../config/api.config';
       <!-- TAB AREA -->
       <div class="tab-content-area">
         
+        <!-- TAB -1: WARDEN HOME DASHBOARD -->
+        <div *ngIf="activeTab === 'home'" class="tab-panel animate-fade">
+          <!-- Warden Profile Card (Top Widget) -->
+          <div class="card student-profile-card" style="margin-bottom: 20px;">
+            <div class="profile-card-pattern"></div>
+            <div class="profile-card-content" style="display: flex; align-items: center; gap: 16px;">
+              <div class="profile-user-img-wrapper" style="width: 70px; height: 70px; border-radius: 50%; overflow: hidden; background: #e2e8f0; border: 2px solid #ffffff; box-shadow: var(--shadow-sm);">
+                <span class="profile-avatar-emoji" *ngIf="!user?.profilePicUrl" style="font-size: 36px; line-height: 70px; text-align: center; display: block;">👨‍💼</span>
+                <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" style="width: 100%; height: 100%; object-fit: cover;" />
+              </div>
+              <div class="profile-user-details" style="color: #ffffff; flex-grow: 1;">
+                <div class="welcome-tag" style="font-size: 12px; opacity: 0.8; font-weight: 500;">Warden Dashboard,</div>
+                <h4 class="profile-user-name" style="margin: 2px 0 6px 0; font-size: 20px; font-weight: 700;">{{ user?.name }}</h4>
+                <div class="profile-pills" style="display: flex; gap: 6px; flex-wrap: wrap;">
+                  <span class="profile-pill block-pill" style="font-size: 11px; background: rgba(255,255,255,0.15); padding: 3px 8px; border-radius: 12px; font-weight: 600;">🏠 {{ user?.hostelBlock || 'All Hostels' }}</span>
+                  <span class="profile-pill role-pill" style="font-size: 11px; background: rgba(255,255,255,0.15); padding: 3px 8px; border-radius: 12px; font-weight: 600;">🛡️ Warden</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Metrics Summary Cards -->
+          <div class="metrics-summary-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px;">
+            <div class="metric-card card clickable" style="padding: 16px; display: flex; flex-direction: column; gap: 4px; background: var(--bg-card); cursor: pointer;" (click)="activeTab = 'approvals'; loadPendingApprovals()">
+              <span style="font-size: 22px;">🔍</span>
+              <span style="font-size: 18px; font-weight: 700; color: var(--text-primary);">{{ pendingApprovals.length }}</span>
+              <span style="font-size: 11.5px; color: var(--text-muted); font-weight: 600;">Pending Approvals</span>
+            </div>
+            
+            <div class="metric-card card clickable" style="padding: 16px; display: flex; flex-direction: column; gap: 4px; background: var(--bg-card); cursor: pointer;" (click)="activeTab = 'complaints'">
+              <span style="font-size: 22px;">📋</span>
+              <span style="font-size: 18px; font-weight: 700; color: var(--text-primary);">{{ getPendingCount() }}</span>
+              <span style="font-size: 11.5px; color: var(--text-muted); font-weight: 600;">New Complaints</span>
+            </div>
+
+            <div class="metric-card card clickable" style="padding: 16px; display: flex; flex-direction: column; gap: 4px; background: var(--bg-card); cursor: pointer;" (click)="onAnnouncementsTab()">
+              <span style="font-size: 22px;">📢</span>
+              <span style="font-size: 18px; font-weight: 700; color: var(--text-primary);">{{ announcements.length }}</span>
+              <span style="font-size: 11.5px; color: var(--text-muted); font-weight: 600;">Active Notices</span>
+            </div>
+
+            <div class="metric-card card clickable" style="padding: 16px; display: flex; flex-direction: column; gap: 4px; background: var(--bg-card); cursor: pointer;" (click)="activeTab = 'mess'; loadMessData()">
+              <span style="font-size: 22px;">⭐</span>
+              <span style="font-size: 18px; font-weight: 700; color: var(--text-primary);">{{ feedbackStats?.overallAvg || 'N/A' }}</span>
+              <span style="font-size: 11.5px; color: var(--text-muted); font-weight: 600;">Mess Rating</span>
+            </div>
+          </div>
+
+          <!-- Quick Notice Publisher Panel -->
+          <div class="card" style="padding: 18px; margin-bottom: 20px; border-radius: var(--radius-md); background: var(--bg-card);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <h5 style="margin: 0; font-size: 16px; font-weight: 700; color: var(--text-primary);">📢 Quick Announcements</h5>
+              <button class="btn btn-primary" style="font-size: 12px; padding: 6px 12px; cursor: pointer; border-radius: 6px;" (click)="onAnnouncementsTab()">
+                ➕ Write Notice
+              </button>
+            </div>
+            <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.4; margin: 0 0 12px 0;">
+              Announce water cut, mess scheduling changes, or other notices directly to target hostel blocks instantly.
+            </p>
+            <div style="background: var(--bg-body); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px;">
+              <span style="font-size: 11.5px; text-transform: uppercase; font-weight: 700; color: var(--primary); display: block; margin-bottom: 6px;">Last notice sent:</span>
+              <strong style="font-size: 13.5px; color: var(--text-primary); display: block;" *ngIf="announcements.length > 0">{{ announcements[0].title }}</strong>
+              <span style="font-size: 12.5px; color: var(--text-muted); display: block; margin-top: 4px; line-height: 1.35;" *ngIf="announcements.length > 0">{{ announcements[0].content | slice:0:80 }}...</span>
+              <span style="font-size: 13px; color: var(--text-muted);" *ngIf="announcements.length === 0">No announcements sent yet.</span>
+            </div>
+          </div>
+          
+          <!-- Integrated Analytics Graph Widgets -->
+          <div class="card" style="padding: 18px; margin-bottom: 20px; background: var(--bg-card);">
+            <h5 style="margin-top: 0; margin-bottom: 12px; font-size: 15px; font-weight: 700; color: var(--text-primary);">📊 Maintenance Resolution Analytics</h5>
+            <div class="analytics-graphs" style="display: flex; flex-direction: column; gap: 14px;">
+              <div class="graph-bar-item">
+                <div style="display: flex; justify-content: space-between; font-size: 12.5px; margin-bottom: 4px; color: var(--text-muted);">
+                  <span>Resolved Issues</span>
+                  <strong style="color: #059669;">{{ getResolvedCount() }} / {{ complaints.length }}</strong>
+                </div>
+                <div style="width: 100%; height: 8px; background: var(--bg-body); border-radius: 4px; overflow: hidden;">
+                  <div [style.width.%]="complaints.length > 0 ? (getResolvedCount() / complaints.length * 100) : 0" style="height: 100%; background: #059669; border-radius: 4px;"></div>
+                </div>
+              </div>
+
+              <div class="graph-bar-item">
+                <div style="display: flex; justify-content: space-between; font-size: 12.5px; margin-bottom: 4px; color: var(--text-muted);">
+                  <span>Awaiting Assignment (New)</span>
+                  <strong style="color: #ef4444;">{{ getPendingCount() }} / {{ complaints.length }}</strong>
+                </div>
+                <div style="width: 100%; height: 8px; background: var(--bg-body); border-radius: 4px; overflow: hidden;">
+                  <div [style.width.%]="complaints.length > 0 ? (getPendingCount() / complaints.length * 100) : 0" style="height: 100%; background: #ef4444; border-radius: 4px;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- TAB 0: COMPLAINTS LIST -->
         <div *ngIf="activeTab === 'complaints'" class="tab-panel animate-fade">
           <h4 class="page-title">📋 Student Complaint Tickets</h4>
@@ -286,14 +381,20 @@ import { API_CONFIG } from '../../config/api.config';
               </div>
 
               <div class="form-group">
-                <label class="form-label" for="targetBlock">Target Block</label>
-                <select id="targetBlock" name="targetBlock" class="form-input" [(ngModel)]="newNotice.hostelBlock" required>
-                  <option value="All">All Hostels</option>
-                  <option value="Boys Hostel 1">Boys Hostel 1</option>
-                  <option value="Boys Hostel 2">Boys Hostel 2</option>
-                  <option value="Girls Hostel 1">Girls Hostel 1</option>
-                  <option value="Girls Hostel 2">Girls Hostel 2</option>
-                </select>
+                <label class="form-label" style="margin-bottom: 8px; display: block;">Target Hostels</label>
+                <div style="background: var(--bg-body); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+                  <label style="display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; cursor: pointer; color: var(--text-primary);">
+                    <input type="checkbox" [checked]="isAllHostelsSelected()" (change)="toggleAllHostelsSelection()" style="width: 16px; height: 16px; accent-color: var(--primary);" />
+                    <span>All Hostels (Sabhi Block)</span>
+                  </label>
+                  <hr style="border: none; border-top: 1px solid var(--border-color); margin: 4px 0;" />
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px;">
+                    <label *ngFor="let hostel of hostelsList" style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; cursor: pointer; color: var(--text-primary);">
+                      <input type="checkbox" [checked]="selectedHostels.includes(hostel)" (change)="toggleHostelSelection(hostel)" style="width: 15px; height: 15px; accent-color: var(--primary);" />
+                      <span>{{ hostel }}</span>
+                    </label>
+                  </div>
+                </div>
               </div>
 
               <div class="form-group">
@@ -491,34 +592,6 @@ import { API_CONFIG } from '../../config/api.config';
           <div *ngIf="messError" class="alert alert-danger">{{ messError }}</div>
 
           <div class="mess-container">
-            <!-- 1. Waste Minimizer Summary -->
-            <div class="card mess-card">
-              <h5>🚪 Today & Tomorrow's Skip Stats (Waste Minimizer)</h5>
-              <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">
-                Plan cooking quantity based on the number of students who reported skipping meals.
-              </p>
-
-              <div class="skip-summary-grid">
-                <div class="skip-summary-day">
-                  <h6>Today ({{ getTodayDateString() | date:'EEEE, MMM d' }})</h6>
-                  <div class="skip-stats-row">
-                    <div class="stat-badge">🍳 Breakfast: <strong>{{ getSkipCount(getTodayDateString(), 'breakfast') }}</strong> skipping</div>
-                    <div class="stat-badge">🍛 Lunch: <strong>{{ getSkipCount(getTodayDateString(), 'lunch') }}</strong> skipping</div>
-                    <div class="stat-badge">🍽️ Dinner: <strong>{{ getSkipCount(getTodayDateString(), 'dinner') }}</strong> skipping</div>
-                  </div>
-                </div>
-
-                <div class="skip-summary-day">
-                  <h6>Tomorrow ({{ getTomorrowDateString() | date:'EEEE, MMM d' }})</h6>
-                  <div class="skip-stats-row">
-                    <div class="stat-badge">🍳 Breakfast: <strong>{{ getSkipCount(getTomorrowDateString(), 'breakfast') }}</strong> skipping</div>
-                    <div class="stat-badge">🍛 Lunch: <strong>{{ getSkipCount(getTomorrowDateString(), 'lunch') }}</strong> skipping</div>
-                    <div class="stat-badge">🍽️ Dinner: <strong>{{ getSkipCount(getTomorrowDateString(), 'dinner') }}</strong> skipping</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             <!-- 2. Menu Management Editor -->
             <div class="card mess-card">
               <h5>📅 Edit Weekly Mess Menu</h5>
@@ -1013,6 +1086,10 @@ import { API_CONFIG } from '../../config/api.config';
 
       <!-- Bottom Nav -->
       <div class="bottom-tabs">
+        <button class="tab-item" [class.active]="activeTab === 'home'" (click)="activeTab = 'home'">
+          <span class="tab-icon">🏠</span>
+          <span>Home</span>
+        </button>
         <button class="tab-item" [class.active]="activeTab === 'complaints'" (click)="activeTab = 'complaints'">
           <span class="tab-icon">📋</span>
           <span>Complaints</span>
@@ -1042,10 +1119,6 @@ import { API_CONFIG } from '../../config/api.config';
             <span class="tab-badge animate-scale" *ngIf="pendingApprovals.length > 0" style="background:#ef4444;">{{ pendingApprovals.length }}</span>
           </span>
           <span>Approvals</span>
-        </button>
-        <button class="tab-item" [class.active]="activeTab === 'analytics'" (click)="activeTab = 'analytics'">
-          <span class="tab-icon">📊</span>
-          <span>Analytics</span>
         </button>
         <button class="tab-item" [class.active]="activeTab === 'my-profile'" (click)="activeTab = 'my-profile'; initProfileEdit()">
           <span class="tab-icon">👤</span>
@@ -1956,7 +2029,7 @@ import { API_CONFIG } from '../../config/api.config';
 })
 export class WardenDashboardComponent implements OnInit, OnDestroy {
   user: User | null = null;
-  activeTab: string = 'complaints';
+  activeTab: string = 'home';
   
   editUser = { name: '', phone: '', bio: '' };
   profilePreviewUrl: string | null = null;
@@ -1985,6 +2058,39 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
     content: '',
     hostelBlock: 'All'
   };
+  hostelsList: string[] = ['Boys Hostel 1', 'Boys Hostel 2', 'Girls Hostel 1', 'Girls Hostel 2'];
+  selectedHostels: string[] = ['Boys Hostel 1', 'Boys Hostel 2', 'Girls Hostel 1', 'Girls Hostel 2'];
+
+  isAllHostelsSelected(): boolean {
+    return this.selectedHostels.length === this.hostelsList.length;
+  }
+
+  toggleAllHostelsSelection(): void {
+    if (this.isAllHostelsSelected()) {
+      this.selectedHostels = [];
+    } else {
+      this.selectedHostels = [...this.hostelsList];
+    }
+    this.updateHostelBlockValue();
+  }
+
+  toggleHostelSelection(hostel: string): void {
+    const idx = this.selectedHostels.indexOf(hostel);
+    if (idx > -1) {
+      this.selectedHostels.splice(idx, 1);
+    } else {
+      this.selectedHostels.push(hostel);
+    }
+    this.updateHostelBlockValue();
+  }
+
+  updateHostelBlockValue(): void {
+    if (this.isAllHostelsSelected() || this.selectedHostels.length === 0) {
+      this.newNotice.hostelBlock = 'All';
+    } else {
+      this.newNotice.hostelBlock = this.selectedHostels.join(',');
+    }
+  }
   postingNotice = false;
   noticeError = '';
   noticeSuccess = '';
@@ -2053,6 +2159,8 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
     this.loadFooterSettings();
     this.loadWardenChatGroups();
     this.loadPendingApprovals();
+    this.loadAnnouncements();
+    this.loadMessData();
 
     this.notifSub = this.socketService.notification$.subscribe(notif => {
       if (notif) {
@@ -2336,6 +2444,7 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
         this.justPosted = true;
         this.noticeSuccess = '✅ Notice posted successfully!';
         this.newNotice = { title: '', content: '', hostelBlock: 'All' };
+        this.selectedHostels = [...this.hostelsList];
         this.clearNoticePhoto();
         this.loadAnnouncements();
         this.cdr.detectChanges();

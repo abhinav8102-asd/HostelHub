@@ -69,23 +69,24 @@ exports.createAnnouncement = async (req, res) => {
 
 exports.getAnnouncements = async (req, res) => {
   try {
-    let whereQuery = {};
-
-    if (req.userRole === 'student') {
-      // Find student block
-      const student = await User.findByPk(req.userId);
-      whereQuery = {
-        hostelBlock: ['All', student.hostelBlock]
-      };
-    }
-
-    const announcements = await Announcement.findAll({
-      where: whereQuery,
+    let announcements = await Announcement.findAll({
       include: [
         { model: User, as: 'creator', attributes: ['name'] }
       ],
       order: [['createdAt', 'DESC']]
     });
+
+    if (req.userRole === 'student') {
+      // Find student block
+      const student = await User.findByPk(req.userId);
+      if (student) {
+        announcements = announcements.filter(a => {
+          if (!a.hostelBlock || a.hostelBlock === 'All') return true;
+          const blocks = a.hostelBlock.split(',').map(b => b.trim());
+          return blocks.includes(student.hostelBlock);
+        });
+      }
+    }
 
     res.status(200).json(announcements);
   } catch (error) {

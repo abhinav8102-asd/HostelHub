@@ -209,13 +209,19 @@ body {
   border-bottom: 1px solid var(--border-color) !important;
   display: flex !important;
   align-items: center !important;
-  justify-content: center !important;
+  justify-content: flex-start !important;
   gap: 4px !important;
   padding: 0 16px !important;
   z-index: 100 !important;
   box-shadow: var(--shadow-sm) !important;
   backdrop-filter: blur(12px);
   transition: background-color 0.3s ease;
+  overflow-x: auto !important;
+  white-space: nowrap !important;
+  -webkit-overflow-scrolling: touch;
+}
+.bottom-tabs::-webkit-scrollbar {
+  display: none !important;
 }
 
 .tab-item {
