@@ -1108,15 +1108,67 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
       </div><!-- /bottom-tabs -->
 
 
-      <!-- Footer -->
-      <footer class="footer animate-fade" *ngIf="footerSettings">
-        <div class="footer-content">
-          <p class="footer-title">{{ footerSettings.footer_text }}</p>
-          <div class="footer-meta">
-            <span *ngIf="footerSettings.footer_email">📧 {{ footerSettings.footer_email }}</span>
-            <span *ngIf="footerSettings.footer_phone">📞 {{ footerSettings.footer_phone }}</span>
+      <!-- Enhanced Rich Footer -->
+      <footer class="footer animate-fade">
+        <div class="footer-container">
+          <!-- Top Section: Brand & Tagline -->
+          <div class="footer-brand-section">
+            <div class="footer-brand-logo">
+              <span class="brand-icon">🏰</span>
+              <span class="brand-name">HostelHub</span>
+              <span class="brand-badge">PRO v2.4</span>
+            </div>
+            <p class="footer-tagline">
+              {{ footerSettings?.footer_text || 'Smart Hostel Administration & Resident Maintenance Ecosystem' }}
+            </p>
           </div>
-          <p class="footer-copyright">{{ footerSettings.footer_copyright }}</p>
+
+          <!-- Quick Navigation Link Pills -->
+          <div class="footer-quick-nav">
+            <span class="nav-pill" (click)="activeTab = 'home'">🏠 Home</span>
+            <span class="nav-pill" (click)="activeTab = 'complaints'">📋 Tickets</span>
+            <span class="nav-pill" (click)="activeTab = 'announcements'">📢 Notices</span>
+            <span class="nav-pill" (click)="activeTab = 'mess'">🍴 Mess Admin</span>
+            <span class="nav-pill" (click)="activeTab = 'attendance'">📅 Roll Call</span>
+            <span class="nav-pill" (click)="activeTab = 'chat'">💬 Chat</span>
+            <span class="nav-pill" (click)="activeTab = 'analytics'">📊 Analytics</span>
+          </div>
+
+          <!-- Middle Section: Contact & Emergency Info Cards -->
+          <div class="footer-info-cards">
+            <div class="footer-card">
+              <span class="f-card-icon">📧</span>
+              <div>
+                <span class="f-card-label">Support Email</span>
+                <span class="f-card-val">{{ footerSettings?.footer_email || 'support@hostelhub.com' }}</span>
+              </div>
+            </div>
+            <div class="footer-card">
+              <span class="f-card-icon">📞</span>
+              <div>
+                <span class="f-card-label">Warden Helpline</span>
+                <span class="f-card-val">{{ footerSettings?.footer_phone || '+91 98765 43210' }}</span>
+              </div>
+            </div>
+            <div class="footer-card emergency-card">
+              <span class="f-card-icon">🚨</span>
+              <div>
+                <span class="f-card-label">24/7 Security Guard Desk</span>
+                <span class="f-card-val">+91 91234 56789</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Section: System Meta & Copyright -->
+          <div class="footer-bottom">
+            <div class="system-status">
+              <span class="status-dot"></span>
+              <span>HostelHub Cloud Server Online</span>
+            </div>
+            <p class="footer-copyright">
+              {{ footerSettings?.footer_copyright || '© 2026 HostelHub Management. All rights reserved.' }} · Encrypted & Secure Portal 🔒
+            </p>
+          </div>
         </div>
       </footer>
     </div><!-- /dashboard-container -->
@@ -1133,13 +1185,13 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
     /* ── WARDEN HOME DASHBOARD ANIMATED STYLES ── */
     .warden-hero-card {
       position: relative;
-      background: var(--gradient-brand);
+      background: linear-gradient(135deg, #b31031 0%, #8a0d24 50%, #4a0412 100%);
       border-radius: var(--radius-xl);
       padding: 24px;
       margin-bottom: 16px;
       overflow: hidden;
-      box-shadow: var(--shadow-brand);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 10px 28px rgba(179, 16, 49, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
     .hero-bg-glow {
       position: absolute;
@@ -2080,40 +2132,146 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
     }
     .btn-delete-comp:hover { background: #ef4444; color: white; }
 
-    /* Footer Styling */
+    /* Enhanced Rich Footer Styling */
     .footer {
-      order: 4;
-      background-color: var(--bg-card);
+      background: var(--bg-card);
       border-top: 1px solid var(--border-color);
-      padding: 20px 20px 24px;
-      margin-top: auto;
-      text-align: center;
+      padding: 24px 20px 30px;
+      margin-top: 24px;
       width: 100%;
-      box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+      box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.04);
     }
-    .footer-content {
+    .footer-container {
       max-width: 900px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
+      gap: 18px;
+    }
+    .footer-brand-section {
+      text-align: center;
+    }
+    .footer-brand-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       gap: 8px;
+      margin-bottom: 6px;
     }
-    .footer-title {
-      font-size: 13px;
-      font-weight: 700;
+    .brand-icon { font-size: 22px; }
+    .brand-name {
+      font-size: 18px;
+      font-weight: 900;
       color: var(--text-primary);
+      letter-spacing: -0.3px;
     }
-    .footer-meta {
+    .brand-badge {
+      font-size: 9.5px;
+      font-weight: 800;
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      letter-spacing: 0.5px;
+      border: 1px solid rgba(179, 16, 49, 0.2);
+    }
+    .footer-tagline {
+      font-size: 12px;
+      color: var(--text-secondary);
+      max-width: 500px;
+      margin: 0 auto;
+      line-height: 1.4;
+    }
+    .footer-quick-nav {
       display: flex;
       justify-content: center;
-      gap: 16px;
-      font-size: 11.5px;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 4px 0;
+    }
+    .nav-pill {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      background: var(--bg-muted);
+      border: 1px solid var(--border-color);
+      padding: 5px 12px;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .nav-pill:hover {
+      background: var(--primary-light);
+      color: var(--primary);
+      border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+    .footer-info-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    @media (max-width: 600px) {
+      .footer-info-cards { grid-template-columns: 1fr; }
+    }
+    .footer-card {
+      background: var(--bg-muted);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-align: left;
+    }
+    .emergency-card {
+      background: rgba(239, 68, 68, 0.08);
+      border-color: rgba(239, 68, 68, 0.25);
+    }
+    .f-card-icon { font-size: 20px; flex-shrink: 0; }
+    .f-card-label {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
       color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .f-card-val {
+      display: block;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-top: 1px;
+    }
+    .emergency-card .f-card-val { color: #ef4444; }
+    .footer-bottom {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      border-top: 1px dashed var(--border-color);
+      padding-top: 14px;
+    }
+    .system-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--success);
+    }
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--success);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--success);
     }
     .footer-copyright {
       font-size: 10.5px;
       color: var(--text-muted);
-      margin-top: 4px;
+      text-align: center;
     }
 
     /* Warden Mess Management CSS */
