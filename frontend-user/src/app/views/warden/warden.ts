@@ -843,7 +843,7 @@ import { API_CONFIG } from '../../config/api.config';
                 <button type="button" class="btn" style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); font-size: 11.5px; padding: 4px 10px; border-radius: 6px; font-weight: 600; cursor: pointer;" (click)="toggleMultiSelectMode()">
                   ☑️ Select
                 </button>
-                <span class="day-badge" style="background: #ef4444; color: white;">WARDEN CHANNEL</span>
+                <span class="day-badge" style="background: var(--primary-light); color: var(--primary); border: 1px solid rgba(179, 16, 49, 0.3); font-size: 10px; font-weight: 800; letter-spacing: 0.5px; padding: 4px 10px; border-radius: 12px;">🛡️ WARDEN CHANNEL</span>
               </div>
 
               <!-- Multi-Select Action Bar -->
