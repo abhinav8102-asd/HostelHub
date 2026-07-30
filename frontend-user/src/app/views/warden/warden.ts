@@ -70,19 +70,19 @@ import { API_CONFIG } from '../../config/api.config';
         <!-- TAB -1: WARDEN HOME DASHBOARD -->
         <div *ngIf="activeTab === 'home'" class="tab-panel animate-fade">
           <!-- Warden Profile Card (Top Widget) -->
-          <div class="card student-profile-card" style="margin-bottom: 20px;">
+          <div class="card student-profile-card" style="margin-bottom: 20px; background: linear-gradient(135deg, #b31031 0%, #8a0d24 50%, #4a0412 100%) !important; border-radius: 18px !important; border: 1px solid rgba(255, 255, 255, 0.2) !important; box-shadow: 0 10px 28px rgba(179, 16, 49, 0.35) !important;">
             <div class="profile-card-pattern"></div>
             <div class="profile-card-content" style="display: flex; align-items: center; gap: 16px;">
-              <div class="profile-user-img-wrapper" style="width: 70px; height: 70px; border-radius: 50%; overflow: hidden; background: #e2e8f0; border: 2px solid #ffffff; box-shadow: var(--shadow-sm);">
-                <span class="profile-avatar-emoji" *ngIf="!user?.profilePicUrl" style="font-size: 36px; line-height: 70px; text-align: center; display: block;">👨‍💼</span>
+              <div class="profile-user-img-wrapper" style="width: 70px; height: 70px; border-radius: 50%; overflow: hidden; background: rgba(255,255,255,0.15); border: 2.5px solid #ffffff; box-shadow: var(--shadow-sm); flex-shrink: 0;">
+                <span class="profile-avatar-emoji" *ngIf="!user?.profilePicUrl" style="font-size: 36px; line-height: 70px; text-align: center; display: block; color: white;">👨‍💼</span>
                 <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" style="width: 100%; height: 100%; object-fit: cover;" />
               </div>
               <div class="profile-user-details" style="color: #ffffff; flex-grow: 1;">
-                <div class="welcome-tag" style="font-size: 12px; opacity: 0.8; font-weight: 500;">Warden Dashboard,</div>
-                <h4 class="profile-user-name" style="margin: 2px 0 6px 0; font-size: 20px; font-weight: 700;">{{ user?.name }}</h4>
+                <div class="welcome-tag" style="font-size: 12px; opacity: 0.85; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Warden Dashboard,</div>
+                <h4 class="profile-user-name" style="margin: 2px 0 6px 0; font-size: 20px; font-weight: 800; color: #ffffff;">{{ user?.name }}</h4>
                 <div class="profile-pills" style="display: flex; gap: 6px; flex-wrap: wrap;">
-                  <span class="profile-pill block-pill" style="font-size: 11px; background: rgba(255,255,255,0.15); padding: 3px 8px; border-radius: 12px; font-weight: 600;">🏠 {{ user?.hostelBlock || 'All Hostels' }}</span>
-                  <span class="profile-pill role-pill" style="font-size: 11px; background: rgba(255,255,255,0.15); padding: 3px 8px; border-radius: 12px; font-weight: 600;">🛡️ Warden</span>
+                  <span class="profile-pill block-pill" style="font-size: 11px; background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 12px; font-weight: 700; color: #ffffff;">🏠 {{ user?.hostelBlock || 'All Hostels' }}</span>
+                  <span class="profile-pill role-pill" style="font-size: 11px; background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 12px; font-weight: 700; color: #ffffff;">🛡️ Warden</span>
                 </div>
               </div>
             </div>
@@ -952,12 +952,12 @@ import { API_CONFIG } from '../../config/api.config';
                     </button>
                   </div>
 
-                  <!-- Attached Image View -->
-                  <div *ngIf="msg.attachmentUrl" style="margin-top: 4px;">
+                  <!-- Attached Image View (Strict Overflow Container) -->
+                  <div *ngIf="msg.attachmentUrl" style="margin-top: 6px; width: 100%; max-width: 100%; overflow: hidden; border-radius: 10px;">
                     <img 
                       [src]="getImageUrl(msg.attachmentUrl)" 
                       (click)="openPhotoModal(getImageUrl(msg.attachmentUrl)); $event.stopPropagation()"
-                      style="max-width: 240px; max-height: 200px; border-radius: 10px; cursor: pointer; object-fit: cover; box-shadow: 0 2px 8px rgba(0,0,0,0.2); display: block;" 
+                      style="width: 100%; max-width: 100%; max-height: 220px; border-radius: 10px; cursor: pointer; object-fit: cover; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: block;" 
                     />
                   </div>
                 </div>
@@ -1127,15 +1127,67 @@ import { API_CONFIG } from '../../config/api.config';
       </div><!-- /bottom-tabs -->
 
 
-      <!-- Footer -->
-      <footer class="footer animate-fade" *ngIf="footerSettings">
-        <div class="footer-content">
-          <p class="footer-title">{{ footerSettings.footer_text }}</p>
-          <div class="footer-meta">
-            <span *ngIf="footerSettings.footer_email">📧 {{ footerSettings.footer_email }}</span>
-            <span *ngIf="footerSettings.footer_phone">📞 {{ footerSettings.footer_phone }}</span>
+      <!-- Enhanced Rich Footer -->
+      <footer class="footer animate-fade">
+        <div class="footer-container">
+          <!-- Top Section: Brand & Tagline -->
+          <div class="footer-brand-section">
+            <div class="footer-brand-logo">
+              <span class="brand-icon">🏰</span>
+              <span class="brand-name">HostelHub</span>
+              <span class="brand-badge">PRO v2.4</span>
+            </div>
+            <p class="footer-tagline">
+              {{ footerSettings?.footer_text || 'Smart Hostel Administration & Resident Maintenance Ecosystem' }}
+            </p>
           </div>
-          <p class="footer-copyright">{{ footerSettings.footer_copyright }}</p>
+
+          <!-- Quick Navigation Link Pills -->
+          <div class="footer-quick-nav">
+            <span class="nav-pill" (click)="activeTab = 'home'">🏠 Home</span>
+            <span class="nav-pill" (click)="activeTab = 'complaints'">📋 Tickets</span>
+            <span class="nav-pill" (click)="onAnnouncementsTab()">📢 Notices</span>
+            <span class="nav-pill" (click)="activeTab = 'mess'; loadMessData()">🍴 Mess Admin</span>
+            <span class="nav-pill" (click)="activeTab = 'attendance'; loadDailyRollCall()">📅 Roll Call</span>
+            <span class="nav-pill" (click)="selectChatTab()">💬 Chat</span>
+            <span class="nav-pill" (click)="activeTab = 'approvals'; loadPendingApprovals()">🔍 Approvals</span>
+          </div>
+
+          <!-- Middle Section: Contact & Emergency Info Cards -->
+          <div class="footer-info-cards">
+            <div class="footer-card">
+              <span class="f-card-icon">📧</span>
+              <div>
+                <span class="f-card-label">Support Email</span>
+                <span class="f-card-val">{{ footerSettings?.footer_email || 'support@hostelhub.com' }}</span>
+              </div>
+            </div>
+            <div class="footer-card">
+              <span class="f-card-icon">📞</span>
+              <div>
+                <span class="f-card-label">Warden Helpline</span>
+                <span class="f-card-val">{{ footerSettings?.footer_phone || '+91 98765 43210' }}</span>
+              </div>
+            </div>
+            <div class="footer-card emergency-card">
+              <span class="f-card-icon">🚨</span>
+              <div>
+                <span class="f-card-label">24/7 Security Guard Desk</span>
+                <span class="f-card-val">+91 91234 56789</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Section: System Meta & Copyright -->
+          <div class="footer-bottom">
+            <div class="system-status">
+              <span class="status-dot"></span>
+              <span>HostelHub Cloud Server Online</span>
+            </div>
+            <p class="footer-copyright">
+              {{ footerSettings?.footer_copyright || '© 2026 HostelHub Management. All rights reserved.' }} · Encrypted & Secure Portal 🔒
+            </p>
+          </div>
         </div>
       </footer>
     </div><!-- /dashboard-container -->
