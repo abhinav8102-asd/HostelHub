@@ -1057,46 +1057,15 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
       </div>
 
 
-      <!-- Exact Clean Footer -->
-      <footer class="footer animate-fade">
-        <div class="footer-clean-container">
-          <div class="footer-header-row">
-            <span class="f-info-icon">ℹ️</span>
-            <h5 class="f-about-heading">About HostelHub</h5>
+      <!-- Original Clean Footer -->
+      <footer class="footer animate-fade" *ngIf="footerSettings">
+        <div class="footer-content">
+          <p class="footer-title">{{ footerSettings.footer_text }}</p>
+          <div class="footer-meta">
+            <span *ngIf="footerSettings.footer_email">📧 {{ footerSettings.footer_email }}</span>
+            <span *ngIf="footerSettings.footer_phone">📞 {{ footerSettings.footer_phone }}</span>
           </div>
-
-          <div class="f-brand-title">HostelHubPRO v2.4</div>
-          <div class="f-brand-subtitle">Smart Hostel Management System</div>
-
-          <div class="footer-detail-list">
-            <div class="f-list-item">
-              <span class="f-item-icon">📧</span>
-              <span class="f-item-label">Support:</span>
-              <a [href]="'mailto:' + (footerSettings?.footer_email || 'support@hostelhub.com')" class="f-item-link">{{ footerSettings?.footer_email || 'support@hostelhub.com' }}</a>
-            </div>
-
-            <div class="f-list-item">
-              <span class="f-item-icon">📞</span>
-              <span class="f-item-label">Warden Helpline:</span>
-              <span class="f-item-value">{{ footerSettings?.footer_phone || '+91 98765 43210' }}</span>
-            </div>
-
-            <div class="f-list-item">
-              <span class="f-item-icon">🛡️</span>
-              <span class="f-item-label">24×7 Security:</span>
-              <span class="f-item-value">+91 91234 56789</span>
-            </div>
-
-            <div class="f-list-item">
-              <span class="f-status-dot"></span>
-              <span class="f-item-label">Server Status:</span>
-              <span class="f-status-text">Online</span>
-            </div>
-          </div>
-
-          <div class="footer-copyright-text">
-            © 2026 HostelHub. All Rights Reserved.
-          </div>
+          <p class="footer-copyright">{{ footerSettings.footer_copyright }}</p>
         </div>
       </footer>
     </div>
