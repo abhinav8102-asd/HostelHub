@@ -786,9 +786,16 @@ import { API_CONFIG } from '../../config/api.config';
           </div>
         </div>
 
-        <!-- TAB 6: WARDEN ATTENDANCE ROLL CALL -->
+        <!-- TAB 6: DAILY ROLL CALL ATTENDANCE -->
         <div *ngIf="activeTab === 'attendance'" class="tab-panel animate-fade">
-          <h4 class="page-title">📅 Daily Roll Call Attendance</h4>
+          <!-- Header Banner Widget -->
+          <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
+            <div style="width: 46px; height: 46px; border-radius: 50%; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">📅</div>
+            <div>
+              <h4 style="margin: 0 0 2px 0; font-size: 17px; font-weight: 800; color: var(--text-primary);">Daily Roll Call Attendance</h4>
+              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Mark and manage student attendance easily</p>
+            </div>
+          </div>
 
           <div *ngIf="attendanceSuccess" class="alert alert-success">{{ attendanceSuccess }}</div>
           <div *ngIf="attendanceError" class="alert alert-danger">{{ attendanceError }}</div>
@@ -922,57 +929,74 @@ import { API_CONFIG } from '../../config/api.config';
 
         <!-- TAB 7: WARDEN BATCH & GENDER GROUP CHAT -->
         <div *ngIf="activeTab === 'chat'" class="tab-panel animate-fade">
-          <h4 class="page-title">💬 Hostel Group Chat Channels</h4>
+          <!-- Chat Header Banner -->
+          <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
+            <div style="width: 46px; height: 46px; border-radius: 50%; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">💬</div>
+            <div>
+              <h4 style="margin: 0 0 2px 0; font-size: 17px; font-weight: 800; color: var(--text-primary);">Hostel Group Chat Channels</h4>
+              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Connect with hostel groups & communicate instantly</p>
+            </div>
+          </div>
 
           <!-- Group Room Selector Bar -->
-          <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 12px; scrollbar-width: thin;">
+          <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 14px;">
             <button 
               type="button"
               *ngFor="let g of wardenChatGroups"
-              class="pill-btn"
-              [class.active]="activeWardenChatGroup?.id === g.id"
               (click)="openWardenChatGroup(g)"
-              style="white-space: nowrap; font-size: 12px; padding: 6px 14px; position: relative; display: inline-flex; align-items: center; gap: 6px;"
+              [style.background]="activeWardenChatGroup?.id === g.id ? '#8a0d24' : 'var(--bg-card)'"
+              [style.color]="activeWardenChatGroup?.id === g.id ? 'white' : 'var(--text-primary)'"
+              style="padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color); font-size: 12.5px; font-weight: 700; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-sm);"
             >
-              {{ g.name.startsWith('Boys') ? '👦' : (g.name.startsWith('Girls') ? '👧' : '👥') }} {{ g.name }}
+              <span>{{ g.name.startsWith('Boys') ? '👦' : (g.name.startsWith('Girls') ? '👧' : '👥') }} {{ g.name }}</span>
+              <span *ngIf="activeWardenChatGroup?.id === g.id" style="width: 8px; height: 8px; background: #ef4444; border-radius: 50%;"></span>
               <span class="channel-badge animate-scale" *ngIf="unreadCounts[g.id] > 0">{{ unreadCounts[g.id] }}</span>
             </button>
           </div>
 
           <!-- Chat Room Container Card -->
-          <div class="card mess-card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; height: calc(100vh - 240px); min-height: 480px;">
+          <div class="card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; height: calc(100vh - 240px); min-height: 520px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--bg-card); box-shadow: var(--shadow-md);">
             
-            <!-- Room Header -->
-            <div style="background: var(--primary-light); padding: 12px 18px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; min-height: 54px;">
-              <div *ngIf="!isMultiSelectMode">
-                <strong style="font-size: 15px; color: var(--primary-dark); display: flex; align-items: center; gap: 6px;">
-                  👥 {{ activeWardenChatGroup?.name || 'Group Chat Room' }}
-                </strong>
-                <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
-                  {{ activeWardenChatGroup?.description }}
+            <!-- Room Header Bar -->
+            <div style="background: var(--bg-card); padding: 14px 18px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+              <div *ngIf="!isMultiSelectMode" style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 42px; height: 42px; border-radius: 50%; background: var(--bg-muted); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;">👥</div>
+                <div>
+                  <strong style="font-size: 15px; font-weight: 800; color: var(--text-primary); display: block;">
+                    {{ activeWardenChatGroup?.name || 'Boys - Batch 2023-2027' }}
+                  </strong>
+                  <span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 1px;">
+                    Official group chat for {{ activeWardenChatGroup?.name || 'Batch 2023-2027 Boys' }}
+                  </span>
+                  <div style="display: flex; gap: 6px; margin-top: 4px; align-items: center;">
+                    <span style="background: #fdf2f4; color: #b31031; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 8px;">🛡️ WARDEN CHANNEL</span>
+                    <span style="background: var(--bg-muted); color: var(--text-muted); font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 8px; display: flex; align-items: center; gap: 4px;">
+                      <span>👥 128 Members</span>
+                      <span style="width: 6px; height: 6px; background: #22c55e; border-radius: 50%;"></span>
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <!-- Normal Mode Right Actions -->
-              <div *ngIf="!isMultiSelectMode" style="display: flex; align-items: center; gap: 8px;">
-                <button type="button" class="btn" style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); font-size: 11.5px; padding: 4px 10px; border-radius: 6px; font-weight: 600; cursor: pointer;" (click)="toggleMultiSelectMode()">
-                  ☑️ Select
-                </button>
-                <span class="day-badge" style="background: var(--primary-light); color: var(--primary); border: 1px solid rgba(179, 16, 49, 0.3); font-size: 10px; font-weight: 800; letter-spacing: 0.5px; padding: 4px 10px; border-radius: 12px;">🛡️ WARDEN CHANNEL</span>
+              <!-- Header Right Action Icons -->
+              <div *ngIf="!isMultiSelectMode" style="display: flex; align-items: center; gap: 10px; color: var(--text-muted); font-size: 16px;">
+                <span style="cursor: pointer;">📌</span>
+                <span style="cursor: pointer;">🔍</span>
+                <span style="cursor: pointer;">⋮</span>
               </div>
 
               <!-- Multi-Select Action Bar -->
               <div *ngIf="isMultiSelectMode" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                <span style="font-size: 13.5px; font-weight: 700; color: var(--primary-dark);">
+                <span style="font-size: 13.5px; font-weight: 700; color: #b31031;">
                   ☑️ {{ selectedMessageIds.size }} selected
                 </span>
 
                 <div style="display: flex; align-items: center; gap: 8px;">
                   <button type="button" class="btn" style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); font-size: 12px; padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer;" (click)="bulkDeleteForMe()" [disabled]="selectedMessageIds.size === 0">
-                    🙈 Delete for Me ({{ selectedMessageIds.size }})
+                    🙈 Delete for Me
                   </button>
                   <button type="button" class="btn btn-primary" style="background: #ef4444; color: white; border: none; font-size: 12px; padding: 6px 12px; border-radius: 6px; font-weight: 700; cursor: pointer;" (click)="bulkDeleteForEveryone()" [disabled]="selectedMessageIds.size === 0">
-                    💥 Delete for Everyone ({{ selectedMessageIds.size }})
+                    💥 Delete for Everyone
                   </button>
                   <button type="button" class="btn" style="background: transparent; border: none; color: var(--text-muted); font-size: 16px; padding: 4px 8px; cursor: pointer;" (click)="clearMessageSelection()">
                     ✕
@@ -1102,37 +1126,42 @@ import { API_CONFIG } from '../../config/api.config';
               <button type="button" (click)="clearChatFile()" style="background: none; border: none; color: #ef4444; font-size: 16px; cursor: pointer;">✕</button>
             </div>
 
-            <!-- Chat Input Footer -->
-            <div style="padding: 14px; background: var(--bg-card); border-top: 1px solid var(--border-color); display: flex; gap: 10px; align-items: center; width: 100%;">
+            <!-- Chat Input Dock (Image 2 Mockup Format) -->
+            <div style="padding: 12px 14px; background: var(--bg-card); border-top: 1px solid var(--border-color); display: flex; gap: 10px; align-items: center; width: 100%;">
               <input type="file" #wardenChatFileInput (change)="onChatFileSelected($event)" accept="image/*" style="display: none;" />
+              
+              <!-- Left Plus Button -->
               <button 
                 type="button" 
-                class="btn" 
-                style="width: 44px !important; height: 44px; flex: none !important; flex-shrink: 0 !important; background: var(--bg-muted); border: 1px solid var(--border-color); font-size: 18px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; cursor: pointer;" 
                 (click)="selectPhoto('chat')"
-                title="Attach image"
+                style="width: 42px; height: 42px; border-radius: 50%; background: #b31031; color: white; border: none; font-size: 20px; font-weight: 700; flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(179, 16, 49, 0.3);"
               >
-                📷
+                +
               </button>
-              <input 
-                type="text" 
-                id="wardenChatInput"
-                class="form-input" 
-                style="flex: 1 !important; min-width: 0 !important; width: 100% !important; height: 44px; font-size: 14px; color: var(--text-primary); background: var(--bg-muted); border: 1px solid var(--border-color); padding: 0 16px; border-radius: var(--radius-md);"
-                placeholder="Type your message here as Warden..." 
-                [(ngModel)]="newWardenChatMessageText" 
-                (keydown.enter)="sendWardenChatMessage(); $event.preventDefault()"
-              />
+
+              <!-- Rounded Input Pill Container -->
+              <div style="flex: 1; min-width: 0; height: 44px; border-radius: 22px; background: var(--bg-muted); border: 1px solid var(--border-color); display: flex; align-items: center; padding: 0 14px; gap: 8px;">
+                <span style="font-size: 16px; color: var(--text-muted); cursor: pointer;">😀</span>
+                <input 
+                  type="text" 
+                  id="wardenChatInput"
+                  style="flex: 1; min-width: 0; border: none; background: transparent; outline: none; font-size: 13.5px; color: var(--text-primary);"
+                  placeholder="Type a message..." 
+                  [(ngModel)]="newWardenChatMessageText" 
+                  (keydown.enter)="sendWardenChatMessage(); $event.preventDefault()"
+                />
+                <span (click)="selectPhoto('chat')" style="font-size: 16px; color: var(--text-muted); cursor: pointer;">📎</span>
+                <span (click)="selectPhoto('chat')" style="font-size: 16px; color: var(--text-muted); cursor: pointer;">📷</span>
+              </div>
+
+              <!-- Send Circle Button -->
               <button 
                 type="button" 
-                class="btn btn-primary" 
-                style="width: auto !important; flex: none !important; flex-shrink: 0 !important; height: 44px; padding: 0 20px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 13.5px; font-weight: 700; border-radius: var(--radius-md);"
-                [disabled]="(!newWardenChatMessageText || !newWardenChatMessageText.trim()) && !selectedChatFile"
-                (mousedown)="$event.preventDefault()"
                 (click)="sendWardenChatMessage()"
+                [disabled]="sendingWardenChatMessage || (!newWardenChatMessageText.trim() && !selectedChatFile)"
+                style="width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #8a0d24 0%, #b31031 100%); color: white; border: none; font-size: 16px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(138, 13, 36, 0.35);"
               >
-                <span>Send</span>
-                <span>✈️</span>
+                ➔
               </button>
             </div>
 
