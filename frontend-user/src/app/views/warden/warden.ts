@@ -163,39 +163,59 @@ import { API_CONFIG } from '../../config/api.config';
 
         <!-- TAB 0: COMPLAINTS LIST -->
         <div *ngIf="activeTab === 'complaints'" class="tab-panel animate-fade">
-          <h4 class="page-title">📋 Student Complaint Tickets</h4>
+          <!-- Complaints Header Card -->
+          <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
+            <div style="width: 46px; height: 46px; border-radius: 50%; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">📋</div>
+            <div>
+              <h4 style="margin: 0 0 2px 0; font-size: 17px; font-weight: 800; color: var(--text-primary);">Student Complaint Tickets</h4>
+              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">View, assign and manage all student complaints</p>
+            </div>
+          </div>
 
           <!-- New Unassigned Complaints Alert Section Banner -->
-          <div *ngIf="getPendingCount() > 0 && filterStatus !== 'pending'" style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 12px; padding: 14px 18px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+          <div *ngIf="getPendingCount() > 0 && filterStatus !== 'pending'" style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
             <div style="display: flex; align-items: center; gap: 10px;">
-              <span style="font-size: 22px;">🔔</span>
+              <span style="font-size: 20px;">🔔</span>
               <div>
-                <strong style="font-size: 14px; color: #ef4444; display: block;">{{ getPendingCount() }} New Complaint(s) Awaiting Staff Assignment</strong>
-                <span style="font-size: 12px; color: var(--text-muted);">Assign staff members to these new tickets to initiate maintenance.</span>
+                <strong style="font-size: 13px; color: #ef4444; display: block;">{{ getPendingCount() }} New Complaint(s) Awaiting Staff Assignment</strong>
+                <span style="font-size: 11.5px; color: var(--text-muted);">Assign staff members to these new tickets to initiate maintenance.</span>
               </div>
             </div>
-            <button type="button" class="btn btn-primary" style="background: #ef4444; color: white; font-size: 12px; padding: 7px 14px; border-radius: 6px; font-weight: 700; cursor: pointer;" (click)="filterStatus = 'pending'">
+            <button type="button" class="btn btn-primary" style="background: #ef4444; color: white; font-size: 11.5px; padding: 6px 12px; border-radius: 6px; font-weight: 700; cursor: pointer;" (click)="filterStatus = 'pending'">
               View New Complaints ({{ getPendingCount() }}) →
             </button>
           </div>
 
           <!-- Filter Pills -->
-          <div class="filter-pills">
-            <button class="pill-btn" [class.active]="filterStatus === 'all'" (click)="filterStatus = 'all'">
-              📁 All ({{ complaints.length }})
+          <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px; align-items: center;">
+            <button 
+              type="button" 
+              (click)="filterStatus = 'all'" 
+              [style.background]="filterStatus === 'all' ? '#b31031' : 'var(--bg-card)'"
+              [style.color]="filterStatus === 'all' ? 'white' : 'var(--text-primary)'"
+              style="padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color); font-size: 12.5px; font-weight: 700; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-sm);"
+            >
+              <span>📋 All ({{ complaints.length }})</span>
             </button>
-            <button class="pill-btn" [class.active]="filterStatus === 'pending'" (click)="filterStatus = 'pending'">
-              🆕 New Complaints ({{ getPendingCount() }})
+            <button 
+              type="button" 
+              (click)="filterStatus = 'pending'" 
+              [style.background]="filterStatus === 'pending' ? '#b31031' : 'var(--bg-card)'"
+              [style.color]="filterStatus === 'pending' ? 'white' : 'var(--text-primary)'"
+              style="padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color); font-size: 12.5px; font-weight: 700; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-sm);"
+            >
+              <span>✉️ New Complaints ({{ getPendingCount() }})</span>
             </button>
-            <button class="pill-btn" [class.active]="filterStatus === 'assigned'" (click)="filterStatus = 'assigned'">
-              ⏳ Assigned ({{ getAssignedOnlyCount() }})
+            <button 
+              type="button" 
+              (click)="filterStatus = 'assigned'" 
+              [style.background]="filterStatus === 'assigned' ? '#b31031' : 'var(--bg-card)'"
+              [style.color]="filterStatus === 'assigned' ? 'white' : 'var(--text-primary)'"
+              style="padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color); font-size: 12.5px; font-weight: 700; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-sm);"
+            >
+              <span>👤 Assigned ({{ getAssignedOnlyCount() }})</span>
             </button>
-            <button class="pill-btn" [class.active]="filterStatus === 'in_progress'" (click)="filterStatus = 'in_progress'">
-              ⚡ In Progress ({{ getInProgressOnlyCount() }})
-            </button>
-            <button class="pill-btn" [class.active]="filterStatus === 'resolved'" (click)="filterStatus = 'resolved'">
-              ✅ Resolved ({{ getResolvedCount() }})
-            </button>
+            <button type="button" style="width: 36px; height: 36px; border-radius: 10px; background: var(--bg-card); border: 1px solid var(--border-color); font-size: 16px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">🌪️</button>
           </div>
 
           <div class="complaints-list" *ngIf="filteredComplaints.length > 0; else noComplaints">
@@ -358,87 +378,125 @@ import { API_CONFIG } from '../../config/api.config';
         </div>
 
 
-        <!-- TAB 1: CREATE ANNOUNCEMENT -->
+        <!-- TAB 1: ANNOUNCEMENTS / NOTICES -->
         <div *ngIf="activeTab === 'announcements'" class="tab-panel animate-fade">
-          <h4 class="page-title">📣 Post Notice / Announcement</h4>
           
-          <div class="form-container">
+          <!-- Post Notice Header Banner Card -->
+          <div class="card" style="padding: 20px; margin-bottom: 20px; border-radius: 18px; border: 1px solid var(--border-color); background: var(--bg-card);">
+            <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
+              <div style="width: 48px; height: 48px; border-radius: 50%; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">📢</div>
+              <div>
+                <h4 style="margin: 0 0 2px 0; font-size: 17px; font-weight: 800; color: var(--text-primary);">Post Notice / Announcement</h4>
+                <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Send important updates to hostel(s) instantly.</p>
+              </div>
+            </div>
+
             <form (ngSubmit)="onNoticeSubmit()" #noticeForm="ngForm">
               <div *ngIf="noticeError" class="alert alert-danger">{{ noticeError }}</div>
               <div *ngIf="noticeSuccess" class="alert alert-success">{{ noticeSuccess }}</div>
 
-              <div class="form-group">
-                <label class="form-label" for="noticeTitle">Notice Title</label>
-                <input 
-                  type="text" 
-                  id="noticeTitle" 
-                  name="noticeTitle" 
-                  class="form-input" 
-                  placeholder="e.g. Water shortage notice"
-                  [(ngModel)]="newNotice.title" 
-                  required
-                />
+              <!-- Title Field -->
+              <div class="form-group" style="margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">
+                  <span>NOTICE TITLE</span>
+                  <span>{{ newNotice.title?.length || 0 }}/100</span>
+                </div>
+                <div style="position: relative; display: flex; align-items: center;">
+                  <span style="position: absolute; left: 14px; font-size: 15px; color: var(--text-muted);">✏️</span>
+                  <input 
+                    type="text" 
+                    id="noticeTitle" 
+                    name="noticeTitle" 
+                    class="form-input" 
+                    style="padding-left: 40px; height: 44px; font-size: 13.5px; border-radius: 12px;"
+                    placeholder="e.g. Water shortage notice"
+                    [(ngModel)]="newNotice.title" 
+                    required
+                    maxlength="100"
+                  />
+                </div>
               </div>
 
-              <div class="form-group">
-                <label class="form-label" style="margin-bottom: 8px; display: block;">Target Hostels</label>
-                <div style="background: var(--bg-body); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
-                  <label style="display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; cursor: pointer; color: var(--text-primary);">
-                    <input type="checkbox" [checked]="isAllHostelsSelected()" (change)="toggleAllHostelsSelection()" style="width: 16px; height: 16px; accent-color: var(--primary);" />
-                    <span>All Hostels (Sabhi Block)</span>
+              <!-- Target Hostels Box Grid -->
+              <div class="form-group" style="margin-bottom: 16px;">
+                <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; display: block;">TARGET HOSTELS</span>
+                <div style="background: var(--bg-muted); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 12px;">
+                  <!-- All Hostels -->
+                  <label style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 14px; cursor: pointer;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <input type="checkbox" [checked]="isAllHostelsSelected()" (change)="toggleAllHostelsSelection()" style="width: 18px; height: 18px; accent-color: #b31031;" />
+                      <div>
+                        <strong style="font-size: 13px; color: var(--text-primary); display: block;">All Hostels (Sabhi Block)</strong>
+                        <span style="font-size: 11px; color: var(--text-muted);">This notice will be sent to all hostels</span>
+                      </div>
+                    </div>
+                    <span *ngIf="isAllHostelsSelected()" style="background: #fdf2f4; color: #b31031; font-size: 10.5px; font-weight: 800; padding: 3px 8px; border-radius: 6px;">Selected</span>
                   </label>
-                  <hr style="border: none; border-top: 1px solid var(--border-color); margin: 4px 0;" />
-                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px;">
-                    <label *ngFor="let hostel of hostelsList" style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; cursor: pointer; color: var(--text-primary);">
-                      <input type="checkbox" [checked]="selectedHostels.includes(hostel)" (change)="toggleHostelSelection(hostel)" style="width: 15px; height: 15px; accent-color: var(--primary);" />
-                      <span>{{ hostel }}</span>
+
+                  <!-- Hostels Grid -->
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <label *ngFor="let hostel of hostelsList" style="display: flex; align-items: center; gap: 10px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; cursor: pointer;">
+                      <input type="checkbox" [checked]="selectedHostels.includes(hostel)" (change)="toggleHostelSelection(hostel)" style="width: 16px; height: 16px; accent-color: #b31031;" />
+                      <span style="font-size: 12.5px; font-weight: 700; color: var(--text-primary);">{{ hostel }}</span>
                     </label>
                   </div>
                 </div>
               </div>
 
-              <div class="form-group">
-                <label class="form-label" for="noticeContent">Notice Message</label>
-                <textarea 
-                  id="noticeContent" 
-                  name="noticeContent" 
-                  class="form-input" 
-                  rows="5" 
-                  placeholder="Write announcement body details..."
-                  [(ngModel)]="newNotice.content" 
-                  required
-                ></textarea>
-              </div>
-
-              <!-- Optional Notice Photo Attachment -->
-              <div class="form-group" style="margin-top: 12px;">
-                <label class="form-label">📷 Attach Image (Optional)</label>
-                <div style="display: flex; align-items: center; gap: 12px;">
-                  <input type="file" (change)="onNoticePhotoSelected($event)" accept="image/*" class="file-input" id="noticePhotoFile" style="display: none;"/>
-                  <button type="button" class="btn btn-secondary" style="cursor: pointer; font-size: 12px; padding: 8px 14px; display: inline-flex; align-items: center; gap: 6px;" (click)="selectPhoto('notice')">
-                    📷 Choose Photo
-                  </button>
-                  <span *ngIf="noticePhotoFile" style="font-size: 12px; color: var(--primary); font-weight: 600;">
-                    ✓ {{ noticePhotoFile.name }}
-                  </span>
-                  <button type="button" *ngIf="noticePhotoFile" (click)="clearNoticePhoto()" style="background: none; border: none; color: #ef4444; font-size: 14px; cursor: pointer;">✕ Remove</button>
+              <!-- Message Textarea -->
+              <div class="form-group" style="margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">
+                  <span>NOTICE MESSAGE</span>
+                  <span>{{ newNotice.content?.length || 0 }}/1000</span>
                 </div>
-                <div *ngIf="noticePhotoPreview" style="margin-top: 10px;">
-                  <img [src]="noticePhotoPreview" style="max-width: 200px; max-height: 140px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-color);" />
+                <div style="position: relative;">
+                  <span style="position: absolute; left: 14px; top: 12px; font-size: 15px; color: var(--text-muted);">📄</span>
+                  <textarea 
+                    id="noticeContent" 
+                    name="noticeContent" 
+                    class="form-input" 
+                    style="padding-left: 40px; font-size: 13.5px; border-radius: 12px; min-height: 100px;"
+                    rows="4" 
+                    placeholder="Write announcement body details..."
+                    [(ngModel)]="newNotice.content" 
+                    required
+                    maxlength="1000"
+                  ></textarea>
                 </div>
               </div>
 
-              <button type="submit" class="btn btn-primary btn-submit" [disabled]="!noticeForm.form.valid || postingNotice || justPosted">
+              <!-- Attach Photo Box -->
+              <div class="form-group" style="margin-bottom: 20px;">
+                <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; display: block;">ATTACH IMAGE (OPTIONAL)</span>
+                <input type="file" (change)="onNoticePhotoSelected($event)" accept="image/*" class="file-input" id="noticePhotoFile" style="display: none;"/>
+                <div (click)="selectPhoto('notice')" style="background: #fdf2f4; border: 1.5px dashed rgba(179, 16, 49, 0.3); border-radius: 14px; padding: 16px; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
+                  <span style="font-size: 26px;">🖼️</span>
+                  <strong style="font-size: 13px; color: #b31031;">Choose Photo</strong>
+                  <span style="font-size: 11px; color: var(--text-muted);">JPG, PNG up to 5MB</span>
+                </div>
+                <div *ngIf="noticePhotoFile" style="margin-top: 8px; display: flex; align-items: center; justify-content: space-between; background: var(--bg-muted); padding: 8px 12px; border-radius: 8px;">
+                  <span style="font-size: 12px; color: #b31031; font-weight: 600;">✓ {{ noticePhotoFile.name }}</span>
+                  <button type="button" (click)="clearNoticePhoto()" style="background: none; border: none; color: #ef4444; font-size: 13px; cursor: pointer;">✕ Remove</button>
+                </div>
+              </div>
+
+              <!-- Submit Button -->
+              <button type="submit" class="btn" style="width: 100%; height: 46px; background: linear-gradient(135deg, #8a0d24 0%, #b31031 100%); color: white; border: none; border-radius: 12px; font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: 0 4px 14px rgba(138, 13, 36, 0.35);" [disabled]="!noticeForm.form.valid || postingNotice || justPosted">
                 <span *ngIf="postingNotice">Posting...</span>
                 <span *ngIf="!postingNotice && justPosted">Posted ✓</span>
-                <span *ngIf="!postingNotice && !justPosted">📢 Post Announcement</span>
+                <span *ngIf="!postingNotice && !justPosted">🚀 Post Announcement</span>
               </button>
             </form>
           </div>
 
-          <!-- Past Announcements History -->
+          <!-- Previously Posted Notices -->
           <div class="announcements-history" *ngIf="announcements.length > 0">
-            <h5 class="history-title">📋 Previously Posted Notices</h5>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <h5 style="margin: 0; font-size: 15px; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+                <span>📋</span> Previously Posted Notices
+              </h5>
+              <span style="font-size: 12px; color: #b31031; font-weight: 700; cursor: pointer;">View All &gt;</span>
+            </div>
             <div class="notice-history-card" *ngFor="let a of announcements">
               <div class="notice-history-header">
                 <div>
@@ -586,42 +644,99 @@ import { API_CONFIG } from '../../config/api.config';
 
         <!-- TAB 5: WARDEN MESS MANAGEMENT -->
         <div *ngIf="activeTab === 'mess'" class="tab-panel animate-fade">
-          <h4 class="page-title">🍴 Mess Admin Portal</h4>
+          <!-- Mess Admin Header Card -->
+          <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
+            <div style="width: 46px; height: 46px; border-radius: 50%; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">🍴</div>
+            <div>
+              <h4 style="margin: 0 0 2px 0; font-size: 17px; font-weight: 800; color: var(--text-primary);">Mess Admin Portal</h4>
+              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Manage weekly mess menu for all hostel blocks</p>
+            </div>
+          </div>
 
           <div *ngIf="messSuccess" class="alert alert-success">{{ messSuccess }}</div>
           <div *ngIf="messError" class="alert alert-danger">{{ messError }}</div>
 
-          <div class="mess-container">
-            <!-- 2. Menu Management Editor -->
-            <div class="card mess-card">
-              <h5>📅 Edit Weekly Mess Menu</h5>
-              <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">
-                Modify meal menu items for Monday through Sunday. Any changes update student portals in real-time.
-              </p>
+          <!-- Edit Weekly Mess Menu Banner Card -->
+          <div class="card" style="padding: 16px; border-radius: 16px; border: 1px solid var(--border-color); background: var(--bg-card); margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+            <div style="display: flex; align-items: flex-start; gap: 12px;">
+              <div style="width: 38px; height: 38px; border-radius: 12px; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">✏️</div>
+              <div>
+                <strong style="font-size: 14px; color: var(--text-primary); display: block; margin-bottom: 2px;">Edit Weekly Mess Menu</strong>
+                <p style="margin: 0; font-size: 11.5px; color: var(--text-muted); line-height: 1.3;">Modify meal menu items for Monday through Sunday. Any changes update student portals in real-time.</p>
+              </div>
+            </div>
+            <span style="font-size: 32px;">🥗</span>
+          </div>
 
-              <div class="menu-editor-list">
-                <div class="menu-edit-row" *ngFor="let m of messMenu">
-                  <div class="menu-edit-day-name">{{ m.dayOfWeek }}</div>
-                  
-                  <div class="menu-edit-inputs">
-                    <div class="edit-input-group">
-                      <label>🍳 Breakfast</label>
-                      <input type="text" [(ngModel)]="m.breakfast" class="form-input text-sm" />
-                    </div>
-                    <div class="edit-input-group">
-                      <label>🍛 Lunch</label>
-                      <input type="text" [(ngModel)]="m.lunch" class="form-input text-sm" />
-                    </div>
-                    <div class="edit-input-group">
-                      <label>🍽️ Dinner</label>
-                      <input type="text" [(ngModel)]="m.dinner" class="form-input text-sm" />
-                    </div>
-                    
-                    <button (click)="saveMenuDay(m)" class="btn btn-primary btn-save-menu-day" [disabled]="savingMenuId === m.id">
-                      {{ savingMenuId === m.id ? 'Saving...' : 'Save Day Menu ✓' }}
-                    </button>
+          <div class="mess-container">
+            <!-- Menu Management Editor Cards -->
+            <div class="menu-editor-list" style="display: flex; flex-direction: column; gap: 16px;">
+              <div class="card" *ngFor="let m of messMenu" style="padding: 18px; border-radius: 16px; border: 1px solid var(--border-color); background: var(--bg-card); position: relative; overflow: hidden; box-shadow: var(--shadow-sm);">
+                <!-- Left Red Accent Bar -->
+                <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #b31031;"></div>
+                
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <h5 style="margin: 0; font-size: 16px; font-weight: 800; color: var(--text-primary);">{{ m.dayOfWeek }}</h5>
+                    <span *ngIf="m.dayOfWeek === 'Monday'" style="background: #fdf2f4; color: #b31031; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px;">Today</span>
+                  </div>
+                  <span style="font-size: 16px; color: var(--text-muted); cursor: pointer;">⋮</span>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px;">
+                  <!-- Breakfast -->
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); width: 80px; flex-shrink: 0; display: flex; align-items: center; gap: 4px;">
+                      <span>🌅</span> Breakfast
+                    </span>
+                    <input type="text" [(ngModel)]="m.breakfast" class="form-input" style="flex: 1; height: 38px; border-radius: 10px; font-size: 12.5px; background: var(--bg-muted); border: 1px solid var(--border-color); padding: 0 12px;" />
+                  </div>
+
+                  <!-- Lunch -->
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); width: 80px; flex-shrink: 0; display: flex; align-items: center; gap: 4px;">
+                      <span>🥪</span> Lunch
+                    </span>
+                    <input type="text" [(ngModel)]="m.lunch" class="form-input" style="flex: 1; height: 38px; border-radius: 10px; font-size: 12.5px; background: var(--bg-muted); border: 1px solid var(--border-color); padding: 0 12px;" />
+                  </div>
+
+                  <!-- Dinner -->
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); width: 80px; flex-shrink: 0; display: flex; align-items: center; gap: 4px;">
+                      <span>🌙</span> Dinner
+                    </span>
+                    <input type="text" [(ngModel)]="m.dinner" class="form-input" style="flex: 1; height: 38px; border-radius: 10px; font-size: 12.5px; background: var(--bg-muted); border: 1px solid var(--border-color); padding: 0 12px;" />
                   </div>
                 </div>
+
+                <!-- Crimson Save Button -->
+                <button type="button" (click)="saveMenuDay(m)" class="btn" style="width: 100%; height: 42px; background: linear-gradient(135deg, #8a0d24 0%, #b31031 100%); color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; box-shadow: 0 3px 10px rgba(138, 13, 36, 0.3);" [disabled]="savingMenuId === m.id">
+                  <span>💾</span> {{ savingMenuId === m.id ? 'Saving...' : 'Save Day Menu' }}
+                </button>
+              </div>
+            </div>
+
+            <!-- Bottom Summary Grid -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 8px;">
+              <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; text-align: center;">
+                <span style="font-size: 16px;">📅</span>
+                <strong style="display: block; font-size: 12px; color: var(--text-primary); margin-top: 2px;">7 Days</strong>
+                <span style="font-size: 9px; color: var(--text-muted);">Menu Set</span>
+              </div>
+              <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; text-align: center;">
+                <span style="font-size: 16px;">👥</span>
+                <strong style="display: block; font-size: 12px; color: var(--text-primary); margin-top: 2px;">5 Hostels</strong>
+                <span style="font-size: 9px; color: var(--text-muted);">Applied</span>
+              </div>
+              <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; text-align: center;">
+                <span style="font-size: 16px;">🕒</span>
+                <strong style="display: block; font-size: 12px; color: var(--text-primary); margin-top: 2px;">Real-time</strong>
+                <span style="font-size: 9px; color: var(--text-muted);">Enabled</span>
+              </div>
+              <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; text-align: center;">
+                <span style="font-size: 16px;">✓</span>
+                <strong style="display: block; font-size: 12px; color: var(--text-primary); margin-top: 2px;">Auto Save</strong>
+                <span style="font-size: 9px; color: var(--text-muted);">Every Change</span>
               </div>
             </div>
 
