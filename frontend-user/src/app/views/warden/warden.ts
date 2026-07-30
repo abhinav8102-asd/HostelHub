@@ -288,11 +288,11 @@ import { API_CONFIG } from '../../config/api.config';
               <div class="form-group">
                 <label class="form-label" for="targetBlock">Target Block</label>
                 <select id="targetBlock" name="targetBlock" class="form-input" [(ngModel)]="newNotice.hostelBlock" required>
-                  <option value="All">All Blocks</option>
-                  <option value="Block-A">Block A</option>
-                  <option value="Block-B">Block B</option>
-                  <option value="Block-C">Block C</option>
-                  <option value="Block-D">Block D</option>
+                  <option value="All">All Hostels</option>
+                  <option value="Boys Hostel 1">Boys Hostel 1</option>
+                  <option value="Boys Hostel 2">Boys Hostel 2</option>
+                  <option value="Girls Hostel 1">Girls Hostel 1</option>
+                  <option value="Girls Hostel 2">Girls Hostel 2</option>
                 </select>
               </div>
 
@@ -635,11 +635,11 @@ import { API_CONFIG } from '../../config/api.config';
                 </div>
                 <div>
                   <select class="form-input" [(ngModel)]="filterHostelBlock">
-                    <option value="">All Blocks</option>
-                    <option value="Block-A">Block A</option>
-                    <option value="Block-B">Block B</option>
-                    <option value="Block-C">Block C</option>
-                    <option value="Block-D">Block D</option>
+                    <option value="">All Hostels</option>
+                    <option value="Boys Hostel 1">Boys Hostel 1</option>
+                    <option value="Boys Hostel 2">Boys Hostel 2</option>
+                    <option value="Girls Hostel 1">Girls Hostel 1</option>
+                    <option value="Girls Hostel 2">Girls Hostel 2</option>
                   </select>
                 </div>
               </div>
@@ -973,7 +973,7 @@ import { API_CONFIG } from '../../config/api.config';
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; color: var(--text-muted);">
                 <div>📧 <strong>Email:</strong> {{ student.email }}</div>
                 <div>📞 <strong>Phone:</strong> {{ student.phone }}</div>
-                <div>🏢 <strong>Block:</strong> {{ student.hostelBlock }}</div>
+                <div>🏢 <strong>Hostel:</strong> {{ student.hostelBlock }}</div>
                 <div>🔑 <strong>Room:</strong> Room {{ student.roomNumber }}</div>
                 <div>🚻 <strong>Gender:</strong> {{ student.gender | titlecase }}</div>
                 <div>📅 <strong>Applied:</strong> {{ student.createdAt | date:'shortDate' }}</div>

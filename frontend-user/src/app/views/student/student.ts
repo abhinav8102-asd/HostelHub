@@ -119,7 +119,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
                 <div class="welcome-tag">Welcome back,</div>
                 <h4 class="profile-user-name">{{ user?.name }}</h4>
                 <div class="profile-pills">
-                  <span class="profile-pill block-pill">🏢 Block {{ user?.hostelBlock || 'N/A' }}</span>
+                  <span class="profile-pill block-pill">🏢 {{ user?.hostelBlock || 'N/A' }}</span>
                   <span class="profile-pill room-pill">🔑 Room {{ user?.roomNumber || 'N/A' }}</span>
                   <span class="profile-pill batch-pill">🎓 {{ user?.batch || 'Batch 2025' }}</span>
                 </div>
