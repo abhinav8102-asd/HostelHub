@@ -219,10 +219,11 @@ import { AuthService } from '../../services/auth.service';
     /* Bottom white card panel */
     .auth-form-card {
       background: #ffffff;
-      border-radius: 32px 32px 0 0;
-      padding: 28px 24px 36px 24px;
-      box-shadow: 0 -8px 24px rgba(0,0,0,0.15);
-      width: 100%;
+      border-radius: 32px;
+      padding: 28px 24px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      width: calc(100% - 40px);
+      margin: 0 20px 24px 20px;
       box-sizing: border-box;
       overflow-y: auto;
     }
