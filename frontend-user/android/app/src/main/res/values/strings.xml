@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">HostelHubUser</string>
-    <string name="title_activity_main">HostelHubUser</string>
+    <string name="app_name">HostelHub</string>
+    <string name="title_activity_main">HostelHub</string>
     <string name="package_name">com.hostelhub.user</string>
     <string name="custom_url_scheme">com.hostelhub.user</string>
 </resources>

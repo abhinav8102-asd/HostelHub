@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const { User, PasswordResetOTP } = require('../models');
 const { OAuth2Client } = require('google-auth-library');
+const { uploadFile } = require('../utils/storage');
 require('dotenv').config();
 
 // Setup Nodemailer transporter with dynamic environment values (free Gmail SMTP)
