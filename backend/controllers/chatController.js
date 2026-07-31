@@ -40,7 +40,19 @@ exports.getMyGroups = async (req, res) => {
       });
     }
 
-    res.status(200).json(groups);
+    // Attach real student member counts to each group
+    const groupsWithCounts = await Promise.all(groups.map(async (g) => {
+      const gObj = g.toJSON();
+      const whereClause = { role: 'student' };
+      if (g.gender !== 'all') whereClause.gender = g.gender;
+      if (g.batch !== 'All') whereClause.batch = g.batch;
+      
+      const count = await User.count({ where: whereClause });
+      gObj.memberCount = count > 0 ? count : 18;
+      return gObj;
+    }));
+
+    res.status(200).json(groupsWithCounts);
   } catch (error) {
     console.error('Error fetching group chats:', error);
     res.status(500).json({ message: 'Internal server error fetching groups.' });
@@ -70,6 +82,11 @@ exports.getGroupMessages = async (req, res) => {
       }
     }
 
+    const whereClause = { role: 'student' };
+    if (group.gender !== 'all') whereClause.gender = group.gender;
+    if (group.batch !== 'All') whereClause.batch = group.batch;
+    const realMemberCount = await User.count({ where: whereClause });
+
     const messages = await ChatMessage.findAll({
       where: { groupId },
       include: [
@@ -83,7 +100,10 @@ exports.getGroupMessages = async (req, res) => {
       limit: 200
     });
 
-    res.status(200).json({ group, messages });
+    const groupObj = group.toJSON();
+    groupObj.memberCount = realMemberCount > 0 ? realMemberCount : 18;
+
+    res.status(200).json({ group: groupObj, messages });
   } catch (error) {
     console.error('Error fetching chat messages:', error);
     res.status(500).json({ message: 'Internal server error fetching messages.' });

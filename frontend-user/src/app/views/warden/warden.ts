@@ -1025,7 +1025,7 @@ import { API_CONFIG } from '../../config/api.config';
                   <div style="display: flex; gap: 6px; margin-top: 4px; align-items: center;">
                     <span style="background: #fdf2f4; color: #b31031; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 8px;">🛡️ WARDEN CHANNEL</span>
                     <span style="background: var(--bg-muted); color: var(--text-muted); font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 8px; display: flex; align-items: center; gap: 4px;">
-                      <span>👥 {{ (rollCallStudents?.length || activeWardenChatGroup?.memberCount || 24) }} Members</span>
+                      <span>👥 {{ (activeWardenChatGroup?.memberCount || rollCallStudents?.length || 18) }} Members</span>
                       <span style="width: 6px; height: 6px; background: #22c55e; border-radius: 50%;"></span>
                     </span>
                   </div>
@@ -1033,12 +1033,9 @@ import { API_CONFIG } from '../../config/api.config';
               </div>
 
               <!-- Header Right Action Icons -->
-              <div *ngIf="!isMultiSelectMode" style="display: flex; align-items: center; gap: 10px; color: var(--text-muted); font-size: 16px;">
-                <button type="button" (click)="toggleMultiSelectMode()" style="background: #fdf2f4; border: 1px solid rgba(179, 16, 49, 0.2); color: #b31031; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
-                  <span>☑️</span> Select
-                </button>
-                <span style="cursor: pointer;">📌</span>
-                <span style="cursor: pointer;">🔍</span>
+              <div *ngIf="!isMultiSelectMode" style="display: flex; align-items: center; gap: 12px; color: var(--text-muted); font-size: 16px;">
+                <span style="cursor: pointer;" title="Pinned">📌</span>
+                <span style="cursor: pointer;" title="Search">🔍</span>
               </div>
 
               <!-- Multi-Select Action Bar -->
