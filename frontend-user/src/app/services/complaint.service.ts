@@ -173,7 +173,7 @@ export class ComplaintService {
 
   getFooterSettings(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/settings/footer`, {
-      headers: this.authService.getAuthHeaders()
+      headers: this.authService.getNoCacheHeaders()
     });
   }
 
@@ -185,13 +185,13 @@ export class ComplaintService {
 
   getWardenList(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/users/wardens`, {
-      headers: this.authService.getAuthHeaders()
+      headers: this.authService.getNoCacheHeaders()
     });
   }
 
   getPublicSettings(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/settings/public`, {
-      headers: this.authService.getAuthHeaders()
+      headers: this.authService.getNoCacheHeaders()
     });
   }
 
