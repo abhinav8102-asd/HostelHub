@@ -725,7 +725,7 @@ import { API_CONFIG } from '../../config/api.config';
               </div>
               <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; text-align: center;">
                 <span style="font-size: 16px;">👥</span>
-                <strong style="display: block; font-size: 12px; color: var(--text-primary); margin-top: 2px;">5 Hostels</strong>
+                <strong style="display: block; font-size: 12px; color: var(--text-primary); margin-top: 2px;">4 Hostels</strong>
                 <span style="font-size: 9px; color: var(--text-muted);">Applied</span>
               </div>
               <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; text-align: center;">
@@ -1006,8 +1006,13 @@ import { API_CONFIG } from '../../config/api.config';
             </div>
 
             <!-- Messages Stream Area -->
-            <div id="wardenChatFeed" (scroll)="onChatStreamScroll()" style="flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: var(--bg-muted);">
+            <div id="wardenChatFeed" (scroll)="onChatStreamScroll()" style="flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; background: #f8fafc;">
               
+              <!-- Centered Today Date Divider Pill -->
+              <div style="align-self: center; margin: 4px 0 8px 0; background: #ffffff; border: 1px solid var(--border-color); color: var(--text-muted); font-size: 11px; font-weight: 700; padding: 4px 14px; border-radius: 12px; box-shadow: var(--shadow-sm);">
+                Today
+              </div>
+
               <!-- Clean Spinner Loader -->
               <div *ngIf="isLoadingWardenChat" style="margin: auto; display: flex; flex-direction: column; align-items: center; gap: 10px; color: var(--text-muted); padding: 40px 0;">
                 <div style="width: 32px; height: 32px; border: 3px solid rgba(239, 68, 68, 0.2); border-top-color: #ef4444; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
@@ -1019,98 +1024,95 @@ import { API_CONFIG } from '../../config/api.config';
                 <p>No messages yet in {{ activeWardenChatGroup?.name }}.</p>
               </div>
 
-              <div *ngFor="let msg of wardenChatMessages; let i = index" [style.align-self]="msg.senderId === user?.id ? 'flex-end' : 'flex-start'" style="max-width: 78%; display: flex; flex-direction: column; position: relative;" (click)="isMultiSelectMode && !msg.isDeleted ? toggleMessageSelection(msg.id, $event) : null">
+              <div *ngFor="let msg of wardenChatMessages; let i = index" [style.align-self]="msg.senderId === user?.id ? 'flex-end' : 'flex-start'" style="max-width: 82%; display: flex; align-items: flex-start; gap: 8px; position: relative;" (click)="isMultiSelectMode && !msg.isDeleted ? toggleMessageSelection(msg.id, $event) : null">
                 
-                <!-- Inline Delete Options Popover right at the message bubble -->
-                <div *ngIf="selectedMsgForDelete?.id === msg.id && !isMultiSelectMode" 
-                  [style.right]="msg.senderId === user?.id ? '0' : 'auto'"
-                  [style.left]="msg.senderId === user?.id ? 'auto' : '0'"
-                  [style.top]="i === 0 ? '100%' : 'auto'"
-                  [style.bottom]="i === 0 ? 'auto' : '100%'"
-                  [style.margin-top]="i === 0 ? '4px' : '0'"
-                  [style.margin-bottom]="i === 0 ? '0' : '4px'"
-                  style="position: absolute; z-index: 1000; background: #1e293b; color: white; border: 1px solid #334155; border-radius: 12px; padding: 6px; display: flex; flex-direction: column; gap: 4px; min-width: 175px; box-shadow: 0 10px 25px rgba(0,0,0,0.6);"
-                  (click)="$event.stopPropagation()"
-                >
-                  <button 
-                    type="button" 
-                    (click)="confirmDeleteForMe(); $event.stopPropagation()"
-                    style="background: transparent; border: none; color: white; text-align: left; padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;"
-                  >
-                    <span>🙈</span>
-                    <span>Delete for Me</span>
-                  </button>
-                  <button 
-                    type="button" 
-                    *ngIf="msg.senderId === user?.id || user?.role === 'warden' || user?.role === 'admin'"
-                    (click)="confirmDeleteForEveryone(); $event.stopPropagation()"
-                    style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; text-align: left; padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px;"
-                  >
-                    <span>💥</span>
-                    <span>Delete for Everyone</span>
-                  </button>
-                  <button 
-                    type="button" 
-                    (click)="startMultiSelectWithMsg(msg); $event.stopPropagation()"
-                    style="background: transparent; border: none; color: #94a3b8; text-align: left; padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;"
-                  >
-                    <span>☑️</span>
-                    <span>Select Messages</span>
-                  </button>
+                <!-- Left Student Circle Avatar (Non-Self Messages) -->
+                <div *ngIf="msg.senderId !== user?.id" style="width: 34px; height: 34px; border-radius: 50%; background: #b31031; color: white; font-weight: 800; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 14px;">
+                  {{ getInitials(msg.sender?.name || 'ST') }}
                 </div>
 
-                <!-- Sender Info for non-self messages -->
-                <div *ngIf="msg.senderId !== user?.id && !msg.isDeleted" style="font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
-                  <span *ngIf="isMultiSelectMode" style="font-size: 12px;">{{ isMessageSelected(msg.id) ? '☑️' : '🔲' }}</span>
-                  <span>{{ msg.sender?.name }}</span>
-                  <span *ngIf="msg.sender?.role === 'warden'" style="background: #ef4444; color: white; padding: 1px 6px; border-radius: 4px; font-size: 9px; font-weight: 800;">👨‍💼 WARDEN</span>
-                  <span *ngIf="msg.sender?.role === 'student'" style="color: var(--text-muted); font-size: 10px; font-weight: 500;">(Room {{ msg.sender?.roomNumber }})</span>
-                </div>
+                <div style="display: flex; flex-direction: column; flex: 1; min-width: 0;">
 
-                <!-- Normal Active Message Bubble -->
-                <div *ngIf="!msg.isDeleted"
-                  [style.background]="isMessageSelected(msg.id) ? 'rgba(179, 16, 49, 0.25)' : (msg.senderId === user?.id ? '#b31031' : (msg.sender?.role === 'warden' ? 'rgba(239, 68, 68, 0.12)' : 'var(--bg-card)'))"
-                  [style.color]="msg.senderId === user?.id ? 'white' : 'var(--text-primary)'"
-                  [style.border]="isMessageSelected(msg.id) ? '2px solid #b31031' : (msg.senderId === user?.id ? 'none' : (msg.sender?.role === 'warden' ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid var(--border-color)'))"
-                  [style.border-radius]="msg.senderId === user?.id ? '16px 16px 4px 16px' : '16px 16px 16px 4px'"
-                  style="padding: 12px 16px; font-size: 13.5px; line-height: 1.5; word-break: break-word; box-shadow: 0 2px 6px rgba(0,0,0,0.06); display: flex; flex-direction: column; gap: 6px; cursor: pointer;"
-                >
-                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%;">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                      <span *ngIf="isMultiSelectMode && msg.senderId === user?.id" style="font-size: 12px;">{{ isMessageSelected(msg.id) ? '☑️' : '🔲' }}</span>
-                      <span *ngIf="msg.message">{{ msg.message }}</span>
-                    </div>
-                    <button 
-                      type="button"
-                      *ngIf="!isMultiSelectMode && msg.senderId === user?.id"
-                      (click)="openDeleteOptions(msg); $event.stopPropagation()"
-                      title="Delete message options"
-                      style="background: none; border: none; cursor: pointer; font-size: 11px; opacity: 0.6; line-height: 1; padding: 2px;"
-                    >
-                      🗑️
+                  <!-- Inline Delete Options Popover -->
+                  <div *ngIf="selectedMsgForDelete?.id === msg.id && !isMultiSelectMode" 
+                    [style.right]="msg.senderId === user?.id ? '0' : 'auto'"
+                    [style.left]="msg.senderId === user?.id ? 'auto' : '0'"
+                    [style.top]="i === 0 ? '100%' : 'auto'"
+                    [style.bottom]="i === 0 ? 'auto' : '100%'"
+                    style="position: absolute; z-index: 1000; background: #1e293b; color: white; border: 1px solid #334155; border-radius: 12px; padding: 6px; display: flex; flex-direction: column; gap: 4px; min-width: 175px; box-shadow: 0 10px 25px rgba(0,0,0,0.6);"
+                    (click)="$event.stopPropagation()"
+                  >
+                    <button type="button" (click)="confirmDeleteForMe(); $event.stopPropagation()" style="background: transparent; border: none; color: white; text-align: left; padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                      <span>🙈</span> Delete for Me
+                    </button>
+                    <button type="button" *ngIf="msg.senderId === user?.id || user?.role === 'warden' || user?.role === 'admin'" (click)="confirmDeleteForEveryone(); $event.stopPropagation()" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; text-align: left; padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                      <span>💥</span> Delete for Everyone
                     </button>
                   </div>
 
-                  <!-- Attached Image View (Strict Overflow Container) -->
-                  <div *ngIf="msg.attachmentUrl" style="margin-top: 6px; width: 100%; max-width: 100%; overflow: hidden; border-radius: 10px;">
-                    <img 
-                      [src]="getImageUrl(msg.attachmentUrl)" 
-                      (click)="openPhotoModal(getImageUrl(msg.attachmentUrl)); $event.stopPropagation()"
-                      style="width: 100%; max-width: 100%; max-height: 220px; border-radius: 10px; cursor: pointer; object-fit: cover; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: block;" 
-                    />
+                  <!-- Sender Name (Student Left Messages) -->
+                  <div *ngIf="msg.senderId !== user?.id && !msg.isDeleted" style="font-size: 11.5px; font-weight: 800; color: #b31031; margin-bottom: 3px; display: flex; align-items: center; gap: 6px;">
+                    <span *ngIf="isMultiSelectMode" style="font-size: 12px;">{{ isMessageSelected(msg.id) ? '☑️' : '🔲' }}</span>
+                    <span>{{ msg.sender?.name }}</span>
                   </div>
+
+                  <!-- Normal Active Message Bubble -->
+                  <div *ngIf="!msg.isDeleted"
+                    [style.background]="isMessageSelected(msg.id) ? 'rgba(179, 16, 49, 0.25)' : (msg.senderId === user?.id ? 'linear-gradient(135deg, #8a0d24 0%, #b31031 100%)' : '#ffffff')"
+                    [style.color]="msg.senderId === user?.id ? 'white' : '#1e293b'"
+                    [style.border]="isMessageSelected(msg.id) ? '2px solid #b31031' : (msg.senderId === user?.id ? 'none' : '1px solid #e2e8f0')"
+                    [style.border-radius]="msg.senderId === user?.id ? '18px 18px 4px 18px' : '18px 18px 18px 4px'"
+                    style="padding: 12px 16px; font-size: 13.5px; line-height: 1.45; word-break: break-word; box-shadow: 0 2px 8px rgba(0,0,0,0.04); display: flex; flex-direction: column; gap: 4px; cursor: pointer;"
+                  >
+                    <!-- Warden Tag Header inside right bubble -->
+                    <div *ngIf="msg.senderId === user?.id" style="display: flex; align-items: center; justify-content: flex-end; gap: 4px; font-size: 10px; font-weight: 800; opacity: 0.9; margin-bottom: 2px;">
+                      <span>Warden</span>
+                      <span>🛡️</span>
+                    </div>
+
+                    <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; width: 100%;">
+                      <span *ngIf="msg.message" style="flex: 1;">{{ msg.message }}</span>
+                      
+                      <!-- Timestamp inside bubble -->
+                      <span [style.color]="msg.senderId === user?.id ? 'rgba(255,255,255,0.75)' : '#94a3b8'" style="font-size: 9.5px; font-weight: 600; white-space: nowrap;">
+                        {{ msg.createdAt | date:'shortTime' }}
+                        <span *ngIf="msg.senderId === user?.id" style="margin-left: 2px;">✓✓</span>
+                      </span>
+                    </div>
+
+                    <!-- Attached Image View -->
+                    <div *ngIf="msg.attachmentUrl" style="margin-top: 6px; width: 100%; max-width: 100%; overflow: hidden; border-radius: 10px;">
+                      <img 
+                        [src]="getImageUrl(msg.attachmentUrl)" 
+                        (click)="openPhotoModal(getImageUrl(msg.attachmentUrl)); $event.stopPropagation()"
+                        style="width: 100%; max-width: 100%; max-height: 220px; border-radius: 10px; cursor: pointer; object-fit: cover; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: block;" 
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Reaction Tag if available -->
+                  <div *ngIf="!msg.isDeleted && msg.reactions?.length" style="align-self: flex-start; margin-top: -6px; margin-left: 10px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 2px 8px; font-size: 11px; display: flex; align-items: center; gap: 4px; box-shadow: var(--shadow-sm);">
+                    <span>👍</span>
+                    <span style="font-weight: 700; color: #475569;">{{ msg.reactions.length }}</span>
+                  </div>
+
+                  <!-- Deleted Message Placeholder Bubble -->
+                  <div *ngIf="msg.isDeleted"
+                    style="background: #ffffff; color: #94a3b8; border: 1px dashed #cbd5e1; border-radius: 14px; padding: 10px 14px; font-size: 12px; font-style: italic; display: flex; align-items: center; justify-content: space-between; gap: 8px;"
+                  >
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                      <span style="color: #ef4444;">🚫</span>
+                      <span>This message was deleted by {{ msg.deletedByName || 'Warden Test' }}</span>
+                    </div>
+                    <span style="font-size: 9.5px; color: #94a3b8; font-style: normal;">{{ msg.createdAt | date:'shortTime' }}</span>
+                  </div>
+
                 </div>
 
-                <!-- Deleted Message Placeholder Bubble -->
-                <div *ngIf="msg.isDeleted"
-                  style="background: var(--bg-card); color: var(--text-muted); border: 1px dashed var(--border-color); border-radius: 12px; padding: 10px 14px; font-size: 12px; font-style: italic; display: flex; align-items: center; gap: 6px;"
-                >
-                  <span>🚫 This message was deleted by {{ msg.deletedByName || 'User' }}</span>
-                </div>
-
-                <!-- Timestamp -->
-                <div [style.text-align]="msg.senderId === user?.id ? 'right' : 'left'" style="font-size: 9.5px; color: var(--text-muted); margin-top: 4px; font-weight: 600;">
-                  {{ msg.createdAt | date:'shortTime' }}
+                <!-- Right Warden Avatar Circle (Self Warden Messages) -->
+                <div *ngIf="msg.senderId === user?.id" style="width: 34px; height: 34px; border-radius: 50%; background: #fdf2f4; border: 1px solid #b31031; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 4px;">
+                  <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" style="width: 100%; height: 100%; object-fit: cover;" />
+                  <span *ngIf="!user?.profilePicUrl" style="font-size: 16px;">👨‍💼</span>
                 </div>
 
               </div>
@@ -2172,6 +2174,14 @@ import { API_CONFIG } from '../../config/api.config';
   `]
 })
 export class WardenDashboardComponent implements OnInit, OnDestroy {
+  getInitials(name: string): string {
+    if (!name) return 'U';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  }
   user: User | null = null;
   activeTab: string = 'home';
   
