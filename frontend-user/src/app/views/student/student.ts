@@ -741,49 +741,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
           <div *ngIf="messError" class="alert alert-danger">{{ messError }}</div>
 
           <div class="mess-container">
-            <!-- 1. Today's Skip Meal Switch Panel -->
-            <div class="card mess-card">
-              <h5>🚪 Waste Minimizer / Skip Meal</h5>
-              <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">
-                Leaving the campus or eating out? Let the mess know in advance to minimize food waste.
-              </p>
-              
-              <div class="skip-meal-grid">
-                <!-- Today's skips -->
-                <div class="skip-meal-day">
-                  <h6>Today ({{ getTodayDateString() | date:'EEEE, MMM d' }})</h6>
-                  <div class="skip-buttons">
-                    <button type="button" class="btn-skip" [class.skipped]="isMealSkipped('breakfast', getTodayDateString())" (click)="toggleSkip('breakfast', getTodayDateString())">
-                      🍳 Breakfast
-                    </button>
-                    <button type="button" class="btn-skip" [class.skipped]="isMealSkipped('lunch', getTodayDateString())" (click)="toggleSkip('lunch', getTodayDateString())">
-                      🍛 Lunch
-                    </button>
-                    <button type="button" class="btn-skip" [class.skipped]="isMealSkipped('dinner', getTodayDateString())" (click)="toggleSkip('dinner', getTodayDateString())">
-                      🍽️ Dinner
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Tomorrow's skips -->
-                <div class="skip-meal-day">
-                  <h6>Tomorrow ({{ getTomorrowDateString() | date:'EEEE, MMM d' }})</h6>
-                  <div class="skip-buttons">
-                    <button type="button" class="btn-skip" [class.skipped]="isMealSkipped('breakfast', getTomorrowDateString())" (click)="toggleSkip('breakfast', getTomorrowDateString())">
-                      🍳 Breakfast
-                    </button>
-                    <button type="button" class="btn-skip" [class.skipped]="isMealSkipped('lunch', getTomorrowDateString())" (click)="toggleSkip('lunch', getTomorrowDateString())">
-                      🍛 Lunch
-                    </button>
-                    <button type="button" class="btn-skip" [class.skipped]="isMealSkipped('dinner', getTomorrowDateString())" (click)="toggleSkip('dinner', getTomorrowDateString())">
-                      🍽️ Dinner
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- 2. Today's Menu Display -->
+            <!-- Today's Menu Display -->
             <div class="card mess-card today-menu-card">
               <div class="menu-header">
                 <h5>📅 Weekly Mess Menu</h5>
@@ -1741,79 +1699,39 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
       box-shadow: var(--shadow-sm);
     }
 
-    /* Exact Clean List Footer Styling */
+    /* Clean Footer Styling matching Warden Portal */
     .footer {
-      order: 4;
       background: var(--bg-card);
       border-top: 1px solid var(--border-color);
       padding: 24px 20px 28px;
       margin-top: auto;
       width: 100%;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.04);
     }
-    .footer-clean-container {
+    .footer-content {
       max-width: 500px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      text-align: left;
-    }
-    .footer-header-row {
-      display: flex;
-      align-items: center;
       gap: 8px;
-      margin-bottom: 2px;
+      text-align: center;
     }
-    .f-info-icon { font-size: 16px; }
-    .f-about-heading {
-      font-size: 15px;
+    .footer-title {
+      font-size: 14px;
       font-weight: 800;
       color: var(--text-primary);
       margin: 0;
     }
-    .f-brand-title {
-      font-size: 14px;
-      font-weight: 800;
-      color: var(--text-primary);
-      letter-spacing: -0.2px;
-    }
-    .f-brand-subtitle {
-      font-size: 13px;
-      font-style: italic;
-      color: var(--text-secondary);
-      margin-bottom: 8px;
-    }
-    .footer-detail-list {
+    .footer-meta {
       display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .f-list-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      color: var(--text-primary);
-    }
-    .f-item-icon { font-size: 15px; flex-shrink: 0; }
-    .f-item-label { font-weight: 700; color: var(--text-primary); }
-    .f-item-link { color: var(--text-primary); text-decoration: underline; font-weight: 500; }
-    .f-item-value { color: var(--text-primary); font-weight: 500; }
-    .f-status-dot {
-      width: 12px;
-      height: 12px;
-      background: #22c55e;
-      border-radius: 50%;
-      flex-shrink: 0;
-      box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
-    }
-    .f-status-text { color: var(--text-primary); font-weight: 600; }
-    .footer-copyright-text {
+      justify-content: center;
+      gap: 16px;
       font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .footer-copyright {
+      font-size: 11px;
       color: var(--text-muted);
-      margin-top: 10px;
-      font-weight: 500;
+      margin-top: 4px;
     }
 
     /* Mess Management CSS */
