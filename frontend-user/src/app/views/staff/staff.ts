@@ -77,7 +77,14 @@ import { SocketService, LiveNotification } from '../../services/socket.service';
         
         <!-- TAB 1: ASSIGNED TASKS -->
         <div *ngIf="activeTab === 'tasks'" class="animate-fade">
-          <h4 class="page-title">My Assigned Tasks</h4>
+          <!-- Header Banner Widget -->
+          <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
+            <div style="width: 46px; height: 46px; border-radius: 50%; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">🛠️</div>
+            <div>
+              <h4 style="margin: 0 0 2px 0; font-size: 17px; font-weight: 800; color: var(--text-primary);">My Assigned Tasks</h4>
+              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">View, track and update your assigned maintenance jobs</p>
+            </div>
+          </div>
 
           <!-- Filter Pills -->
           <div class="filter-pills">
@@ -198,8 +205,17 @@ import { SocketService, LiveNotification } from '../../services/socket.service';
 
         <!-- TAB 2: ALERTS LOG -->
         <div *ngIf="activeTab === 'alerts'" class="animate-fade">
-          <div class="notif-header-row">
-            <h4 class="page-title">🔕 Alert History</h4>
+          <!-- Header Banner Widget -->
+          <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
+            <div style="width: 46px; height: 46px; border-radius: 50%; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">🔔</div>
+            <div>
+              <h4 style="margin: 0 0 2px 0; font-size: 17px; font-weight: 800; color: var(--text-primary);">Alert History</h4>
+              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Real-time activity logs and notification history</p>
+            </div>
+          </div>
+
+          <div class="notif-header-row" style="margin-bottom: 12px;">
+            <h5 style="margin: 0; font-size: 14px; font-weight: 700; color: var(--text-primary);">Notifications</h5>
             <button class="clear-notif-btn" *ngIf="notifications.length > 0" (click)="clearAllNotifications()">
               Mark all as read Checkbox
             </button>
@@ -225,71 +241,137 @@ import { SocketService, LiveNotification } from '../../services/socket.service';
 
         <!-- TAB 3: EDIT PROFILE -->
         <div *ngIf="activeTab === 'my-profile'" class="animate-fade">
-          <h4 class="page-title">👤 Edit Profile</h4>
-          
-          <div class="form-container">
-            <form (ngSubmit)="onProfileSubmit()" #profileForm="ngForm">
-              <div *ngIf="profileError" class="alert alert-danger">{{ profileError }}</div>
-              <div *ngIf="profileSuccess" class="alert alert-success">{{ profileSuccess }}</div>
+          <!-- Header Banner Widget -->
+          <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
+            <div style="width: 46px; height: 46px; border-radius: 50%; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">👤</div>
+            <div>
+              <h4 style="margin: 0 0 2px 0; font-size: 17px; font-weight: 800; color: var(--text-primary);">Edit Profile</h4>
+              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Update your profile information</p>
+            </div>
+          </div>
 
-              <!-- Profile Pic Section -->
-              <div class="form-group" style="text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 20px;">
-                <label class="form-label">Profile Picture</label>
-                <div class="profile-pic-container" style="position: relative; width: 100px; height: 100px; border-radius: 50%; border: 2px solid var(--primary); overflow: hidden; background: #f1f5f9; display: flex; justify-content: center; align-items: center; box-shadow: var(--shadow-md);">
+          <form (ngSubmit)="onProfileSubmit()" #profileForm="ngForm" style="display: flex; flex-direction: column; gap: 16px;">
+            <div *ngIf="profileError" class="alert alert-danger">{{ profileError }}</div>
+            <div *ngIf="profileSuccess" class="alert alert-success">{{ profileSuccess }}</div>
+
+            <!-- Profile Photo Card Box -->
+            <div class="card" style="padding: 24px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--bg-card); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; box-shadow: var(--shadow-sm);">
+              <div style="position: relative; width: 104px; height: 104px; border-radius: 50%; border: 3px solid #b31031; padding: 3px; background: var(--bg-card);">
+                <div style="width: 100%; height: 100%; border-radius: 50%; overflow: hidden; background: #f1f5f9; display: flex; align-items: center; justify-content: center;">
                   <img *ngIf="profilePreviewUrl" [src]="profilePreviewUrl" style="width: 100%; height: 100%; object-fit: cover;" />
-                  <span *ngIf="!profilePreviewUrl" style="font-size: 40px; color: #94a3b8;">🔧</span>
+                  <span *ngIf="!profilePreviewUrl" style="font-size: 44px; color: #94a3b8;">🔧</span>
                 </div>
-                 <input type="file" (change)="onProfilePicChange($event)" accept="image/*" class="file-input" id="profilePicFile" style="display: none;"/>
-                 <button type="button" class="btn btn-secondary" style="cursor: pointer; font-size: 12px; padding: 6px 12px;" (click)="selectPhoto('profile')">
-                   📷 Choose Photo
-                 </button>
+                <!-- Camera Badge Icon -->
+                <button type="button" (click)="selectPhoto('profile')" style="position: absolute; bottom: 2px; right: 2px; width: 30px; height: 30px; border-radius: 50%; background: #b31031; color: white; border: 2px solid white; display: flex; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+                  📷
+                </button>
               </div>
 
-              <div class="form-group">
-                <label class="form-label" for="profileName">Full Name</label>
+              <div>
+                <strong style="font-size: 14.5px; color: var(--text-primary); display: block; margin-bottom: 2px;">Profile Photo</strong>
+                <span style="font-size: 11px; color: var(--text-muted);">JPG, PNG up to 5MB</span>
+              </div>
+
+              <input type="file" (change)="onProfilePicChange($event)" accept="image/*" class="file-input" id="profilePicFile" style="display: none;"/>
+              <button type="button" (click)="selectPhoto('profile')" class="btn" style="width: 100%; max-width: 320px; height: 42px; background: #fdf2f4; color: #b31031; border: 1px solid rgba(179, 16, 49, 0.2); border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <span>📷</span> Change Photo
+              </button>
+            </div>
+
+            <!-- Profile Info Form Fields Card -->
+            <div class="card" style="padding: 20px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--bg-card); display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-sm);">
+              <!-- Full Name Field -->
+              <div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                  <span style="width: 32px; height: 32px; border-radius: 8px; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 15px;">👤</span>
+                  <label class="form-label" style="margin: 0; font-size: 12.5px; font-weight: 700; color: var(--text-primary);">Full Name</label>
+                </div>
                 <input 
                   type="text" 
                   id="profileName" 
                   name="profileName" 
                   class="form-input" 
+                  style="height: 42px; border-radius: 12px; font-size: 13px; background: var(--bg-muted); border: 1px solid var(--border-color); padding: 0 14px;"
                   [(ngModel)]="editUser.name" 
                   required
                 />
               </div>
 
-              <div class="form-group">
-                <label class="form-label" for="profilePhone">Phone Number</label>
+              <!-- Phone Number Field -->
+              <div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                  <span style="width: 32px; height: 32px; border-radius: 8px; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 15px;">📞</span>
+                  <label class="form-label" style="margin: 0; font-size: 12.5px; font-weight: 700; color: var(--text-primary);">Phone Number</label>
+                </div>
                 <input 
                   type="text" 
                   id="profilePhone" 
                   name="profilePhone" 
                   class="form-input" 
+                  style="height: 42px; border-radius: 12px; font-size: 13px; background: var(--bg-muted); border: 1px solid var(--border-color); padding: 0 14px;"
                   [(ngModel)]="editUser.phone" 
                   required
                 />
               </div>
 
-              <div class="form-group">
-                <label class="form-label" for="profileBio">Bio</label>
-                <textarea 
-                  id="profileBio" 
-                  name="profileBio" 
-                  class="form-input" 
-                  rows="3" 
-                  placeholder="Tell us about yourself..."
-                  [(ngModel)]="editUser.bio"
-                ></textarea>
+              <!-- Bio Field -->
+              <div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                  <span style="width: 32px; height: 32px; border-radius: 8px; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 15px;">📄</span>
+                  <label class="form-label" style="margin: 0; font-size: 12.5px; font-weight: 700; color: var(--text-primary);">Bio</label>
+                </div>
+                <div style="position: relative;">
+                  <textarea 
+                    id="profileBio" 
+                    name="profileBio" 
+                    class="form-input" 
+                    rows="3" 
+                    style="border-radius: 12px; font-size: 13px; background: var(--bg-muted); border: 1px solid var(--border-color); padding: 10px 14px; width: 100%;"
+                    placeholder="Tell us about yourself..."
+                    [(ngModel)]="editUser.bio"
+                  ></textarea>
+                  <span style="position: absolute; right: 12px; bottom: 8px; font-size: 10px; color: var(--text-muted);">{{ editUser.bio ? editUser.bio.length : 0 }}/150</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Save Changes Crimson Button -->
+            <button type="submit" class="btn" style="width: 100%; height: 46px; background: linear-gradient(135deg, #8a0d24 0%, #b31031 100%); color: white; border: none; border-radius: 14px; font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: 0 4px 14px rgba(138, 13, 36, 0.35);" [disabled]="!profileForm.form.valid || updatingProfile">
+              <span>💾</span> {{ updatingProfile ? 'Updating...' : 'Save Changes' }}
+            </button>
+
+            <!-- Bottom Need Help Box -->
+            <div class="card" style="padding: 16px; border-radius: 16px; border: 1px solid var(--border-color); background: var(--bg-card); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <strong style="font-size: 13px; color: #b31031; display: block; margin-bottom: 2px;">Need Help?</strong>
+                <span style="font-size: 11.5px; color: var(--text-muted);">We are here to assist you.</span>
               </div>
 
-              <button type="submit" class="btn btn-primary btn-submit" [disabled]="!profileForm.form.valid || updatingProfile">
-                <span *ngIf="updatingProfile">Updating...</span>
-                <span *ngIf="!updatingProfile">Save Changes</span>
-              </button>
-            </form>
-          </div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <a href="mailto:support@hostelhub.com" style="background: var(--bg-muted); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 11.5px; font-weight: 600; padding: 6px 12px; border-radius: 20px; text-decoration: none; display: flex; align-items: center; gap: 6px;">
+                  <span>✉️</span> support@hostelhub.com
+                </a>
+                <a href="tel:+919876543210" style="background: var(--bg-muted); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 11.5px; font-weight: 600; padding: 6px 12px; border-radius: 20px; text-decoration: none; display: flex; align-items: center; gap: 6px;">
+                  <span>📞</span> +91 98765 43210
+                </a>
+              </div>
+            </div>
+          </form>
         </div>
 
       </div>
+
+      <!-- Clean 3-Line Footer -->
+      <footer class="footer animate-fade" *ngIf="footerSettings">
+        <div class="footer-content">
+          <p class="footer-title">{{ footerSettings.footer_text }}</p>
+          <div class="footer-meta">
+            <span *ngIf="footerSettings.footer_email">📧 {{ footerSettings.footer_email }}</span>
+            <span *ngIf="footerSettings.footer_phone">📞 {{ footerSettings.footer_phone }}</span>
+          </div>
+          <p class="footer-copyright">{{ footerSettings.footer_copyright }}</p>
+        </div>
+      </footer>
     </div>
   `,
   styles: [`
@@ -841,10 +923,40 @@ import { SocketService, LiveNotification } from '../../services/socket.service';
     .notif-badge-icon {
       font-size: 14px;
     }
-    .notif-msg {
-      font-size: 12.5px;
-      color: var(--neutral-700);
-      line-height: 1.4;
+    /* Footer Styling */
+    .footer {
+      order: 4;
+      background-color: var(--bg-card);
+      border-top: 1px solid var(--border-color);
+      padding: 20px 20px 24px;
+      margin-top: auto;
+      text-align: center;
+      width: 100%;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+    }
+    .footer-content {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .footer-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .footer-meta {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+    .footer-copyright {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      margin-top: 4px;
     }
   `]
 })
@@ -866,6 +978,12 @@ export class StaffDashboardComponent implements OnInit, OnDestroy {
   profileError = '';
   profileSuccess = '';
   notifications: any[] = [];
+  footerSettings = {
+    footer_text: 'HostelHub Management System • Staff & Maintenance Portal',
+    footer_email: 'support@hostelhub.com',
+    footer_phone: '+91 98765 43210',
+    footer_copyright: '© 2026 HostelHub Inc. All rights reserved.'
+  };
 
   activeToast: LiveNotification | null = null;
   private notifSub!: Subscription;
