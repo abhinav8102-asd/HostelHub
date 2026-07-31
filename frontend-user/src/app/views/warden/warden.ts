@@ -1034,9 +1034,11 @@ import { API_CONFIG } from '../../config/api.config';
 
               <!-- Header Right Action Icons -->
               <div *ngIf="!isMultiSelectMode" style="display: flex; align-items: center; gap: 10px; color: var(--text-muted); font-size: 16px;">
+                <button type="button" (click)="toggleMultiSelectMode()" style="background: #fdf2f4; border: 1px solid rgba(179, 16, 49, 0.2); color: #b31031; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                  <span>☑️</span> Select
+                </button>
                 <span style="cursor: pointer;">📌</span>
                 <span style="cursor: pointer;">🔍</span>
-                <span style="cursor: pointer;">⋮</span>
               </div>
 
               <!-- Multi-Select Action Bar -->
@@ -1078,7 +1080,12 @@ import { API_CONFIG } from '../../config/api.config';
                 <p>No messages yet in {{ activeWardenChatGroup?.name }}.</p>
               </div>
 
-              <div *ngFor="let msg of wardenChatMessages; let i = index" [style.align-self]="msg.senderId === user?.id ? 'flex-end' : 'flex-start'" style="max-width: 82%; display: flex; align-items: flex-start; gap: 8px; position: relative;" (click)="isMultiSelectMode && !msg.isDeleted ? toggleMessageSelection(msg.id, $event) : null">
+              <div *ngFor="let msg of wardenChatMessages; let i = index" 
+                [style.align-self]="msg.senderId === user?.id ? 'flex-end' : 'flex-start'" 
+                style="max-width: 82%; display: flex; align-items: flex-start; gap: 8px; position: relative;" 
+                (click)="isMultiSelectMode ? toggleMessageSelection(msg.id, $event) : (!msg.isDeleted ? openDeleteOptions(msg) : null); $event.stopPropagation()"
+                (contextmenu)="!msg.isDeleted ? openDeleteOptions(msg) : null; $event.preventDefault(); $event.stopPropagation()"
+              >
                 
                 <!-- Left Student Circle Avatar (Non-Self Messages) -->
                 <div *ngIf="msg.senderId !== user?.id" style="width: 34px; height: 34px; border-radius: 50%; background: #b31031; color: white; font-weight: 800; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 14px;">
@@ -1102,6 +1109,9 @@ import { API_CONFIG } from '../../config/api.config';
                     <button type="button" *ngIf="msg.senderId === user?.id || user?.role === 'warden' || user?.role === 'admin'" (click)="confirmDeleteForEveryone(); $event.stopPropagation()" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; text-align: left; padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px;">
                       <span>💥</span> Delete for Everyone
                     </button>
+                    <button type="button" (click)="startMultiSelectWithMsg(msg); $event.stopPropagation()" style="background: transparent; border: none; color: #94a3b8; text-align: left; padding: 6px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                      <span>☑️</span> Select Multiple
+                    </button>
                   </div>
 
                   <!-- Sender Name (Student Left Messages) -->
@@ -1116,21 +1126,25 @@ import { API_CONFIG } from '../../config/api.config';
                     [style.color]="msg.senderId === user?.id ? 'white' : '#1e293b'"
                     [style.border]="isMessageSelected(msg.id) ? '2px solid #b31031' : (msg.senderId === user?.id ? 'none' : '1px solid #e2e8f0')"
                     [style.border-radius]="msg.senderId === user?.id ? '18px 18px 4px 18px' : '18px 18px 18px 4px'"
-                    style="padding: 12px 16px; font-size: 13.5px; line-height: 1.45; word-break: break-word; box-shadow: 0 2px 8px rgba(0,0,0,0.04); display: flex; flex-direction: column; gap: 4px; cursor: pointer;"
+                    style="padding: 12px 16px; font-size: 13.5px; line-height: 1.45; word-break: break-word; box-shadow: 0 2px 8px rgba(0,0,0,0.04); display: flex; flex-direction: column; gap: 4px; cursor: pointer; position: relative;"
                   >
                     <!-- Warden Tag Header inside right bubble -->
-                    <div *ngIf="msg.senderId === user?.id" style="display: flex; align-items: center; justify-content: flex-end; gap: 4px; font-size: 10px; font-weight: 800; opacity: 0.9; margin-bottom: 2px;">
-                      <span>Warden</span>
-                      <span>🛡️</span>
+                    <div *ngIf="msg.senderId === user?.id" style="display: flex; align-items: center; justify-content: space-between; gap: 4px; font-size: 10px; font-weight: 800; opacity: 0.9; margin-bottom: 2px;">
+                      <span (click)="openDeleteOptions(msg); $event.stopPropagation()" style="cursor: pointer; opacity: 0.7; font-size: 12px;" title="Delete Options">🗑️</span>
+                      <div style="display: flex; align-items: center; gap: 4px;">
+                        <span>Warden</span>
+                        <span>🛡️</span>
+                      </div>
                     </div>
 
                     <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; width: 100%;">
                       <span *ngIf="msg.message" style="flex: 1;">{{ msg.message }}</span>
                       
                       <!-- Timestamp inside bubble -->
-                      <span [style.color]="msg.senderId === user?.id ? 'rgba(255,255,255,0.75)' : '#94a3b8'" style="font-size: 9.5px; font-weight: 600; white-space: nowrap;">
-                        {{ msg.createdAt | date:'shortTime' }}
+                      <span [style.color]="msg.senderId === user?.id ? 'rgba(255,255,255,0.75)' : '#94a3b8'" style="font-size: 9.5px; font-weight: 600; white-space: nowrap; display: flex; align-items: center; gap: 4px;">
+                        <span>{{ msg.createdAt | date:'shortTime' }}</span>
                         <span *ngIf="msg.senderId === user?.id" style="margin-left: 2px;">✓✓</span>
+                        <span *ngIf="msg.senderId !== user?.id" (click)="openDeleteOptions(msg); $event.stopPropagation()" style="cursor: pointer; opacity: 0.6; font-size: 11px;" title="Delete Options">🗑️</span>
                       </span>
                     </div>
 
@@ -2402,9 +2416,9 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
       }
     });
 
-    // Subscribe to real-time message deletion events
+    // Real-time socket listener for message deletion
     this.wardenChatDeleteSub = this.chatService.onMessageDeletedEveryone().subscribe(data => {
-      if (this.activeWardenChatGroup && data.groupId === this.activeWardenChatGroup.id) {
+      if (data) {
         const msg = this.wardenChatMessages.find(m => m.id === data.messageId);
         if (msg) {
           msg.isDeleted = true;
