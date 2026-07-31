@@ -56,8 +56,26 @@ exports.getPublicSettings = async (req, res) => {
       app_about: 'HostelHub is an all-in-one digital platform designed to streamline hostel management. It allows students to raise maintenance tickets instantly, monitors staff assignments, skips mess meals, tracks attendance, and updates students with official announcements.',
       app_how_it_works: '1. Raise a Ticket: Submit electrical, plumbing, carpentry, or cleaning issues with photos.\n2. Automated Routing: Wardens assign staff based on category.\n3. Track Resolution: View status changes and review work completion proof.\n4. Connect: Join batch group chats and stay updated.',
       developer_team: JSON.stringify([
-        { name: 'Abhinav Kumar', role: 'Lead Full-Stack Developer', description: 'Expert in Node.js, Express, Sequelize, and Angular architecture.', pic: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80' },
-        { name: 'Saransh Singh', role: 'UI/UX Designer', description: 'Specializes in crafting premium dark/light mode interfaces and custom transitions.', pic: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80' }
+        { 
+          name: 'Abhinav Kumar', 
+          role: 'Lead Full-Stack Developer', 
+          description: 'Expert in Node.js, Express, Sequelize, and Angular architecture.', 
+          pic: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+          github: 'https://github.com/abhinav8102-asd',
+          linkedin: 'https://linkedin.com',
+          twitter: 'https://twitter.com',
+          email: 'mailto:abhinav@hostelhub.com'
+        },
+        { 
+          name: 'Saransh Singh', 
+          role: 'UI/UX Designer', 
+          description: 'Specializes in crafting premium dark/light mode interfaces and custom transitions.', 
+          pic: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
+          github: 'https://github.com',
+          linkedin: 'https://linkedin.com',
+          twitter: 'https://twitter.com',
+          email: 'mailto:saransh@hostelhub.com'
+        }
       ])
     };
 
@@ -67,7 +85,7 @@ exports.getPublicSettings = async (req, res) => {
 
     // Parse developer_team if it's stored as JSON
     try {
-      config.developer_team = JSON.parse(config.developer_team);
+      config.developer_team = typeof config.developer_team === 'string' ? JSON.parse(config.developer_team) : config.developer_team;
     } catch (e) {
       config.developer_team = [];
     }

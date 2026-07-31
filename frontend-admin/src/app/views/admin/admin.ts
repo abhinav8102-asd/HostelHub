@@ -291,6 +291,25 @@ import { ComplaintService } from '../../services/complaint.service';
                       <input type="text" name="devDesc_{{idx}}" class="form-input" placeholder="e.g. Expert in Angular architecture" [(ngModel)]="dev.description" required/>
                     </div>
                   </div>
+
+                  <div class="form-row" style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <label class="form-label" style="font-size: 11px;">🐱 GitHub Link</label>
+                      <input type="text" name="devGithub_{{idx}}" class="form-input" placeholder="https://github.com/username" [(ngModel)]="dev.github" style="font-size: 12px;"/>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <label class="form-label" style="font-size: 11px;">💼 LinkedIn Link</label>
+                      <input type="text" name="devLinkedin_{{idx}}" class="form-input" placeholder="https://linkedin.com/in/username" [(ngModel)]="dev.linkedin" style="font-size: 12px;"/>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <label class="form-label" style="font-size: 11px;">🐦 Twitter/X Link</label>
+                      <input type="text" name="devTwitter_{{idx}}" class="form-input" placeholder="https://twitter.com/username" [(ngModel)]="dev.twitter" style="font-size: 12px;"/>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <label class="form-label" style="font-size: 11px;">✉️ Email Link / Address</label>
+                      <input type="text" name="devEmail_{{idx}}" class="form-input" placeholder="mailto:dev@hostelhub.com" [(ngModel)]="dev.email" style="font-size: 12px;"/>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -766,7 +785,11 @@ export class AdminDashboardComponent implements OnInit {
       name: '',
       role: '',
       description: '',
-      pic: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80'
+      pic: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80',
+      github: '',
+      linkedin: '',
+      twitter: '',
+      email: ''
     });
     this.cdr.detectChanges();
   }
