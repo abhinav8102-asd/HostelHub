@@ -45,12 +45,12 @@ const Complaint = sequelize.define('Complaint', {
     field: 'staff_id'
   },
   photoUrl: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT('long'),
     allowNull: true,
     field: 'photo_url'
   },
   completionPhotoUrl: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT('long'),
     allowNull: true,
     field: 'completion_photo_url'
   },

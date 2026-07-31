@@ -58,7 +58,24 @@ async function uploadFile(fileObject, bucketName = 'hostelhub') {
     }
   }
 
-  // Fallback to local path if Supabase is not configured or fails
+  // Permanent Database Storage Fallback: Convert image buffer to Base64 Data URL
+  try {
+    let buffer;
+    if (fileObject.buffer) {
+      buffer = fileObject.buffer;
+    } else if (fileObject.path && fs.existsSync(fileObject.path)) {
+      buffer = fs.readFileSync(fileObject.path);
+      // Clean up temporary disk file
+      try { fs.unlinkSync(fileObject.path); } catch (e) {}
+    }
+    if (buffer) {
+      const mime = fileObject.mimetype || 'image/jpeg';
+      return `data:${mime};base64,${buffer.toString('base64')}`;
+    }
+  } catch (e) {
+    console.error('Base64 conversion fallback error:', e);
+  }
+
   return `/uploads/${fileObject.filename}`;
 }
 

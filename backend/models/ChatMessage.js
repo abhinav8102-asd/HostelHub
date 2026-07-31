@@ -22,7 +22,7 @@ const ChatMessage = sequelize.define('ChatMessage', {
     allowNull: false
   },
   attachmentUrl: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT('long'),
     allowNull: true,
     field: 'attachment_url'
   },

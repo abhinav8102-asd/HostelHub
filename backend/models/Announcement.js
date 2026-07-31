@@ -27,7 +27,7 @@ const Announcement = sequelize.define('Announcement', {
     field: 'created_by'
   },
   photoUrl: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT('long'),
     allowNull: true,
     field: 'photo_url'
   }

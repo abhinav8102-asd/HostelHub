@@ -53,7 +53,7 @@ const User = sequelize.define('User', {
     defaultValue: 'pending_verification'
   },
   profilePicUrl: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT('long'),
     allowNull: true,
     field: 'profile_pic_url'
   },
