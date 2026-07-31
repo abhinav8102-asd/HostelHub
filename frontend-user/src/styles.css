@@ -295,6 +295,43 @@ body {
   transition: background-color 0.3s ease;
 }
 
+/* ── FOOTER ── */
+.footer {
+  order: 10 !important;
+  background: var(--bg-card) !important;
+  border-top: 1px solid var(--border-color) !important;
+  padding: 24px 20px 28px !important;
+  margin-top: auto !important;
+  width: 100% !important;
+  color: var(--text-primary) !important;
+}
+.footer-content {
+  max-width: 500px !important;
+  margin: 0 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  text-align: center !important;
+}
+.footer-title {
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  color: var(--text-primary) !important;
+  margin: 0 !important;
+}
+.footer-meta {
+  display: flex !important;
+  justify-content: center !important;
+  gap: 16px !important;
+  font-size: 12px !important;
+  color: var(--text-secondary) !important;
+}
+.footer-copyright {
+  font-size: 11px !important;
+  color: var(--text-muted) !important;
+  margin-top: 4px !important;
+}
+
 /* ── AUTH PAGE ── */
 .auth-page {
   max-width: 460px !important;

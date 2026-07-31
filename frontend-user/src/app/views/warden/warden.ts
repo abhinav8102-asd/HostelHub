@@ -1059,10 +1059,10 @@ import { API_CONFIG } from '../../config/api.config';
             </div>
 
             <!-- Messages Stream Area -->
-            <div id="wardenChatFeed" (scroll)="onChatStreamScroll()" style="flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; background: #f8fafc;">
+            <div id="wardenChatFeed" (scroll)="onChatStreamScroll()" style="flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; background: var(--bg-body);">
               
               <!-- Centered Today Date Divider Pill -->
-              <div style="align-self: center; margin: 4px 0 8px 0; background: #ffffff; border: 1px solid var(--border-color); color: var(--text-muted); font-size: 11px; font-weight: 700; padding: 4px 14px; border-radius: 12px; box-shadow: var(--shadow-sm);">
+              <div style="align-self: center; margin: 4px 0 8px 0; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); font-size: 11px; font-weight: 700; padding: 4px 14px; border-radius: 12px; box-shadow: var(--shadow-sm);">
                 Today
               </div>
 
@@ -1097,10 +1097,10 @@ import { API_CONFIG } from '../../config/api.config';
                     [style.left]="msg.senderId === user?.id ? 'auto' : '0'"
                     [style.top]="i === 0 ? '100%' : 'auto'"
                     [style.bottom]="i === 0 ? 'auto' : '100%'"
-                    style="position: absolute; z-index: 1000; background: #1e293b; color: white; border: 1px solid #334155; border-radius: 12px; padding: 6px; display: flex; flex-direction: column; gap: 4px; min-width: 175px; box-shadow: 0 10px 25px rgba(0,0,0,0.6);"
+                    style="position: absolute; z-index: 1000; background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 12px; padding: 6px; display: flex; flex-direction: column; gap: 4px; min-width: 175px; box-shadow: var(--shadow-lg);"
                     (click)="$event.stopPropagation()"
                   >
-                    <button type="button" (click)="confirmDeleteForMe(); $event.stopPropagation()" style="background: transparent; border: none; color: white; text-align: left; padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                    <button type="button" (click)="confirmDeleteForMe(); $event.stopPropagation()" style="background: transparent; border: none; color: var(--text-primary); text-align: left; padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
                       <span>🙈</span> Delete for Me
                     </button>
                     <button type="button" *ngIf="msg.senderId === user?.id || user?.role === 'warden' || user?.role === 'admin'" (click)="confirmDeleteForEveryone(); $event.stopPropagation()" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; text-align: left; padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px;">
@@ -1119,11 +1119,11 @@ import { API_CONFIG } from '../../config/api.config';
 
                   <!-- Normal Active Message Bubble -->
                   <div *ngIf="!msg.isDeleted"
-                    [style.background]="isMessageSelected(msg.id) ? 'rgba(179, 16, 49, 0.25)' : (msg.senderId === user?.id ? 'linear-gradient(135deg, #8a0d24 0%, #b31031 100%)' : '#ffffff')"
-                    [style.color]="msg.senderId === user?.id ? 'white' : '#1e293b'"
-                    [style.border]="isMessageSelected(msg.id) ? '2px solid #b31031' : (msg.senderId === user?.id ? 'none' : '1px solid #e2e8f0')"
+                    [style.background]="isMessageSelected(msg.id) ? 'rgba(179, 16, 49, 0.25)' : (msg.senderId === user?.id ? 'linear-gradient(135deg, #8a0d24 0%, #b31031 100%)' : 'var(--bg-card)')"
+                    [style.color]="msg.senderId === user?.id ? 'white' : 'var(--text-primary)'"
+                    [style.border]="isMessageSelected(msg.id) ? '2px solid #b31031' : (msg.senderId === user?.id ? 'none' : '1px solid var(--border-color)')"
                     [style.border-radius]="msg.senderId === user?.id ? '18px 18px 4px 18px' : '18px 18px 18px 4px'"
-                    style="padding: 12px 16px; font-size: 13.5px; line-height: 1.45; word-break: break-word; box-shadow: 0 2px 8px rgba(0,0,0,0.04); display: flex; flex-direction: column; gap: 4px; cursor: pointer; position: relative;"
+                    style="padding: 12px 16px; font-size: 13.5px; line-height: 1.45; word-break: break-word; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 4px; cursor: pointer; position: relative;"
                   >
                     <!-- Warden Tag Header inside right bubble -->
                     <div *ngIf="msg.senderId === user?.id" style="display: flex; align-items: center; justify-content: space-between; gap: 4px; font-size: 10px; font-weight: 800; opacity: 0.9; margin-bottom: 2px;">
@@ -1138,7 +1138,7 @@ import { API_CONFIG } from '../../config/api.config';
                       <span *ngIf="msg.message" style="flex: 1;">{{ msg.message }}</span>
                       
                       <!-- Timestamp inside bubble -->
-                      <span [style.color]="msg.senderId === user?.id ? 'rgba(255,255,255,0.75)' : '#94a3b8'" style="font-size: 9.5px; font-weight: 600; white-space: nowrap; display: flex; align-items: center; gap: 4px;">
+                      <span [style.color]="msg.senderId === user?.id ? 'rgba(255,255,255,0.75)' : 'var(--text-muted)'" style="font-size: 9.5px; font-weight: 600; white-space: nowrap; display: flex; align-items: center; gap: 4px;">
                         <span>{{ msg.createdAt | date:'shortTime' }}</span>
                         <span *ngIf="msg.senderId === user?.id" style="margin-left: 2px;">✓✓</span>
                         <span *ngIf="msg.senderId !== user?.id" (click)="openDeleteOptions(msg); $event.stopPropagation()" style="cursor: pointer; opacity: 0.6; font-size: 11px;" title="Delete Options">🗑️</span>
@@ -1156,20 +1156,20 @@ import { API_CONFIG } from '../../config/api.config';
                   </div>
 
                   <!-- Reaction Tag if available -->
-                  <div *ngIf="!msg.isDeleted && msg.reactions?.length" style="align-self: flex-start; margin-top: -6px; margin-left: 10px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 2px 8px; font-size: 11px; display: flex; align-items: center; gap: 4px; box-shadow: var(--shadow-sm);">
+                  <div *ngIf="!msg.isDeleted && msg.reactions?.length" style="align-self: flex-start; margin-top: -6px; margin-left: 10px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 2px 8px; font-size: 11px; display: flex; align-items: center; gap: 4px; box-shadow: var(--shadow-sm);">
                     <span>👍</span>
-                    <span style="font-weight: 700; color: #475569;">{{ msg.reactions.length }}</span>
+                    <span style="font-weight: 700; color: var(--text-muted);">{{ msg.reactions.length }}</span>
                   </div>
 
                   <!-- Deleted Message Placeholder Bubble -->
                   <div *ngIf="msg.isDeleted"
-                    style="background: #ffffff; color: #94a3b8; border: 1px dashed #cbd5e1; border-radius: 14px; padding: 10px 14px; font-size: 12px; font-style: italic; display: flex; align-items: center; justify-content: space-between; gap: 8px;"
+                    style="background: var(--bg-card); color: var(--text-muted); border: 1px dashed var(--border-color); border-radius: 14px; padding: 10px 14px; font-size: 12px; font-style: italic; display: flex; align-items: center; justify-content: space-between; gap: 8px;"
                   >
                     <div style="display: flex; align-items: center; gap: 6px;">
                       <span style="color: #ef4444;">🚫</span>
                       <span>This message was deleted by {{ msg.deletedByName || 'Warden Test' }}</span>
                     </div>
-                    <span style="font-size: 9.5px; color: #94a3b8; font-style: normal;">{{ msg.createdAt | date:'shortTime' }}</span>
+                    <span style="font-size: 9.5px; color: var(--text-muted); font-style: normal;">{{ msg.createdAt | date:'shortTime' }}</span>
                   </div>
 
                 </div>
