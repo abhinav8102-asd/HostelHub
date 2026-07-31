@@ -597,56 +597,69 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
           </div>
 
           <!-- Attendance History Section -->
-          <div class="card mess-card" style="margin-top: 20px;">
-            <h5>📋 My Attendance History</h5>
+          <div class="card" style="padding: 18px; margin-top: 20px; border-radius: 18px; border: 1px solid var(--border-color); background: var(--bg-card); box-shadow: var(--shadow-sm);">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
+              <span style="width: 28px; height: 28px; border-radius: 50%; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 13px;">📋</span>
+              <strong style="font-size: 15px; color: var(--text-primary);">My Attendance Records</strong>
+            </div>
             
             <div *ngIf="isLoadingAttendance" class="skeleton-list">
               <div class="skeleton skeleton-card"></div>
             </div>
 
             <div *ngIf="!isLoadingAttendance && attendanceStats">
-              <!-- Attendance Stats Metrics -->
-              <div class="feedback-metrics" style="margin-bottom: 20px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;">
-                <div class="metric-box">
-                  <div class="metric-val" [style.color]="attendanceStats.percentage >= 75 ? '#22c55e' : '#ef4444'">
+              <!-- Attendance Stats Metrics Grid -->
+              <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 16px;">
+                <div style="background: var(--bg-muted); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; text-align: center;">
+                  <div style="font-size: 15px; font-weight: 800;" [style.color]="attendanceStats.percentage >= 75 ? '#166534' : '#b91c1c'">
                     {{ attendanceStats.percentage }}%
                   </div>
-                  <div class="metric-lbl">Attendance</div>
+                  <div style="font-size: 9px; color: var(--text-muted); margin-top: 2px;">Attendance</div>
                 </div>
-                <div class="metric-box">
-                  <div class="metric-val">{{ attendanceStats.total }}</div>
-                  <div class="metric-lbl">Total Days</div>
+                <div style="background: var(--bg-muted); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; text-align: center;">
+                  <div style="font-size: 15px; font-weight: 800; color: var(--text-primary);">{{ attendanceStats.total }}</div>
+                  <div style="font-size: 9px; color: var(--text-muted); margin-top: 2px;">Total Days</div>
                 </div>
-                <div class="metric-box">
-                  <div class="metric-val" style="color: #22c55e;">{{ attendanceStats.present }}</div>
-                  <div class="metric-lbl">Present</div>
+                <div style="background: #e6f4ea; border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 12px; padding: 10px; text-align: center;">
+                  <div style="font-size: 15px; font-weight: 800; color: #166534;">{{ attendanceStats.present }}</div>
+                  <div style="font-size: 9px; color: #166534; margin-top: 2px;">Present</div>
                 </div>
-                <div class="metric-box">
-                  <div class="metric-val" style="color: #ef4444;">{{ attendanceStats.absent }}</div>
-                  <div class="metric-lbl">Absent</div>
+                <div style="background: #fee2e2; border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; padding: 10px; text-align: center;">
+                  <div style="font-size: 15px; font-weight: 800; color: #b91c1c;">{{ attendanceStats.absent }}</div>
+                  <div style="font-size: 9px; color: #b91c1c; margin-top: 2px;">Absent</div>
                 </div>
-                <div class="metric-box">
-                  <div class="metric-val" style="color: #eab308;">{{ attendanceStats.outing }}</div>
-                  <div class="metric-lbl">Outing</div>
+                <div style="background: #fef3c7; border: 1px solid rgba(245, 158, 11, 0.2); border-radius: 12px; padding: 10px; text-align: center;">
+                  <div style="font-size: 15px; font-weight: 800; color: #b45309;">{{ attendanceStats.outing }}</div>
+                  <div style="font-size: 9px; color: #b45309; margin-top: 2px;">Outing</div>
                 </div>
               </div>
 
               <!-- Attendance History List -->
-              <h6 style="margin-top: 14px; margin-bottom: 8px;">Recent Days Roll Call</h6>
-              <div class="comments-list" *ngIf="attendanceHistory.length > 0; else noAttendance">
-                <div class="comment-item" *ngFor="let att of attendanceHistory" style="flex-direction: row; justify-content: space-between; align-items: center; padding: 10px 14px;">
-                  <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+              <strong style="font-size: 13px; color: var(--text-primary); display: block; margin-bottom: 8px;">Recent Days Roll Call</strong>
+              <div class="comments-list" *ngIf="attendanceHistory.length > 0; else noAttendance" style="display: flex; flex-direction: column; gap: 8px;">
+                <div *ngFor="let att of attendanceHistory" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--bg-muted); border: 1px solid var(--border-color); border-radius: 10px;">
+                  <span style="font-size: 12.5px; font-weight: 700; color: var(--text-primary);">
                     📅 {{ att.date | date:'EEEE, MMM d, y' }}
                   </span>
                   
-                  <span class="badge" [class]="'badge-' + att.status">
-                    {{ att.status | titlecase }}
+                  <span 
+                    [style.background]="att.status === 'present' ? '#e6f4ea' : (att.status === 'absent' ? '#fee2e2' : '#fef3c7')"
+                    [style.color]="att.status === 'present' ? '#166534' : (att.status === 'absent' ? '#b91c1c' : '#b45309')"
+                    style="font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 8px; text-transform: uppercase;"
+                  >
+                    {{ att.status }}
                   </span>
                 </div>
               </div>
               <ng-template #noAttendance>
                 <p style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 12px 0;">No attendance records found yet.</p>
               </ng-template>
+
+              <!-- Real-time Shield Note -->
+              <div style="margin-top: 14px; background: #f0f9ff; border: 1px solid rgba(14, 165, 233, 0.2); border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 16px; color: #0284c7;">🛡️</span>
+                <span style="font-size: 11px; color: #0369a1;">Attendance is marked daily by Warden and updated in real-time.</span>
+              </div>
             </div>
           </div>
         </div>
@@ -800,57 +813,74 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
 
         <!-- TAB 6: BATCH GROUP CHAT -->
         <div *ngIf="activeTab === 'chat'" class="tab-panel animate-fade">
-          <h4 class="page-title">💬 Hostel Batch Chat</h4>
+          <!-- Chat Header Banner -->
+          <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
+            <div style="width: 46px; height: 46px; border-radius: 50%; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">💬</div>
+            <div>
+              <h4 style="margin: 0 0 2px 0; font-size: 17px; font-weight: 800; color: var(--text-primary);">Hostel Group Chat Channels</h4>
+              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Connect with hostel groups & communicate instantly</p>
+            </div>
+          </div>
 
           <!-- Group Room Selector Bar if multiple available -->
-          <div *ngIf="myChatGroups.length > 1" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; padding-bottom: 4px;">
+          <div *ngIf="myChatGroups.length > 0" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 14px;">
             <button 
               type="button"
               *ngFor="let g of myChatGroups"
-              class="pill-btn"
-              [class.active]="activeChatGroup?.id === g.id"
               (click)="openChatGroup(g)"
-              style="white-space: nowrap; font-size: 12px; padding: 6px 14px; cursor: pointer; position: relative; display: inline-flex; align-items: center; gap: 6px;"
+              [style.background]="activeChatGroup?.id === g.id ? '#8a0d24' : 'var(--bg-card)'"
+              [style.color]="activeChatGroup?.id === g.id ? 'white' : 'var(--text-primary)'"
+              style="padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color); font-size: 12.5px; font-weight: 700; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-sm);"
             >
-              👥 {{ g.name }}
+              <span>👧 {{ g.name }}</span>
+              <span *ngIf="activeChatGroup?.id === g.id" style="width: 8px; height: 8px; background: #ef4444; border-radius: 50%;"></span>
               <span class="channel-badge animate-scale" *ngIf="unreadCounts[g.id] > 0">{{ unreadCounts[g.id] }}</span>
             </button>
           </div>
 
-          <!-- Group Room Card -->
-          <div class="card mess-card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; height: calc(100vh - 220px); min-height: 480px;">
+          <!-- Group Room Container Card -->
+          <div class="card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; height: calc(100vh - 240px); min-height: 520px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--bg-card); box-shadow: var(--shadow-md);">
             
             <!-- Room Header -->
-            <div style="background: var(--primary-light); padding: 12px 18px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; min-height: 54px;">
-              <div *ngIf="!isMultiSelectMode">
-                <strong style="font-size: 15px; color: var(--primary-dark); display: flex; align-items: center; gap: 6px;">
-                  👥 {{ activeChatGroup?.name || 'Batch Group Chat' }}
-                </strong>
-                <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
-                  🔒 Segregated for {{ user?.gender === 'female' ? 'Girls' : 'Boys' }} · {{ user?.batch || 'Batch 2025' }}
+            <div style="background: var(--bg-card); padding: 14px 18px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+              <div *ngIf="!isMultiSelectMode" style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 42px; height: 42px; border-radius: 50%; background: var(--bg-muted); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;">👥</div>
+                <div>
+                  <strong style="font-size: 15px; font-weight: 800; color: var(--text-primary); display: block;">
+                    {{ activeChatGroup?.name || 'Boys - Batch 2023-2027' }}
+                  </strong>
+                  <span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 1px;">
+                    Official group chat for {{ activeChatGroup?.name || 'Batch 2023-2027 Boys' }}
+                  </span>
+                  <div style="display: flex; gap: 6px; margin-top: 4px; align-items: center;">
+                    <span style="background: #fdf2f4; color: #b31031; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 8px;">🛡️ WARDEN CHANNEL</span>
+                    <span style="background: var(--bg-muted); color: var(--text-muted); font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 8px; display: flex; align-items: center; gap: 4px;">
+                      <span>👥 128 Members</span>
+                      <span style="width: 6px; height: 6px; background: #22c55e; border-radius: 50%;"></span>
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <!-- Normal Mode Right Actions -->
-              <div *ngIf="!isMultiSelectMode" style="display: flex; align-items: center; gap: 8px;">
-                <button type="button" class="btn" style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); font-size: 11.5px; padding: 4px 10px; border-radius: 6px; font-weight: 600; cursor: pointer;" (click)="toggleMultiSelectMode()">
-                  ☑️ Select
-                </button>
-                <span class="day-badge" style="background: var(--primary); color: white;">LIVE CHAT</span>
+              <!-- Normal Mode Right Action Icons -->
+              <div *ngIf="!isMultiSelectMode" style="display: flex; align-items: center; gap: 10px; color: var(--text-muted); font-size: 16px;">
+                <span style="cursor: pointer;">📌</span>
+                <span style="cursor: pointer;">🔍</span>
+                <span style="cursor: pointer;">⋮</span>
               </div>
 
               <!-- Multi-Select Action Bar -->
               <div *ngIf="isMultiSelectMode" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                <span style="font-size: 13.5px; font-weight: 700; color: var(--primary-dark);">
+                <span style="font-size: 13.5px; font-weight: 700; color: #b31031;">
                   ☑️ {{ selectedMessageIds.size }} selected
                 </span>
 
                 <div style="display: flex; align-items: center; gap: 8px;">
                   <button type="button" class="btn" style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); font-size: 12px; padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer;" (click)="bulkDeleteForMe()" [disabled]="selectedMessageIds.size === 0">
-                    🙈 Delete for Me ({{ selectedMessageIds.size }})
+                    🙈 Delete for Me
                   </button>
                   <button type="button" class="btn btn-primary" style="background: #ef4444; color: white; border: none; font-size: 12px; padding: 6px 12px; border-radius: 6px; font-weight: 700; cursor: pointer;" (click)="bulkDeleteForEveryone()" [disabled]="selectedMessageIds.size === 0">
-                    💥 Delete for Everyone ({{ selectedMessageIds.size }})
+                    💥 Delete for Everyone
                   </button>
                   <button type="button" class="btn" style="background: transparent; border: none; color: var(--text-muted); font-size: 16px; padding: 4px 8px; cursor: pointer;" (click)="clearMessageSelection()">
                     ✕
@@ -864,7 +894,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
 
               <!-- Clean Spinner Loader -->
               <div *ngIf="isLoadingChat" style="margin: auto; display: flex; flex-direction: column; align-items: center; gap: 10px; color: var(--text-muted); padding: 40px 0;">
-                <div style="width: 32px; height: 32px; border: 3px solid rgba(99, 102, 241, 0.2); border-top-color: #6366f1; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                <div style="width: 32px; height: 32px; border: 3px solid rgba(179, 16, 49, 0.2); border-top-color: #b31031; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
                 <span style="font-size: 13px; font-weight: 600;">Loading chat messages...</span>
               </div>
 
@@ -917,15 +947,15 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
                 <div *ngIf="msg.senderId !== user?.id && !msg.isDeleted" style="font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
                   <span *ngIf="isMultiSelectMode" style="font-size: 12px;">{{ isMessageSelected(msg.id) ? '☑️' : '🔲' }}</span>
                   <span>{{ msg.sender?.name }}</span>
-                  <span *ngIf="msg.sender?.role === 'warden'" style="background: #ef4444; color: white; padding: 1px 6px; border-radius: 4px; font-size: 9px; font-weight: 800;">👨‍💼 WARDEN</span>
+                  <span *ngIf="msg.sender?.role === 'warden'" style="background: #b31031; color: white; padding: 1px 6px; border-radius: 4px; font-size: 9px; font-weight: 800;">👨‍💼 WARDEN 🛡️</span>
                   <span *ngIf="msg.sender?.role === 'student'" style="color: var(--text-muted); font-size: 10px; font-weight: 500;">(Room {{ msg.sender?.roomNumber }})</span>
                 </div>
 
                 <!-- Normal Active Message Bubble -->
                 <div *ngIf="!msg.isDeleted"
-                  [style.background]="isMessageSelected(msg.id) ? 'rgba(99, 102, 241, 0.25)' : (msg.senderId === user?.id ? '#6366f1' : (msg.sender?.role === 'warden' ? 'rgba(239, 68, 68, 0.12)' : 'var(--bg-card)'))"
+                  [style.background]="isMessageSelected(msg.id) ? 'rgba(179, 16, 49, 0.25)' : (msg.senderId === user?.id ? '#b31031' : (msg.sender?.role === 'warden' ? 'rgba(179, 16, 49, 0.12)' : 'var(--bg-card)'))"
                   [style.color]="msg.senderId === user?.id ? 'white' : 'var(--text-primary)'"
-                  [style.border]="isMessageSelected(msg.id) ? '2px solid #6366f1' : (msg.senderId === user?.id ? 'none' : (msg.sender?.role === 'warden' ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid var(--border-color)'))"
+                  [style.border]="isMessageSelected(msg.id) ? '2px solid #b31031' : (msg.senderId === user?.id ? 'none' : (msg.sender?.role === 'warden' ? '1px solid rgba(179, 16, 49, 0.3)' : '1px solid var(--border-color)'))"
                   [style.border-radius]="msg.senderId === user?.id ? '16px 16px 4px 16px' : '16px 16px 16px 4px'"
                   style="padding: 12px 16px; font-size: 13.5px; line-height: 1.5; word-break: break-word; box-shadow: 0 2px 6px rgba(0,0,0,0.06); display: flex; flex-direction: column; gap: 6px; cursor: pointer;"
                 >
@@ -946,10 +976,11 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
                   </div>
 
                   <!-- Attached Image View -->
-                  <div *ngIf="msg.attachmentUrl" style="margin-top: 4px;">
+                  <div *ngIf="msg.attachmentUrl" style="margin-top: 6px; width: 100%; max-width: 100%; overflow: hidden; border-radius: 10px;">
                     <img 
                       [src]="getImageUrl(msg.attachmentUrl)" 
-                      style="max-width: 240px; max-height: 200px; border-radius: 10px; cursor: pointer; object-fit: cover; box-shadow: 0 2px 8px rgba(0,0,0,0.2); display: block;" 
+                      (click)="openPhotoModal(getImageUrl(msg.attachmentUrl)); $event.stopPropagation()"
+                      style="width: 100%; max-width: 100%; max-height: 220px; border-radius: 10px; cursor: pointer; object-fit: cover; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: block;" 
                     />
                   </div>
                 </div>
@@ -979,37 +1010,42 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
               <button type="button" (click)="clearChatFile()" style="background: none; border: none; color: #ef4444; font-size: 16px; cursor: pointer;">✕</button>
             </div>
 
-            <!-- Chat Input Footer -->
-            <div style="padding: 14px; background: var(--bg-card); border-top: 1px solid var(--border-color); display: flex; gap: 10px; align-items: center; width: 100%;">
+            <!-- Chat Input Dock (Image 2 Mockup Format) -->
+            <div style="padding: 12px 14px; background: var(--bg-card); border-top: 1px solid var(--border-color); display: flex; gap: 10px; align-items: center; width: 100%;">
               <input type="file" #chatFileInput (change)="onChatFileSelected($event)" accept="image/*" style="display: none;" />
+              
+              <!-- Left Plus Button -->
               <button 
                 type="button" 
-                class="btn" 
-                style="width: 44px !important; height: 44px; flex: none !important; flex-shrink: 0 !important; background: var(--bg-muted); border: 1px solid var(--border-color); font-size: 18px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; cursor: pointer;" 
                 (click)="selectPhoto('chat')"
-                title="Attach image"
+                style="width: 42px; height: 42px; border-radius: 50%; background: #b31031; color: white; border: none; font-size: 20px; font-weight: 700; flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(179, 16, 49, 0.3);"
               >
-                📷
+                +
               </button>
-              <input 
-                type="text" 
-                id="studentChatInput"
-                class="form-input" 
-                style="flex: 1 !important; min-width: 0 !important; width: 100% !important; height: 44px; font-size: 14px; color: var(--text-primary); background: var(--bg-muted); border: 1px solid var(--border-color); padding: 0 16px; border-radius: var(--radius-md);"
-                placeholder="Type your message here..." 
-                [(ngModel)]="newChatMessageText" 
-                (keydown.enter)="sendStudentChatMessage(); $event.preventDefault()"
-              />
+
+              <!-- Rounded Input Pill Container -->
+              <div style="flex: 1; min-width: 0; height: 44px; border-radius: 22px; background: var(--bg-muted); border: 1px solid var(--border-color); display: flex; align-items: center; padding: 0 14px; gap: 8px;">
+                <span style="font-size: 16px; color: var(--text-muted); cursor: pointer;">😀</span>
+                <input 
+                  type="text" 
+                  id="studentChatInput"
+                  style="flex: 1; min-width: 0; border: none; background: transparent; outline: none; font-size: 13.5px; color: var(--text-primary);"
+                  placeholder="Type a message..." 
+                  [(ngModel)]="newChatMessageText" 
+                  (keydown.enter)="sendStudentChatMessage(); $event.preventDefault()"
+                />
+                <span (click)="selectPhoto('chat')" style="font-size: 16px; color: var(--text-muted); cursor: pointer;">📎</span>
+                <span (click)="selectPhoto('chat')" style="font-size: 16px; color: var(--text-muted); cursor: pointer;">📷</span>
+              </div>
+
+              <!-- Send Circle Button -->
               <button 
                 type="button" 
-                class="btn btn-primary" 
-                style="width: auto !important; flex: none !important; flex-shrink: 0 !important; height: 44px; padding: 0 20px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 13.5px; font-weight: 700; border-radius: var(--radius-md);"
-                [disabled]="(!newChatMessageText || !newChatMessageText.trim()) && !selectedChatFile"
-                (mousedown)="$event.preventDefault()"
                 (click)="sendStudentChatMessage()"
+                [disabled]="sendingChatMessage || (!newChatMessageText.trim() && !selectedChatFile)"
+                style="width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #8a0d24 0%, #b31031 100%); color: white; border: none; font-size: 16px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(138, 13, 36, 0.35);"
               >
-                <span>Send</span>
-                <span>✈️</span>
+                ➔
               </button>
             </div>
 
