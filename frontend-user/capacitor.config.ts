@@ -5,7 +5,8 @@ const config: CapacitorConfig = {
   appName: 'HostelHub',
   webDir: 'dist/frontend-user/browser',
   server: {
-    androidScheme: 'https'
+    androidScheme: 'https',
+    iosScheme: 'https'
   },
   plugins: {
     SplashScreen: {
