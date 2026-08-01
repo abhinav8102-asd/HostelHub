@@ -985,7 +985,7 @@ import { API_CONFIG } from '../../config/api.config';
         <div *ngIf="activeTab === 'chat'" class="tab-panel animate-fade full-screen-chat-panel">
 
           <!-- Group Room Selector Bar -->
-          <div style="display: flex; gap: 8px; overflow-x: auto; padding: 10px 14px; background: var(--bg-card); border-bottom: 1px solid var(--border-color);">
+          <div style="display: flex; gap: 8px; overflow-x: auto; padding: 14px 16px; background: var(--bg-card); border-bottom: 1px solid var(--border-color);">
             <button 
               type="button"
               *ngFor="let g of wardenChatGroups"
@@ -1048,7 +1048,7 @@ import { API_CONFIG } from '../../config/api.config';
             </div>
 
             <!-- Messages Stream Area -->
-            <div id="wardenChatFeed" (scroll)="onChatStreamScroll()" style="flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; background: var(--bg-body);">
+            <div id="wardenChatFeed" style="flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; background: var(--bg-body);">
               
               <!-- Centered Today Date Divider Pill -->
               <div style="align-self: center; margin: 4px 0 8px 0; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); font-size: 11px; font-weight: 700; padding: 4px 14px; border-radius: 12px; box-shadow: var(--shadow-sm);">
@@ -1056,7 +1056,7 @@ import { API_CONFIG } from '../../config/api.config';
               </div>
 
               <!-- Clean Spinner Loader -->
-              <div *ngIf="isLoadingWardenChat" style="margin: auto; display: flex; flex-direction: column; align-items: center; gap: 10px; color: var(--text-muted); padding: 40px 0;">
+              <div *ngIf="isLoadingWardenChat && wardenChatMessages.length === 0" style="margin: auto; display: flex; flex-direction: column; align-items: center; gap: 10px; color: var(--text-muted); padding: 40px 0;">
                 <div style="width: 32px; height: 32px; border: 3px solid rgba(239, 68, 68, 0.2); border-top-color: #ef4444; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
                 <span style="font-size: 13px; font-weight: 600;">Loading group channel...</span>
               </div>
@@ -3112,13 +3112,6 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  onChatStreamScroll(): void {
-    const inputEl = document.getElementById('wardenChatInput') as HTMLInputElement;
-    if (inputEl && document.activeElement === inputEl) {
-      inputEl.blur();
-    }
-  }
-
   sendWardenChatMessage(): void {
     if ((!this.newWardenChatMessageText || !this.newWardenChatMessageText.trim()) && !this.selectedChatFile) return;
     if (!this.activeWardenChatGroup) return;
@@ -3129,16 +3122,6 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
 
     this.newWardenChatMessageText = '';
     this.clearChatFile();
-
-    const refocus = () => {
-      const inputEl = document.getElementById('wardenChatInput') as HTMLInputElement;
-      if (inputEl) {
-        inputEl.focus();
-      }
-    };
-    refocus();
-    setTimeout(refocus, 10);
-    setTimeout(refocus, 80);
 
     if (fileToSend) {
       this.isUploadingImage = true;

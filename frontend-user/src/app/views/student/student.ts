@@ -841,7 +841,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
         <div *ngIf="activeTab === 'chat'" class="tab-panel animate-fade full-screen-chat-panel">
 
           <!-- Group Room Selector Bar if multiple available -->
-          <div *ngIf="myChatGroups.length > 0" style="display: flex; gap: 8px; overflow-x: auto; padding: 10px 14px; background: var(--bg-card); border-bottom: 1px solid var(--border-color);">
+          <div *ngIf="myChatGroups.length > 0" style="display: flex; gap: 8px; overflow-x: auto; padding: 14px 16px; background: var(--bg-card); border-bottom: 1px solid var(--border-color);">
             <button 
               type="button"
               *ngFor="let g of myChatGroups"
@@ -904,7 +904,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
             </div>
 
             <!-- Messages Stream Area -->
-            <div id="studentChatFeed" (scroll)="onChatStreamScroll()" style="flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; background: var(--bg-body);">
+            <div id="studentChatFeed" style="flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; background: var(--bg-body);">
 
               <!-- Centered Today Date Divider Pill -->
               <div style="align-self: center; margin: 4px 0 8px 0; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); font-size: 11px; font-weight: 700; padding: 4px 14px; border-radius: 12px; box-shadow: var(--shadow-sm);">
@@ -912,7 +912,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
               </div>
 
               <!-- Clean Spinner Loader -->
-              <div *ngIf="isLoadingChat" style="margin: auto; display: flex; flex-direction: column; align-items: center; gap: 10px; color: var(--text-muted); padding: 40px 0;">
+              <div *ngIf="isLoadingChat && chatMessages.length === 0" style="margin: auto; display: flex; flex-direction: column; align-items: center; gap: 10px; color: var(--text-muted); padding: 40px 0;">
                 <div style="width: 32px; height: 32px; border: 3px solid rgba(179, 16, 49, 0.2); border-top-color: #b31031; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
                 <span style="font-size: 13px; font-weight: 600;">Loading chat messages...</span>
               </div>
@@ -2599,16 +2599,6 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
 
     this.newChatMessageText = '';
     this.clearChatFile();
-
-    const refocus = () => {
-      const inputEl = document.getElementById('studentChatInput') as HTMLInputElement;
-      if (inputEl) {
-        inputEl.focus();
-      }
-    };
-    refocus();
-    setTimeout(refocus, 10);
-    setTimeout(refocus, 80);
 
     if (fileToSend) {
       this.isUploadingImage = true;

@@ -297,11 +297,14 @@ body {
 
 /* ── FULL SCREEN CHAT PANEL ── */
 .full-screen-chat-panel {
-  height: calc(100vh - 58px) !important;
+  height: 100vh !important;
   display: flex !important;
   flex-direction: column !important;
-  margin: -28px -20px -28px -20px !important;
+  margin: 0 !important;
   padding: 0 !important;
+  padding-top: max(env(safe-area-inset-top), 12px) !important;
+  padding-bottom: max(env(safe-area-inset-bottom), 0px) !important;
+  box-sizing: border-box !important;
   overflow: hidden !important;
 }
 .full-screen-chat-panel .chat-room-container {
