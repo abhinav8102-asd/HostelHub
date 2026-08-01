@@ -860,23 +860,19 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
           <div class="card chat-room-container" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; flex: 1; border-radius: 0; border: none; background: var(--bg-card);">
             
             <!-- Room Header -->
-            <div style="background: var(--bg-card); padding: 14px 18px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
-              <div *ngIf="!isMultiSelectMode" style="display: flex; align-items: center; gap: 12px;">
-                <div style="width: 42px; height: 42px; border-radius: 50%; background: var(--bg-muted); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;">👥</div>
+            <div style="background: var(--bg-card); padding: 12px 16px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+              <div *ngIf="!isMultiSelectMode" style="display: flex; align-items: center; gap: 10px;">
+                <button type="button" (click)="activeTab = 'home'" style="background: var(--bg-muted); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 50%; width: 34px; height: 34px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;" title="Back to Dashboard">
+                  ←
+                </button>
+                <div style="width: 38px; height: 38px; border-radius: 50%; background: var(--bg-muted); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">👥</div>
                 <div>
-                  <strong style="font-size: 15px; font-weight: 800; color: var(--text-primary); display: block;">
+                  <strong style="font-size: 14.5px; font-weight: 800; color: var(--text-primary); display: block;">
                     {{ activeChatGroup?.name || 'Boys - Batch 2023-2027' }}
                   </strong>
-                  <span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 1px;">
+                  <span style="font-size: 10.5px; color: var(--text-muted); display: block;">
                     Official group chat for {{ activeChatGroup?.name || 'Batch 2023-2027 Boys' }}
                   </span>
-                  <div style="display: flex; gap: 6px; margin-top: 4px; align-items: center;">
-                    <span style="background: #fdf2f4; color: #b31031; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 8px;">🛡️ WARDEN CHANNEL</span>
-                    <span style="background: var(--bg-muted); color: var(--text-muted); font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 8px; display: flex; align-items: center; gap: 4px;">
-                      <span>👥 {{ (activeChatGroup?.memberCount || 18) }} Members</span>
-                      <span style="width: 6px; height: 6px; background: #22c55e; border-radius: 50%;"></span>
-                    </span>
-                  </div>
                 </div>
               </div>
 
@@ -1087,7 +1083,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
       </div>
 
       <!-- Bottom Tab Navigation (displayed as top-nav by global CSS) -->
-      <div class="bottom-tabs">
+      <div class="bottom-tabs" *ngIf="activeTab !== 'chat'">
         <button type="button" class="tab-item" [class.active]="activeTab === 'home'" (click)="switchTab('home')">
           <span class="tab-icon">🏠</span>
           <span>Home</span>
@@ -2540,28 +2536,22 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
   }
 
   openChatGroup(group: any): void {
+    const isSameGroup = this.activeChatGroup && this.activeChatGroup.id === group.id;
     this.activeChatGroup = group;
     this.unreadCounts[group.id] = 0;
-    this.isLoadingChat = true;
-    this.chatMessages = [];
-
-    const safetyTimer = setTimeout(() => {
-      if (this.isLoadingChat) {
-        this.isLoadingChat = false;
-        this.cdr.detectChanges();
-      }
-    }, 4000);
+    if (!isSameGroup) {
+      this.chatMessages = [];
+      this.isLoadingChat = true;
+    }
 
     this.chatService.getGroupMessages(group.id).subscribe({
       next: (res) => {
-        clearTimeout(safetyTimer);
         this.chatMessages = res.messages;
         this.isLoadingChat = false;
         this.cdr.detectChanges();
         this.scrollChatToBottom();
       },
       error: (err) => {
-        clearTimeout(safetyTimer);
         console.error('Failed to load group messages:', err);
         this.isLoadingChat = false;
         this.cdr.detectChanges();

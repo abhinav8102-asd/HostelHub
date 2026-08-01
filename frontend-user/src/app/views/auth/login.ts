@@ -13,10 +13,7 @@ import { AuthService } from '../../services/auth.service';
       <!-- Top Branding Section -->
       <div class="brand-header">
         <div class="logo-card">
-          <div class="brand-logo-text">
-            <span class="l-hostel">Hostel</span><span class="l-hub">Hub</span><span class="l-icon">🏠</span>
-          </div>
-          <div class="logo-tagline">— From Concept to Comfort —</div>
+          <img src="assets/logo.png" alt="HostelHub Logo" class="brand-logo-img" />
         </div>
         <h2 class="welcome-text">Welcome Back! 👋</h2>
         <p class="welcome-subtext">Login to manage and raise hostel complaints instantly</p>
@@ -134,35 +131,18 @@ import { AuthService } from '../../services/auth.service';
 
     .logo-card {
       background: #ffffff;
-      padding: 14px 28px;
-      border-radius: 24px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 18px;
-    }
-
-    .brand-logo-text {
-      display: flex;
+      border-radius: 20px;
+      padding: 10px 24px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 3px;
-      font-size: 26px;
-      font-weight: 900;
-      letter-spacing: -0.5px;
-      font-family: 'Outfit', sans-serif;
+      margin-bottom: 18px;
     }
-    .l-hostel { color: #1e293b; }
-    .l-hub { color: #b31031; }
-    .l-icon { font-size: 20px; margin-left: 2px; }
-
-    .logo-tagline {
-      font-size: 9.5px;
-      color: #64748b;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      margin-top: 2px;
+    .brand-logo-img {
+      height: 48px;
+      width: auto;
+      object-fit: contain;
     }
 
     .welcome-text {

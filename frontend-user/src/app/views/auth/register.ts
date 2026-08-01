@@ -13,10 +13,7 @@ import { AuthService } from '../../services/auth.service';
       <!-- Top Branding Section -->
       <div class="brand-header">
         <div class="logo-card">
-          <div class="brand-logo-text">
-            <span class="l-hostel">Hostel</span><span class="l-hub">Hub</span><span class="l-icon">🏠</span>
-          </div>
-          <div class="logo-tagline">— From Concept to Comfort —</div>
+          <img src="assets/logo.png" alt="HostelHub Logo" class="brand-logo-img" />
         </div>
         <h2 class="welcome-text">Create Account</h2>
         <p class="welcome-subtext">Register as a student to submit maintenance problems</p>
