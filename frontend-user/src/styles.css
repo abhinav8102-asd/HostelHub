@@ -295,6 +295,22 @@ body {
   transition: background-color 0.3s ease;
 }
 
+/* ── FULL SCREEN CHAT PANEL ── */
+.full-screen-chat-panel {
+  height: calc(100vh - 58px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  margin: -28px -20px -28px -20px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+.full-screen-chat-panel .chat-room-container {
+  height: 100% !important;
+  border-radius: 0 !important;
+  border: none !important;
+  flex: 1 !important;
+}
+
 /* ── FOOTER ── */
 .footer {
   order: 10 !important;

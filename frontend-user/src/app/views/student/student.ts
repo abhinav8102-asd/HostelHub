@@ -79,11 +79,11 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
       </div>
 
       <!-- HEADER -->
-      <div class="header">
-        <div class="user-info">
+      <div class="header" *ngIf="activeTab !== 'chat'">
+        <div class="user-info" (click)="switchTab('my-profile')" style="cursor: pointer;" title="View Profile">
           <div class="avatar-ring">
             <span class="avatar" *ngIf="!user?.profilePicUrl">🎓</span>
-            <img *ngIf="user?.profilePicUrl" [src]="'https://hostelhub-0cyi.onrender.com' + user.profilePicUrl" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
+            <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" (error)="onAvatarError($event)" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
           </div>
           <div>
             <h3>{{ user?.name }}</h3>
@@ -838,23 +838,15 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
         </div>
 
         <!-- TAB 6: BATCH GROUP CHAT -->
-        <div *ngIf="activeTab === 'chat'" class="tab-panel animate-fade">
-          <!-- Chat Header Banner -->
-          <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
-            <div style="width: 46px; height: 46px; border-radius: 50%; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">💬</div>
-            <div>
-              <h4 style="margin: 0 0 2px 0; font-size: 17px; font-weight: 800; color: var(--text-primary);">Hostel Group Chat Channels</h4>
-              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Connect with hostel groups & communicate instantly</p>
-            </div>
-          </div>
+        <div *ngIf="activeTab === 'chat'" class="tab-panel animate-fade full-screen-chat-panel">
 
           <!-- Group Room Selector Bar if multiple available -->
-          <div *ngIf="myChatGroups.length > 0" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 14px;">
+          <div *ngIf="myChatGroups.length > 0" style="display: flex; gap: 8px; overflow-x: auto; padding: 10px 14px; background: var(--bg-card); border-bottom: 1px solid var(--border-color);">
             <button 
               type="button"
               *ngFor="let g of myChatGroups"
               (click)="openChatGroup(g)"
-              [style.background]="activeChatGroup?.id === g.id ? '#8a0d24' : 'var(--bg-card)'"
+              [style.background]="activeChatGroup?.id === g.id ? '#8a0d24' : 'var(--bg-muted)'"
               [style.color]="activeChatGroup?.id === g.id ? 'white' : 'var(--text-primary)'"
               style="padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color); font-size: 12.5px; font-weight: 700; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-sm);"
             >
@@ -865,7 +857,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
           </div>
 
           <!-- Group Room Container Card -->
-          <div class="card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; height: calc(100vh - 240px); min-height: 520px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--bg-card); box-shadow: var(--shadow-md);">
+          <div class="card chat-room-container" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; flex: 1; border-radius: 0; border: none; background: var(--bg-card);">
             
             <!-- Room Header -->
             <div style="background: var(--bg-card); padding: 14px 18px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
@@ -888,10 +880,11 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
                 </div>
               </div>
 
-              <!-- Normal Mode Right Action Icons -->
-              <div *ngIf="!isMultiSelectMode" style="display: flex; align-items: center; gap: 12px; color: var(--text-muted); font-size: 16px;">
-                <span style="cursor: pointer;" title="Pinned">📌</span>
-                <span style="cursor: pointer;" title="Search">🔍</span>
+              <!-- Normal Mode Right Action Bar -->
+              <div *ngIf="!isMultiSelectMode" style="display: flex; align-items: center; gap: 8px;">
+                <button type="button" class="btn" style="background: var(--bg-muted); color: var(--text-primary); border: 1px solid var(--border-color); font-size: 11.5px; font-weight: 700; padding: 6px 12px; border-radius: 12px; cursor: pointer;" (click)="toggleMultiSelectMode()">
+                  Select
+                </button>
               </div>
 
               <!-- Multi-Select Action Bar -->
@@ -1065,7 +1058,6 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
 
               <!-- Rounded Input Pill Container -->
               <div style="flex: 1; min-width: 0; height: 44px; border-radius: 22px; background: var(--bg-muted); border: 1px solid var(--border-color); display: flex; align-items: center; padding: 0 14px; gap: 8px;">
-                <span style="font-size: 16px; color: var(--text-muted); cursor: pointer;">😀</span>
                 <input 
                   type="text" 
                   id="studentChatInput"
@@ -1134,7 +1126,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
 
 
       <!-- Original Clean Footer -->
-      <footer class="footer animate-fade" *ngIf="footerSettings">
+      <footer class="footer animate-fade" *ngIf="footerSettings && activeTab !== 'chat'">
         <div class="footer-content">
           <p class="footer-title">{{ footerSettings.footer_text }}</p>
           <div class="footer-meta">
@@ -2911,6 +2903,13 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
         const el = document.getElementById('chatFileInput') as HTMLInputElement;
         if (el) el.click();
       }
+    }
+  }
+
+  onAvatarError(event: Event): void {
+    const target = event.target as HTMLImageElement;
+    if (target) {
+      target.style.display = 'none';
     }
   }
 }

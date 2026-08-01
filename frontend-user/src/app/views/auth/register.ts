@@ -14,7 +14,7 @@ import { AuthService } from '../../services/auth.service';
       <div class="brand-header">
         <div class="logo-card">
           <div class="brand-logo-text">
-            <span class="l-hostel">hostel</span><span class="l-hub">h<span class="l-roof">🏠</span>b</span>
+            <span class="l-hostel">Hostel</span><span class="l-hub">Hub</span><span class="l-icon">🏠</span>
           </div>
           <div class="logo-tagline">— From Concept to Comfort —</div>
         </div>

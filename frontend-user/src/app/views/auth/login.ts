@@ -14,7 +14,7 @@ import { AuthService } from '../../services/auth.service';
       <div class="brand-header">
         <div class="logo-card">
           <div class="brand-logo-text">
-            <span class="l-hostel">hostel</span><span class="l-hub">h<span class="l-roof">🏠</span>b</span>
+            <span class="l-hostel">Hostel</span><span class="l-hub">Hub</span><span class="l-icon">🏠</span>
           </div>
           <div class="logo-tagline">— From Concept to Comfort —</div>
         </div>
@@ -144,14 +144,18 @@ import { AuthService } from '../../services/auth.service';
     }
 
     .brand-logo-text {
-      font-size: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      font-size: 26px;
       font-weight: 900;
-      letter-spacing: -1px;
+      letter-spacing: -0.5px;
       font-family: 'Outfit', sans-serif;
     }
     .l-hostel { color: #1e293b; }
-    .l-hub { color: #b31031; position: relative; }
-    .l-roof { font-size: 16px; position: absolute; top: -10px; right: 10px; }
+    .l-hub { color: #b31031; }
+    .l-icon { font-size: 20px; margin-left: 2px; }
 
     .logo-tagline {
       font-size: 9.5px;
