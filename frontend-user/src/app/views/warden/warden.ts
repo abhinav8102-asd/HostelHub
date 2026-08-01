@@ -1958,15 +1958,15 @@ import { API_CONFIG } from '../../config/api.config';
     .history-title {
       font-size: 13px;
       font-weight: 700;
-      color: #374151;
+      color: var(--text-primary);
       margin-bottom: 10px;
     }
     .notice-history-card {
-      background: var(--white);
-      border: 1px solid var(--neutral-200);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
-      padding: 12px;
-      margin-bottom: 10px;
+      padding: 14px;
+      margin-bottom: 12px;
       box-shadow: var(--shadow-sm);
     }
     .notice-history-header {
@@ -1986,7 +1986,7 @@ import { API_CONFIG } from '../../config/api.config';
     }
     .notice-date {
       font-size: 10px;
-      color: #94a3b8;
+      color: var(--text-muted);
       display: block;
       margin-top: 3px;
     }
@@ -2002,14 +2002,14 @@ import { API_CONFIG } from '../../config/api.config';
     }
     .btn-delete-notice:hover { background: #fee2e2; }
     .notice-history-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: #1e293b;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-primary) !important;
       margin-bottom: 4px;
     }
     .notice-history-body {
-      font-size: 12px;
-      color: #64748b;
+      font-size: 12.5px;
+      color: var(--text-muted) !important;
       line-height: 1.4;
     }
 
