@@ -1138,6 +1138,7 @@ import { API_CONFIG } from '../../config/api.config';
                     <div *ngIf="msg.attachmentUrl" style="margin-top: 6px; width: 100%; max-width: 100%; overflow: hidden; border-radius: 10px;">
                       <img 
                         [src]="getImageUrl(msg.attachmentUrl)" 
+                        (load)="scrollWardenChatToBottom()"
                         (click)="openPhotoModal(getImageUrl(msg.attachmentUrl)); $event.stopPropagation()"
                         style="width: 100%; max-width: 100%; max-height: 220px; border-radius: 10px; cursor: pointer; object-fit: cover; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: block;" 
                       />
@@ -2443,8 +2444,13 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
     this.activeTab = tab;
     if (tab === 'my-profile') {
       this.initProfileEdit();
+    } else if (tab === 'chat') {
+      this.selectChatTab();
     }
     this.cdr.detectChanges();
+    if (tab === 'chat') {
+      this.scrollWardenChatToBottom();
+    }
   }
 
   toggleDarkMode(): void {
@@ -3027,6 +3033,7 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
       this.unreadCounts[this.activeWardenChatGroup.id] = 0;
     }
     this.cdr.detectChanges();
+    this.scrollWardenChatToBottom();
   }
 
   // Warden Group Chat Methods
@@ -3224,12 +3231,17 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
   }
 
   scrollWardenChatToBottom(): void {
-    setTimeout(() => {
+    const scrollFn = () => {
       const feed = document.getElementById('wardenChatFeed');
       if (feed) {
         feed.scrollTop = feed.scrollHeight;
       }
-    }, 100);
+    };
+    scrollFn();
+    setTimeout(scrollFn, 50);
+    setTimeout(scrollFn, 150);
+    setTimeout(scrollFn, 300);
+    setTimeout(scrollFn, 500);
   }
 
   // Warden Chat Deletion & Multi-Select Options

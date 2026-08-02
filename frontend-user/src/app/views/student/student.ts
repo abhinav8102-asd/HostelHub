@@ -995,6 +995,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
                     <div *ngIf="msg.attachmentUrl" style="margin-top: 6px; width: 100%; max-width: 100%; overflow: hidden; border-radius: 10px;">
                       <img 
                         [src]="getImageUrl(msg.attachmentUrl)" 
+                        (load)="scrollChatToBottom()"
                         (click)="openPhotoModal(getImageUrl(msg.attachmentUrl)); $event.stopPropagation()"
                         style="width: 100%; max-width: 100%; max-height: 220px; border-radius: 10px; cursor: pointer; object-fit: cover; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: block;" 
                       />
@@ -1916,6 +1917,7 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
       if (this.activeChatGroup) {
         this.unreadCounts[this.activeChatGroup.id] = 0;
       }
+      this.scrollChatToBottom();
     } else if (tab === 'my-complaints') {
       this.loadComplaints();
     } else if (tab === 'profile') {
@@ -1925,9 +1927,14 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
       this.loadAttendanceStats();
     }
     try {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (tab !== 'chat') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     } catch (e) {}
     this.cdr.detectChanges();
+    if (tab === 'chat') {
+      this.scrollChatToBottom();
+    }
   }
 
   ngOnInit(): void {
@@ -2702,12 +2709,17 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
   }
 
   scrollChatToBottom(): void {
-    setTimeout(() => {
+    const scrollFn = () => {
       const feed = document.getElementById('studentChatFeed');
       if (feed) {
         feed.scrollTop = feed.scrollHeight;
       }
-    }, 100);
+    };
+    scrollFn();
+    setTimeout(scrollFn, 50);
+    setTimeout(scrollFn, 150);
+    setTimeout(scrollFn, 300);
+    setTimeout(scrollFn, 500);
   }
 
   // Chat Deletion & Multi-Select Options
