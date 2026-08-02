@@ -157,7 +157,7 @@ exports.updateProfile = async (req, res) => {
 
     let requiresReapproval = false;
 
-    // Check critical fields change (gender, batch, hostelBlock, rollNumber)
+    // Critical fields check: ONLY Gender or Academic Batch require Warden re-approval
     if (gender && gender !== user.gender) {
       user.gender = gender;
       requiresReapproval = true;
@@ -166,17 +166,14 @@ exports.updateProfile = async (req, res) => {
       user.batch = batch;
       requiresReapproval = true;
     }
-    if (hostelBlock && hostelBlock !== user.hostelBlock) {
-      user.hostelBlock = hostelBlock;
-      requiresReapproval = true;
-    }
+
+    if (hostelBlock) user.hostelBlock = hostelBlock;
     if (rollNumber && rollNumber !== user.rollNumber) {
       const existingRoll = await User.findOne({ where: { rollNumber } });
       if (existingRoll && existingRoll.id !== user.id) {
         return res.status(400).json({ message: 'This Roll Number is already registered.' });
       }
       user.rollNumber = rollNumber;
-      requiresReapproval = true;
     }
 
     if (name) user.name = name;

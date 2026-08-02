@@ -9,13 +9,14 @@ export interface MessMenu {
   dayOfWeek: string;
   breakfast: string;
   lunch: string;
+  snacks?: string;
   dinner: string;
 }
 
 export interface MessFeedback {
   id?: number;
   studentId?: number;
-  mealType: 'breakfast' | 'lunch' | 'dinner';
+  mealType: 'breakfast' | 'lunch' | 'snacks' | 'dinner';
   date: string;
   rating: number;
   comment?: string;
@@ -30,7 +31,7 @@ export interface MessFeedback {
 export interface MessSkip {
   id?: number;
   studentId?: number;
-  mealType: 'breakfast' | 'lunch' | 'dinner';
+  mealType: 'breakfast' | 'lunch' | 'snacks' | 'dinner';
   date: string;
 }
 

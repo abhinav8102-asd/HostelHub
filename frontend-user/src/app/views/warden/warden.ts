@@ -752,7 +752,15 @@ import { API_CONFIG } from '../../config/api.config';
                     <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); width: 80px; flex-shrink: 0; display: flex; align-items: center; gap: 4px;">
                       <span>🥪</span> Lunch
                     </span>
-                    <input type="text" [(ngModel)]="m.lunch" class="form-input" style="flex: 1; height: 38px; border-radius: 10px; font-size: 12.5px; background: var(--bg-muted); border: 1px solid var(--border-color); padding: 0 12px;" />
+                    <input type="text" [(ngModel)]="m.lunch" class="form-input" style="flex: 1; height: 38px; border-radius: 10px; font-size: 12.5px; background: var(--bg-muted); border: 1px solid var(--border-color); padding: 0 12px; color: var(--text-primary);" />
+                  </div>
+
+                  <!-- Snacks -->
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); width: 80px; flex-shrink: 0; display: flex; align-items: center; gap: 4px;">
+                      <span>☕</span> Snacks
+                    </span>
+                    <input type="text" [(ngModel)]="m.snacks" placeholder="e.g. Samosa & Hot Chai" class="form-input" style="flex: 1; height: 38px; border-radius: 10px; font-size: 12.5px; background: var(--bg-muted); border: 1px solid var(--border-color); padding: 0 12px; color: var(--text-primary);" />
                   </div>
 
                   <!-- Dinner -->
@@ -760,7 +768,7 @@ import { API_CONFIG } from '../../config/api.config';
                     <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); width: 80px; flex-shrink: 0; display: flex; align-items: center; gap: 4px;">
                       <span>🌙</span> Dinner
                     </span>
-                    <input type="text" [(ngModel)]="m.dinner" class="form-input" style="flex: 1; height: 38px; border-radius: 10px; font-size: 12.5px; background: var(--bg-muted); border: 1px solid var(--border-color); padding: 0 12px;" />
+                    <input type="text" [(ngModel)]="m.dinner" class="form-input" style="flex: 1; height: 38px; border-radius: 10px; font-size: 12.5px; background: var(--bg-muted); border: 1px solid var(--border-color); padding: 0 12px; color: var(--text-primary);" />
                   </div>
                 </div>
 
@@ -854,6 +862,37 @@ import { API_CONFIG } from '../../config/api.config';
 
           <div *ngIf="attendanceSuccess" class="alert alert-success">{{ attendanceSuccess }}</div>
           <div *ngIf="attendanceError" class="alert alert-danger">{{ attendanceError }}</div>
+
+          <!-- Attendance Summary Metrics Cards Bar (All Hostels & Hostel-Wise Filterable) -->
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px;">
+            <!-- Total Students -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 12px; text-align: center; box-shadow: var(--shadow-sm);">
+              <div style="font-size: 20px; font-weight: 800; color: var(--text-primary);">{{ getAttendanceTotalStudentsCount() }}</div>
+              <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-top: 2px;">👥 Total Students</div>
+              <div style="font-size: 9px; color: #64748b; margin-top: 2px;">{{ filterHostelBlock || 'All Hostels' }}</div>
+            </div>
+
+            <!-- Present Count -->
+            <div style="background: #e6f4ea; border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 14px; padding: 12px; text-align: center;">
+              <div style="font-size: 20px; font-weight: 800; color: #166534;">{{ getAttendancePresentCount() }}</div>
+              <div style="font-size: 10.5px; font-weight: 800; color: #166534; margin-top: 2px;">✅ Present</div>
+              <div style="font-size: 9px; color: #15803d; margin-top: 2px;">{{ filterHostelBlock || 'All Hostels' }}</div>
+            </div>
+
+            <!-- Absent Count -->
+            <div style="background: #fee2e2; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 14px; padding: 12px; text-align: center;">
+              <div style="font-size: 20px; font-weight: 800; color: #b91c1c;">{{ getAttendanceAbsentCount() }}</div>
+              <div style="font-size: 10.5px; font-weight: 800; color: #b91c1c; margin-top: 2px;">❌ Absent</div>
+              <div style="font-size: 9px; color: #dc2626; margin-top: 2px;">{{ filterHostelBlock || 'All Hostels' }}</div>
+            </div>
+
+            <!-- Outing / Leave Count -->
+            <div style="background: #fef3c7; border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 14px; padding: 12px; text-align: center;">
+              <div style="font-size: 20px; font-weight: 800; color: #b45309;">{{ getAttendanceOutingCount() }}</div>
+              <div style="font-size: 10.5px; font-weight: 800; color: #b45309; margin-top: 2px;">🏃 Outing</div>
+              <div style="font-size: 9px; color: #d97706; margin-top: 2px;">{{ filterHostelBlock || 'All Hostels' }}</div>
+            </div>
+          </div>
 
           <div class="mess-container">
             <!-- Attendance Control Bar -->
@@ -1347,14 +1386,25 @@ import { API_CONFIG } from '../../config/api.config';
       </div>
 
       <!-- Original Clean Footer -->
-      <footer class="footer animate-fade" *ngIf="footerSettings && activeTab !== 'chat'">
-        <div class="footer-content">
-          <p class="footer-title">{{ footerSettings.footer_text }}</p>
-          <div class="footer-meta">
-            <span *ngIf="footerSettings.footer_email">📧 {{ footerSettings.footer_email }}</span>
-            <span *ngIf="footerSettings.footer_phone">📞 {{ footerSettings.footer_phone }}</span>
+      <!-- Original Clean Footer with Developer Instagram -->
+      <footer class="footer animate-fade" *ngIf="activeTab !== 'chat'">
+        <div class="footer-content" style="text-align: center; padding: 18px 14px; border-top: 1px solid var(--border-color); margin-top: 24px; background: var(--bg-card); border-radius: 16px;">
+          <p class="footer-title" style="margin: 0 0 6px 0; font-size: 13.5px; font-weight: 800; color: var(--text-primary);">{{ footerSettings?.footer_text || 'HostelHub - Modern Hostel Management' }}</p>
+          <div class="footer-meta" style="display: flex; justify-content: center; align-items: center; gap: 14px; font-size: 12px; color: var(--text-muted); flex-wrap: wrap;">
+            <span>📧 {{ footerSettings?.footer_email || 'support@hostelhub.com' }}</span>
+            <span>📞 {{ footerSettings?.footer_phone || '+91 98765 43210' }}</span>
+            <a href="https://instagram.com" target="_blank" style="color: #e1306c; text-decoration: none; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;">
+              <span>📸</span> Instagram
+            </a>
           </div>
-          <p class="footer-copyright">{{ footerSettings.footer_copyright }}</p>
+          <div style="margin-top: 10px; font-size: 11.5px; color: var(--text-muted); font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap;">
+            <span>Developed by HostelHub Engineering Team 💻</span>
+            <span>•</span>
+            <a href="https://instagram.com" target="_blank" style="color: #e1306c; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; background: rgba(225, 48, 108, 0.1); padding: 3px 10px; border-radius: 12px; border: 1px solid rgba(225, 48, 108, 0.2);">
+              <span>📸</span> Follow us on Instagram
+            </a>
+          </div>
+          <p class="footer-copyright" style="margin: 8px 0 0 0; font-size: 10.5px; color: var(--text-muted);">{{ footerSettings?.footer_copyright || '© 2026 HostelHub Inc. All rights reserved.' }}</p>
         </div>
       </footer>
     </div><!-- /dashboard-container -->
@@ -3062,6 +3112,22 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
       
       return matchSearch && matchBlock;
     });
+  }
+
+  getAttendanceTotalStudentsCount(): number {
+    return this.filteredStudents.length;
+  }
+
+  getAttendancePresentCount(): number {
+    return this.filteredStudents.filter(s => (this.attendanceMarkMap[s.id] || 'present') === 'present').length;
+  }
+
+  getAttendanceAbsentCount(): number {
+    return this.filteredStudents.filter(s => this.attendanceMarkMap[s.id] === 'absent').length;
+  }
+
+  getAttendanceOutingCount(): number {
+    return this.filteredStudents.filter(s => this.attendanceMarkMap[s.id] === 'outing').length;
   }
 
   // Bulk mark all present

@@ -20,6 +20,11 @@ const MessMenu = sequelize.define('MessMenu', {
     type: DataTypes.STRING,
     allowNull: false
   },
+  snacks: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: 'Samosa & Tea / Coffee'
+  },
   dinner: {
     type: DataTypes.STRING,
     allowNull: false

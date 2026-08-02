@@ -3,13 +3,13 @@ const { Op } = require('sequelize');
 
 // Self-healing default menu seed data
 const defaultMenu = [
-  { dayOfWeek: 'Monday', breakfast: 'Aloo Paratha with Curd & Pickle', lunch: 'Rajma Masala, Steamed Rice, Roti, Salad', dinner: 'Mix Veg, Dal Tadka, Roti, Kheer' },
-  { dayOfWeek: 'Tuesday', breakfast: 'Idli, Wada with Sambar & Coconut Chutney', lunch: 'Kadhi Pakoda, Jeera Rice, Roti, Aloo Jeera', dinner: 'Paneer Bhurji, Dal Fry, Roti, Gulab Jamun' },
-  { dayOfWeek: 'Wednesday', breakfast: 'Poha with Sev, Tea/Milk & Fruits', lunch: 'Veg Biryani, Veg Raita, Roti, Papad', dinner: 'Dal Makhani, Egg Curry / Paneer Pasanda, Roti, Ice Cream' },
-  { dayOfWeek: 'Thursday', breakfast: 'Puri Bhaji & Tea/Coffee', lunch: 'Chole Bhature, Boondi Raita, Onion Salad', dinner: 'Aloo Gobi Matar, Yellow Dal, Roti, Custard' },
-  { dayOfWeek: 'Friday', breakfast: 'Uttapam with Tomato & Coconut Chutney', lunch: 'Dal Fry, Rice, Seasonal Dry Veg, Roti', dinner: 'Shahi Paneer, Butter Naan / Roti, Dal Fry, Halwa' },
-  { dayOfWeek: 'Saturday', breakfast: 'Bread Butter, Jam & Omelette / Sprouts', lunch: 'Veg Pulao, Kadhi, Roti, French Fries', dinner: 'Pav Bhaji, Pulao, Salad, Rasgulla' },
-  { dayOfWeek: 'Sunday', breakfast: 'Chole Kulche, Pickle & Lassi', lunch: 'Special Veg Thali (Paneer Butter Masala, Dal Makhani, Pulao, Roti, Sweet)', dinner: 'Aloo Shimla Mirch, Khichdi / Roti, Curd' }
+  { dayOfWeek: 'Monday', breakfast: 'Aloo Paratha with Curd & Pickle', lunch: 'Rajma Masala, Steamed Rice, Roti, Salad', snacks: 'Samosa & Hot Chai', dinner: 'Mix Veg, Dal Tadka, Roti, Kheer' },
+  { dayOfWeek: 'Tuesday', breakfast: 'Idli, Wada with Sambar & Coconut Chutney', lunch: 'Kadhi Pakoda, Jeera Rice, Roti, Aloo Jeera', snacks: 'Veg Pakora & Tea', dinner: 'Paneer Bhurji, Dal Fry, Roti, Gulab Jamun' },
+  { dayOfWeek: 'Wednesday', breakfast: 'Poha with Sev, Tea/Milk & Fruits', lunch: 'Veg Biryani, Veg Raita, Roti, Papad', snacks: 'Bread Cutlet & Coffee', dinner: 'Dal Makhani, Egg Curry / Paneer Pasanda, Roti, Ice Cream' },
+  { dayOfWeek: 'Thursday', breakfast: 'Puri Bhaji & Tea/Coffee', lunch: 'Chole Bhature, Boondi Raita, Onion Salad', snacks: 'Suji Halwa & Chai', dinner: 'Aloo Gobi Matar, Yellow Dal, Roti, Custard' },
+  { dayOfWeek: 'Friday', breakfast: 'Uttapam with Tomato & Coconut Chutney', lunch: 'Dal Fry, Rice, Seasonal Dry Veg, Roti', snacks: 'Kachori & Tea', dinner: 'Shahi Paneer, Butter Naan / Roti, Dal Fry, Halwa' },
+  { dayOfWeek: 'Saturday', breakfast: 'Bread Butter, Jam & Omelette / Sprouts', lunch: 'Veg Pulao, Kadhi, Roti, French Fries', snacks: 'Veg Roll & Coffee', dinner: 'Pav Bhaji, Pulao, Salad, Rasgulla' },
+  { dayOfWeek: 'Sunday', breakfast: 'Chole Kulche, Pickle & Lassi', lunch: 'Special Veg Thali (Paneer Butter Masala, Dal Makhani, Pulao, Roti, Sweet)', snacks: 'Cream Roll & Milk', dinner: 'Aloo Shimla Mirch, Khichdi / Roti, Curd' }
 ];
 
 const checkAndSeedMenu = async () => {
@@ -36,16 +36,17 @@ exports.getMenu = async (req, res) => {
 exports.updateMenu = async (req, res) => {
   try {
     const { id } = req.params;
-    const { breakfast, lunch, dinner } = req.body;
+    const { breakfast, lunch, snacks, dinner } = req.body;
 
     const menuItem = await MessMenu.findByPk(id);
     if (!menuItem) {
       return res.status(404).json({ message: 'Menu day not found.' });
     }
 
-    menuItem.breakfast = breakfast || menuItem.breakfast;
-    menuItem.lunch = lunch || menuItem.lunch;
-    menuItem.dinner = dinner || menuItem.dinner;
+    menuItem.breakfast = breakfast !== undefined ? breakfast : menuItem.breakfast;
+    menuItem.lunch = lunch !== undefined ? lunch : menuItem.lunch;
+    if (snacks !== undefined) menuItem.snacks = snacks;
+    menuItem.dinner = dinner !== undefined ? dinner : menuItem.dinner;
     await menuItem.save();
 
     res.status(200).json({ message: 'Mess menu updated successfully!', menu: menuItem });
