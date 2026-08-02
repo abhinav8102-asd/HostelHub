@@ -149,24 +149,63 @@ exports.getProfile = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
   try {
-    const { name, phone, bio } = req.body;
+    const { name, phone, bio, email, hostelBlock, roomNumber, rollNumber, gender, batch } = req.body;
     const user = await User.findByPk(req.userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found.' });
     }
 
+    let requiresReapproval = false;
+
+    // Check critical fields change (gender, batch, hostelBlock, rollNumber)
+    if (gender && gender !== user.gender) {
+      user.gender = gender;
+      requiresReapproval = true;
+    }
+    if (batch && batch !== user.batch) {
+      user.batch = batch;
+      requiresReapproval = true;
+    }
+    if (hostelBlock && hostelBlock !== user.hostelBlock) {
+      user.hostelBlock = hostelBlock;
+      requiresReapproval = true;
+    }
+    if (rollNumber && rollNumber !== user.rollNumber) {
+      const existingRoll = await User.findOne({ where: { rollNumber } });
+      if (existingRoll && existingRoll.id !== user.id) {
+        return res.status(400).json({ message: 'This Roll Number is already registered.' });
+      }
+      user.rollNumber = rollNumber;
+      requiresReapproval = true;
+    }
+
     if (name) user.name = name;
     if (phone) user.phone = phone;
+    if (email && email !== user.email) {
+      const existingEmail = await User.findOne({ where: { email } });
+      if (existingEmail && existingEmail.id !== user.id) {
+        return res.status(400).json({ message: 'This Email address is already in use.' });
+      }
+      user.email = email;
+    }
+    if (roomNumber) user.roomNumber = roomNumber;
     if (bio !== undefined) user.bio = bio;
 
     if (req.file) {
       user.profilePicUrl = await uploadFile(req.file);
     }
 
+    if (requiresReapproval && user.role === 'student') {
+      user.status = 'pending_verification';
+    }
+
     await user.save();
 
     res.status(200).json({
-      message: 'Profile updated successfully!',
+      message: requiresReapproval 
+        ? 'Profile updated! Because critical data (Gender/Batch) was changed, your account is now pending Warden re-approval.' 
+        : 'Profile updated successfully!',
+      requiresReapproval,
       user: {
         id: user.id,
         name: user.name,
@@ -175,6 +214,10 @@ exports.updateProfile = async (req, res) => {
         phone: user.phone,
         roomNumber: user.roomNumber,
         hostelBlock: user.hostelBlock,
+        gender: user.gender,
+        batch: user.batch,
+        rollNumber: user.rollNumber,
+        status: user.status,
         bio: user.bio,
         profilePicUrl: user.profilePicUrl
       }

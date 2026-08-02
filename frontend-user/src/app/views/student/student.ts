@@ -567,7 +567,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
             <div class="card" style="padding: 24px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--bg-card); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; box-shadow: var(--shadow-sm);">
               <div style="position: relative; width: 104px; height: 104px; border-radius: 50%; border: 3px solid #b31031; padding: 3px; background: var(--bg-card);">
                 <div style="width: 100%; height: 100%; border-radius: 50%; overflow: hidden; background: #f1f5f9; display: flex; align-items: center; justify-content: center;">
-                  <img *ngIf="profilePreviewUrl" [src]="profilePreviewUrl" style="width: 100%; height: 100%; object-fit: cover;" />
+                  <img *ngIf="profilePreviewUrl" [src]="profilePreviewUrl" (error)="profilePreviewUrl = null" style="width: 100%; height: 100%; object-fit: cover;" />
                   <span *ngIf="!profilePreviewUrl" style="font-size: 44px; color: #94a3b8;">🎓</span>
                 </div>
                 <!-- Camera Badge Icon -->
@@ -589,6 +589,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
 
             <!-- Profile Info Form Fields Card -->
             <div class="card" style="padding: 20px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--bg-card); display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-sm);">
+              
               <!-- Full Name Field -->
               <div>
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
@@ -600,8 +601,25 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
                   id="profileName" 
                   name="profileName" 
                   class="form-input" 
-                  style="height: 42px; border-radius: 12px; font-size: 13px; background: var(--bg-muted); border: 1px solid var(--border-color); padding: 0 14px;"
+                  style="height: 42px; border-radius: 12px; font-size: 13px; background: var(--bg-muted); border: 1px solid var(--border-color); padding: 0 14px; width: 100%;"
                   [(ngModel)]="editUser.name" 
+                  required
+                />
+              </div>
+
+              <!-- Email Address Field -->
+              <div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                  <span style="width: 32px; height: 32px; border-radius: 8px; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 15px;">✉️</span>
+                  <label class="form-label" style="margin: 0; font-size: 12.5px; font-weight: 700; color: var(--text-primary);">Email Address</label>
+                </div>
+                <input 
+                  type="email" 
+                  id="profileEmail" 
+                  name="profileEmail" 
+                  class="form-input" 
+                  style="height: 42px; border-radius: 12px; font-size: 13px; background: var(--bg-muted); border: 1px solid var(--border-color); padding: 0 14px; width: 100%;"
+                  [(ngModel)]="editUser.email" 
                   required
                 />
               </div>
@@ -617,11 +635,117 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
                   id="profilePhone" 
                   name="profilePhone" 
                   class="form-input" 
-                  style="height: 42px; border-radius: 12px; font-size: 13px; background: var(--bg-muted); border: 1px solid var(--border-color); padding: 0 14px;"
+                  style="height: 42px; border-radius: 12px; font-size: 13px; background: var(--bg-muted); border: 1px solid var(--border-color); padding: 0 14px; width: 100%;"
                   [(ngModel)]="editUser.phone" 
                   required
                 />
               </div>
+
+              <!-- Roll Number Field -->
+              <div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                  <span style="width: 32px; height: 32px; border-radius: 8px; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 15px;">💳</span>
+                  <label class="form-label" style="margin: 0; font-size: 12.5px; font-weight: 700; color: var(--text-primary);">Roll Number</label>
+                </div>
+                <input 
+                  type="text" 
+                  id="profileRollNumber" 
+                  name="profileRollNumber" 
+                  class="form-input" 
+                  style="height: 42px; border-radius: 12px; font-size: 13px; background: var(--bg-muted); border: 1px solid var(--border-color); padding: 0 14px; width: 100%;"
+                  [(ngModel)]="editUser.rollNumber" 
+                  required
+                />
+              </div>
+
+              <!-- Hostel Block & Room Number Row -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                    <span style="font-size: 14px;">🏢</span>
+                    <label class="form-label" style="margin: 0; font-size: 11.5px; font-weight: 700; color: var(--text-primary);">Hostel Block</label>
+                  </div>
+                  <select 
+                    id="profileHostelBlock" 
+                    name="profileHostelBlock" 
+                    class="form-input" 
+                    style="height: 42px; border-radius: 12px; font-size: 12px; background: var(--bg-muted); border: 1px solid var(--border-color); padding: 0 10px; width: 100%; color: var(--text-primary);"
+                    [(ngModel)]="editUser.hostelBlock"
+                    required
+                  >
+                    <option value="Boys Hostel 1">Boys Hostel 1</option>
+                    <option value="Boys Hostel 2">Boys Hostel 2</option>
+                    <option value="Girls Hostel 1">Girls Hostel 1</option>
+                    <option value="Girls Hostel 2">Girls Hostel 2</option>
+                  </select>
+                </div>
+
+                <div>
+                  <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                    <span style="font-size: 14px;">🚪</span>
+                    <label class="form-label" style="margin: 0; font-size: 11.5px; font-weight: 700; color: var(--text-primary);">Room No.</label>
+                  </div>
+                  <input 
+                    type="text" 
+                    id="profileRoomNumber" 
+                    name="profileRoomNumber" 
+                    class="form-input" 
+                    style="height: 42px; border-radius: 12px; font-size: 12px; background: var(--bg-muted); border: 1px solid var(--border-color); padding: 0 10px; width: 100%;"
+                    [(ngModel)]="editUser.roomNumber" 
+                    required
+                  />
+                </div>
+              </div>
+
+              <!-- Critical Warning Box for Gender & Batch -->
+              <div style="background: #fff7ed; border: 1px solid #fdba74; border-radius: 12px; padding: 12px; display: flex; align-items: flex-start; gap: 10px;">
+                <span style="font-size: 18px; color: #ea580c; flex-shrink: 0;">⚠️</span>
+                <span style="font-size: 11px; color: #9a3412; line-height: 1.45; font-weight: 600;">
+                  <strong>Critical Fields:</strong> Changing Gender or Academic Batch will reset your account to 'PENDING APPROVAL' and require Warden re-approval.
+                </span>
+              </div>
+
+              <!-- Gender & Academic Batch Row -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                    <span style="font-size: 14px;">👥</span>
+                    <label class="form-label" style="margin: 0; font-size: 11.5px; font-weight: 700; color: var(--text-primary);">Gender</label>
+                  </div>
+                  <select 
+                    id="profileGender" 
+                    name="profileGender" 
+                    class="form-input" 
+                    style="height: 42px; border-radius: 12px; font-size: 12px; background: var(--bg-muted); border: 1px solid var(--border-color); padding: 0 10px; width: 100%; color: var(--text-primary);"
+                    [(ngModel)]="editUser.gender"
+                    required
+                  >
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                  </select>
+                </div>
+
+                <div>
+                  <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                    <span style="font-size: 14px;">🎓</span>
+                    <label class="form-label" style="margin: 0; font-size: 11.5px; font-weight: 700; color: var(--text-primary);">Batch</label>
+                  </div>
+                  <select 
+                    id="profileBatch" 
+                    name="profileBatch" 
+                    class="form-input" 
+                    style="height: 42px; border-radius: 12px; font-size: 12px; background: var(--bg-muted); border: 1px solid var(--border-color); padding: 0 10px; width: 100%; color: var(--text-primary);"
+                    [(ngModel)]="editUser.batch"
+                    required
+                  >
+                    <option value="Batch 2023-2027">Batch 2023-2027</option>
+                    <option value="Batch 2024-2028">Batch 2024-2028</option>
+                    <option value="Batch 2025-2029">Batch 2025-2029</option>
+                    <option value="Batch 2026-2030">Batch 2026-2030</option>
+                  </select>
+                </div>
+              </div>
+
               <!-- Bio Field -->
               <div>
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
@@ -634,7 +758,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
                     name="profileBio" 
                     class="form-input" 
                     rows="3" 
-                    style="border-radius: 12px; font-size: 13px; background: var(--bg-muted); border: 1px solid var(--border-color); padding: 10px 14px; width: 100%;"
+                    style="border-radius: 12px; font-size: 13px; background: var(--bg-muted); border: 1px solid var(--border-color); padding: 10px 14px; width: 100%; color: var(--text-primary);"
                     placeholder="Tell us about yourself..."
                     [(ngModel)]="editUser.bio"
                   ></textarea>
@@ -1136,6 +1260,29 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
             </button>
             <button type="button" (click)="confirmExitApp()" style="flex: 1; padding: 12px; border-radius: 14px; border: none; background: linear-gradient(135deg, #8a0d24 0%, #b31031 100%); color: white; font-size: 13.5px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(179, 16, 49, 0.35);">
               Yes, Exit
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Critical Data Change Warning Modal -->
+      <div *ngIf="showCriticalUpdateModal" class="photo-modal" (click)="showCriticalUpdateModal = false" style="z-index: 99999;">
+        <div class="card" (click)="$event.stopPropagation()" style="width: 90%; max-width: 360px; border-radius: 24px; padding: 24px; text-align: center; background: var(--bg-card); border: 1px solid var(--border-color); box-shadow: 0 20px 40px rgba(0,0,0,0.5); animation: modalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);">
+          <div style="width: 56px; height: 56px; border-radius: 50%; background: #ffedd5; color: #ea580c; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 14px;">⚠️</div>
+          <h3 style="margin: 0 0 6px 0; font-size: 18px; font-weight: 800; color: var(--text-primary);">Critical Data Change</h3>
+          <p style="margin: 0 0 12px 0; font-size: 12.5px; color: var(--text-muted); line-height: 1.45;">
+            You are changing critical profile information (Gender / Academic Batch / Hostel Block).
+          </p>
+          <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 12px; padding: 10px 12px; font-size: 11.5px; color: #ef4444; font-weight: 700; margin-bottom: 20px; text-align: left; line-height: 1.4;">
+            🚨 Warning: Change at your own risk! Your account will require Warden re-approval.
+          </div>
+          
+          <div style="display: flex; gap: 10px;">
+            <button type="button" (click)="showCriticalUpdateModal = false" style="flex: 1; padding: 12px; border-radius: 14px; border: 1px solid var(--border-color); background: var(--bg-muted); color: var(--text-primary); font-size: 13px; font-weight: 700; cursor: pointer;">
+              Cancel
+            </button>
+            <button type="button" (click)="confirmCriticalUpdate()" style="flex: 1; padding: 12px; border-radius: 14px; border: none; background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%); color: white; font-size: 13px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);">
+              Proceed & Save
             </button>
           </div>
         </div>
@@ -1877,7 +2024,17 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
   activeToast: LiveNotification | null = null;
   private notifSub!: Subscription;
   footerSettings: any = null;
-  editUser = { name: '', phone: '', bio: '' };
+  editUser: any = {
+    name: '',
+    email: '',
+    phone: '',
+    rollNumber: '',
+    hostelBlock: '',
+    roomNumber: '',
+    gender: 'male',
+    batch: 'Batch 2023-2027',
+    bio: ''
+  };
   profilePreviewUrl: string | null = null;
   selectedProfilePic: File | null = null;
   updatingProfile = false;
@@ -2398,15 +2555,28 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     this.router.navigate(['/student/login']);
   }
 
+  showToast(message: string): void {
+    this.activeToast = { message, type: 'info', createdAt: new Date() } as any;
+    setTimeout(() => this.clearToast(), 3000);
+  }
+
+  showCriticalUpdateModal: boolean = false;
+
   initProfileEdit(): void {
     const u = this.authService.currentUserValue;
     if (u) {
       this.editUser = {
-        name: u.name,
-        phone: u.phone,
+        name: u.name || '',
+        email: u.email || '',
+        phone: u.phone || '',
+        rollNumber: u.rollNumber || '',
+        hostelBlock: u.hostelBlock || '',
+        roomNumber: u.roomNumber || '',
+        gender: u.gender || 'male',
+        batch: u.batch || 'Batch 2023-2027',
         bio: u.bio || ''
       };
-      this.profilePreviewUrl = u.profilePicUrl ? 'https://hostelhub-0cyi.onrender.com' + u.profilePicUrl : null;
+      this.profilePreviewUrl = this.getImageUrl(u.profilePicUrl);
       this.selectedProfilePic = null;
       this.profileError = '';
       this.profileSuccess = '';
@@ -2427,14 +2597,41 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
   }
 
   onProfileSubmit(): void {
+    const u = this.user;
+    if (!u) return;
+
+    const isCriticalChanged = 
+      (this.editUser.gender && this.editUser.gender !== u.gender) ||
+      (this.editUser.batch && this.editUser.batch !== u.batch) ||
+      (this.editUser.hostelBlock && this.editUser.hostelBlock !== u.hostelBlock) ||
+      (this.editUser.rollNumber && this.editUser.rollNumber !== u.rollNumber);
+
+    if (isCriticalChanged && !this.showCriticalUpdateModal) {
+      this.showCriticalUpdateModal = true;
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.confirmCriticalUpdate();
+  }
+
+  confirmCriticalUpdate(): void {
+    this.showCriticalUpdateModal = false;
     this.updatingProfile = true;
     this.profileError = '';
     this.profileSuccess = '';
 
     const formData = new FormData();
     formData.append('name', this.editUser.name);
+    formData.append('email', this.editUser.email);
     formData.append('phone', this.editUser.phone);
+    formData.append('rollNumber', this.editUser.rollNumber);
+    formData.append('hostelBlock', this.editUser.hostelBlock);
+    formData.append('roomNumber', this.editUser.roomNumber);
+    formData.append('gender', this.editUser.gender);
+    formData.append('batch', this.editUser.batch);
     formData.append('bio', this.editUser.bio);
+
     if (this.selectedProfilePic) {
       formData.append('profilePic', this.selectedProfilePic);
     }
@@ -2442,8 +2639,14 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     this.authService.updateProfile(formData).subscribe({
       next: (res) => {
         this.updatingProfile = false;
-        this.profileSuccess = '✅ Profile updated successfully!';
         this.user = res.user;
+        if (res.requiresReapproval || res.user?.status === 'pending_verification') {
+          this.profileSuccess = '⚠️ Profile updated! Critical data was changed. Your account is now pending Warden re-approval.';
+          this.showToast('⚠️ Critical data updated! Account pending Warden re-approval.');
+        } else {
+          this.profileSuccess = '✅ Profile updated successfully!';
+          this.showToast('✅ Profile updated successfully!');
+        }
         this.cdr.detectChanges();
       },
       error: (err) => {

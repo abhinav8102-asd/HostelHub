@@ -14,10 +14,11 @@ export interface User {
   phone: string;
   roomNumber?: string;
   hostelBlock?: string;
-  status: 'active' | 'inactive';
+  rollNumber?: string;
+  status: string;
   profilePicUrl?: string;
   bio?: string;
-  gender?: 'male' | 'female';
+  gender?: string;
   batch?: string;
 }
 
