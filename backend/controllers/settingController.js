@@ -63,6 +63,7 @@ exports.getPublicSettings = async (req, res) => {
           pic: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
           github: 'https://github.com/abhinav8102-asd',
           linkedin: 'https://linkedin.com',
+          instagram: 'https://instagram.com',
           twitter: 'https://twitter.com',
           email: 'mailto:abhinav@hostelhub.com'
         },
@@ -73,6 +74,7 @@ exports.getPublicSettings = async (req, res) => {
           pic: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
           github: 'https://github.com',
           linkedin: 'https://linkedin.com',
+          instagram: 'https://instagram.com',
           twitter: 'https://twitter.com',
           email: 'mailto:saransh@hostelhub.com'
         }
@@ -82,6 +84,18 @@ exports.getPublicSettings = async (req, res) => {
     settings.forEach(s => {
       config[s.key] = s.value;
     });
+
+    if (typeof config.developer_team === 'string') {
+      try {
+        const parsed = JSON.parse(config.developer_team);
+        config.developer_team = parsed.map((d) => ({
+          ...d,
+          instagram: d.instagram || 'https://instagram.com'
+        }));
+      } catch (e) {
+        config.developer_team = [];
+      }
+    }
 
     // Parse developer_team if it's stored as JSON
     try {

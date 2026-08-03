@@ -1386,23 +1386,15 @@ import { API_CONFIG } from '../../config/api.config';
       </div>
 
       <!-- Original Clean Footer -->
-      <!-- Original Clean Footer with Developer Instagram -->
       <footer class="footer animate-fade" *ngIf="activeTab !== 'chat'">
         <div class="footer-content" style="text-align: center; padding: 18px 14px; border-top: 1px solid var(--border-color); margin-top: 24px; background: var(--bg-card); border-radius: 16px;">
           <p class="footer-title" style="margin: 0 0 6px 0; font-size: 13.5px; font-weight: 800; color: var(--text-primary);">{{ footerSettings?.footer_text || 'HostelHub - Modern Hostel Management' }}</p>
           <div class="footer-meta" style="display: flex; justify-content: center; align-items: center; gap: 14px; font-size: 12px; color: var(--text-muted); flex-wrap: wrap;">
             <span>📧 {{ footerSettings?.footer_email || 'support@hostelhub.com' }}</span>
             <span>📞 {{ footerSettings?.footer_phone || '+91 98765 43210' }}</span>
-            <a href="https://instagram.com" target="_blank" style="color: #e1306c; text-decoration: none; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;">
-              <span>📸</span> Instagram
-            </a>
           </div>
-          <div style="margin-top: 10px; font-size: 11.5px; color: var(--text-muted); font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap;">
-            <span>Developed by HostelHub Engineering Team 💻</span>
-            <span>•</span>
-            <a href="https://instagram.com" target="_blank" style="color: #e1306c; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; background: rgba(225, 48, 108, 0.1); padding: 3px 10px; border-radius: 12px; border: 1px solid rgba(225, 48, 108, 0.2);">
-              <span>📸</span> Follow us on Instagram
-            </a>
+          <div style="margin-top: 8px; font-size: 11.5px; color: var(--text-muted); font-weight: 600;">
+            Developed by HostelHub Engineering Team 💻
           </div>
           <p class="footer-copyright" style="margin: 8px 0 0 0; font-size: 10.5px; color: var(--text-muted);">{{ footerSettings?.footer_copyright || '© 2026 HostelHub Inc. All rights reserved.' }}</p>
         </div>

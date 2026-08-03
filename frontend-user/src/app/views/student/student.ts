@@ -205,6 +205,9 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
                 <a *ngIf="dev.linkedin" [href]="dev.linkedin" target="_blank" rel="noopener" class="social-icon-btn" title="LinkedIn Profile" (click)="$event.stopPropagation()">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
                 </a>
+                <a *ngIf="dev.instagram || true" [href]="dev.instagram || 'https://instagram.com'" target="_blank" rel="noopener" class="social-icon-btn" title="Instagram Profile" (click)="$event.stopPropagation()">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                </a>
                 <a *ngIf="dev.twitter" [href]="dev.twitter" target="_blank" rel="noopener" class="social-icon-btn" title="Twitter Profile" (click)="$event.stopPropagation()">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
                 </a>
@@ -1295,23 +1298,16 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
         </div>
       </div>
 
-      <!-- Original Clean Footer with Developer Instagram -->
+      <!-- Original Clean Footer -->
       <footer class="footer animate-fade" *ngIf="activeTab !== 'chat'">
         <div class="footer-content" style="text-align: center; padding: 18px 14px; border-top: 1px solid var(--border-color); margin-top: 24px; background: var(--bg-card); border-radius: 16px;">
           <p class="footer-title" style="margin: 0 0 6px 0; font-size: 13.5px; font-weight: 800; color: var(--text-primary);">{{ footerSettings?.footer_text || 'HostelHub - Modern Hostel Management' }}</p>
           <div class="footer-meta" style="display: flex; justify-content: center; align-items: center; gap: 14px; font-size: 12px; color: var(--text-muted); flex-wrap: wrap;">
             <span>📧 {{ footerSettings?.footer_email || 'support@hostelhub.com' }}</span>
             <span>📞 {{ footerSettings?.footer_phone || '+91 98765 43210' }}</span>
-            <a href="https://instagram.com" target="_blank" style="color: #e1306c; text-decoration: none; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;">
-              <span>📸</span> Instagram
-            </a>
           </div>
-          <div style="margin-top: 10px; font-size: 11.5px; color: var(--text-muted); font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap;">
-            <span>Developed by HostelHub Engineering Team 💻</span>
-            <span>•</span>
-            <a href="https://instagram.com" target="_blank" style="color: #e1306c; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; background: rgba(225, 48, 108, 0.1); padding: 3px 10px; border-radius: 12px; border: 1px solid rgba(225, 48, 108, 0.2);">
-              <span>📸</span> Follow us on Instagram
-            </a>
+          <div style="margin-top: 8px; font-size: 11.5px; color: var(--text-muted); font-weight: 600;">
+            Developed by HostelHub Engineering Team 💻
           </div>
           <p class="footer-copyright" style="margin: 8px 0 0 0; font-size: 10.5px; color: var(--text-muted);">{{ footerSettings?.footer_copyright || '© 2026 HostelHub Inc. All rights reserved.' }}</p>
         </div>
