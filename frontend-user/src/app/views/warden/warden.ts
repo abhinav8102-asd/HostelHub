@@ -216,7 +216,24 @@ import { API_CONFIG } from '../../config/api.config';
             >
               <span>👤 Assigned ({{ getAssignedOnlyCount() }})</span>
             </button>
-            <button type="button" style="width: 36px; height: 36px; border-radius: 10px; background: var(--bg-card); border: 1px solid var(--border-color); font-size: 16px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">🌪️</button>
+            <button 
+              type="button" 
+              (click)="filterStatus = 'in_progress'" 
+              [style.background]="filterStatus === 'in_progress' ? '#b31031' : 'var(--bg-card)'"
+              [style.color]="filterStatus === 'in_progress' ? 'white' : 'var(--text-primary)'"
+              style="padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color); font-size: 12.5px; font-weight: 700; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-sm);"
+            >
+              <span>⚙️ In Progress ({{ getInProgressOnlyCount() }})</span>
+            </button>
+            <button 
+              type="button" 
+              (click)="filterStatus = 'resolved'" 
+              [style.background]="filterStatus === 'resolved' ? '#b31031' : 'var(--bg-card)'"
+              [style.color]="filterStatus === 'resolved' ? 'white' : 'var(--text-primary)'"
+              style="padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color); font-size: 12.5px; font-weight: 700; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-sm);"
+            >
+              <span>✅ Resolved ({{ getResolvedCount() }})</span>
+            </button>
           </div>
 
           <div class="complaints-list" *ngIf="filteredComplaints.length > 0; else noComplaints">
