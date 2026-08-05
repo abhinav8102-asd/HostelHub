@@ -294,8 +294,8 @@ import { API_CONFIG } from '../../config/api.config';
                 <!-- Photo attached by student -->
                 <div class="photo-view" *ngIf="comp.photoUrl">
                   <p class="section-label">📸 Attachment from Student:</p>
-                  <div class="image-container" (click)="openPhotoModal('https://hostelhub-0cyi.onrender.com' + comp.photoUrl)">
-                    <img [src]="'https://hostelhub-0cyi.onrender.com' + comp.photoUrl" class="comp-img" alt="Student issue proof"/>
+                  <div class="image-container" (click)="openPhotoModal(getImageUrl(comp.photoUrl))">
+                    <img [src]="getImageUrl(comp.photoUrl)" class="comp-img" alt="Student issue proof" (error)="onImgError($event)"/>
                     <div class="image-overlay">🔍 Tap to Zoom</div>
                   </div>
                 </div>
@@ -316,8 +316,8 @@ import { API_CONFIG } from '../../config/api.config';
                   <!-- Work Proof Image -->
                   <div class="photo-view" *ngIf="comp.completionPhotoUrl">
                     <p class="section-label text-success">✅ Resolution Work Proof:</p>
-                    <div class="image-container" (click)="openPhotoModal('https://hostelhub-0cyi.onrender.com' + comp.completionPhotoUrl)">
-                      <img [src]="'https://hostelhub-0cyi.onrender.com' + comp.completionPhotoUrl" class="comp-img" alt="Work completion proof"/>
+                    <div class="image-container" (click)="openPhotoModal(getImageUrl(comp.completionPhotoUrl))">
+                      <img [src]="getImageUrl(comp.completionPhotoUrl)" class="comp-img" alt="Work completion proof" (error)="onImgError($event)"/>
                       <div class="image-overlay">🔍 Tap to Zoom</div>
                     </div>
                   </div>
@@ -864,7 +864,7 @@ import { API_CONFIG } from '../../config/api.config';
           <div *ngIf="attendanceError" class="alert alert-danger">{{ attendanceError }}</div>
 
           <!-- Attendance Summary Metrics Cards Bar (All Hostels & Hostel-Wise Filterable) -->
-          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px;">
             <!-- Total Students -->
             <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 12px; text-align: center; box-shadow: var(--shadow-sm);">
               <div style="font-size: 20px; font-weight: 800; color: var(--text-primary);">{{ getAttendanceTotalStudentsCount() }}</div>
@@ -884,13 +884,6 @@ import { API_CONFIG } from '../../config/api.config';
               <div style="font-size: 20px; font-weight: 800; color: #b91c1c;">{{ getAttendanceAbsentCount() }}</div>
               <div style="font-size: 10.5px; font-weight: 800; color: #b91c1c; margin-top: 2px;">❌ Absent</div>
               <div style="font-size: 9px; color: #dc2626; margin-top: 2px;">{{ filterHostelBlock || 'All Hostels' }}</div>
-            </div>
-
-            <!-- Outing / Leave Count -->
-            <div style="background: #fef3c7; border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 14px; padding: 12px; text-align: center;">
-              <div style="font-size: 20px; font-weight: 800; color: #b45309;">{{ getAttendanceOutingCount() }}</div>
-              <div style="font-size: 10.5px; font-weight: 800; color: #b45309; margin-top: 2px;">🏃 Outing</div>
-              <div style="font-size: 9px; color: #d97706; margin-top: 2px;">{{ filterHostelBlock || 'All Hostels' }}</div>
             </div>
           </div>
 
@@ -986,15 +979,6 @@ import { API_CONFIG } from '../../config/api.config';
                         style="padding: 4px 10px; font-size: 11px; border-radius: 4px;"
                       >
                         Absent
-                      </button>
-                      <button 
-                        type="button" 
-                        class="pill-btn" 
-                        [class.active]="attendanceMarkMap[s.id] === 'outing'"
-                        (click)="attendanceMarkMap[s.id] = 'outing'"
-                        style="padding: 4px 10px; font-size: 11px; border-radius: 4px;"
-                      >
-                        Outing
                       </button>
                     </div>
                   </div>
@@ -3320,7 +3304,13 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
       return url;
     }
     const cleanPath = url.startsWith('/') ? url : '/' + url;
-    return 'https://hostelhub-0cyi.onrender.com' + cleanPath;
+    return API_CONFIG.baseUrl + cleanPath;
+  }
+
+  onImgError(event: any): void {
+    if (event && event.target) {
+      event.target.style.display = 'none';
+    }
   }
 
   private handleIncomingWardenChatMessage(msg: ChatMessage, tempId?: number): void {

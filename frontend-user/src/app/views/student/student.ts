@@ -10,6 +10,7 @@ import { SocketService, LiveNotification } from '../../services/socket.service';
 import { MessService } from '../../services/mess.service';
 import { AttendanceService } from '../../services/attendance.service';
 import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service';
+import { API_CONFIG } from '../../config/api.config';
 
 
 
@@ -448,8 +449,8 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
                   <!-- Attachment -->
                   <div class="attachment-view" *ngIf="comp.photoUrl">
                     <p class="section-label">📸 Original Attachment:</p>
-                    <div class="image-container" (click)="openPhotoModal('https://hostelhub-0cyi.onrender.com' + comp.photoUrl)">
-                      <img [src]="'https://hostelhub-0cyi.onrender.com' + comp.photoUrl" class="comp-img" alt="Attachment"/>
+                    <div class="image-container" (click)="openPhotoModal(getImageUrl(comp.photoUrl))">
+                      <img [src]="getImageUrl(comp.photoUrl)" class="comp-img" alt="Attachment" (error)="onImgError($event)"/>
                       <div class="image-overlay">🔍 Tap to Zoom</div>
                     </div>
                   </div>
@@ -470,8 +471,8 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
                   <!-- Completion Proof -->
                   <div class="completion-view" *ngIf="comp.completionPhotoUrl">
                     <div class="completion-header">✅ Resolution Work Proof</div>
-                    <div class="image-container" (click)="openPhotoModal('https://hostelhub-0cyi.onrender.com' + comp.completionPhotoUrl)">
-                      <img [src]="'https://hostelhub-0cyi.onrender.com' + comp.completionPhotoUrl" class="completion-img" alt="Work completion proof"/>
+                    <div class="image-container" (click)="openPhotoModal(getImageUrl(comp.completionPhotoUrl))">
+                      <img [src]="getImageUrl(comp.completionPhotoUrl)" class="completion-img" alt="Work completion proof" (error)="onImgError($event)"/>
                       <div class="image-overlay">🔍 Tap to Zoom</div>
                     </div>
                   </div>
@@ -805,7 +806,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
 
             <div *ngIf="!isLoadingAttendance && attendanceStats">
               <!-- Attendance Stats Metrics Grid -->
-              <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 16px;">
+              <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px;">
                 <div style="background: var(--bg-muted); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; text-align: center;">
                   <div style="font-size: 15px; font-weight: 800;" [style.color]="attendanceStats.percentage >= 75 ? '#166534' : '#b91c1c'">
                     {{ attendanceStats.percentage }}%
@@ -824,10 +825,6 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
                   <div style="font-size: 15px; font-weight: 800; color: #b91c1c;">{{ attendanceStats.absent }}</div>
                   <div style="font-size: 9px; color: #b91c1c; margin-top: 2px;">Absent</div>
                 </div>
-                <div style="background: #fef3c7; border: 1px solid rgba(245, 158, 11, 0.2); border-radius: 12px; padding: 10px; text-align: center;">
-                  <div style="font-size: 15px; font-weight: 800; color: #b45309;">{{ attendanceStats.outing }}</div>
-                  <div style="font-size: 9px; color: #b45309; margin-top: 2px;">Outing</div>
-                </div>
               </div>
 
               <!-- Attendance History List -->
@@ -839,8 +836,8 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
                   </span>
                   
                   <span 
-                    [style.background]="att.status === 'present' ? '#e6f4ea' : (att.status === 'absent' ? '#fee2e2' : '#fef3c7')"
-                    [style.color]="att.status === 'present' ? '#166534' : (att.status === 'absent' ? '#b91c1c' : '#b45309')"
+                    [style.background]="att.status === 'present' ? '#e6f4ea' : '#fee2e2'"
+                    [style.color]="att.status === 'present' ? '#166534' : '#b91c1c'"
                     style="font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 8px; text-transform: uppercase;"
                   >
                     {{ att.status }}
@@ -2964,7 +2961,13 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
       return url;
     }
     const cleanPath = url.startsWith('/') ? url : '/' + url;
-    return 'https://hostelhub-0cyi.onrender.com' + cleanPath;
+    return API_CONFIG.baseUrl + cleanPath;
+  }
+
+  onImgError(event: any): void {
+    if (event && event.target) {
+      event.target.style.display = 'none';
+    }
   }
 
   private handleIncomingStudentChatMessage(msg: ChatMessage, tempId?: number): void {

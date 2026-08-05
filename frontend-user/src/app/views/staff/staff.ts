@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { AuthService, User } from '../../services/auth.service';
 import { ComplaintService } from '../../services/complaint.service';
 import { SocketService, LiveNotification } from '../../services/socket.service';
+import { API_CONFIG } from '../../config/api.config';
 
 @Component({
   selector: 'app-staff-dashboard',
@@ -38,7 +39,7 @@ import { SocketService, LiveNotification } from '../../services/socket.service';
         <div class="user-info">
           <div class="avatar-ring">
             <span class="avatar" *ngIf="!user?.profilePicUrl">🔧</span>
-            <img *ngIf="user?.profilePicUrl" [src]="'https://hostelhub-0cyi.onrender.com' + user.profilePicUrl" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
+            <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" (error)="onImgError($event)"/>
           </div>
           <div>
             <h3>Staff Portal</h3>
@@ -138,8 +139,8 @@ import { SocketService, LiveNotification } from '../../services/socket.service';
                 <!-- Problem photo attached by student -->
                 <div class="photo-view" *ngIf="task.photoUrl">
                   <p class="section-label">📸 Issue Attachment:</p>
-                  <div class="image-container" (click)="openPhotoModal('https://hostelhub-0cyi.onrender.com' + task.photoUrl)">
-                    <img [src]="'https://hostelhub-0cyi.onrender.com' + task.photoUrl" class="comp-img" alt="Student issue photo"/>
+                  <div class="image-container" (click)="openPhotoModal(getImageUrl(task.photoUrl))">
+                    <img [src]="getImageUrl(task.photoUrl)" class="comp-img" alt="Student issue photo" (error)="onImgError($event)"/>
                     <div class="image-overlay">🔍 Tap to Zoom</div>
                   </div>
                 </div>
@@ -182,8 +183,8 @@ import { SocketService, LiveNotification } from '../../services/socket.service';
                   <p class="text-success">🎉 Job Completed Successfully!</p>
                   <div class="photo-view" *ngIf="task.completionPhotoUrl">
                     <p class="section-label">✅ Uploaded Work Proof:</p>
-                    <div class="image-container" (click)="openPhotoModal('https://hostelhub-0cyi.onrender.com' + task.completionPhotoUrl)">
-                      <img [src]="'https://hostelhub-0cyi.onrender.com' + task.completionPhotoUrl" class="comp-img" alt="Work completion proof"/>
+                    <div class="image-container" (click)="openPhotoModal(getImageUrl(task.completionPhotoUrl))">
+                      <img [src]="getImageUrl(task.completionPhotoUrl)" class="comp-img" alt="Work completion proof" (error)="onImgError($event)"/>
                       <div class="image-overlay">🔍 Tap to Zoom</div>
                     </div>
                   </div>
@@ -1217,7 +1218,7 @@ export class StaffDashboardComponent implements OnInit, OnDestroy {
         phone: u.phone,
         bio: u.bio || ''
       };
-      this.profilePreviewUrl = u.profilePicUrl ? 'https://hostelhub-0cyi.onrender.com' + u.profilePicUrl : null;
+      this.profilePreviewUrl = u.profilePicUrl ? this.getImageUrl(u.profilePicUrl) : null;
       this.selectedProfilePic = null;
       this.profileError = '';
       this.profileSuccess = '';
@@ -1302,6 +1303,21 @@ export class StaffDashboardComponent implements OnInit, OnDestroy {
         const el = document.getElementById('profilePicFile') as HTMLInputElement;
         if (el) el.click();
       }
+    }
+  }
+
+  getImageUrl(url: string | null | undefined): string {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+      return url;
+    }
+    const cleanPath = url.startsWith('/') ? url : '/' + url;
+    return API_CONFIG.baseUrl + cleanPath;
+  }
+
+  onImgError(event: any): void {
+    if (event && event.target) {
+      event.target.style.display = 'none';
     }
   }
 }
