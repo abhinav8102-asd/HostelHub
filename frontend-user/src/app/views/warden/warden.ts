@@ -2698,7 +2698,7 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
           this.justAssigned[complaintId] = false;
           this.cdr.detectChanges();
         }, 3000);
-        this.showToast('✅ Complaint successfully assign ho gaya hai!');
+        this.showToast('✅ Staff successfully assigned to complaint!');
         this.cdr.detectChanges();
       },
       error: (err) => {

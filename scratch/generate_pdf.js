@@ -1,0 +1,817 @@
+const fs = require('fs');
+const path = require('path');
+const { execSync } = require('child_process');
+
+const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HostelHub - Complete End-to-End Technical Documentation</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+
+    @page {
+      size: A4;
+      margin: 20mm 15mm 20mm 15mm;
+      @bottom-right {
+        content: counter(page);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: #1e293b;
+      line-height: 1.6;
+      background: #ffffff;
+      margin: 0;
+      padding: 0;
+      font-size: 11.5pt;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Outfit', sans-serif;
+      color: #0f172a;
+      margin-top: 1.4em;
+      margin-bottom: 0.5em;
+      font-weight: 700;
+      page-break-after: avoid;
+    }
+
+    h1 { font-size: 26pt; color: #b31031; border-bottom: 3px solid #b31031; padding-bottom: 6px; }
+    h2 { font-size: 18pt; color: #8a0d24; border-bottom: 1.5px solid #e2e8f0; padding-bottom: 4px; margin-top: 28px; }
+    h3 { font-size: 14pt; color: #1e293b; margin-top: 20px; }
+    h4 { font-size: 12pt; color: #334155; }
+
+    /* Cover Page */
+    .cover-page {
+      height: 98vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 40px 20px;
+      page-break-after: always;
+      background: linear-gradient(135deg, #4c0615 0%, #b31031 50%, #8a0d24 100%);
+      color: white;
+      border-radius: 20px;
+      margin-bottom: 30px;
+    }
+
+    .cover-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .cover-logo {
+      width: 64px;
+      height: 64px;
+      background: white;
+      color: #b31031;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 900;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+
+    .cover-title-group h1 {
+      color: white;
+      border: none;
+      font-size: 36pt;
+      margin: 0;
+      line-height: 1.1;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+    }
+
+    .cover-subtitle {
+      font-size: 16pt;
+      opacity: 0.92;
+      margin-top: 12px;
+      font-weight: 400;
+    }
+
+    .cover-meta {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(10px);
+      padding: 24px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .cover-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      font-size: 11pt;
+    }
+
+    .cover-meta-item strong {
+      display: block;
+      font-size: 9pt;
+      text-transform: uppercase;
+      opacity: 0.75;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    /* Badges & Tables */
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 9pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-get { background: #e0f2fe; color: #0369a1; }
+    .badge-post { background: #dcfce7; color: #15803d; }
+    .badge-put { background: #fef3c7; color: #b45309; }
+    .badge-delete { background: #fee2e2; color: #b91c1c; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 10pt;
+      page-break-inside: avoid;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    th {
+      background: #f8fafc;
+      font-weight: 700;
+      color: #334155;
+      border-top: 1px solid #cbd5e1;
+      border-bottom: 2px solid #cbd5e1;
+      font-family: 'Outfit', sans-serif;
+      text-transform: uppercase;
+      font-size: 8.5pt;
+      letter-spacing: 0.5px;
+    }
+
+    tr:nth-child(even) td {
+      background: #f8fafc;
+    }
+
+    code, pre {
+      font-family: 'Fira Code', monospace;
+      font-size: 9.5pt;
+    }
+
+    code {
+      background: #f1f5f9;
+      color: #0f172a;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid #e2e8f0;
+    }
+
+    pre {
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 16px;
+      border-radius: 12px;
+      overflow-x: auto;
+      line-height: 1.45;
+      border: 1px solid #1e293b;
+      page-break-inside: avoid;
+    }
+
+    .endpoint-card {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 16px;
+      margin: 16px 0;
+      page-break-inside: avoid;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+
+    .endpoint-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .endpoint-path {
+      font-family: 'Fira Code', monospace;
+      font-weight: 600;
+      font-size: 11pt;
+      color: #0f172a;
+    }
+
+    .callout {
+      padding: 14px 18px;
+      border-radius: 10px;
+      margin: 16px 0;
+      font-size: 10.5pt;
+      page-break-inside: avoid;
+    }
+
+    .callout-info { background: #eff6ff; border-left: 4px solid #3b82f6; color: #1e3a8a; }
+    .callout-warning { background: #fffbeb; border-left: 4px solid #f59e0b; color: #78350f; }
+    .callout-success { background: #f0fdf4; border-left: 4px solid #22c55e; color: #14532d; }
+
+    .toc {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 30px;
+    }
+
+    .toc-title {
+      font-size: 16pt;
+      font-weight: 800;
+      color: #8a0d24;
+      margin-top: 0;
+      margin-bottom: 16px;
+      border-bottom: 2px solid #b31031;
+      padding-bottom: 6px;
+    }
+
+    .toc-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .toc-list li {
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .toc-list li a {
+      color: #0f172a;
+      text-decoration: none;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .toc-list ul {
+      list-style: none;
+      padding-left: 20px;
+      margin-top: 6px;
+      font-weight: 400;
+    }
+
+    .page-break {
+      page-break-after: always;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- COVER PAGE -->
+  <div class="cover-page">
+    <div>
+      <div class="cover-header">
+        <div class="cover-logo">H</div>
+        <div style="font-size: 20pt; font-weight: 800; font-family: 'Outfit';">HostelHub</div>
+      </div>
+
+      <div style="margin-top: 80px;">
+        <div class="cover-title-group">
+          <h1>End-to-End System Documentation</h1>
+        </div>
+        <div class="cover-subtitle">Complete Architecture, Database Schema, REST API Reference & Socket.io WebSockets Guide</div>
+      </div>
+    </div>
+
+    <div class="cover-meta">
+      <div class="cover-meta-grid">
+        <div class="cover-meta-item">
+          <strong>Project Name</strong>
+          HostelHub Management System
+        </div>
+        <div class="cover-meta-item">
+          <strong>Document Version</strong>
+          v2.5.0 (Production Release)
+        </div>
+        <div class="cover-meta-item">
+          <strong>Backend Tech</strong>
+          Node.js, Express, Sequelize, PostgreSQL, Socket.io
+        </div>
+        <div class="cover-meta-item">
+          <strong>Frontend Tech</strong>
+          Angular Standalone, TypeScript, Capacitor Android
+        </div>
+        <div class="cover-meta-item">
+          <strong>Author Engineering Team</strong>
+          Abhinav Kumar (Lead Full-Stack Developer)
+        </div>
+        <div class="cover-meta-item">
+          <strong>Date Generated</strong>
+          August 2026
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE OF CONTENTS -->
+  <div class="toc">
+    <div class="toc-title">📖 Table of Contents</div>
+    <ul class="toc-list">
+      <li>1. Executive Summary & Architecture Overview</li>
+      <li>2. Core Tech Stack & Dependencies</li>
+      <li>3. Database ERD & Entity Specifications (Sequelize / PostgreSQL)
+        <ul>
+          <li>3.1 User & Auth Entities (User, PasswordResetOTP)</li>
+          <li>3.2 Maintenance & Ticket Entities (Complaint)</li>
+          <li>3.3 Mess Management Entities (MessMenu, MessSkip, MessFeedback)</li>
+          <li>3.4 Attendance & Roster Entities (Attendance)</li>
+          <li>3.5 Announcements & Communication (Announcement, GroupChat, ChatMessage)</li>
+          <li>3.6 System Configuration & Notifications (Setting, Notification)</li>
+        </ul>
+      </li>
+      <li>4. Complete REST API Reference
+        <ul>
+          <li>4.1 Authentication & Profile APIs (/api/auth)</li>
+          <li>4.2 User Management & Approvals APIs (/api/users)</li>
+          <li>4.3 Maintenance Complaints & Workload APIs (/api/complaints)</li>
+          <li>4.4 Mess Menu, Skipping & Feedback APIs (/api/mess)</li>
+          <li>4.5 Attendance Roll Call & Metrics APIs (/api/attendance)</li>
+          <li>4.6 Official Announcements APIs (/api/announcements)</li>
+          <li>4.7 Real-Time Group Chat APIs (/api/chat)</li>
+          <li>4.8 Public Settings & Footer APIs (/api/settings)</li>
+          <li>4.9 Live Notifications APIs (/api/notifications)</li>
+        </ul>
+      </li>
+      <li>5. Socket.io WebSockets Specifications</li>
+      <li>6. Mobile Native Capabilities & Capacitor Integration</li>
+      <li>7. Critical Workflows & Business Logic Enforcements</li>
+    </ul>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECTION 1: EXECUTIVE SUMMARY -->
+  <h2>1. Executive Summary & Architecture Overview</h2>
+  <p>
+    <strong>HostelHub</strong> is a full-stack digital hostel management platform engineered to automate maintenance complaint dispatching, daily student roll call attendance, mess menu regulations, meal skipping, official announcements, and real-time batch group communications.
+  </p>
+
+  <div class="callout callout-info">
+    <strong>Key Architectural Design:</strong> The system features a decoupled Client-Server architecture. The frontend is built as a single-page progressive web application using <strong>Angular (Standalone Components)</strong> and compiled into a native Android APK via <strong>Capacitor</strong>. The backend runs on a high-throughput <strong>Node.js / Express.js REST API</strong> layer paired with <strong>Sequelize ORM</strong> and <strong>PostgreSQL</strong>. Real-time updates (chat messages, ticket updates, notifications) are powered by <strong>Socket.io</strong>.
+  </div>
+
+  <table style="margin-top: 20px;">
+    <thead>
+      <tr>
+        <th>Role</th>
+        <th>Portal Access</th>
+        <th>Key Responsibilities</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Student</strong></td>
+        <td>Student Portal</td>
+        <td>Raise complaints with photos, track ticket progress, view mess menu, skip meals, give mess feedback, view attendance metrics, join hostel/batch group chats, edit profile.</td>
+      </tr>
+      <tr>
+        <td><strong>Warden</strong></td>
+        <td>Warden Portal</td>
+        <td>Approve new student registrations, assign maintenance staff to complaints, mark daily roll call attendance, publish announcements, monitor mess skip stats, respond to warden group chats.</td>
+      </tr>
+      <tr>
+        <td><strong>Staff</strong></td>
+        <td>Staff Portal</td>
+        <td>View assigned maintenance jobs, update ticket status (In Progress), upload job completion proof photo, submit resolved status.</td>
+      </tr>
+      <tr>
+        <td><strong>Admin</strong></td>
+        <td>Admin Portal</td>
+        <td>Manage system users, create warden/staff accounts, view global analytics, configure public footer & developer settings, manage database overrides.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- SECTION 2: TECH STACK -->
+  <h2>2. Core Tech Stack & Dependencies</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Layer</th>
+        <th>Technology</th>
+        <th>Version / Purpose</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Frontend Framework</strong></td>
+        <td>Angular</td>
+        <td>v19 (Standalone Architecture, RxJS, HttpClient, FormsModule)</td>
+      </tr>
+      <tr>
+        <td><strong>Mobile Runtime</strong></td>
+        <td>Capacitor</td>
+        <td>v8 (Native Android Bridge, Camera API, Preferences, App Back Button Listener)</td>
+      </tr>
+      <tr>
+        <td><strong>Design System</strong></td>
+        <td>Vanilla CSS Tokens</td>
+        <td>Custom Design Tokens, Dynamic Light/Dark Theme, Glassmorphism, Micro-animations</td>
+      </tr>
+      <tr>
+        <td><strong>Backend Environment</strong></td>
+        <td>Node.js & Express.js</td>
+        <td>RESTful Routing, Async Controllers, Middleware Stack</td>
+      </tr>
+      <tr>
+        <td><strong>Database & ORM</strong></td>
+        <td>PostgreSQL & Sequelize</td>
+        <td>Relational Schema, Foreign Key Constraints, Transactions, Auto-migrations</td>
+      </tr>
+      <tr>
+        <td><strong>Real-Time Engine</strong></td>
+        <td>Socket.io</td>
+        <td>Bidirectional WebSockets for Chat, Notifications, Ticket & Announcement Sync</td>
+      </tr>
+      <tr>
+        <td><strong>Storage Layer</strong></td>
+        <td>Supabase / Local Disk Fallback</td>
+        <td>Cloud Image Storage for complaint attachments, completion proofs, profile pictures</td>
+      </tr>
+      <tr>
+        <td><strong>Authentication</strong></td>
+        <td>JWT & bcryptjs</td>
+        <td>JsonWebToken bearer authentication, bcrypt password hashing, Role-Based Access Control</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="page-break"></div>
+
+  <!-- SECTION 3: DATABASE ERD & ENTITIES -->
+  <h2>3. Database ERD & Entity Specifications</h2>
+
+  <h3>3.1 User Model (users table)</h3>
+  <p>Stores credentials, personal details, hostel assignment, roll number, and approval flags.</p>
+  <pre><code>User {
+  id: INTEGER (PK, AutoIncrement)
+  name: STRING (NotNull)
+  email: STRING (NotNull, Unique)
+  password: STRING (NotNull)
+  role: ENUM('student', 'warden', 'staff', 'admin') (Default: 'student')
+  hostelBlock: STRING ('Boys Hostel 1', 'Boys Hostel 2', 'Girls Hostel 1', 'Girls Hostel 2')
+  roomNumber: STRING
+  rollNumber: STRING
+  batch: STRING (e.g. 'Batch 2025')
+  gender: STRING ('Male', 'Female', 'Other')
+  phone: STRING
+  bio: TEXT
+  profilePicUrl: STRING
+  status: ENUM('pending', 'active', 'rejected') (Default: 'pending')
+  reApprovalStatus: BOOLEAN (Default: false)
+  googleId: STRING (Nullable)
+  createdAt: DATETIME
+  updatedAt: DATETIME
+}</code></pre>
+
+  <h3>3.2 Complaint Model (complaints table)</h3>
+  <pre><code>Complaint {
+  id: INTEGER (PK, AutoIncrement)
+  studentId: INTEGER (FK -> users.id)
+  staffId: INTEGER (FK -> users.id, Nullable)
+  title: STRING (NotNull)
+  description: TEXT (NotNull)
+  category: ENUM('electrical', 'plumbing', 'carpentry', 'cleaning', 'other')
+  priority: ENUM('low', 'medium', 'high', 'urgent') (Default: 'medium')
+  status: ENUM('pending', 'assigned', 'in_progress', 'resolved') (Default: 'pending')
+  photoUrl: TEXT (Nullable)
+  completionPhotoUrl: TEXT (Nullable)
+  feedbackRating: INTEGER (Nullable, 1-5)
+  feedbackComment: TEXT (Nullable)
+  createdAt: DATETIME
+  updatedAt: DATETIME
+}</code></pre>
+
+  <h3>3.3 Mess Management Models</h3>
+  <pre><code>MessMenu {
+  id: INTEGER (PK, AutoIncrement)
+  dayOfWeek: ENUM('Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday')
+  breakfast: TEXT
+  lunch: TEXT
+  snacks: TEXT
+  dinner: TEXT
+  isSpecial: BOOLEAN (Default: false)
+}
+
+MessSkip {
+  id: INTEGER (PK, AutoIncrement)
+  studentId: INTEGER (FK -> users.id)
+  date: DATEONLY (NotNull)
+  mealType: ENUM('breakfast', 'lunch', 'snacks', 'dinner')
+}
+
+MessFeedback {
+  id: INTEGER (PK, AutoIncrement)
+  studentId: INTEGER (FK -> users.id)
+  rating: INTEGER (1-5)
+  category: STRING ('Quality', 'Hygiene', 'Quantity', 'Behavior')
+  comment: TEXT
+}</code></pre>
+
+  <h3>3.4 Attendance Model (attendances table)</h3>
+  <pre><code>Attendance {
+  id: INTEGER (PK, AutoIncrement)
+  studentId: INTEGER (FK -> users.id)
+  date: DATEONLY (NotNull)
+  status: ENUM('present', 'absent') (NotNull, Default: 'present')
+  markedBy: INTEGER (FK -> users.id)
+  remarks: TEXT (Nullable)
+}</code></pre>
+
+  <h3>3.5 GroupChat & ChatMessage Models</h3>
+  <pre><code>GroupChat {
+  id: INTEGER (PK, AutoIncrement)
+  name: STRING (NotNull)
+  type: ENUM('block', 'batch', 'all_hostel', 'wardens')
+  hostelBlock: STRING (Nullable)
+  batch: STRING (Nullable)
+}
+
+ChatMessage {
+  id: INTEGER (PK, AutoIncrement)
+  groupId: INTEGER (FK -> group_chats.id)
+  senderId: INTEGER (FK -> users.id)
+  message: TEXT
+  attachmentUrl: TEXT (Nullable)
+  isDeleted: BOOLEAN (Default: false)
+  deletedByName: STRING (Nullable)
+  createdAt: DATETIME
+}</code></pre>
+
+  <div class="page-break"></div>
+
+  <!-- SECTION 4: REST API ENDPOINTS REFERENCE -->
+  <h2>4. Complete REST API Endpoints Reference</h2>
+
+  <h3>4.1 Authentication & Profile APIs (/api/auth)</h3>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="badge badge-post">POST</span>
+      <span class="endpoint-path">/api/auth/register</span>
+    </div>
+    <p><strong>Description:</strong> Register a new student or warden account. Requires Warden approval before login if role is student.</p>
+    <p><strong>Body (JSON):</strong> <code>{ name, email, password, role, hostelBlock, roomNumber, rollNumber, batch, gender, phone }</code></p>
+    <p><strong>Response (201 Created):</strong> <code>{ message: "Registration successful! Pending Warden approval.", user: {...} }</code></p>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="badge badge-post">POST</span>
+      <span class="endpoint-path">/api/auth/login</span>
+    </div>
+    <p><strong>Description:</strong> Authenticates user credentials and returns JWT bearer token with user object.</p>
+    <p><strong>Body (JSON):</strong> <code>{ email, password }</code></p>
+    <p><strong>Response (200 OK):</strong> <code>{ token: "eyJhbGci...", user: { id, name, email, role, status, ... } }</code></p>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="badge badge-get">GET</span>
+      <span class="endpoint-path">/api/auth/profile</span>
+    </div>
+    <p><strong>Headers:</strong> Authorization: Bearer &lt;token&gt;</p>
+    <p><strong>Response (200 OK):</strong> Returns authenticated user profile object.</p>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="badge badge-put">PUT</span>
+      <span class="endpoint-path">/api/auth/profile</span>
+    </div>
+    <p><strong>Description:</strong> Updates user profile. If student changes <strong>gender</strong> or <strong>batch</strong>, <code>reApprovalStatus</code> is set to true and Warden approval is required.</p>
+    <p><strong>Content-Type:</strong> multipart/form-data (optional <code>profilePic</code> file upload)</p>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="badge badge-post">POST</span>
+      <span class="endpoint-path">/api/auth/forgot-password</span>
+    </div>
+    <p><strong>Description:</strong> Generates 6-digit OTP and sends email verification code for password reset.</p>
+  </div>
+
+  <h3>4.2 User Management & Approvals APIs (/api/users)</h3>
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="badge badge-get">GET</span>
+      <span class="endpoint-path">/api/users/pending</span>
+    </div>
+    <p><strong>Access:</strong> Warden, Admin</p>
+    <p><strong>Description:</strong> Retrieves list of pending student registrations and critical profile edit re-approvals.</p>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="badge badge-put">PUT</span>
+      <span class="endpoint-path">/api/users/approve/:userId</span>
+    </div>
+    <p><strong>Access:</strong> Warden, Admin</p>
+    <p><strong>Description:</strong> Approves student account or critical profile edits, setting status to 'active' and reApprovalStatus to false.</p>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="badge badge-delete">DELETE</span>
+      <span class="endpoint-path">/api/users/reject/:userId</span>
+    </div>
+    <p><strong>Access:</strong> Warden, Admin</p>
+    <p><strong>Description:</strong> Rejects pending registration and removes user account record.</p>
+  </div>
+
+  <h3>4.3 Maintenance Complaints APIs (/api/complaints)</h3>
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="badge badge-post">POST</span>
+      <span class="endpoint-path">/api/complaints/raise</span>
+    </div>
+    <p><strong>Access:</strong> Student</p>
+    <p><strong>Payload:</strong> multipart/form-data with <code>title, description, category, priority, photo</code></p>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="badge badge-put">PUT</span>
+      <span class="endpoint-path">/api/complaints/assign/:complaintId</span>
+    </div>
+    <p><strong>Access:</strong> Warden</p>
+    <p><strong>Body:</strong> <code>{ staffId: 5 }</code></p>
+    <p><strong>Description:</strong> Assigns service staff member to ticket and updates status to 'assigned'.</p>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="badge badge-put">PUT</span>
+      <span class="endpoint-path">/api/complaints/update-status/:complaintId</span>
+    </div>
+    <p><strong>Access:</strong> Staff</p>
+    <p><strong>Payload:</strong> multipart/form-data with <code>status ('in_progress' | 'resolved'), completionPhoto</code></p>
+  </div>
+
+  <div class="page-break"></div>
+
+  <h3>4.4 Mess Menu, Skipping & Feedback APIs (/api/mess)</h3>
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="badge badge-get">GET</span>
+      <span class="endpoint-path">/api/mess/menu</span>
+    </div>
+    <p><strong>Description:</strong> Fetches 7-day mess menu schedule including Breakfast, Lunch, Evening Snacks, and Dinner.</p>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="badge badge-put">PUT</span>
+      <span class="endpoint-path">/api/mess/menu/:id</span>
+    </div>
+    <p><strong>Access:</strong> Warden, Admin</p>
+    <p><strong>Body:</strong> <code>{ breakfast, lunch, snacks, dinner, isSpecial }</code></p>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="badge badge-post">POST</span>
+      <span class="endpoint-path">/api/mess/skip</span>
+    </div>
+    <p><strong>Access:</strong> Student</p>
+    <p><strong>Body:</strong> <code>{ date: "2026-08-06", mealType: "lunch" }</code></p>
+  </div>
+
+  <h3>4.5 Attendance APIs (/api/attendance)</h3>
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="badge badge-post">POST</span>
+      <span class="endpoint-path">/api/attendance/mark</span>
+    </div>
+    <p><strong>Access:</strong> Warden, Admin</p>
+    <p><strong>Body:</strong> <code>{ date: "2026-08-05", attendances: [{ studentId: 10, status: "present", remarks: "" }] }</code></p>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="badge badge-get">GET</span>
+      <span class="endpoint-path">/api/attendance/summary?date=2026-08-05&hostelBlock=Boys Hostel 1</span>
+    </div>
+    <p><strong>Access:</strong> Warden, Admin</p>
+    <p><strong>Description:</strong> Returns filterable count totals: Total Students, Present Count, Absent Count.</p>
+  </div>
+
+  <h3>4.6 Real-Time Group Chat APIs (/api/chat)</h3>
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="badge badge-get">GET</span>
+      <span class="endpoint-path">/api/chat/groups</span>
+    </div>
+    <p><strong>Description:</strong> Fetches user's relevant group chats (Hostel Block Chat, Academic Batch Chat, All Hostel Group, Warden Admin Chat).</p>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="badge badge-post">POST</span>
+      <span class="endpoint-path">/api/chat/send</span>
+    </div>
+    <p><strong>Body:</strong> <code>{ groupId: 2, message: "Hello team", attachmentUrl: null }</code></p>
+  </div>
+
+  <!-- SECTION 5: WEBSOCKETS -->
+  <h2>5. Socket.io WebSockets Specifications</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Event Name</th>
+        <th>Direction</th>
+        <th>Payload Structure</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>join_room</code></td>
+        <td>Client &rarr; Server</td>
+        <td><code>"group_2"</code> or <code>"user_10"</code></td>
+        <td>Joins specified Socket room for live updates.</td>
+      </tr>
+      <tr>
+        <td><code>send_message</code></td>
+        <td>Client &rarr; Server</td>
+        <td><code>{ groupId, senderId, message, attachmentUrl }</code></td>
+        <td>Emits live chat message to room members.</td>
+      </tr>
+      <tr>
+        <td><code>new_message</code></td>
+        <td>Server &rarr; Client</td>
+        <td><code>{ id, groupId, senderId, message, sender: {...} }</code></td>
+        <td>Broadcasts message to room subscribers instantly.</td>
+      </tr>
+      <tr>
+        <td><code>notification</code></td>
+        <td>Server &rarr; Client</td>
+        <td><code>{ message, type, createdAt }</code></td>
+        <td>Triggers in-app toast notification.</td>
+      </tr>
+      <tr>
+        <td><code>delete_message_everyone</code></td>
+        <td>Server &rarr; Client</td>
+        <td><code>{ messageId, groupId, deletedByName }</code></td>
+        <td>Soft deletes message in real-time for all members.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- SECTION 6: KEY ENFORCEMENTS -->
+  <h2>6. Critical Enforcements & Security Rules</h2>
+  <div class="callout callout-warning">
+    <strong>Profile Re-Approval Rule:</strong> When a student updates their profile details, editing standard fields (Name, Phone, Bio, Room Number, Profile Picture) is updated immediately. However, if the student changes <strong>Gender</strong> or <strong>Academic Batch</strong>, a security alert pops up warning that these are critical fields, setting <code>reApprovalStatus = true</code> requiring Warden re-approval.
+  </div>
+
+  <div class="callout callout-success">
+    <strong>Real-Time Roll Call:</strong> Daily Roll Call Attendance strictly tracks binary statuses (<strong>Present</strong> vs <strong>Absent</strong>) with hostel-wise filtering and bulk "Mark All Present" capabilities.
+  </div>
+
+  <footer style="margin-top: 50px; text-align: center; border-top: 1px solid #cbd5e1; padding-top: 20px; font-size: 9.5pt; color: #64748b;">
+    HostelHub End-to-End Technical Documentation &bull; Generated August 2026 &bull; Confidential & Developer Reference
+  </footer>
+
+</body>
+</html>
+`;
+
+const htmlPath = path.join(__dirname, '../HostelHub_Full_Documentation.html');
+const pdfPath = path.join('C:\\Users\\abhin\\Desktop\\HostelHub', 'HostelHub_Full_Documentation.pdf');
+
+fs.writeFileSync(htmlPath, htmlContent, 'utf8');
+console.log('HTML documentation written to:', htmlPath);
+
+try {
+  const cmd = `& "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe" --headless --disable-gpu --print-to-pdf="${pdfPath}" "${htmlPath}"`;
+  execSync(cmd, { shell: 'powershell.exe' });
+  console.log('PDF generated successfully at:', pdfPath);
+
+  // Copy PDF file directly to Windows Clipboard
+  execSync(`powershell -command "Set-Clipboard -Path '${pdfPath}'"`, { shell: 'powershell.exe' });
+  console.log('PDF file copied to Windows Clipboard for Ctrl+V!');
+} catch (err) {
+  console.error('Error generating PDF via Edge:', err);
+}

@@ -1,0 +1,439 @@
+const fs = require('fs');
+const path = require('path');
+const { execSync } = require('child_process');
+
+const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HostelHub - 10-Slide Presentation Deck</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+
+    @page {
+      size: 11in 6.1875in; /* 16:9 Landscape Slide Widescreen */
+      margin: 0;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+    }
+
+    .slide {
+      width: 11in;
+      height: 6.1875in;
+      page-break-after: always;
+      position: relative;
+      background: #faf8f8;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .slide-header {
+      background: linear-gradient(135deg, #4c0615 0%, #8a0d24 50%, #b31031 100%);
+      color: white;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 3px solid #d97706;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-logo {
+      width: 34px;
+      height: 34px;
+      background: white;
+      color: #8a0d24;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 900;
+      font-family: 'Outfit';
+    }
+
+    .header-titles h2 {
+      margin: 0;
+      font-family: 'Outfit';
+      font-size: 18px;
+      font-weight: 800;
+      color: white;
+    }
+
+    .header-titles span {
+      font-size: 9px;
+      font-weight: 700;
+      color: #fef3c7;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .slide-body {
+      padding: 22px 28px;
+      flex: 1;
+      display: flex;
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    .card-title {
+      font-family: 'Outfit';
+      font-size: 16px;
+      font-weight: 800;
+      color: #8a0d24;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    ul.bullet-list {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    ul.bullet-list li {
+      margin-bottom: 10px;
+      font-size: 12px;
+      color: #1e293b;
+      line-height: 1.5;
+    }
+
+    .app-screenshot {
+      height: 4.8in;
+      border-radius: 14px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+      border: 2px solid #e2e8f0;
+      object-fit: contain;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SLIDE 1: COVER -->
+  <div class="slide" style="background: linear-gradient(135deg, #4c0615 0%, #8a0d24 50%, #b31031 100%); color: white; justify-content: center; align-items: center; text-align: center; padding: 40px;">
+    <div style="width: 80px; height: 80px; background: white; color: #8a0d24; border-radius: 24px; font-size: 44px; font-weight: 900; font-family: 'Outfit'; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.4);">H</div>
+    <h1 style="font-family: 'Outfit'; font-size: 42px; font-weight: 900; margin: 0 0 10px 0; color: white;">HostelHub</h1>
+    <div style="font-size: 20px; font-weight: 700; color: #fef3c7; margin-bottom: 16px;">All-in-One Digital Hostel Management Platform</div>
+    <p style="font-size: 14px; max-width: 650px; opacity: 0.9; margin: 0 auto 30px; line-height: 1.6;">Streamlining Maintenance Complaints, Daily Roll Call Attendance, Mess Regulations & Real-Time Batch Group Communication</p>
+    <div style="font-size: 12px; opacity: 0.75; font-weight: 600;">Developed by Abhinav Kumar (Lead Full-Stack Developer) &bull; August 2026</div>
+  </div>
+
+  <!-- SLIDE 2: PROBLEM STATEMENT -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="header-left">
+        <div class="header-logo">H</div>
+        <div class="header-titles">
+          <span>PROJECT VISION & OBJECTIVES</span>
+          <h2>Problem Statement & HostelHub Vision</h2>
+        </div>
+      </div>
+      <div style="font-size: 11px; font-weight: 700; color: #fef3c7;">SLIDE 02 / 10</div>
+    </div>
+    <div class="slide-body">
+      <div class="card" style="flex: 1;">
+        <div class="card-title">⚠️ Traditional Hostel Pain Points</div>
+        <ul class="bullet-list">
+          <li><strong>Manual Register Attendance:</strong> High proxy error rates and physical record loss.</li>
+          <li><strong>Unorganized Repair Dispatch:</strong> Long delays in electrician and plumber assignment.</li>
+          <li><strong>Food Waste in Mess:</strong> No prior tracking of meal skips causing excess cooking.</li>
+          <li><strong>Unverified Communication:</strong> Fragmented chat groups with zero warden moderation.</li>
+          <li><strong>No Proof Accountability:</strong> Service staff resolving tickets without proof photo upload.</li>
+        </ul>
+      </div>
+      <div class="card" style="flex: 1; background: #f0fdf4; border-color: #bbf7d0;">
+        <div class="card-title" style="color: #166534;">🎯 The HostelHub Solution</div>
+        <ul class="bullet-list">
+          <li><strong>100% Digital Workflow:</strong> Unifies Students, Wardens, Staff & Admins in real-time.</li>
+          <li><strong>Automated Ticket Dispatching:</strong> Category-based routing with resolution SLA timeline.</li>
+          <li><strong>Mandatory Resolution Proof:</strong> Staff uploads job completion photo before closing ticket.</li>
+          <li><strong>Hostel Block Roll Call:</strong> Instant filterable statistics (Total, Present, Absent).</li>
+          <li><strong>Evening Snacks & Skip System:</strong> Cuts mess food waste by up to 30%.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: SYSTEM ARCHITECTURE & APP PREVIEW -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="header-left">
+        <div class="header-logo">H</div>
+        <div class="header-titles">
+          <span>PLATFORM OVERVIEW</span>
+          <h2>System Architecture & App Interface</h2>
+        </div>
+      </div>
+      <div style="font-size: 11px; font-weight: 700; color: #fef3c7;">SLIDE 03 / 10</div>
+    </div>
+    <div class="slide-body">
+      <div class="card" style="flex: 1.2;">
+        <div class="card-title">🚀 Core Modular Pillars</div>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="background: #faf8f8; padding: 10px 14px; border-radius: 10px; border: 1px solid #e2e8f0;">
+            <strong style="color: #8a0d24; font-size: 13px;">🔧 Maintenance Ticket Engine:</strong>
+            <span style="font-size: 11px; color: #475569; display: block;">Camera photo capture, priority tags, staff assignment & star ratings.</span>
+          </div>
+          <div style="background: #faf8f8; padding: 10px 14px; border-radius: 10px; border: 1px solid #e2e8f0;">
+            <strong style="color: #8a0d24; font-size: 13px;">📅 Daily Roll Call Roster:</strong>
+            <span style="font-size: 11px; color: #475569; display: block;">Binary Present/Absent marking with hostel block filtering.</span>
+          </div>
+          <div style="background: #faf8f8; padding: 10px 14px; border-radius: 10px; border: 1px solid #e2e8f0;">
+            <strong style="color: #8a0d24; font-size: 13px;">☕ Mess Regulations & Snacks:</strong>
+            <span style="font-size: 11px; color: #475569; display: block;">Weekly menu schedule, evening snacks item & meal skip tracking.</span>
+          </div>
+          <div style="background: #faf8f8; padding: 10px 14px; border-radius: 10px; border: 1px solid #e2e8f0;">
+            <strong style="color: #8a0d24; font-size: 13px;">💬 Real-Time Group Chat:</strong>
+            <span style="font-size: 11px; color: #475569; display: block;">Block & Batch chats powered by Socket.io WebSockets.</span>
+          </div>
+        </div>
+      </div>
+      <div style="flex: 0.8; display: flex; align-items: center; justify-content: center;">
+        <img src="file:///C:/Users/abhin/.gemini/antigravity-ide/brain/a135e2ae-3ec5-4446-a8af-46a5537b2c14/media__1785587242838.png" class="app-screenshot" alt="Student Profile & Wardens"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: STUDENT PORTAL -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="header-left">
+        <div class="header-logo">H</div>
+        <div class="header-titles">
+          <span>STUDENT EXPERIENCES</span>
+          <h2>Student Portal - Frictionless Issue Dispatch</h2>
+        </div>
+      </div>
+      <div style="font-size: 11px; font-weight: 700; color: #fef3c7;">SLIDE 04 / 10</div>
+    </div>
+    <div class="slide-body">
+      <div class="card" style="flex: 1.2;">
+        <div class="card-title">📝 Key Student Capabilities</div>
+        <ul class="bullet-list">
+          <li><strong>Categorized Issue Selection:</strong> Electrical, Plumbing, Carpentry, Cleaning, Other.</li>
+          <li><strong>Urgency Priority Tags:</strong> Low, Medium, High, and Urgent severity tags.</li>
+          <li><strong>Native Photo Proof Capture:</strong> Attach photo evidence directly using phone camera.</li>
+          <li><strong>4-Stage Ticket Progress Timeline:</strong> Visual progression tracking (Ticket Raised &rarr; Staff Assignment &rarr; Work Progress &rarr; Job Resolved).</li>
+          <li><strong>Direct Warden Contact Cards:</strong> One-tap phone/email buttons to contact assigned block wardens.</li>
+        </ul>
+      </div>
+      <div style="flex: 0.8; display: flex; align-items: center; justify-content: center;">
+        <img src="file:///C:/Users/abhin/.gemini/antigravity-ide/brain/a135e2ae-3ec5-4446-a8af-46a5537b2c14/media__1785587403608.png" class="app-screenshot" alt="Complaint Details & Contact Student"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: TICKET RESOLUTION WORKFLOW -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="header-left">
+        <div class="header-logo">H</div>
+        <div class="header-titles">
+          <span>WORKFLOW PIPELINE</span>
+          <h2>4-Stage Ticket Resolution Lifecycle</h2>
+        </div>
+      </div>
+      <div style="font-size: 11px; font-weight: 700; color: #fef3c7;">SLIDE 05 / 10</div>
+    </div>
+    <div class="slide-body" style="gap: 12px;">
+      <div class="card" style="flex: 1; border-top: 4px solid #d97706;">
+        <div class="card-title" style="color: #d97706;">1. Raise Ticket</div>
+        <p style="font-size: 11.5px; color: #334155;">Student submits issue title, description, category, priority tag & issue photo attachment.</p>
+      </div>
+      <div class="card" style="flex: 1; border-top: 4px solid #8a0d24;">
+        <div class="card-title" style="color: #8a0d24;">2. Assign Staff</div>
+        <p style="font-size: 11.5px; color: #334155;">Warden reviews new complaints & assigns available electrician, plumber or technician.</p>
+      </div>
+      <div class="card" style="flex: 1; border-top: 4px solid #b31031;">
+        <div class="card-title" style="color: #b31031;">3. Work Progress</div>
+        <p style="font-size: 11.5px; color: #334155;">Staff marks job 'In Progress', inspects site & conducts physical maintenance repair.</p>
+      </div>
+      <div class="card" style="flex: 1; border-top: 4px solid #166534;">
+        <div class="card-title" style="color: #166534;">4. Proof & Feedback</div>
+        <p style="font-size: 11.5px; color: #334155;">Staff uploads completion photo proof. Student inspects work & rates 1-5 stars.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: DAILY ROLL CALL ATTENDANCE -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="header-left">
+        <div class="header-logo">H</div>
+        <div class="header-titles">
+          <span>WARDEN OPERATIONS</span>
+          <h2>Daily Roll Call Attendance & Roster</h2>
+        </div>
+      </div>
+      <div style="font-size: 11px; font-weight: 700; color: #fef3c7;">SLIDE 06 / 10</div>
+    </div>
+    <div class="slide-body">
+      <div class="card" style="flex: 1.2;">
+        <div class="card-title">📅 Real-Time Attendance Management</div>
+        <ul class="bullet-list">
+          <li><strong>Strict Binary Status Model:</strong> Tracks Present & Absent (Outing clutter eliminated).</li>
+          <li><strong>Hostel Block Filter:</strong> Filter by All Hostels, Boys Hostel 1/2, or Girls Hostel 1/2.</li>
+          <li><strong>Summary Metrics Bar:</strong> High-contrast cards for Total Students, Present Count & Absent Count.</li>
+          <li><strong>Bulk Actions & Remarks:</strong> One-tap 'Mark All Present' with custom student remarks.</li>
+          <li><strong>Student Attendance History:</strong> Students monitor personal attendance % & history logs.</li>
+        </ul>
+      </div>
+      <div style="flex: 0.8; display: flex; align-items: center; justify-content: center;">
+        <img src="file:///C:/Users/abhin/.gemini/antigravity-ide/brain/a135e2ae-3ec5-4446-a8af-46a5537b2c14/media__1785667420651.png" class="app-screenshot" alt="Roll Call Attendance Roster"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: MESS REGULATIONS & SNACKS -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="header-left">
+        <div class="header-logo">H</div>
+        <div class="header-titles">
+          <span>MESS MANAGEMENT</span>
+          <h2>Mess Regulations, Evening Snacks & Meal Skipping</h2>
+        </div>
+      </div>
+      <div style="font-size: 11px; font-weight: 700; color: #fef3c7;">SLIDE 07 / 10</div>
+    </div>
+    <div class="slide-body">
+      <div class="card" style="flex: 1;">
+        <div class="card-title">☕ 4-Meal Schedule</div>
+        <ul class="bullet-list">
+          <li><strong>Breakfast:</strong> Morning nutritious meals & beverages.</li>
+          <li><strong>Lunch:</strong> Full noon meal menu items.</li>
+          <li><strong>Evening Snacks (☕ Added):</strong> Evening tea & snacks refreshment.</li>
+          <li><strong>Dinner:</strong> Evening meal & special weekend menus.</li>
+          <li><strong>Warden Menu Controls:</strong> Real-time menu updates by Warden.</li>
+        </ul>
+      </div>
+      <div class="card" style="flex: 1; background: #f0fdf4; border-color: #bbf7d0;">
+        <div class="card-title" style="color: #166534;">♻️ Meal Skip & Waste Prevention</div>
+        <ul class="bullet-list">
+          <li><strong>Student Skip Toggle:</strong> One-tap toggle for upcoming meals.</li>
+          <li><strong>Mess Kitchen Analytics:</strong> Real-time headcount of expected diners.</li>
+          <li><strong>Cuts Food Waste:</strong> Reduces food waste by up to 30%.</li>
+          <li><strong>Mess Feedback System:</strong> Ratings on hygiene, quality & behavior.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: REAL-TIME CHAT & DEVELOPER TEAM -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="header-left">
+        <div class="header-logo">H</div>
+        <div class="header-titles">
+          <span>COMMUNICATION & TEAM</span>
+          <h2>Real-Time Group Chat & Support Team</h2>
+        </div>
+      </div>
+      <div style="font-size: 11px; font-weight: 700; color: #fef3c7;">SLIDE 08 / 10</div>
+    </div>
+    <div class="slide-body">
+      <div class="card" style="flex: 1.2;">
+        <div class="card-title">💬 Live Socket.io Messaging & Support</div>
+        <ul class="bullet-list">
+          <li><strong>Automatic Group Membership:</strong> Joined into Block Chat & Batch Chat on signup.</li>
+          <li><strong>Official Announcements:</strong> Wardens broadcast notices to specific or all hostel blocks.</li>
+          <li><strong>Image Attachment Sharing:</strong> Share repair photos & academic notices.</li>
+          <li><strong>Developer Team Cards:</strong> Direct links to GitHub, LinkedIn, Twitter, Email & 📸 Instagram.</li>
+        </ul>
+      </div>
+      <div style="flex: 0.8; display: flex; align-items: center; justify-content: center;">
+        <img src="file:///C:/Users/abhin/.gemini/antigravity-ide/brain/a135e2ae-3ec5-4446-a8af-46a5537b2c14/media__1785586595628.png" class="app-screenshot" alt="Developer Team Cards"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 9: TECH STACK & SECURITY GUARDS -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="header-left">
+        <div class="header-logo">H</div>
+        <div class="header-titles">
+          <span>ENGINEERING & SECURITY</span>
+          <h2>Tech Stack & Critical Security Guards</h2>
+        </div>
+      </div>
+      <div style="font-size: 11px; font-weight: 700; color: #fef3c7;">SLIDE 09 / 10</div>
+    </div>
+    <div class="slide-body">
+      <div class="card" style="flex: 1;">
+        <div class="card-title">⚙️ Full Stack Technology</div>
+        <ul class="bullet-list">
+          <li><strong>Frontend:</strong> Angular v19 Standalone, TypeScript, RxJS, Vanilla CSS.</li>
+          <li><strong>Mobile APK:</strong> Capacitor Native Android Bridge & Back-Button Guard.</li>
+          <li><strong>Backend API:</strong> Node.js, Express.js REST Controllers & Auth Middlewares.</li>
+          <li><strong>Database:</strong> PostgreSQL with Sequelize ORM.</li>
+          <li><strong>Cloud Storage:</strong> Supabase Storage with Base64 fallback.</li>
+        </ul>
+      </div>
+      <div class="card" style="flex: 1; background: #fffbeb; border-color: #fde68a;">
+        <div class="card-title" style="color: #b45309;">🔒 Security Enforcements</div>
+        <ul class="bullet-list">
+          <li><strong>Profile Re-Approval Rule:</strong> Editing Gender or Batch triggers critical warning & requires Warden Re-approval.</li>
+          <li><strong>Dual-Press Back Exit Guard:</strong> Back button navigates to Home tab first; second press opens Exit Confirmation Modal.</li>
+          <li><strong>JWT Role Protection:</strong> Route guards for Student, Warden, Staff & Admin.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 10: CONCLUSION -->
+  <div class="slide" style="background: linear-gradient(135deg, #4c0615 0%, #8a0d24 50%, #b31031 100%); color: white; justify-content: center; align-items: center; text-align: center; padding: 40px;">
+    <h1 style="font-family: 'Outfit'; font-size: 38px; font-weight: 900; margin: 0 0 16px 0; color: white;">Transforming Hostel Management with HostelHub</h1>
+    <div style="font-size: 18px; font-weight: 700; color: #fef3c7; margin-bottom: 30px;">✓ Zero Paperwork &bull; ✓ 100% Ticket Accountability &bull; ✓ Reduced Mess Food Waste &bull; ✓ Real-Time Safety</div>
+    <div style="font-size: 36px; font-weight: 900; font-family: 'Outfit'; color: white; margin-bottom: 20px;">Thank You!</div>
+    <p style="font-size: 13px; opacity: 0.85; margin: 0;">For app deployment or technical inquiries, contact Abhinav Kumar (Lead Full-Stack Developer).</p>
+  </div>
+
+</body>
+</html>
+`;
+
+const htmlPath = path.join(__dirname, '../HostelHub_Presentation_Slides.html');
+const pdfPath = path.join('C:\\Users\\abhin\\Desktop\\HostelHub', 'HostelHub_Presentation.pdf');
+const pptxPath = path.join('C:\\Users\\abhin\\Desktop\\HostelHub', 'HostelHub_Presentation.pptx');
+
+fs.writeFileSync(htmlPath, htmlContent, 'utf8');
+
+try {
+  const cmd = `& "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe" --headless --disable-gpu --print-to-pdf="${pdfPath}" "${htmlPath}"`;
+  execSync(cmd, { shell: 'powershell.exe' });
+  console.log('Presentation PDF generated successfully at:', pdfPath);
+
+  // Copy PPTX file directly to Windows Clipboard
+  execSync(`powershell -command "Set-Clipboard -Path '${pptxPath}'"`, { shell: 'powershell.exe' });
+  console.log('PowerPoint PPTX file copied to Windows Clipboard for Ctrl+V!');
+} catch (err) {
+  console.error('Error generating presentation PDF:', err);
+}

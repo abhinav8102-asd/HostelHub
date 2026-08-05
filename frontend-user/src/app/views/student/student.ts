@@ -2419,9 +2419,9 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
         clearTimeout(safetyTimer);
         this.raising = false;
         this.justSubmitted = true;
-        this.raiseSuccess = '✅ Ticket raise ho gaya!';
+        this.raiseSuccess = '✅ Ticket submitted successfully!';
         // Show toast notification
-        this.activeToast = { message: '✅ Aapka ticket successfully submit ho gaya! Warden jald hi assign karega.', type: 'info', createdAt: new Date() } as any;
+        this.activeToast = { message: '✅ Your ticket has been submitted successfully! Staff will be assigned shortly.', type: 'info', createdAt: new Date() } as any;
         setTimeout(() => this.clearToast(), 3000);
         // Reset form
         this.newComplaint = { title: '', category: '', description: '', priority: 'medium' };
