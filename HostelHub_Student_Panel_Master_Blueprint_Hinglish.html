@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <title>HostelHub - Student Panel Complete Feature & UI Master Blueprint</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        @page {
+            size: A4;
+            margin: 15mm 15mm 15mm 15mm;
+            @bottom-right {
+                content: counter(page);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #1e293b;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            font-size: 11.5px;
+        }
+
+        .header-container {
+            border-bottom: 3.5px solid #b31031;
+            padding-bottom: 12px;
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: #b31031;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 4px 12px rgba(179, 16, 49, 0.3);
+        }
+
+        .title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 24px;
+            font-weight: 900;
+            color: #4c0615;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #b31031;
+            margin-top: 2px;
+        }
+
+        .meta-badge {
+            background: #fff1f2;
+            color: #9f1239;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+            border: 1px solid #fecdd3;
+        }
+
+        .summary-box {
+            background: #fff1f2;
+            border-left: 4px solid #b31031;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin-bottom: 18px;
+        }
+
+        .summary-box p {
+            margin: 0;
+            color: #881337;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #4c0615 0%, #b31031 100%);
+            color: #ffffff;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 13.5px;
+            font-weight: 700;
+            margin-top: 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            letter-spacing: 0.3px;
+            page-break-after: avoid;
+        }
+
+        .section-number {
+            background: #ffffff;
+            color: #b31031;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .feature-card {
+            background: #ffffff;
+            border: 1px solid #fecdd3;
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            page-break-inside: avoid;
+        }
+
+        .card-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #881337;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-title .icon {
+            margin-right: 8px;
+            font-size: 15px;
+        }
+
+        ul.bullet-list {
+            margin: 0;
+            padding-left: 18px;
+        }
+
+        ul.bullet-list li {
+            margin-bottom: 5px;
+            color: #334155;
+            font-size: 11.5px;
+        }
+
+        ul.bullet-list li strong {
+            color: #0f172a;
+        }
+
+        .tag {
+            display: inline-block;
+            font-size: 9.5px;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 4px;
+            margin-left: 8px;
+            text-transform: uppercase;
+        }
+
+        .tag-core { background: #ffe4e6; color: #9f1239; }
+        .tag-auth { background: #e0f2fe; color: #0369a1; }
+        .tag-complaint { background: #fef3c7; color: #92400e; }
+        .tag-chat { background: #f3e8ff; color: #6b21a8; }
+        .tag-mess { background: #dcfce7; color: #166534; }
+
+        .ui-preview-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 12px;
+            margin-top: 10px;
+            page-break-inside: avoid;
+        }
+
+        .preview-box {
+            background: #0f172a;
+            border: 1px solid #b31031;
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .preview-box h4 {
+            margin: 0 0 6px 0;
+            color: #fecdd3;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        .preview-box img {
+            width: 100%;
+            height: auto;
+            max-height: 280px;
+            object-fit: contain;
+            border-radius: 6px;
+        }
+
+        .footer {
+            margin-top: 30px;
+            border-top: 1px solid #fecdd3;
+            padding-top: 10px;
+            text-align: center;
+            font-size: 9.5px;
+            color: #9f1239;
+        }
+
+        .page-break {
+            page-break-after: always;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <div class="header-container">
+        <div class="logo-group">
+            <div class="logo-icon">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+            </div>
+            <div>
+                <h1 class="title">HostelHub</h1>
+                <div class="subtitle">Student Portal Complete Feature & Architecture Master Blueprint</div>
+            </div>
+        </div>
+        <div class="meta-badge">Student App 100% Complete Scope • Hinglish</div>
+    </div>
+
+    <div class="summary-box">
+        <p><strong>🎯 Document Overview:</strong> Ye document HostelHub ke <strong>Student Portal (frontend-user & Mobile App)</strong> ke har ek function, feature, authentication security, real-time chat, complaint engine, mess ratings, aur mobile/desktop UI layout ka 100% complete master breakdown provide karta hai.</p>
+    </div>
+
+    <!-- SECTION 1: AUTHENTICATION -->
+    <div class="section-header">
+        <span class="section-number">1</span> 🔑 Student Authentication & Security Engine
+    </div>
+
+    <div class="feature-card">
+        <div class="card-title">
+            <span class="icon">🔐</span> Account Access & Onboarding Features
+            <span class="tag tag-auth">Auth Engine</span>
+        </div>
+        <ul class="bullet-list">
+            <li><strong>Email & Password Login:</strong> Secure login with JWT Token storage in browser/app state for seamless sessions.</li>
+            <li><strong>Google OAuth 2.0 Single Sign-On:</strong> 1-Click "Sign in with Google" integration for instant login without typing passwords.</li>
+            <li><strong>Student Registration Signup:</strong> New student onboarding form requiring Full Name, Email, Password, Phone Number, Gender (Male/Female), and Batch selection. New accounts get <code>pending_verification</code> status until Admin/Warden approval.</li>
+            <li><strong>Forgot Password & Email OTP Verification:</strong> 6-Digit OTP sent to registered email for password recovery with countdown expiration timer.</li>
+            <li><strong>In-App Change Password:</strong> Secure password change from Profile settings page.</li>
+        </ul>
+    </div>
+
+    <!-- SECTION 2: PROFILE MANAGEMENT -->
+    <div class="section-header">
+        <span class="section-number">2</span> 👤 Student Profile & Account Details
+    </div>
+
+    <div class="feature-card">
+        <div class="card-title">
+            <span class="icon">🪪</span> Digital Student ID & Personal Details
+            <span class="tag tag-core">Profile Management</span>
+        </div>
+        <ul class="bullet-list">
+            <li><strong>Profile Overview Card:</strong> View Name, Roll Number, Allocated Room Number, Hostel Block, Roll No, Batch (e.g. Batch 2025), Gender, Phone, and Bio.</li>
+            <li><strong>Profile Picture Upload:</strong> Upload and change profile avatar directly from mobile camera or gallery (Powered by backend <code>Multer</code> storage engine).</li>
+            <li><strong>Editable Student Bio & Contact:</strong> Personal bio and contact phone number updates.</li>
+        </ul>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- SECTION 3: COMPLAINT ENGINE -->
+    <div class="section-header">
+        <span class="section-number">3</span> 🛠️ Complaint Lodging & Real-Time Tracking Engine
+    </div>
+
+    <div class="feature-card">
+        <div class="card-title">
+            <span class="icon">📝</span> Complaint Registration & Media Attachment
+            <span class="tag tag-complaint">Core Feature</span>
+        </div>
+        <ul class="bullet-list">
+            <li><strong>Multi-Category Complaint Registration:</strong> Raise maintenance or misconduct issues under categories:
+                <ul>
+                    <li>🚰 <strong>Plumbing:</strong> Water leakage, tap repair, flush issue.</li>
+                    <li>⚡ <strong>Electrical:</strong> Fan, light bulb, switchboard, AC fault.</li>
+                    <li>📡 <strong>Wi-Fi / IT:</strong> Network downtime, router issue, slow speed.</li>
+                    <li>🍽️ <strong>Mess & Food:</strong> Food quality, hygiene, mess hall issues.</li>
+                    <li>🪑 <strong>Furniture / Carpentry:</strong> Door lock, bed, study table repair.</li>
+                    <li>⚖️ <strong>Misconduct / Disciplinary:</strong> Noise disturbance, rule violations.</li>
+                </ul>
+            </li>
+            <li><strong>Camera Photo Evidence Upload:</strong> Take photo directly from mobile camera or upload from gallery as proof.</li>
+            <li><strong>Real-Time Status Timeline Badges:</strong>
+                <ul>
+                    <li>🟡 <strong>Pending:</strong> Complaint raised, waiting for warden review.</li>
+                    <li>🔵 <strong>In Progress:</strong> Warden assigned maintenance staff (e.g. Electrician Ramesh working).</li>
+                    <li>🟢 <strong>Resolved:</strong> Work finished & verified.</li>
+                    <li>🔴 <strong>Rejected:</strong> Invalid or duplicate request with warden reason.</li>
+                </ul>
+            </li>
+            <li><strong>Direct Complaint Chat Thread:</strong> Chat and add comments on specific complaints directly with the Warden or assigned Technician.</li>
+        </ul>
+    </div>
+
+    <!-- SECTION 4: ATTENDANCE SYSTEM -->
+    <div class="section-header">
+        <span class="section-number">4</span> 📅 Attendance Tracker & Monthly Calendar
+    </div>
+
+    <div class="feature-card">
+        <div class="card-title">
+            <span class="icon">📊</span> Student Attendance Dashboard
+            <span class="tag tag-core">Attendance Engine</span>
+        </div>
+        <ul class="bullet-list">
+            <li><strong>Real-Time Today's Attendance Status:</strong> Instant status check whether marked 🟢 <strong>Present</strong>, 🔴 <strong>Absent</strong>, or 🟡 <strong>Outstation Leave</strong> for the day.</li>
+            <li><strong>Monthly Attendance Calendar Grid:</strong> Interactive calendar showing daily attendance history with color-coded day badges.</li>
+            <li><strong>Attendance Percentage Gauge:</strong> Visual percentage ring (e.g., 94% Attendance) to track semester attendance requirement.</li>
+        </ul>
+    </div>
+
+    <!-- SECTION 5: MESS OPERATIONS -->
+    <div class="section-header">
+        <span class="section-number">5</span> 🍽️ Mess Operations, Daily Menu & 5-Star Feedback
+    </div>
+
+    <div class="feature-card">
+        <div class="card-title">
+            <span class="icon">🍱</span> Daily Mess Menu & Food Quality Rating
+            <span class="tag tag-mess">Mess Module</span>
+        </div>
+        <ul class="bullet-list">
+            <li><strong>Daily & Weekly Mess Menu:</strong> View today's and full week's meal schedule:
+                <ul>
+                    <li>🍳 <strong>Breakfast:</strong> 7:30 AM - 9:00 AM</li>
+                    <li>🍲 <strong>Lunch:</strong> 12:30 PM - 2:00 PM</li>
+                    <li>☕ <strong>Evening Snacks:</strong> 5:00 PM - 6:00 PM</li>
+                    <li>🍛 <strong>Dinner:</strong> 8:00 PM - 9:30 PM</li>
+                </ul>
+            </li>
+            <li><strong>1-to-5 Star Meal Feedback Submission:</strong> Submit star ratings and food quality comments for any meal.</li>
+            <li><strong>Skip Meal Requests:</strong> Mark meal skip requests before cutoff time for food wastage control.</li>
+        </ul>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- SECTION 6: REAL-TIME CHAT -->
+    <div class="section-header">
+        <span class="section-number">6</span> 💬 Real-Time Chat & Community Messaging
+    </div>
+
+    <div class="feature-card">
+        <div class="card-title">
+            <span class="icon">⚡</span> Socket.io Instant Messaging System
+            <span class="tag tag-chat">Real-Time Chat</span>
+        </div>
+        <ul class="bullet-list">
+            <li><strong>1-on-1 Direct Messaging:</strong> Direct private chat channel with Hostel Warden and other Students.</li>
+            <li><strong>Hostel Block & Floor Group Chat Rooms:</strong> Group chat channels for all residents of specific hostel blocks (e.g., *Boys Block A Main Chat*).</li>
+            <li><strong>Real-Time Socket.io Delivery:</strong> Instant message delivery without page refresh.</li>
+            <li><strong>Unread Message Counter Badges:</strong> Dynamic red unread badge counters on chat tabs.</li>
+            <li><strong>Media & Attachment Sharing:</strong> Share photos and documents inside chat.</li>
+        </ul>
+    </div>
+
+    <!-- SECTION 7: ANNOUNCEMENTS & PUSH NOTIFICATIONS -->
+    <div class="section-header">
+        <span class="section-number">7</span> 📢 Announcements, Circulars & Push Alerts
+    </div>
+
+    <div class="feature-card">
+        <div class="card-title">
+            <span class="icon">🔔</span> Live Notification & Notice Board
+            <span class="tag tag-core">Alerts</span>
+        </div>
+        <ul class="bullet-list">
+            <li><strong>Official Hostel Notice Board:</strong> View official circulars and notices published by Warden and Management.</li>
+            <li><strong>Real-Time Push Notifications:</strong> Instant alert popups for:
+                <ul>
+                    <li>Complaint Status Updates (e.g. <em>"Your plumbing complaint #104 has been marked Resolved"</em>)</li>
+                    <li>New Official Announcements</li>
+                    <li>Warden Direct Messages</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <!-- SECTION 8: UI PREVIEWS -->
+    <div class="section-header">
+        <span class="section-number">8</span> 📱 Mobile App & Desktop Web Resolution Previews
+    </div>
+
+    <div class="ui-preview-grid">
+        <div class="preview-box">
+            <h4>📱 Mobile Phone Resolution (Student App)</h4>
+            <img src="assets/mockups/student_mobile_complaint_and_chat_ui_mockup_1786258675942.png" alt="Student Mobile UI">
+        </div>
+        <div class="preview-box">
+            <h4>💻 Desktop Web Resolution (Student Portal)</h4>
+            <img src="assets/mockups/student_desktop_dashboard_and_mess_ui_mockup_1786258692343.png" alt="Student Desktop UI">
+        </div>
+    </div>
+
+    <div class="footer">
+        HostelHub Student Portal Master Blueprint • Complete Feature Breakdown • Confidential
+    </div>
+
+</body>
+</html>

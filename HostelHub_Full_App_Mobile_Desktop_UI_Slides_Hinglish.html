@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <title>HostelHub - Full App Mobile & Desktop UI Feature Blueprint</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        @page {
+            size: A4 landscape;
+            margin: 10mm 10mm 10mm 10mm;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #ffffff;
+            background-color: #1a0509;
+            margin: 0;
+            padding: 0;
+            line-height: 1.4;
+            font-size: 11.5px;
+        }
+
+        .slide-container {
+            width: 100%;
+            height: 98vh;
+            background: linear-gradient(135deg, #2c080f 0%, #4c0615 50%, #1a0509 100%);
+            border-radius: 14px;
+            padding: 14px 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            page-break-after: always;
+            border: 1.5px solid #b31031;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        .slide-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #b31031;
+            padding-bottom: 6px;
+            margin-bottom: 8px;
+        }
+
+        .slide-title-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .slide-number {
+            background: #b31031;
+            color: white;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+
+        .slide-title {
+            font-family: 'Outfit', sans-serif;
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 800;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: -0.3px;
+        }
+
+        .slide-subtitle {
+            color: #fca5a5;
+            font-size: 10.5px;
+            margin-top: 1px;
+        }
+
+        .meta-badge {
+            background: rgba(179, 16, 49, 0.25);
+            color: #fecdd3;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            border: 1px solid #b31031;
+        }
+
+        .resolutions-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            align-items: center;
+            flex-grow: 1;
+        }
+
+        .view-card {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid #7f1d1d;
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+
+        .view-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .view-tag {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        .tag-mobile { background: #991b1b; color: #fee2e2; }
+        .tag-desktop { background: #1e3a8a; color: #dbeafe; }
+
+        .view-title {
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .mockup-image-frame {
+            background: #000000;
+            border-radius: 8px;
+            padding: 4px;
+            border: 1px solid #b31031;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 310px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .mockup-image-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        ul.feature-bullets {
+            margin: 0;
+            padding-left: 16px;
+        }
+
+        ul.feature-bullets li {
+            margin-bottom: 4px;
+            color: #e2e8f0;
+            font-size: 10.5px;
+        }
+
+        ul.feature-bullets li strong {
+            color: #fda4af;
+        }
+
+        .slide-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #831843;
+            padding-top: 6px;
+            margin-top: 6px;
+            font-size: 9px;
+            color: #f472b6;
+        }
+
+        .page-break {
+            page-break-after: always;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SLIDE 1: STUDENT PORTAL -->
+    <div class="slide-container">
+        <div class="slide-header">
+            <div class="slide-title-group">
+                <span class="slide-number">Slide 01</span>
+                <div>
+                    <h2 class="slide-title">Student Portal Features (Mobile App & Desktop Web)</h2>
+                    <div class="slide-subtitle">Complaint Lodging with Camera Evidence, Real-Time Community Chat, Attendance & Mess Menu</div>
+                </div>
+            </div>
+            <div class="meta-badge">HostelHub Theme • Student Experience</div>
+        </div>
+
+        <div class="resolutions-grid">
+            <!-- Mobile View -->
+            <div class="view-card">
+                <div>
+                    <div class="view-header">
+                        <span class="view-title">📱 Mobile Phone Resolution (App View)</span>
+                        <span class="view-tag tag-mobile">Mobile APK</span>
+                    </div>
+                    <div class="mockup-image-frame">
+                        <img src="assets/mockups/student_mobile_complaint_and_chat_ui_mockup_1786258675942.png" alt="Student Mobile App UI">
+                    </div>
+                </div>
+                <ul class="feature-bullets">
+                    <li><strong>Camera Evidence Photo Upload:</strong> Complaint lodge karte waqt mobile camera/gallery se picture attach karna.</li>
+                    <li><strong>Real-Time Chat & Groups:</strong> 1-on-1 Student-to-Warden chat aur Hostel Block group chat rooms with unread badges.</li>
+                </ul>
+            </div>
+
+            <!-- Desktop View -->
+            <div class="view-card">
+                <div>
+                    <div class="view-header">
+                        <span class="view-title">💻 Desktop / Tablet Resolution (Web Portal View)</span>
+                        <span class="view-tag tag-desktop">Desktop Web</span>
+                    </div>
+                    <div class="mockup-image-frame">
+                        <img src="assets/mockups/student_desktop_dashboard_and_mess_ui_mockup_1786258692343.png" alt="Student Desktop Portal UI">
+                    </div>
+                </div>
+                <ul class="feature-bullets">
+                    <li><strong>Attendance History Calendar:</strong> Monthly attendance grid (Present, Absent, Outstation status).</li>
+                    <li><strong>Weekly Mess Menu & 5-Star Feedback:</strong> Daily menu schedule view aur khane ki 1-5 star ratings & feedback submission.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="slide-footer">
+            <span>HostelHub Full App UI Blueprint &bull; Slide 1 of 4</span>
+            <span>Crimson Maroon Theme &bull; Mobile & Desktop Previews</span>
+        </div>
+    </div>
+
+    <!-- SLIDE 2: WARDEN PORTAL -->
+    <div class="slide-container">
+        <div class="slide-header">
+            <div class="slide-title-group">
+                <span class="slide-number">Slide 02</span>
+                <div>
+                    <h2 class="slide-title">Warden Command Features (Mobile App & Desktop Web)</h2>
+                    <div class="slide-subtitle">Daily Roll Call Attendance, Complaint Management, Staff Task Routing & Announcements</div>
+                </div>
+            </div>
+            <div class="meta-badge">HostelHub Theme • Warden Operations</div>
+        </div>
+
+        <div class="resolutions-grid">
+            <!-- Mobile View -->
+            <div class="view-card">
+                <div>
+                    <div class="view-header">
+                        <span class="view-title">📱 Mobile Phone Resolution (App View)</span>
+                        <span class="view-tag tag-mobile">Mobile APK</span>
+                    </div>
+                    <div class="mockup-image-frame">
+                        <img src="assets/mockups/warden_mobile_attendance_rollcall_ui_mockup_1786258710667.png" alt="Warden Mobile App UI">
+                    </div>
+                </div>
+                <ul class="feature-bullets">
+                    <li><strong>Daily Roll Call Attendance:</strong> Hostel Block & floor filter ke sath Present/Absent toggles aur 1-click "Mark All Present".</li>
+                    <li><strong>Quick Mobile Actions:</strong> On-the-go student verification aur emergency notifications push karna.</li>
+                </ul>
+            </div>
+
+            <!-- Desktop View -->
+            <div class="view-card">
+                <div>
+                    <div class="view-header">
+                        <span class="view-title">💻 Desktop / Tablet Resolution (Web Portal View)</span>
+                        <span class="view-tag tag-desktop">Desktop Web</span>
+                    </div>
+                    <div class="mockup-image-frame">
+                        <img src="assets/mockups/warden_desktop_complaint_and_broadcast_ui_mockup_1786258728692.png" alt="Warden Desktop Portal UI">
+                    </div>
+                </div>
+                <ul class="feature-bullets">
+                    <li><strong>Complaint Resolution & Staff Routing:</strong> Evidence photo inspect karke Technician/Staff ko task assign karna.</li>
+                    <li><strong>Broadcast Circulars:</strong> Targeted announcements publish karna for specific hostel blocks.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="slide-footer">
+            <span>HostelHub Full App UI Blueprint &bull; Slide 2 of 4</span>
+            <span>Crimson Maroon Theme &bull; Mobile & Desktop Previews</span>
+        </div>
+    </div>
+
+    <!-- SLIDE 3: STAFF & ADMIN PORTALS -->
+    <div class="slide-container">
+        <div class="slide-header">
+            <div class="slide-title-group">
+                <span class="slide-number">Slide 03</span>
+                <div>
+                    <h2 class="slide-title">Staff Work Orders & Super Admin Controls</h2>
+                    <div class="slide-subtitle">Technician Mobile Task List & Super Admin User Provisioning & Room Allocation</div>
+                </div>
+            </div>
+            <div class="meta-badge">HostelHub Theme • Staff & Admin</div>
+        </div>
+
+        <div class="resolutions-grid">
+            <!-- Mobile View -->
+            <div class="view-card">
+                <div>
+                    <div class="view-header">
+                        <span class="view-title">📱 Staff Mobile Resolution (Task App)</span>
+                        <span class="view-tag tag-mobile">Mobile APK</span>
+                    </div>
+                    <div class="mockup-image-frame">
+                        <img src="assets/mockups/staff_mobile_work_orders_ui_mockup_1786258744151.png" alt="Staff Mobile App UI">
+                    </div>
+                </div>
+                <ul class="feature-bullets">
+                    <li><strong>Assigned Work Orders List:</strong> Electrician/Plumber task cards showing Room No, urgency tag, status updates.</li>
+                    <li><strong>Completion Photo Upload:</strong> Repair complete hone par proof photo upload karke status Resolved mark karna.</li>
+                </ul>
+            </div>
+
+            <!-- Desktop View -->
+            <div class="view-card">
+                <div>
+                    <div class="view-header">
+                        <span class="view-title">💻 Admin Desktop Resolution (Super Admin)</span>
+                        <span class="view-tag tag-desktop">Desktop Web</span>
+                    </div>
+                    <div class="mockup-image-frame">
+                        <img src="assets/mockups/admin_desktop_user_and_hostel_mgmt_ui_mockup_1786258760041.png" alt="Admin Desktop Portal UI">
+                    </div>
+                </div>
+                <ul class="feature-bullets">
+                    <li><strong>User Access & Verification:</strong> Master user directory, pending student account approvals, block/unblock users.</li>
+                    <li><strong>Hostel & Room Allocation:</strong> Create Hostel Blocks, floors, single/double/triple sharing rooms, and room allotment.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="slide-footer">
+            <span>HostelHub Full App UI Blueprint &bull; Slide 3 of 4</span>
+            <span>Crimson Maroon Theme &bull; Mobile & Desktop Previews</span>
+        </div>
+    </div>
+
+    <!-- SLIDE 4: EXECUTIVE MANAGEMENT PANEL -->
+    <div class="slide-container">
+        <div class="slide-header">
+            <div class="slide-title-group">
+                <span class="slide-number">Slide 04</span>
+                <div>
+                    <h2 class="slide-title">Executive Management Panel (Director AI App & Web Control Room)</h2>
+                    <div class="slide-subtitle">Mobile Director AI App & Antigravity Multi-AI Master Dashboard Web Portal</div>
+                </div>
+            </div>
+            <div class="meta-badge">HostelHub Theme • Executive Management</div>
+        </div>
+
+        <div class="resolutions-grid">
+            <!-- Mobile View -->
+            <div class="view-card">
+                <div>
+                    <div class="view-header">
+                        <span class="view-title">📱 Management Mobile Resolution (Director AI App)</span>
+                        <span class="view-tag tag-mobile">Mobile APK</span>
+                    </div>
+                    <div class="mockup-image-frame">
+                        <img src="assets/mockups/management_mobile_director_ai_app_ui_mockup_1786258778110.png" alt="Management Mobile AI App UI">
+                    </div>
+                </div>
+                <ul class="feature-bullets">
+                    <li><strong>Director AI Mobile Voice/Text Assistant:</strong> Voice mic button se natural Hinglish queries ask karna on smartphone.</li>
+                    <li><strong>Mobile Red Alerts & Quick Stats:</strong> Overdue complaints table aur emergency SOS alerts on mobile screen.</li>
+                </ul>
+            </div>
+
+            <!-- Desktop View -->
+            <div class="view-card">
+                <div>
+                    <div class="view-header">
+                        <span class="view-title">💻 Management Desktop Resolution (Control Room)</span>
+                        <span class="view-tag tag-desktop">Desktop Web</span>
+                    </div>
+                    <div class="mockup-image-frame">
+                        <img src="assets/mockups/management_desktop_master_dashboard_ui_mockup_1786258797496.png" alt="Management Master Web UI">
+                    </div>
+                </div>
+                <ul class="feature-bullets">
+                    <li><strong>Antigravity AI Model Switcher Bar:</strong> 1-Click model switcher (Auto-Select, Gemini Flash, GPT-4o, Claude).</li>
+                    <li><strong>360° Hostel Control Room:</strong> Interactive Complaint Flowchart, Floor Capacity Heatmap, SLA Bar Graphs & Audit Trail.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="slide-footer">
+            <span>HostelHub Full App UI Blueprint &bull; Slide 4 of 4</span>
+            <span>Crimson Maroon Theme &bull; Mobile & Desktop Previews</span>
+        </div>
+    </div>
+
+</body>
+</html>

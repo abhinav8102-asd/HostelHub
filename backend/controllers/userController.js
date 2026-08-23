@@ -54,15 +54,16 @@ exports.updateUserStatus = async (req, res) => {
 
 exports.createWardenOrStaff = async (req, res) => {
   try {
-    const { name, email, password, role, phone } = req.body;
+    const { name, email, password, role, phone, bio } = req.body;
 
-    if (!['warden', 'staff', 'management'].includes(role)) {
+    const userRole = role || 'staff';
+    if (!['warden', 'staff', 'management'].includes(userRole)) {
       return res.status(400).json({ message: 'Role must be warden, staff, or management.' });
     }
 
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
-      return res.status(400).json({ message: 'Email is already registered!' });
+      return res.status(400).json({ message: 'User with this email already exists!' });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -72,13 +73,14 @@ exports.createWardenOrStaff = async (req, res) => {
       name,
       email,
       password: passwordHash,
-      role,
+      role: userRole,
       phone,
+      bio: bio || (userRole === 'management' ? 'Management Team Member' : null),
       status: 'active'
     });
 
     res.status(201).json({
-      message: `${role.charAt(0).toUpperCase() + role.slice(1)} created successfully!`,
+      message: `${userRole.charAt(0).toUpperCase() + userRole.slice(1)} account created successfully!`,
       user: { id: newUser.id, name: newUser.name, email: newUser.email, role: newUser.role }
     });
   } catch (error) {

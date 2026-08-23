@@ -1023,7 +1023,7 @@ export class AdminDashboardComponent implements OnInit {
       },
       error: (err) => {
         this.creating = false;
-        this.createError = err.error?.message || 'Error creating account.';
+        this.createError = err.error?.message || (typeof err.error === 'string' ? err.error : null) || err.message || 'Error creating account.';
         this.cdr.detectChanges();
       }
     });

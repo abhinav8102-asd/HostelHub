@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <title>HostelHub - Security & Data Safety Document (Hinglish)</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+
+    @page {
+      size: A4;
+      margin: 18mm 15mm 18mm 15mm;
+      @bottom-right { content: counter(page); }
+    }
+
+    * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    body { font-family: 'Inter', sans-serif; color: #1e293b; line-height: 1.65; background: #ffffff; margin: 0; padding: 0; font-size: 11pt; }
+    h1, h2, h3 { font-family: 'Outfit', sans-serif; color: #0f172a; margin-top: 1.3em; margin-bottom: 0.4em; font-weight: 700; page-break-after: avoid; }
+    h1 { font-size: 24pt; color: #b31031; border-bottom: 3px solid #b31031; padding-bottom: 6px; }
+    h2 { font-size: 16pt; color: #8a0d24; border-bottom: 1.5px solid #e2e8f0; padding-bottom: 4px; margin-top: 24px; }
+
+    .cover-page {
+      height: 96vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 40px 24px;
+      page-break-after: always;
+      background: linear-gradient(135deg, #4c0615 0%, #b31031 50%, #8a0d24 100%);
+      color: white;
+      border-radius: 18px;
+    }
+
+    .cover-logo {
+      width: 60px; height: 60px; background: white; color: #b31031; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 900; font-family: 'Outfit';
+    }
+
+    .cover-meta {
+      background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(10px); padding: 20px 24px; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .cover-meta-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; font-size: 10.5pt; }
+    .cover-meta-item strong { display: block; font-size: 8.5pt; text-transform: uppercase; opacity: 0.75; letter-spacing: 1px; margin-bottom: 3px; }
+
+    table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 9.5pt; page-break-inside: avoid; }
+    th, td { padding: 9px 11px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    th { background: #f8fafc; font-weight: 700; color: #334155; border-top: 1px solid #cbd5e1; border-bottom: 2px solid #cbd5e1; font-family: 'Outfit'; text-transform: uppercase; font-size: 8pt; letter-spacing: 0.5px; }
+    tr:nth-child(even) td { background: #f8fafc; }
+
+    .callout { padding: 12px 16px; border-radius: 10px; margin: 14px 0; font-size: 10pt; page-break-inside: avoid; }
+    .callout-info { background: #eff6ff; border-left: 4px solid #3b82f6; color: #1e3a8a; }
+    .callout-success { background: #f0fdf4; border-left: 4px solid #22c55e; color: #14532d; }
+    .callout-warning { background: #fffbeb; border-left: 4px solid #f59e0b; color: #78350f; }
+    .page-break { page-break-after: always; }
+  </style>
+</head>
+<body>
+
+  <!-- COVER PAGE -->
+  <div class="cover-page">
+    <div>
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <div class="cover-logo">H</div>
+        <div style="font-size: 18pt; font-weight: 800; font-family: 'Outfit';">HostelHub</div>
+      </div>
+
+      <div style="margin-top: 70px;">
+        <h1 style="color: white; border: none; font-size: 32pt; margin: 0;">Security & Data Protection Document</h1>
+        <div style="font-size: 15pt; opacity: 0.92; margin-top: 10px;">Aapka Data Kaise Safe Hai, Server Kahan Hai, Aur Web App Kaise Mobile APK me Convert Hua (Hinglish Guide)</div>
+      </div>
+    </div>
+
+    <div class="cover-meta">
+      <div class="cover-meta-grid">
+        <div class="cover-meta-item">
+          <strong>Document Type</strong>
+          Security & Infrastructure Guide (Hinglish)
+        </div>
+        <div class="cover-meta-item">
+          <strong>Database Host Server</strong>
+          Supabase PostgreSQL (AWS Data Center)
+        </div>
+        <div class="cover-meta-item">
+          <strong>API Application Server</strong>
+          Render Cloud Platform (HTTPS Cloud Instance)
+        </div>
+        <div class="cover-meta-item">
+          <strong>Web to App Conversion</strong>
+          Capacitor v8 Android Native Bridge
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 1 -->
+  <h2>1. Data Kaise Safe Ho Raha Hai (Encryption & Security)</h2>
+  <p>
+    HostelHub me student, warden aur staff ke data ki privacy aur security ke liye 5-layer encryption aur security guards lagaye gaye hain.
+  </p>
+
+  <div class="callout callout-success">
+    <strong>🔒 Password Hashing (Zero Plaintext Storage):</strong> Aapka login password database me kabhi bhi real text me save nahi hota. Password ko <strong>bcryptjs algorithm (10 salt rounds)</strong> ke dwara highly secure hash string me convert karke save kiya jata hai. Isko decode karna impossible hai.
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Security Mechanism</th>
+        <th>Kaun Sa Tech Use Hua</th>
+        <th>Aapka Data Kaise Secure Hota Hai</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Password Protection</strong></td>
+        <td><code>bcryptjs (10 Salt Rounds)</code></td>
+        <td>One-way hashing ke dwara passwords ko unreadable hash string me store karta hai.</td>
+      </tr>
+      <tr>
+        <td><strong>API Authentication</strong></td>
+        <td><code>JWT Bearer Tokens</code></td>
+        <td>Har API request ke sath encrypted token verify hota hai jisse unauthorized log access na kar sakein.</td>
+      </tr>
+      <tr>
+        <td><strong>Data in Transit</strong></td>
+        <td><code>HTTPS / SSL Encryption</code></td>
+        <td>Mobile app aur server ke bich hone wala saara data HTTPS SSL encryption se lock rehta hai.</td>
+      </tr>
+      <tr>
+        <td><strong>Database Safety</strong></td>
+        <td><code>Sequelize ORM Safe Queries</code></td>
+        <td>SQL Injection attacks ko fully block karta hai. Raw SQL injection harmful code run nahi ho sakta.</td>
+      </tr>
+      <tr>
+        <td><strong>Security Headers</strong></td>
+        <td><code>Helmet.js Security Guard</code></td>
+        <td>XSS attacks, MIME sniffing aur unauthorized cross-origin requests ko express server par reject karta hai.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- SECTION 2 -->
+  <h2>2. Data Kahan Aur Kis Server Par Store Ho Raha Hai?</h2>
+  
+  <div class="callout callout-info">
+    <strong>🌐 Cloud Server Details:</strong>
+    <ul>
+      <li><strong>Database Server:</strong> System ka saara database (Users, Complaints, Mess Menu, Attendance, Group Chats) <strong>Supabase Cloud Managed PostgreSQL Server</strong> par store ho raha hai. Supabase world's most secure <strong>Amazon Web Services (AWS) Data Centers</strong> par run hota hai.</li>
+      <li><strong>Backend REST API Server:</strong> Server logic aur controllers <strong>Render.com Cloud App Hosting Platform</strong> (<code>https://hostelhub-0cyi.onrender.com</code>) par hosted hain.</li>
+      <li><strong>Photo & File Uploads:</strong> Complaint issue images, work completion proofs, aur profile pictures Cloud Storage Buckets par base64 / encrypted storage paths ke dwara fully secure rehte hain.</li>
+    </ul>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- SECTION 3 -->
+  <h2>3. Ye Website Kisne Aur Kaise App me Convert Kiya?</h2>
+  <p>
+    HostelHub web application ko <strong>Capacitor v8 (Native Android Bridge Framework)</strong> ki madad se high-performance Android APK me convert kiya gaya hai.
+  </p>
+
+  <h3>3.1 Conversion Process Kaise Work Karta Hai:</h3>
+  <ol>
+    <li><strong>Angular Single-Page App Build:</strong> Pehle Angular framework ke through code (HTML/CSS/TypeScript) ko fast web application bundle me build kiya jata hai.</li>
+    <li><strong>Capacitor Native Sync:</strong> Capacitor bridge tool (<code>npx cap sync</code>) web build folder ko Android native project directory (<code>android/app/src/main/assets/public</code>) me insert karta hai.</li>
+    <li><strong>Android Native WebView Engine:</strong> Android OS ke andar pre-built native Chrome WebView container web application ko 60 FPS full screen mobile app ki tarah execute karta hai. Isme browser ka address bar, URL, ya controls bilkul hide ho jate hain.</li>
+    <li><strong>Native Mobile Hardware Integrations:</strong>
+      <ul>
+        <li><code>@capacitor/camera</code>: Direct mobile camera hardware se issue picture clicked photo upload karne me madad karta hai.</li>
+        <li><code>@capacitor/preferences</code>: Android SharedPreferences me login token save rakhta hai jisse app restart hone par bhi login lost na ho.</li>
+        <li><code>@capacitor/app</code>: Android Hardware Back Button click event capture karta hai aur exit confirmation modal trigger karta hai.</li>
+      </ul>
+    </li>
+  </ol>
+
+  <!-- SECTION 4 -->
+  <h2>4. Special Profile Security Rule</h2>
+  
+  <div class="callout callout-warning">
+    <strong>🛡️ Gender & Batch Critical Edit Warning:</strong> Student jab profile edit karta hai to Name, Room Number, Phone, Bio, ya Profile Picture bina kisi extra approval ke instantly save ho jata hai. Par agar koi student <strong>Gender</strong> ya <strong>Academic Batch</strong> change karega, to system usko critical data warning alert deta hai aur Warden Re-approval (<code>reApprovalStatus = true</code>) compulsory kar deta hai.
+  </div>
+
+  <footer style="margin-top: 40px; text-align: center; border-top: 1px solid #cbd5e1; padding-top: 16px; font-size: 9pt; color: #64748b;">
+    HostelHub Security & Infrastructure Whitepaper (Hinglish) &bull; Generated August 2026 &bull; Developer & Security Reference
+  </footer>
+
+</body>
+</html>

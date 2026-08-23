@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <title>HostelHub - Complete Current System Architecture & Access Level Audit</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        @page {
+            size: A4;
+            margin: 15mm 15mm 15mm 15mm;
+            @bottom-right {
+                content: counter(page);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #1e293b;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            font-size: 11.5px;
+        }
+
+        .header-container {
+            border-bottom: 3.5px solid #b31031;
+            padding-bottom: 12px;
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: #b31031;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 4px 12px rgba(179, 16, 49, 0.3);
+        }
+
+        .title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 22px;
+            font-weight: 900;
+            color: #4c0615;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 12px;
+            font-weight: 600;
+            color: #b31031;
+            margin-top: 2px;
+        }
+
+        .meta-badge {
+            background: #fff1f2;
+            color: #9f1239;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+            border: 1px solid #fecdd3;
+        }
+
+        .summary-box {
+            background: #fff1f2;
+            border-left: 4px solid #b31031;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin-bottom: 18px;
+        }
+
+        .summary-box p {
+            margin: 0;
+            color: #881337;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #4c0615 0%, #b31031 100%);
+            color: #ffffff;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 13.5px;
+            font-weight: 700;
+            margin-top: 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            letter-spacing: 0.3px;
+            page-break-after: avoid;
+        }
+
+        .section-number {
+            background: #ffffff;
+            color: #b31031;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .feature-card {
+            background: #ffffff;
+            border: 1px solid #fecdd3;
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            page-break-inside: avoid;
+        }
+
+        .card-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #881337;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-title .icon {
+            margin-right: 8px;
+            font-size: 15px;
+        }
+
+        ul.bullet-list {
+            margin: 0;
+            padding-left: 18px;
+        }
+
+        ul.bullet-list li {
+            margin-bottom: 5px;
+            color: #334155;
+            font-size: 11.5px;
+        }
+
+        ul.bullet-list li strong {
+            color: #0f172a;
+        }
+
+        .tag {
+            display: inline-block;
+            font-size: 9.5px;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 4px;
+            margin-left: 8px;
+            text-transform: uppercase;
+        }
+
+        .tag-tech { background: #e0f2fe; color: #0369a1; }
+        .tag-sec { background: #dcfce7; color: #166534; }
+        .tag-role { background: #fef3c7; color: #92400e; }
+        .tag-data { background: #fae8ff; color: #86198f; }
+
+        .role-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+            page-break-inside: avoid;
+        }
+
+        .role-box {
+            background: #fff1f2;
+            padding: 10px;
+            border-radius: 6px;
+            border-top: 3px solid #b31031;
+        }
+
+        .role-box h4 {
+            margin: 0 0 4px 0;
+            font-size: 12px;
+            color: #881337;
+        }
+
+        .role-box p {
+            margin: 0;
+            font-size: 10.5px;
+            color: #475569;
+        }
+
+        .footer {
+            margin-top: 30px;
+            border-top: 1px solid #fecdd3;
+            padding-top: 10px;
+            text-align: center;
+            font-size: 9.5px;
+            color: #9f1239;
+        }
+
+        .page-break {
+            page-break-after: always;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <div class="header-container">
+        <div class="logo-group">
+            <div class="logo-icon">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+            </div>
+            <div>
+                <h1 class="title">HostelHub</h1>
+                <div class="subtitle">Complete Current System Architecture & Access Level Audit</div>
+            </div>
+        </div>
+        <div class="meta-badge">System Master Audit • Hinglish</div>
+    </div>
+
+    <div class="summary-box">
+        <p><strong>🎯 Document Overview:</strong> Ye document HostelHub system ke <strong>Current Stack, Software Documents, Architecture Base, Data Handling, Security Framework, Server Environment, Total Panels, aur Every Access Level</strong> ka complete 100% accurate technical audit report hai.</p>
+    </div>
+
+    <!-- SECTION 1: SOFTWARE DOCUMENTS -->
+    <div class="section-header">
+        <span class="section-number">1</span> 📑 Available Software Documentation Files
+    </div>
+
+    <div class="feature-card">
+        <div class="card-title">
+            <span class="icon">📁</span> Project Root Documentation Inventory
+            <span class="tag tag-tech">Official Docs</span>
+        </div>
+        <ul class="bullet-list">
+            <li><strong>Complete End-to-End Technical Docs:</strong> <code>HostelHub_Full_Documentation.pdf</code> & <code>.html</code></li>
+            <li><strong>Hinglish Technical Breakdown:</strong> <code>HostelHub_Documentation_Hinglish.pdf</code> & <code>.html</code></li>
+            <li><strong>Security & Privacy Audit:</strong> <code>HostelHub_Security_Data_Protection_Hinglish.pdf</code> & <code>.html</code></li>
+            <li><strong>Android Web-to-Native APK Guide:</strong> <code>HostelHub_Web_To_Native_APK_Guide_Hinglish.pdf</code> & <code>.html</code></li>
+            <li><strong>Executive Management Blueprint:</strong> <code>HostelHub_Management_Implementation_Plan_Hinglish.pdf</code> & <code>.html</code></li>
+            <li><strong>Student Panel Master Blueprint:</strong> <code>HostelHub_Student_Panel_Master_Blueprint_Hinglish.pdf</code> & <code>.html</code></li>
+            <li><strong>12-Slide UI Photo Slide Deck:</strong> <code>HostelHub_All_UI_Screens_Visual_Slide_Deck_Hinglish.pdf</code> & <code>.html</code></li>
+            <li><strong>Mobile & Desktop UI Previews:</strong> <code>HostelHub_Full_App_Mobile_Desktop_UI_Slides_Hinglish.pdf</code> & <code>.html</code></li>
+            <li><strong>Future Expansion Roadmap:</strong> <code>HostelHub_Management_Warden_Future_Roadmap_Hinglish.pdf</code> & <code>.html</code></li>
+        </ul>
+    </div>
+
+    <!-- SECTION 2: BASE & TECH STACK -->
+    <div class="section-header">
+        <span class="section-number">2</span> 🏗️ Platform Base, Technology Stack & Server
+    </div>
+
+    <div class="feature-card">
+        <div class="card-title">
+            <span class="icon">💻</span> Technical Architecture & Runtimes
+            <span class="tag tag-tech">Tech Stack</span>
+        </div>
+        <ul class="bullet-list">
+            <li><strong>Architecture Base:</strong> Decoupled Full-Stack Architecture — Centralized Node.js REST API Backend + Independent Frontend Portals. Hybrid Web-to-Native Android APK base.</li>
+            <li><strong>Backend Runtime:</strong> Node.js v24+ with Express.js framework.</li>
+            <li><strong>Real-Time Engine:</strong> Socket.io Engine (WebSockets for 1-on-1 chat, group chat, and instant push alerts).</li>
+            <li><strong>Database ORM:</strong> Sequelize ORM with SQLite database engine (<code>database.sqlite</code>).</li>
+            <li><strong>Frontend Framework:</strong> Angular SPA Framework (TypeScript, HTML5, Vanilla CSS3 with custom Glassmorphism Crimson Theme <code>#b31031</code>).</li>
+            <li><strong>Authentication Stack:</strong> <code>jsonwebtoken</code> (JWT), <code>bcryptjs</code> (salted hashing), Google OAuth 2.0, Nodemailer OTP engine.</li>
+            <li><strong>Media Upload Handler:</strong> <code>Multer</code> middleware for handling images & avatars.</li>
+            <li><strong>Current Server Setup:</strong> Node.js Express server running on <code>http://localhost:5000</code> with integrated Socket.io WebSocket server (<code>server.js</code>).</li>
+        </ul>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- SECTION 3: DATA HANDLING & SECURITY -->
+    <div class="section-header">
+        <span class="section-number">3</span> 💾 Data Handling & Security Framework
+    </div>
+
+    <div class="feature-card">
+        <div class="card-title">
+            <span class="icon">🗄️</span> Data Handling & Storage Models
+            <span class="tag tag-data">Database Engine</span>
+        </div>
+        <ul class="bullet-list">
+            <li><strong>SQLite Database File:</strong> <code>backend/database.sqlite</code> managed via Sequelize ORM with auto-migrations.</li>
+            <li><strong>12 Core Schema Tables:</strong> <code>User</code>, <code>Attendance</code>, <code>Complaint</code>, <code>ChatMessage</code>, <code>GroupChat</code>, <code>MessMenu</code>, <code>MessFeedback</code>, <code>MessSkip</code>, <code>Announcement</code>, <code>Notification</code>, <code>PasswordResetOTP</code>, <code>Setting</code>.</li>
+            <li><strong>File Storage Engine:</strong> Local disk storage in <code>backend/uploads/</code> with static file serving (<code>/uploads</code>) and sanitized file naming.</li>
+        </ul>
+    </div>
+
+    <div class="feature-card">
+        <div class="card-title">
+            <span class="icon">🛡️</span> Security & Data Protection Architecture
+            <span class="tag tag-sec">Security Core</span>
+        </div>
+        <ul class="bullet-list">
+            <li><strong>Stateless JWT Bearer Auth:</strong> Tokens carried in <code>Authorization: Bearer &lt;token&gt;</code> header with session expiration.</li>
+            <li><strong>Role-Based Access Control (RBAC):</strong> Strict <code>auth.js</code> middleware enforcing route protection (<code>authorizeRoles('admin', 'warden')</code>).</li>
+            <li><strong>Bcrypt Salted Hashing:</strong> 10-round salted password hashing (Plaintext passwords never stored).</li>
+            <li><strong>SQL Injection & XSS Protection:</strong> Parameterized Sequelize ORM queries eliminate SQL Injection vulnerabilities.</li>
+            <li><strong>Upload Security:</strong> Strict MIME-type validation (JPEG, PNG, WEBP) & randomized filename generation.</li>
+            <li><strong>Socket Handshake Auth:</strong> Authenticated WebSocket handshake prevents unauthorized chat room access.</li>
+        </ul>
+    </div>
+
+    <!-- SECTION 4: ACCESS LEVELS & PANELS -->
+    <div class="section-header">
+        <span class="section-number">4</span> 👥 Total Panels & Every Access Level Breakdown
+    </div>
+
+    <div class="role-grid">
+        <div class="role-box">
+            <h4>🎓 Access Level 1: Student (frontend-user / APK)</h4>
+            <p>• Login / Signup / Google OAuth<br>• Lodge complaints with camera photo proof<br>• Track status (Pending &rarr; In Progress &rarr; Resolved)<br>• Attendance Calendar & Attendance % Gauge<br>• Mess Menu & 1-5 Star Meal Feedback<br>• 1-on-1 & Group Chat with Warden/Students<br>• Live Push Notifications & Circulars.</p>
+        </div>
+        <div class="role-box">
+            <h4>👨‍🏫 Access Level 2: Warden (frontend-warden / APK)</h4>
+            <p>• Daily Roll Call Attendance (Present/Absent/Outstation)<br>• "Mark All Present" 1-click bulk feature<br>• Complaint photo inspection & status update<br>• Assign complaints to maintenance staff (e.g. Electrician)<br>• Edit Weekly Mess Menu & monitor ratings<br>• Broadcast targeted circulars & Direct Chat.</p>
+        </div>
+        <div class="role-box">
+            <h4>🛠️ Access Level 3: Staff (frontend-staff / APK)</h4>
+            <p>• View assigned work orders (Electrician/Plumber/Wi-Fi)<br>• Update status (Pending &rarr; In Progress &rarr; Completed)<br>• Add completion notes & repair proof photo<br>• Chat with assigning Warden for room entry.</p>
+        </div>
+        <div class="role-box">
+            <h4>🔑 Access Level 4: Super Admin (frontend-admin / APK)</h4>
+            <p>• Master User Directory across all roles<br>• Approve pending student signups & block/unblock<br>• Create Hostel Blocks, Floors, Rooms (Single/Double/Triple)<br>• Room Allocation to students & System Settings.</p>
+        </div>
+    </div>
+
+    <div class="feature-card" style="margin-top: 10px;">
+        <div class="card-title">
+            <span class="icon">👑</span> Access Level 5: Executive Management (Director Control Room)
+            <span class="tag tag-role">Executive Level</span>
+        </div>
+        <ul class="bullet-list">
+            <li><strong>360° Hostel Health Cards:</strong> Occupancy %, Attendance %, Red Alerts summary.</li>
+            <li><strong>Director AI Co-Pilot Assistant:</strong> Real-time natural language DB query engine with read-only security sandbox.</li>
+            <li><strong>Antigravity AI Model Switcher:</strong> 1-Click model switcher (Auto-Select, Gemini Flash, GPT-4o, Claude).</li>
+            <li><strong>Visual Analytics & Audit Trail:</strong> Interactive Complaint Flowchart, Floor Capacity Heatmap, SLA Bar Graph, and Real-Time System Audit Trail.</li>
+            <li><strong>Accreditation Exporter:</strong> 1-Click NAAC / NIRF Compliance PDF Exporter.</li>
+        </ul>
+    </div>
+
+    <div class="footer">
+        HostelHub Complete System Architecture & Access Level Audit • Generated August 2026 • Confidential
+    </div>
+
+</body>
+</html>

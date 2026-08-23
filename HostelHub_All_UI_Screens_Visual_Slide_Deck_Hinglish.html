@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <title>HostelHub - All UI Screens Master Visual Slide Deck</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        @page {
+            size: A4 landscape;
+            margin: 8mm 8mm 8mm 8mm;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #ffffff;
+            background-color: #0f172a;
+            margin: 0;
+            padding: 0;
+            line-height: 1.4;
+            font-size: 11px;
+        }
+
+        .slide {
+            width: 100%;
+            height: 98vh;
+            background: linear-gradient(135deg, #1e070c 0%, #3b0710 50%, #0f172a 100%);
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            page-break-after: always;
+            border: 1.5px solid #b31031;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.8);
+        }
+
+        .slide-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #b31031;
+            padding-bottom: 6px;
+            margin-bottom: 6px;
+        }
+
+        .slide-title-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .slide-num {
+            background: #b31031;
+            color: white;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 3px 9px;
+            border-radius: 14px;
+            text-transform: uppercase;
+        }
+
+        .slide-title {
+            font-family: 'Outfit', sans-serif;
+            color: #ffffff;
+            font-size: 17px;
+            font-weight: 800;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: -0.3px;
+        }
+
+        .role-badge {
+            background: rgba(179, 16, 49, 0.3);
+            color: #fecdd3;
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 9.5px;
+            font-weight: 700;
+            border: 1px solid #b31031;
+        }
+
+        .slide-body {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 14px;
+            align-items: center;
+            flex-grow: 1;
+        }
+
+        .full-mockup-frame {
+            background: #000000;
+            border-radius: 8px;
+            padding: 4px;
+            border: 1.5px solid #b31031;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 380px;
+            overflow: hidden;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+        }
+
+        .full-mockup-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        .details-panel {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid #7f1d1d;
+            border-radius: 8px;
+            padding: 12px 14px;
+            height: 380px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .details-heading {
+            color: #fecdd3;
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #831843;
+            padding-bottom: 4px;
+        }
+
+        ul.feature-list {
+            margin: 0;
+            padding-left: 16px;
+        }
+
+        ul.feature-list li {
+            margin-bottom: 6px;
+            color: #e2e8f0;
+            font-size: 10.5px;
+            line-height: 1.45;
+        }
+
+        ul.feature-list li strong {
+            color: #ffffff;
+        }
+
+        .benefit-box {
+            background: #2e080f;
+            border: 1px solid #b31031;
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-top: 8px;
+            font-size: 10px;
+            color: #fecdd3;
+        }
+
+        .slide-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #831843;
+            padding-top: 5px;
+            font-size: 8.5px;
+            color: #f472b6;
+        }
+
+        .page-break {
+            page-break-after: always;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SLIDE 1 -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="slide-title-group">
+                <span class="slide-num">Slide 01</span>
+                <h2 class="slide-title">Student App - Camera Complaint & Real-Time Chat (Mobile View)</h2>
+            </div>
+            <span class="role-badge">Student Portal &bull; Mobile App</span>
+        </div>
+        <div class="slide-body">
+            <div class="full-mockup-frame">
+                <img src="assets/mockups/student_mobile_complaint_and_chat_ui_mockup_1786258675942.png" alt="Student Mobile UI">
+            </div>
+            <div class="details-panel">
+                <div>
+                    <div class="details-heading">📱 Mobile App Interface Breakdown:</div>
+                    <ul class="feature-list">
+                        <li><strong>Camera Photo Evidence Upload:</strong> Complaint raise karte waqt camera/gallery se live photo attach karna.</li>
+                        <li><strong>Category Selector:</strong> Plumbing, Electrical, Wi-Fi, Mess, Carpentry, Misconduct categories.</li>
+                        <li><strong>Real-Time Socket.io Chat:</strong> Warden aur Maintenance Staff ke sath 1-on-1 private chat thread.</li>
+                        <li><strong>Group Chat Rooms:</strong> Hostel Block & Floor group chat rooms with unread badges.</li>
+                    </ul>
+                </div>
+                <div class="benefit-box">
+                    💡 <strong>Student Benefit:</strong> Phone se instant photo khinch kar complaint raise karo aur warden se live chat par updates lo.
+                </div>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>HostelHub Master Visual Slide Deck &bull; Slide 1 of 12</span>
+            <span>Crimson Maroon Theme (#b31031)</span>
+        </div>
+    </div>
+
+    <!-- SLIDE 2 -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="slide-title-group">
+                <span class="slide-num">Slide 02</span>
+                <h2 class="slide-title">Student Portal - Attendance Calendar & Mess Ratings (Desktop View)</h2>
+            </div>
+            <span class="role-badge">Student Portal &bull; Desktop Web</span>
+        </div>
+        <div class="slide-body">
+            <div class="full-mockup-frame">
+                <img src="assets/mockups/student_desktop_dashboard_and_mess_ui_mockup_1786258692343.png" alt="Student Desktop UI">
+            </div>
+            <div class="details-panel">
+                <div>
+                    <div class="details-heading">💻 Desktop Web Portal Breakdown:</div>
+                    <ul class="feature-list">
+                        <li><strong>Monthly Attendance History:</strong> Interactive calendar showing daily Present 🟢, Absent 🔴, and Outstation 🟡 badges.</li>
+                        <li><strong>Attendance Gauge:</strong> Visual percentage ring (e.g. 94% Attendance) tracking semester eligibility.</li>
+                        <li><strong>Weekly Mess Schedule:</strong> Daily Breakfast, Lunch, Snacks, Dinner menu view.</li>
+                        <li><strong>1-to-5 Star Feedback:</strong> Submit meal ratings & quality feedback comments directly to mess committee.</li>
+                    </ul>
+                </div>
+                <div class="benefit-box">
+                    💡 <strong>Student Benefit:</strong> Poore month ki attendance audit aur weekly mess menu single dashboard par dekhna.
+                </div>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>HostelHub Master Visual Slide Deck &bull; Slide 2 of 12</span>
+            <span>Crimson Maroon Theme (#b31031)</span>
+        </div>
+    </div>
+
+    <!-- SLIDE 3 -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="slide-title-group">
+                <span class="slide-num">Slide 03</span>
+                <h2 class="slide-title">Warden App - Daily Roll Call Attendance (Mobile View)</h2>
+            </div>
+            <span class="role-badge">Warden Portal &bull; Mobile App</span>
+        </div>
+        <div class="slide-body">
+            <div class="full-mockup-frame">
+                <img src="assets/mockups/warden_mobile_attendance_rollcall_ui_mockup_1786258710667.png" alt="Warden Mobile Roll Call UI">
+            </div>
+            <div class="details-panel">
+                <div>
+                    <div class="details-heading">📱 Mobile App Interface Breakdown:</div>
+                    <ul class="feature-list">
+                        <li><strong>Fast Roll Call Attendance:</strong> Hostel Block & Floor filters ke sath student list scrollable view.</li>
+                        <li><strong>Status Toggles:</strong> Individual student ke liye Present, Absent, ya Outstation toggle select karna.</li>
+                        <li><strong>1-Click Bulk Action:</strong> "Mark All Present" button fast roll call verification ke liye.</li>
+                        <li><strong>Instant Database Sync:</strong> Attendance mark karte hi database aur student dashboard par live update.</li>
+                    </ul>
+                </div>
+                <div class="benefit-box">
+                    💡 <strong>Warden Benefit:</strong> Daily night roll call 2 minute mein mobile se complete karna without paper registers.
+                </div>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>HostelHub Master Visual Slide Deck &bull; Slide 3 of 12</span>
+            <span>Crimson Maroon Theme (#b31031)</span>
+        </div>
+    </div>
+
+    <!-- SLIDE 4 -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="slide-title-group">
+                <span class="slide-num">Slide 04</span>
+                <h2 class="slide-title">Warden Portal - Complaint Resolution & Broadcasts (Desktop View)</h2>
+            </div>
+            <span class="role-badge">Warden Portal &bull; Desktop Web</span>
+        </div>
+        <div class="slide-body">
+            <div class="full-mockup-frame">
+                <img src="assets/mockups/warden_desktop_complaint_and_broadcast_ui_mockup_1786258728692.png" alt="Warden Desktop UI">
+            </div>
+            <div class="details-panel">
+                <div>
+                    <div class="details-heading">💻 Desktop Web Portal Breakdown:</div>
+                    <ul class="feature-list">
+                        <li><strong>Photo Evidence Inspector:</strong> Student dwara upload ki gayi photo proof inspect karna.</li>
+                        <li><strong>Staff Task Routing:</strong> Complaint technician/staff ko assign karna (e.g. Electrician Ramesh).</li>
+                        <li><strong>Status Controls:</strong> Mark complaints as In Progress, Resolved, ya Rejected with remarks.</li>
+                        <li><strong>Targeted Announcements:</strong> Specific hostel blocks ko official circulars publish karna.</li>
+                    </ul>
+                </div>
+                <div class="benefit-box">
+                    💡 <strong>Warden Benefit:</strong> Maintenance staff work allocation aur hostel broadcasts ek hi screen se manage karna.
+                </div>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>HostelHub Master Visual Slide Deck &bull; Slide 4 of 12</span>
+            <span>Crimson Maroon Theme (#b31031)</span>
+        </div>
+    </div>
+
+    <!-- SLIDE 5 -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="slide-title-group">
+                <span class="slide-num">Slide 05</span>
+                <h2 class="slide-title">Staff App - Technician Work Orders (Mobile View)</h2>
+            </div>
+            <span class="role-badge">Staff / Technician &bull; Mobile App</span>
+        </div>
+        <div class="slide-body">
+            <div class="full-mockup-frame">
+                <img src="assets/mockups/staff_mobile_work_orders_ui_mockup_1786258744151.png" alt="Staff Mobile UI">
+            </div>
+            <div class="details-panel">
+                <div>
+                    <div class="details-heading">📱 Mobile App Interface Breakdown:</div>
+                    <ul class="feature-list">
+                        <li><strong>Assigned Work Orders:</strong> Electrician / Plumber / IT staff ko assigned task cards showing Room No & Issue.</li>
+                        <li><strong>Urgency Badges:</strong> High / Medium / Low urgency tags and warden notes.</li>
+                        <li><strong>Status Update Toggles:</strong> Change status from Pending &rarr; In Progress &rarr; Completed.</li>
+                        <li><strong>Completion Proof Photo:</strong> Repair work khatam karke completion photo upload karna.</li>
+                    </ul>
+                </div>
+                <div class="benefit-box">
+                    💡 <strong>Staff Benefit:</strong> Technicians ko unke phone par direct task order milna and clear room locations.
+                </div>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>HostelHub Master Visual Slide Deck &bull; Slide 5 of 12</span>
+            <span>Crimson Maroon Theme (#b31031)</span>
+        </div>
+    </div>
+
+    <!-- SLIDE 6 -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="slide-title-group">
+                <span class="slide-num">Slide 06</span>
+                <h2 class="slide-title">Super Admin - User Directory & Room Allocation (Desktop View)</h2>
+            </div>
+            <span class="role-badge">Super Admin &bull; Desktop Web</span>
+        </div>
+        <div class="slide-body">
+            <div class="full-mockup-frame">
+                <img src="assets/mockups/admin_desktop_user_and_hostel_mgmt_ui_mockup_1786258760041.png" alt="Admin Desktop UI">
+            </div>
+            <div class="details-panel">
+                <div>
+                    <div class="details-heading">💻 Desktop Web Portal Breakdown:</div>
+                    <ul class="feature-list">
+                        <li><strong>Master User Directory:</strong> Saare Students, Wardens, Staff, Admin accounts view, edit, block, ya delete karna.</li>
+                        <li><strong>Pending Account Approvals:</strong> Naye student signups ko verify & approve karna.</li>
+                        <li><strong>Hostel Infrastructure Setup:</strong> Create Hostel Blocks, floors, single/double/triple sharing rooms.</li>
+                        <li><strong>Room Allocation Matrix:</strong> Student ko room assign karna aur room transfers update karna.</li>
+                    </ul>
+                </div>
+                <div class="benefit-box">
+                    💡 <strong>Admin Benefit:</strong> Poore system users aur physical hostel infrastructure ka 100% centralized master control.
+                </div>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>HostelHub Master Visual Slide Deck &bull; Slide 6 of 12</span>
+            <span>Crimson Maroon Theme (#b31031)</span>
+        </div>
+    </div>
+
+    <!-- SLIDE 7 -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="slide-title-group">
+                <span class="slide-num">Slide 07</span>
+                <h2 class="slide-title">Director AI App - Mobile Executive Assistant (Mobile View)</h2>
+            </div>
+            <span class="role-badge">Management &bull; Mobile Director AI</span>
+        </div>
+        <div class="slide-body">
+            <div class="full-mockup-frame">
+                <img src="assets/mockups/management_mobile_director_ai_app_ui_mockup_1786258778110.png" alt="Management Mobile AI UI">
+            </div>
+            <div class="details-panel">
+                <div>
+                    <div class="details-heading">📱 Mobile App Interface Breakdown:</div>
+                    <ul class="feature-list">
+                        <li><strong>Voice Mic Assistant:</strong> Voice mic button dabakar natural Hinglish queries poochhna.</li>
+                        <li><strong>Quick Red Alerts:</strong> Overdue complaints (>48hrs) aur emergency SOS alerts on mobile screen.</li>
+                        <li><strong>Instant Data Extraction:</strong> Natural language query ko live database table mein convert karna.</li>
+                        <li><strong>Executive Mobile Controls:</strong> On-the-go director level status monitoring on smartphone.</li>
+                    </ul>
+                </div>
+                <div class="benefit-box">
+                    💡 <strong>Director Benefit:</strong> Management college ke bahar bhi phone par bol kar instant real-time data le sakti hai.
+                </div>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>HostelHub Master Visual Slide Deck &bull; Slide 7 of 12</span>
+            <span>Crimson Maroon Theme (#b31031)</span>
+        </div>
+    </div>
+
+    <!-- SLIDE 8 -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="slide-title-group">
+                <span class="slide-num">Slide 08</span>
+                <h2 class="slide-title">Control Room - Antigravity Multi-AI Master Dashboard (Desktop View)</h2>
+            </div>
+            <span class="role-badge">Management &bull; Control Room</span>
+        </div>
+        <div class="slide-body">
+            <div class="full-mockup-frame">
+                <img src="assets/mockups/management_desktop_master_dashboard_ui_mockup_1786258797496.png" alt="Management Master Web UI">
+            </div>
+            <div class="details-panel">
+                <div>
+                    <div class="details-heading">💻 Desktop Web Control Room Breakdown:</div>
+                    <ul class="feature-list">
+                        <li><strong>Antigravity AI Model Switcher:</strong> 1-Click dropdown (Auto-Select, Gemini Flash, GPT-4o, Claude).</li>
+                        <li><strong>360° Hostel Health Cards:</strong> Occupancy %, Attendance %, Red Alerts, Gate Pass Count.</li>
+                        <li><strong>Interactive Complaint Flowchart:</strong> Complaint lifecycle stage visual map with bottleneck alerts.</li>
+                        <li><strong>Floor Capacity Heatmap:</strong> Color-coded room status grid (Green, Blue, Yellow).</li>
+                    </ul>
+                </div>
+                <div class="benefit-box">
+                    💡 <strong>Management Benefit:</strong> Master executive control room with zero-downtime multi-AI model switcher.
+                </div>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>HostelHub Master Visual Slide Deck &bull; Slide 8 of 12</span>
+            <span>Crimson Maroon Theme (#b31031)</span>
+        </div>
+    </div>
+
+    <!-- SLIDE 9 -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="slide-title-group">
+                <span class="slide-num">Slide 09</span>
+                <h2 class="slide-title">Director AI Co-Pilot - Query & Dynamic Chart Rendering UI</h2>
+            </div>
+            <span class="role-badge">Management &bull; AI Co-Pilot</span>
+        </div>
+        <div class="slide-body">
+            <div class="full-mockup-frame">
+                <img src="assets/mockups/director_ai_copilot_ui_mockup_1786258482849.png" alt="Director AI Co-Pilot UI">
+            </div>
+            <div class="details-panel">
+                <div>
+                    <div class="details-heading">🤖 AI Chat Engine Breakdown:</div>
+                    <ul class="feature-list">
+                        <li><strong>Natural Language Input:</strong> Query e.g. <em>"Show 48hr unresolved complaints in Block A"</em>.</li>
+                        <li><strong>Dynamic Table Responses:</strong> AI instant dark table render karta hai with Red Urgency Tags.</li>
+                        <li><strong>Embedded Bar Graphs:</strong> Query e.g. <em>"Wi-Fi complaints by floor"</em> par direct Bar Chart.</li>
+                        <li><strong>Read-Only Safety:</strong> 100% Read-Only database connection with zero data corruption risk.</li>
+                    </ul>
+                </div>
+                <div class="benefit-box">
+                    💡 <strong>Management Benefit:</strong> Natural text query enter karte hi live visual tables aur graphs automatic ban jate hain.
+                </div>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>HostelHub Master Visual Slide Deck &bull; Slide 9 of 12</span>
+            <span>Crimson Maroon Theme (#b31031)</span>
+        </div>
+    </div>
+
+    <!-- SLIDE 10 -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="slide-title-group">
+                <span class="slide-num">Slide 10</span>
+                <h2 class="slide-title">Analytics - Occupancy Heatmap & SLA Speed Comparison UI</h2>
+            </div>
+            <span class="role-badge">Management &bull; Visual Analytics</span>
+        </div>
+        <div class="slide-body">
+            <div class="full-mockup-frame">
+                <img src="assets/mockups/hostel_occupancy_heatmap_ui_mockup_1786258502724.png" alt="Occupancy Heatmap UI">
+            </div>
+            <div class="details-panel">
+                <div>
+                    <div class="details-heading">📊 Visual Analytics Breakdown:</div>
+                    <ul class="feature-list">
+                        <li><strong>Floor-by-Floor Heatmap:</strong> 🟢 Green (Occupied), 🔵 Blue (Vacant), 🟡 Yellow (Maintenance).</li>
+                        <li><strong>SLA Resolution Bar Graph:</strong> Hostel Block wise resolution hours (*Block A: 3.2h* vs *Block B: 11.5h*).</li>
+                        <li><strong>GitHub-Style Absence Grid:</strong> 30-day green attendance grid showing peak absenteeism days.</li>
+                    </ul>
+                </div>
+                <div class="benefit-box">
+                    💡 <strong>Management Benefit:</strong> Hostel block performance aur warden/staff response speed transparent compare hona.
+                </div>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>HostelHub Master Visual Slide Deck &bull; Slide 10 of 12</span>
+            <span>Crimson Maroon Theme (#b31031)</span>
+        </div>
+    </div>
+
+    <!-- SLIDE 11 -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="slide-title-group">
+                <span class="slide-num">Slide 11</span>
+                <h2 class="slide-title">Governance - System Audit Trail & Student 360° Profile UI</h2>
+            </div>
+            <span class="role-badge">Management &bull; Audit & NAAC</span>
+        </div>
+        <div class="slide-body">
+            <div class="full-mockup-frame">
+                <img src="assets/mockups/system_audit_trail_ui_mockup_1786258520222.png" alt="Audit Trail UI">
+            </div>
+            <div class="details-panel">
+                <div>
+                    <div class="details-heading">🛡️ System Audit & Compliance Breakdown:</div>
+                    <ul class="feature-list">
+                        <li><strong>Real-Time Audit Trail:</strong> Chronological live activity log (<code>ROOM_ALLOCATION</code>, <code>STATUS_OVERRIDE</code>).</li>
+                        <li><strong>Student 360° Profile:</strong> Roll number lookup showing attendance gauge (94%), room info, and past history.</li>
+                        <li><strong>1-Click NAAC / NIRF PDF Exporter:</strong> Inspection ready compliance reports download in 1-click.</li>
+                    </ul>
+                </div>
+                <div class="benefit-box">
+                    💡 <strong>Management Benefit:</strong> 100% System audit transparency + 1-click government accreditation PDF exports.
+                </div>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>HostelHub Master Visual Slide Deck &bull; Slide 11 of 12</span>
+            <span>Crimson Maroon Theme (#b31031)</span>
+        </div>
+    </div>
+
+    <!-- SLIDE 12 -->
+    <div class="slide">
+        <div class="slide-header">
+            <div class="slide-title-group">
+                <span class="slide-num">Slide 12</span>
+                <h2 class="slide-title">Overview - Executive Control Dashboard & Flowchart UI</h2>
+            </div>
+            <span class="role-badge">Executive &bull; Master Overview</span>
+        </div>
+        <div class="slide-body">
+            <div class="full-mockup-frame">
+                <img src="assets/mockups/management_dashboard_ui_mockup_1786258461208.png" alt="Management Overview UI">
+            </div>
+            <div class="details-panel">
+                <div>
+                    <div class="details-heading">📌 Master Executive Summary:</div>
+                    <ul class="feature-list">
+                        <li><strong>Complete System Integration:</strong> Student, Warden, Staff, Admin, aur Management roles unified.</li>
+                        <li><strong>Multi-AI Model Fallback:</strong> Zero downtime with Gemini, OpenAI, and Claude.</li>
+                        <li><strong>100% Responsive:</strong> Native Mobile Apps (APKs) + High-Performance Desktop Web Portals.</li>
+                    </ul>
+                </div>
+                <div class="benefit-box">
+                    💡 <strong>HostelHub Master Vision:</strong> Enterprise-Grade Smart Campus & Hostel Management Ecosystem.
+                </div>
+            </div>
+        </div>
+        <div class="slide-footer">
+            <span>HostelHub Master Visual Slide Deck &bull; Slide 12 of 12</span>
+            <span>Crimson Maroon Theme (#b31031)</span>
+        </div>
+    </div>
+
+</body>
+</html>

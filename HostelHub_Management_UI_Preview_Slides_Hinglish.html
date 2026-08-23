@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <title>HostelHub - Executive Management UI Visual Preview Blueprint</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        @page {
+            size: A4 landscape;
+            margin: 10mm 10mm 10mm 10mm;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #1e293b;
+            background-color: #0f172a;
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+            font-size: 12px;
+        }
+
+        .slide-container {
+            width: 100%;
+            height: 98vh;
+            background: #1e293b;
+            border-radius: 14px;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            page-break-after: always;
+            border: 1px solid #334155;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .slide-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #3b82f6;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+        }
+
+        .slide-title-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .slide-number {
+            background: #2563eb;
+            color: white;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+
+        .slide-title {
+            color: #f8fafc;
+            font-size: 18px;
+            font-weight: 800;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: -0.3px;
+        }
+
+        .slide-subtitle {
+            color: #94a3b8;
+            font-size: 11px;
+            margin-top: 2px;
+        }
+
+        .meta-badge {
+            background: #1e3a8a;
+            color: #93c5fd;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            border: 1px solid #3b82f6;
+        }
+
+        .slide-content-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 16px;
+            align-items: center;
+            flex-grow: 1;
+        }
+
+        .mockup-image-frame {
+            background: #090d16;
+            border-radius: 10px;
+            padding: 6px;
+            border: 1px solid #3b82f6;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            max-height: 480px;
+            overflow: hidden;
+        }
+
+        .mockup-image-frame img {
+            width: 100%;
+            height: auto;
+            max-height: 468px;
+            object-fit: contain;
+            border-radius: 6px;
+        }
+
+        .feature-details-card {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 14px 16px;
+            color: #f8fafc;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .details-title {
+            color: #60a5fa;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        ul.detail-bullets {
+            margin: 0;
+            padding-left: 18px;
+        }
+
+        ul.detail-bullets li {
+            margin-bottom: 8px;
+            color: #cbd5e1;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        ul.detail-bullets li strong {
+            color: #ffffff;
+        }
+
+        .highlight-badge-box {
+            background: #1e1b4b;
+            border: 1px solid #6366f1;
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-top: 10px;
+            font-size: 10.5px;
+            color: #c7d2fe;
+        }
+
+        .slide-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #334155;
+            padding-top: 6px;
+            margin-top: 8px;
+            font-size: 9.5px;
+            color: #64748b;
+        }
+
+        .page-break {
+            page-break-after: always;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SLIDE 1 -->
+    <div class="slide-container">
+        <div class="slide-header">
+            <div class="slide-title-group">
+                <span class="slide-number">UI Slide 01</span>
+                <div>
+                    <h2 class="slide-title">Executive Management Control Dashboard UI</h2>
+                    <div class="slide-subtitle">Master Control Screen with Antigravity AI Switcher & Real-Time Stats</div>
+                </div>
+            </div>
+            <div class="meta-badge">Executive View • High Precision UI</div>
+        </div>
+
+        <div class="slide-content-grid">
+            <div class="mockup-image-frame">
+                <img src="assets/mockups/management_dashboard_ui_mockup_1786258461208.png" alt="Management Dashboard UI">
+            </div>
+
+            <div class="feature-details-card">
+                <div>
+                    <div class="details-title">📌 Key Features Displayed on this Screen:</div>
+                    <ul class="detail-bullets">
+                        <li><strong>Antigravity-Style AI Model Switcher Bar:</strong> Top bar navigation jahan Management 1-click se <code>Auto-Select</code>, <code>Gemini Flash</code>, <code>GPT-4o</code>, ya <code>Claude</code> AI model select kar sakti hai.</li>
+                        <li><strong>Top 4 Glossy KPI Stat Cards:</strong> Total Occupancy Rate (88%), Today's Attendance (94%), Escalated Red Alerts (3), aur Live Gate Count (142).</li>
+                        <li><strong>Interactive Complaint Flowchart:</strong> Complaint lifecycle stage tracker (Student Raised &rarr; Warden Received &rarr; Staff Assigned &rarr; Resolved).</li>
+                        <li><strong>Hostel Capacity Floor Heatmap:</strong> Color-coded room grid (Green = Occupied, Blue = Vacant, Yellow = Maintenance).</li>
+                    </ul>
+                </div>
+                <div class="highlight-badge-box">
+                    💡 <strong>Management Benefit:</strong> Single screen par poore college hostel ka 360-degree real-time status bina kisi extra clicks ke mil jata hai.
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-footer">
+            <span>HostelHub Executive UI Blueprint &bull; Slide 1 of 4</span>
+            <span>Confidential &bull; Generated for College Management</span>
+        </div>
+    </div>
+
+    <!-- SLIDE 2 -->
+    <div class="slide-container">
+        <div class="slide-header">
+            <div class="slide-title-group">
+                <span class="slide-number">UI Slide 02</span>
+                <div>
+                    <h2 class="slide-title">Director AI Co-Pilot Assistant UI</h2>
+                    <div class="slide-subtitle">Natural Language Voice/Text Real-Time DB Query Engine</div>
+                </div>
+            </div>
+            <div class="meta-badge">AI Assistant View</div>
+        </div>
+
+        <div class="slide-content-grid">
+            <div class="mockup-image-frame">
+                <img src="assets/mockups/director_ai_copilot_ui_mockup_1786258482849.png" alt="Director AI Co-Pilot UI">
+            </div>
+
+            <div class="feature-details-card">
+                <div>
+                    <div class="details-title">🤖 Key Features Displayed on this Screen:</div>
+                    <ul class="detail-bullets">
+                        <li><strong>Voice & Text Query Interface:</strong> Natural Hinglish/English input box (e.g. <em>"Show 48hr unresolved complaints in Block A"</em>).</li>
+                        <li><strong>Dynamic Table Responses:</strong> Real-time database scan karke AI immediate dark-themed table with Red Urgency Tags render karta hai.</li>
+                        <li><strong>Embedded ApexCharts/Chart.js Graphs:</strong> Query like <em>"Wi-Fi complaints by floor"</em> par AI text ke bajaye colorful Bar Graph render kar deta hai.</li>
+                        <li><strong>100% Read-Only Safety Sandbox:</strong> Zero data mutation risk — strictly read-only SQL/Sequelize execution.</li>
+                    </ul>
+                </div>
+                <div class="highlight-badge-box">
+                    💡 <strong>Management Benefit:</strong> Management ko manual reports khojne ki zaroorat nahi — bas poocho aur instant table/chart samne hoga!
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-footer">
+            <span>HostelHub Executive UI Blueprint &bull; Slide 2 of 4</span>
+            <span>Confidential &bull; Generated for College Management</span>
+        </div>
+    </div>
+
+    <!-- SLIDE 3 -->
+    <div class="slide-container">
+        <div class="slide-header">
+            <div class="slide-title-group">
+                <span class="slide-number">UI Slide 03</span>
+                <div>
+                    <h2 class="slide-title">Hostel Capacity Heatmap & SLA Speed Analytics UI</h2>
+                    <div class="slide-subtitle">Floor-by-Floor Interactive Grid & Comparative Performance Charts</div>
+                </div>
+            </div>
+            <div class="meta-badge">Analytics View</div>
+        </div>
+
+        <div class="slide-content-grid">
+            <div class="mockup-image-frame">
+                <img src="assets/mockups/hostel_occupancy_heatmap_ui_mockup_1786258502724.png" alt="Occupancy Heatmap UI">
+            </div>
+
+            <div class="feature-details-card">
+                <div>
+                    <div class="details-title">📊 Key Features Displayed on this Screen:</div>
+                    <ul class="detail-bullets">
+                        <li><strong>Interactive Room Capacity Heatmap:</strong> Glowing neon green cells (Occupied), electric blue cells (Vacant), yellow cells (Under Maintenance). Hover karke student profile details preview.</li>
+                        <li><strong>SLA Resolution Speed Bar Graph:</strong> Hostel Block wise comparative resolution hours (e.g. <em>Block A: 3.2 hrs</em> vs <em>Block B: 11.5 hrs</em>).</li>
+                        <li><strong>GitHub-Style Absenteeism Calendar Grid:</strong> 30-day green/red attendance grid showing peak absenteeism days (Fridays / Long Weekends).</li>
+                    </ul>
+                </div>
+                <div class="highlight-badge-box">
+                    💡 <strong>Management Benefit:</strong> Wardens aur maintenance contractors ki efficiency aur delay bottlenecks clearly rank hote hain.
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-footer">
+            <span>HostelHub Executive UI Blueprint &bull; Slide 3 of 4</span>
+            <span>Confidential &bull; Generated for College Management</span>
+        </div>
+    </div>
+
+    <!-- SLIDE 4 -->
+    <div class="slide-container">
+        <div class="slide-header">
+            <div class="slide-title-group">
+                <span class="slide-number">UI Slide 04</span>
+                <div>
+                    <h2 class="slide-title">System Audit Trail & Student 360° Profile UI</h2>
+                    <div class="slide-subtitle">Real-Time Action Feed & 1-Click NAAC/NIRF Accreditation Exports</div>
+                </div>
+            </div>
+            <div class="meta-badge">Audit & Compliance View</div>
+        </div>
+
+        <div class="slide-content-grid">
+            <div class="mockup-image-frame">
+                <img src="assets/mockups/system_audit_trail_ui_mockup_1786258520222.png" alt="Audit Trail UI">
+            </div>
+
+            <div class="feature-details-card">
+                <div>
+                    <div class="details-title">🛡️ Key Features Displayed on this Screen:</div>
+                    <ul class="detail-bullets">
+                        <li><strong>Real-Time System Audit Trail Feed:</strong> Chronological live activity log with tags like <code>[ROOM_ALLOCATION]</code>, <code>[ROLE_CHANGE]</code>, <code>[STATUS_OVERRIDE]</code>.</li>
+                        <li><strong>Student 360° Profile Card:</strong> Roll number lookup showing attendance gauge (94%), room info, complaint history, aur warden notes.</li>
+                        <li><strong>1-Click NAAC / NIRF PDF Exporter:</strong> Inspection ready compliance reports single click se download hona.</li>
+                    </ul>
+                </div>
+                <div class="highlight-badge-box">
+                    💡 <strong>Management Benefit:</strong> 100% System transparency + Instant government accreditation report export.
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-footer">
+            <span>HostelHub Executive UI Blueprint &bull; Slide 4 of 4</span>
+            <span>Confidential &bull; Generated for College Management</span>
+        </div>
+    </div>
+
+</body>
+</html>

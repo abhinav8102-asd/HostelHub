@@ -205,19 +205,32 @@ export class ComplaintService {
 
   // Management API Methods
   createManagementAccount(data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/management/accounts`, data, {
+    const payload = {
+      ...data,
+      role: 'management'
+    };
+    return this.http.post(`${this.apiUrl}/users/create-staff-warden`, payload, {
       headers: this.authService.getJsonHeaders()
     });
   }
 
   getManagementAccounts(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/management/accounts`, {
-      headers: this.authService.getAuthHeaders()
+    return new Observable((observer) => {
+      this.http.get<any[]>(`${this.apiUrl}/users/all`, {
+        headers: this.authService.getAuthHeaders()
+      }).subscribe({
+        next: (res) => {
+          const mgmtList = Array.isArray(res) ? res.filter((u: any) => u.role === 'management') : [];
+          observer.next(mgmtList);
+          observer.complete();
+        },
+        error: (err) => observer.error(err)
+      });
     });
   }
 
   deleteManagementAccount(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/management/accounts/${id}`, {
+    return this.http.delete(`${this.apiUrl}/users/delete/${id}`, {
       headers: this.authService.getAuthHeaders()
     });
   }

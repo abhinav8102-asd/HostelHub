@@ -1,0 +1,443 @@
+const fs = require('fs');
+const path = require('path');
+const { execSync } = require('child_process');
+
+const htmlContent = `<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <title>HostelHub - Complete Application Master Documentation</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+
+    @page {
+      size: A4;
+      margin: 18mm 15mm 18mm 15mm;
+      @bottom-right {
+        content: counter(page);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: #1e293b;
+      line-height: 1.6;
+      background: #ffffff;
+      margin: 0;
+      padding: 0;
+      font-size: 11pt;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Outfit', sans-serif;
+      color: #0f172a;
+      margin-top: 1.4em;
+      margin-bottom: 0.5em;
+      font-weight: 700;
+      page-break-after: avoid;
+    }
+
+    h1 { font-size: 24pt; color: #b31031; border-bottom: 3px solid #b31031; padding-bottom: 6px; }
+    h2 { font-size: 16pt; color: #8a0d24; border-bottom: 1.5px solid #e2e8f0; padding-bottom: 4px; margin-top: 26px; }
+    h3 { font-size: 13pt; color: #1e293b; margin-top: 18px; }
+    h4 { font-size: 11pt; color: #334155; }
+
+    /* Cover Page */
+    .cover-page {
+      height: 96vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 35px 25px;
+      page-break-after: always;
+      background: linear-gradient(135deg, #4c0615 0%, #b31031 50%, #8a0d24 100%);
+      color: white;
+      border-radius: 18px;
+      margin-bottom: 25px;
+    }
+
+    .cover-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .cover-logo {
+      width: 64px;
+      height: 64px;
+      background: white;
+      color: #b31031;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 900;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+
+    .cover-title-group h1 {
+      color: white;
+      border: none;
+      font-size: 34pt;
+      margin: 0;
+      line-height: 1.1;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+    }
+
+    .cover-subtitle {
+      font-size: 15pt;
+      opacity: 0.92;
+      margin-top: 10px;
+      font-weight: 400;
+    }
+
+    .cover-meta {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(10px);
+      padding: 22px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .cover-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      font-size: 10.5pt;
+    }
+
+    .cover-meta-item strong {
+      display: block;
+      font-size: 8.5pt;
+      text-transform: uppercase;
+      opacity: 0.75;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    /* Panel Card */
+    .panel-box {
+      background: #f8fafc;
+      border-left: 5px solid #b31031;
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      border-top: 1px solid #e2e8f0;
+      border-right: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e2e8f0;
+      page-break-inside: avoid;
+    }
+
+    .panel-box h3 {
+      margin-top: 0;
+      color: #b31031;
+      font-size: 14pt;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .feature-list {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .feature-list li {
+      margin-bottom: 6px;
+      color: #334155;
+      font-size: 11pt;
+    }
+
+    .feature-list li strong {
+      color: #0f172a;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 8.5pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-left: 6px;
+    }
+
+    .badge-user { background: #e0f2fe; color: #0369a1; }
+    .badge-warden { background: #fef3c7; color: #92400e; }
+    .badge-staff { background: #f3e8ff; color: #6b21a8; }
+    .badge-admin { background: #fee2e2; color: #991b1b; }
+    .badge-sec { background: #dcfce7; color: #166534; }
+
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 12px;
+      page-break-inside: avoid;
+    }
+
+    .tech-box {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .tech-box h4 {
+      margin: 0 0 6px 0;
+      color: #b31031;
+      font-size: 11pt;
+    }
+
+    .tech-box p {
+      margin: 0;
+      font-size: 10pt;
+      color: #475569;
+    }
+
+    .code-block {
+      background: #0f172a;
+      color: #38bdf8;
+      font-family: 'Fira Code', monospace;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 9.5pt;
+      margin: 10px 0;
+      overflow-x: auto;
+    }
+
+    .footer {
+      margin-top: 30px;
+      text-align: center;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 12px;
+      font-size: 9pt;
+      color: #64748b;
+    }
+
+    .page-break {
+      page-break-after: always;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- COVER PAGE -->
+  <div class="cover-page">
+    <div>
+      <div class="cover-header">
+        <div class="cover-logo">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#b31031" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+        </div>
+        <div class="cover-title-group">
+          <h1>HostelHub</h1>
+          <div class="cover-subtitle">Complete Application Architecture & Feature Master Audit</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cover-meta">
+      <div class="cover-meta-grid">
+        <div class="cover-meta-item">
+          <strong>Document Scope</strong>
+          Full Panel-Wise Audit, Data Storage & Security Breakdown
+        </div>
+        <div class="cover-meta-item">
+          <strong>System Version</strong>
+          HostelHub v2.4 Enterprise Edition
+        </div>
+        <div class="cover-meta-item">
+          <strong>Primary Tech Stack</strong>
+          Node.js, Express, SQLite, Sequelize, Angular, Socket.io
+        </div>
+        <div class="cover-meta-item">
+          <strong>Language & Format</strong>
+          Hinglish • Executive Master PDF Report
+        </div>
+      </div>
+    </div>
+
+    <div style="font-size: 10pt; opacity: 0.85;">
+      HostelHub Ecosystem • Confidential System Audit Document &bull; August 2026
+    </div>
+  </div>
+
+  <!-- SECTION 1: SYSTEM OVERVIEW -->
+  <h2>1. 📱 HostelHub Ecosystem Overview (Full App Summary)</h2>
+  <p><strong>HostelHub</strong> ek multi-role, end-to-end Smart Hostel Management Platform hai jo student residence lifecycle ko completely digitize karta hai. System 4 dedicated frontends (Portals) aur 1 centralized backend service par chalta hai:</p>
+
+  <div class="tech-grid">
+    <div class="tech-box">
+      <h4>🎓 Student Portal (frontend-user)</h4>
+      <p>Complaint lodging, live roll call attendance, mess feedback, real-time chat, profile management, and push alerts.</p>
+    </div>
+    <div class="tech-box">
+      <h4>👨‍🏫 Warden Portal (frontend-warden)</h4>
+      <p>Block-wise roll call marking, complaint resolution & staff task assignment, mess menu management, announcements broadcast.</p>
+    </div>
+    <div class="tech-box">
+      <h4>🛠️ Staff / Technician Portal (frontend-staff)</h4>
+      <p>Task execution dashboard for Electricians, Plumbers & IT support, task status updates, completion proof upload.</p>
+    </div>
+    <div class="tech-box">
+      <h4>🔑 Super Admin Portal (frontend-admin)</h4>
+      <p>User provisioning, student account approvals, hostel block & room capacity management, global app settings.</p>
+    </div>
+  </div>
+
+  <!-- SECTION 2: PANEL-WISE FEATURE BREAKDOWN -->
+  <h2>2. 📋 Panel-Wise Complete Features Audit</h2>
+
+  <!-- PANEL 1: STUDENT -->
+  <div class="panel-box">
+    <h3><span class="badge badge-user">Panel 1</span> 🎓 Student Portal (User Dashboard)</h3>
+    <ul class="feature-list">
+      <li><strong>Authentication & Onboarding:</strong> Email/Password login, Google OAuth 2.0 Single Sign-On, Student Registration form, Password Reset via Email OTP.</li>
+      <li><strong>Profile Management:</strong> View & edit personal details, Profile Picture upload (Multer integration), Room Number, Hostel Block, Roll Number, Bio, Gender, and Batch info.</li>
+      <li><strong>Complaint Lodging Engine:</strong> Raise complaints under categories (Plumbing, Electrical, Wi-Fi, Food Quality, Misconduct). Upload photo evidence directly from phone camera/gallery. Real-time status tracking (Pending &rarr; In Progress &rarr; Resolved). Chat/comments on specific complaints.</li>
+      <li><strong>Attendance History:</strong> View monthly attendance calendar, attendance status badges (Present, Absent, Outstation Leave).</li>
+      <li><strong>Mess Feedback & Daily Menu:</strong> View today's and weekly Mess Menu (Breakfast, Lunch, Snacks, Dinner). Submit 1-5 Star Ratings and comments for meal quality.</li>
+      <li><strong>Real-Time Community & Chat:</strong> Direct 1-on-1 messaging (Student-to-Warden, Student-to-Student), Hostel Block & Floor Group Chat rooms with real-time Socket.io instant messaging, unread badges, and attachment sharing.</li>
+      <li><strong>Notifications & Circulars:</strong> Live push alerts for complaint status changes, new announcements, and warden broadcasts.</li>
+    </ul>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- PANEL 2: WARDEN -->
+  <div class="panel-box">
+    <h3><span class="badge badge-warden">Panel 2</span> 👨‍🏫 Warden Portal (Operational Command)</h3>
+    <ul class="feature-list">
+      <li><strong>Operational Dashboard:</strong> Block-wise student count, pending complaints widget, today's attendance percentage summary.</li>
+      <li><strong>Daily Roll Call Attendance:</strong> Mark daily student attendance (Present / Absent / Outstation), filter by floor or room, 1-click "Mark All Present" bulk feature.</li>
+      <li><strong>Complaint Management & Staff Routing:</strong> View complaints raised in their hostel block, inspect uploaded evidence photos, update status (In Progress, Resolved, Rejected), assign complaints to specific maintenance staff (e.g. Electrician Ramesh).</li>
+      <li><strong>Mess Operations Oversight:</strong> Edit & update weekly mess menu schedule, monitor daily student mess ratings and feedback comments.</li>
+      <li><strong>Official Broadcast Circulars:</strong> Publish official announcements/notices targeted to specific hostel blocks or entire college with push notifications.</li>
+      <li><strong>Direct Student & Staff Chat:</strong> Real-time messaging with students for issue resolution and staff for maintenance updates.</li>
+    </ul>
+  </div>
+
+  <!-- PANEL 3: STAFF -->
+  <div class="panel-box">
+    <h3><span class="badge badge-staff">Panel 3</span> 🛠️ Staff / Maintenance Portal (Work Order Engine)</h3>
+    <ul class="feature-list">
+      <li><strong>Assigned Task Dashboard:</strong> View maintenance work orders assigned by Wardens based on trade (Electrical, Plumbing, Wi-Fi/IT, Carpentry).</li>
+      <li><strong>Task Progress Update:</strong> Change task status from Pending &rarr; In Progress &rarr; Resolved. Add work completion notes.</li>
+      <li><strong>Warden Coordination Chat:</strong> Direct chat channel with the assigning Warden for room entry permissions or material required.</li>
+    </ul>
+  </div>
+
+  <!-- PANEL 4: ADMIN -->
+  <div class="panel-box">
+    <h3><span class="badge badge-admin">Panel 4</span> 🔑 Super Admin Portal (System Management)</h3>
+    <ul class="feature-list">
+      <li><strong>User Access & Account Verification:</strong> View master user directory across all roles ('student', 'warden', 'staff', 'admin'). Approve pending student registrations, block suspicious accounts, change user roles.</li>
+      <li><strong>Hostel Infrastructure Management:</strong> Create & edit Hostel Blocks (e.g., Boys Block A, Girls Block B), Floors, Rooms, Room sharing capacity (Single, Double, Triple), Room Amenities (AC / Non-AC). Assign rooms to students.</li>
+      <li><strong>Complaint Categories & Settings:</strong> Manage system-wide complaint categories, app parameters, and global system notices.</li>
+      <li><strong>Centralized Master Reports:</strong> Export student master database, attendance logs, and complaint resolution analytics.</li>
+    </ul>
+  </div>
+
+  <!-- SECTION 3: DATA STORAGE & BACKEND ENGINE -->
+  <h2>3. 💾 Data Storage & Backend Architecture Engine</h2>
+  <p>Backend Node.js + Express framework par structured Sequelize ORM ke sath chalta hai:</p>
+
+  <div class="tech-grid">
+    <div class="tech-box">
+      <h4>🗄️ Database Engine</h4>
+      <p>SQLite Database (<code>database.sqlite</code>) managed via Sequelize ORM with automatic table migrations & indexing.</p>
+    </div>
+    <div class="tech-box">
+      <h4>📁 File Storage (Uploads)</h4>
+      <p>Local <code>uploads/</code> directory managed by <code>Multer</code> middleware for profile pictures & complaint evidence images.</p>
+    </div>
+    <div class="tech-box">
+      <h4>⚡ Real-Time WebSockets</h4>
+      <p>Socket.io engine (<code>socket.js</code>) handling instant messaging, chat room joining, and real-time notification push.</p>
+    </div>
+    <div class="tech-box">
+      <h4>📜 Database Migration Scripts</h4>
+      <p>Automated scripts (<code>initDb.js</code>, <code>seed.js</code>, <code>migrate_add_google_id.js</code>, <code>migrate_add_chat_fields.js</code>).</p>
+    </div>
+  </div>
+
+  <h3>🗂️ Core Database Models & Schema Breakdown:</h3>
+  <ul class="feature-list">
+    <li><strong>User Model (<code>User.js</code>):</strong> Stores user profiles, role enum (<code>student</code>, <code>warden</code>, <code>staff</code>, <code>admin</code>), status (<code>active</code>, <code>pending_verification</code>, <code>blocked</code>), Google ID, hashed password, room number, hostel block, roll number, phone, gender, and batch.</li>
+    <li><strong>Attendance Model (<code>Attendance.js</code>):</strong> Stores daily roll call entries linked to User ID, date, status (<code>present</code>, <code>absent</code>, <code>outstation</code>), and warden ID.</li>
+    <li><strong>Complaint Model (<code>Complaint.js</code>):</strong> Stores complaints with category, title, description, proof image URL, status (<code>pending</code>, <code>in_progress</code>, <code>resolved</code>, <code>rejected</code>), student ID, assigned staff ID, hostel block.</li>
+    <li><strong>ChatMessage & GroupChat Models (<code>ChatMessage.js</code>, <code>GroupChat.js</code>):</strong> Stores 1-on-1 and group messages, sender ID, receiver ID, group ID, message text, attachment URL, read receipts.</li>
+    <li><strong>MessMenu, MessFeedback & MessSkip Models:</strong> Stores day-wise menu schedules, 1-5 star meal feedback ratings, student comments, and skip requests.</li>
+    <li><strong>Announcement & Notification Models:</strong> Stores published circulars, targeted blocks, push notification logs, and read flags.</li>
+    <li><strong>PasswordResetOTP Model:</strong> Stores email-linked hashed OTP tokens and expiration timestamps.</li>
+  </ul>
+
+  <div class="page-break"></div>
+
+  <!-- SECTION 4: SECURITY & DATA PROTECTION -->
+  <h2>4. 🛡️ Security, Privacy & Data Protection Architecture</h2>
+
+  <div class="panel-box">
+    <h3><span class="badge badge-sec">Security</span> 🔒 Complete System Security Framework</h3>
+    <ul class="feature-list">
+      <li><strong>JWT Token Authentication:</strong> Stateless JSON Web Token authentication with HTTP Bearer Authorization header. Tokens carry user ID, email, and role claims with expiration enforcing re-authentication.</li>
+      <li><strong>Role-Based Access Control (RBAC Middleware):</strong> Strict <code>auth.js</code> middleware enforcing route protection (e.g. <code>authorizeRoles('admin', 'warden')</code>). Students cannot access Warden or Admin APIs.</li>
+      <li><strong>Bcrypt Password Hashing:</strong> All user passwords are salted & hashed using <code>bcryptjs</code> (10 salt rounds) before storing in DB. Plaintext passwords are never saved.</li>
+      <li><strong>Google OAuth 2.0 Security:</strong> Secure Google token validation for single sign-on without password exposure.</li>
+      <li><strong>SQL Injection & XSS Protection:</strong> Sequelize ORM provides fully parameterized SQL queries, eliminating SQL Injection vulnerabilities. Inputs are sanitized against XSS attacks.</li>
+      <li><strong>Multer Storage Security:</strong> File upload validation enforcing allowed MIME types (JPEG, PNG, WEBP), file size caps, and random filename generation to prevent arbitrary file execution scripts.</li>
+      <li><strong>Environment Isolation:</strong> Sensitive keys (JWT Secret, Database path, Server Port) isolated in server <code>.env</code> file.</li>
+      <li><strong>Socket.io Room Authorization:</strong> Real-time chat socket connections require handshake token authentication, isolating group chat channels to authorized members only.</li>
+    </ul>
+  </div>
+
+  <!-- SECTION 5: HIDDEN ASSETS & NATIVE COMPATIBILITY -->
+  <h2>5. 💎 Live Features & Native Mobile Apps (Things Often Missed)</h2>
+  <ul class="feature-list">
+    <li><strong>Native Android APK Builds:</strong> Web-to-Native WebView wrappers available in root directory:
+      <ul>
+        <li><code>HostelHub-Latest.apk</code> (Student/Staff App)</li>
+        <li><code>HostelHub-Admin-Latest.apk</code> (Warden/Admin Management App)</li>
+      </ul>
+    </li>
+    <li><strong>Adaptive Branding & Responsive UI:</strong> Custom CSS glassmorphism theme with dark/light mode toggle, mobile navigation drawer, and desktop sidebar layout.</li>
+    <li><strong>Real-time Unread Message Counters:</strong> Dynamic badge notifications in chat tabs synced via Socket.io events.</li>
+    <li><strong>Database Seeding & Recovery:</strong> Automated database seed scripts (<code>seed.js</code>) for initial admin account and test data initialization.</li>
+  </ul>
+
+  <footer class="footer">
+    HostelHub Complete Application Architecture & Feature Master Audit &bull; Generated August 2026 &bull; Confidential
+  </footer>
+
+</body>
+</html>
+`;
+
+const htmlPath = path.join(__dirname, '../HostelHub_Complete_App_Documentation_Hinglish.html');
+const pdfPath = 'C:\\Users\\abhin\\Desktop\\HostelHub\\HostelHub_Complete_App_Documentation_Hinglish.pdf';
+
+fs.writeFileSync(htmlPath, htmlContent, 'utf8');
+console.log('HTML Master Documentation written to:', htmlPath);
+
+try {
+  const cmd = `& "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe" --headless --disable-gpu --print-to-pdf="${pdfPath}" "${htmlPath}"`;
+  execSync(cmd, { shell: 'powershell.exe' });
+  console.log('PDF generated successfully at:', pdfPath);
+
+  // Copy PDF file directly to Windows Clipboard
+  execSync(`powershell -command "Set-Clipboard -Path '${pdfPath}'"`, { shell: 'powershell.exe' });
+  console.log('PDF file copied to Windows Clipboard for Ctrl+V!');
+} catch (err) {
+  console.error('Error generating Master PDF via Edge:', err);
+}
