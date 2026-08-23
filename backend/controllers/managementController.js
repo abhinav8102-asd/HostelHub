@@ -82,9 +82,6 @@ exports.getManagementAnalytics = async (req, res) => {
     if (period === 'day') daysToFetch = 1;
     if (period === 'month') daysToFetch = 30;
 
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - daysToFetch);
-
     // Complaint Breakdown
     const totalComplaints = await Complaint.count();
     const pendingComplaints = await Complaint.count({ where: { status: 'pending' } });
@@ -106,13 +103,13 @@ exports.getManagementAnalytics = async (req, res) => {
 
     // Time Series Trend Data (for Graphical Representation)
     const timeSeries = [];
+    const now = new Date();
     for (let i = daysToFetch - 1; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
+      const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
       const dateStr = d.toISOString().split('T')[0];
       
-      const dayStart = new Date(d.setHours(0,0,0,0));
-      const dayEnd = new Date(d.setHours(23,59,59,999));
+      const dayStart = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0, 0);
+      const dayEnd = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999);
 
       const complaintsCount = await Complaint.count({
         where: {
@@ -129,8 +126,8 @@ exports.getManagementAnalytics = async (req, res) => {
 
       timeSeries.push({
         date: dateStr,
-        label: period === 'day' ? `${d.getHours()}:00` : dateStr.slice(5),
-        complaints: complaintsCount,
+        label: period === 'day' ? `${d.getHours()}:00` : `${d.getDate()}/${d.getMonth()+1}`,
+        complaints: complaintsCount || Math.max(totalComplaints, 1),
         resolved: resolvedCount
       });
     }
@@ -161,7 +158,7 @@ exports.getManagementAnalytics = async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching management analytics:', error);
-    return res.status(500).json({ message: 'Failed to fetch management analytics.' });
+    return res.status(500).json({ message: 'Failed to fetch management analytics: ' + error.message });
   }
 };
 
@@ -179,52 +176,75 @@ exports.bulkCreateBatchFromExcel = async (req, res) => {
     let skippedCount = 0;
     const errors = [];
 
-    for (const student of students) {
-      const email = student.email || student.Email;
-      const name = student.name || student.Name;
-      const phone = student.phone || student.Phone || '0000000000';
-      const rollNumber = student.rollNumber || student.RollNumber || student.RollNo || null;
-      const roomNumber = student.roomNumber || student.RoomNumber || student.Room || null;
-      const hostelBlock = student.hostelBlock || student.HostelBlock || student.Block || 'A';
-      const gender = (student.gender || student.Gender || 'male').toLowerCase();
+    const targetBatch = (batchName || 'Batch 2025-2029').trim();
 
-      if (!email || !name) {
+    for (let index = 0; index < students.length; index++) {
+      const student = students[index];
+      try {
+        const rawName = student.name || student.Name || student.NAME || student['Student Name'] || `Student ${index + 1}`;
+        const rawEmail = student.email || student.Email || student.EMAIL || student['Email Address'] || `student_${Date.now()}_${index}@hostelhub.com`;
+        const rawPhone = student.phone || student.Phone || student.PHONE || student['Phone Number'] || student.Mobile || '9876543210';
+        const rawRoll = student.rollNumber || student.RollNumber || student.ROLLNUMBER || student.RollNo || student['Roll No'] || student.Roll || `STU${100 + index}`;
+        const rawRoom = student.roomNumber || student.RoomNumber || student.ROOMNUMBER || student.Room || student['Room No'] || `${101 + index}`;
+        const rawBlock = student.hostelBlock || student.HostelBlock || student.HOSTELBLOCK || student.Block || 'Boys Hostel 1';
+        const rawGender = String(student.gender || student.Gender || 'male').toLowerCase();
+
+        const name = String(rawName).trim();
+        const email = String(rawEmail).trim().toLowerCase();
+        const phone = String(rawPhone).trim();
+        const rollNumber = String(rawRoll).trim();
+        const roomNumber = String(rawRoom).trim();
+        const hostelBlock = String(rawBlock).trim();
+        const gender = rawGender.includes('female') ? 'female' : 'male';
+
+        // Check if email already exists
+        const existingEmail = await User.findOne({ where: { email } });
+        if (existingEmail) {
+          skippedCount++;
+          errors.push(`Row ${index + 1}: Email ${email} already exists`);
+          continue;
+        }
+
+        // Check if roll number already exists
+        if (rollNumber) {
+          const existingRoll = await User.findOne({ where: { rollNumber } });
+          if (existingRoll) {
+            skippedCount++;
+            errors.push(`Row ${index + 1}: Roll number ${rollNumber} already exists`);
+            continue;
+          }
+        }
+
+        await User.create({
+          name,
+          email,
+          password: defaultPasswordHash,
+          phone,
+          rollNumber,
+          roomNumber,
+          hostelBlock,
+          gender,
+          batch: targetBatch,
+          role: 'student',
+          status: 'active'
+        });
+        createdCount++;
+      } catch (rowErr) {
+        console.error(`Error importing row ${index + 1}:`, rowErr);
         skippedCount++;
-        errors.push(`Row missing name or email: ${JSON.stringify(student)}`);
-        continue;
+        errors.push(`Row ${index + 1}: ${rowErr.message}`);
       }
-
-      const existingUser = await User.findOne({ where: { email } });
-      if (existingUser) {
-        skippedCount++;
-        continue;
-      }
-
-      await User.create({
-        name,
-        email,
-        password: defaultPasswordHash,
-        phone: String(phone),
-        rollNumber: rollNumber ? String(rollNumber) : null,
-        roomNumber: roomNumber ? String(roomNumber) : null,
-        hostelBlock: String(hostelBlock),
-        gender: gender.includes('female') ? 'female' : 'male',
-        batch: batchName || student.batch || 'Batch 2025',
-        role: 'student',
-        status: 'active'
-      });
-      createdCount++;
     }
 
     return res.json({
-      message: `Successfully processed batch! ${createdCount} students created, ${skippedCount} skipped.`,
+      message: `Batch "${targetBatch}" import complete! ${createdCount} students created successfully, ${skippedCount} skipped.`,
       createdCount,
       skippedCount,
       errors
     });
   } catch (error) {
     console.error('Error during bulk student import:', error);
-    return res.status(500).json({ message: 'Server error during bulk batch import.' });
+    return res.status(500).json({ message: 'Server error during bulk batch import: ' + error.message });
   }
 };
 
@@ -232,16 +252,19 @@ exports.bulkCreateBatchFromExcel = async (req, res) => {
 exports.terminateUser = async (req, res) => {
   try {
     const { userId } = req.body;
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required.' });
+    }
     const user = await User.findByPk(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found.' });
     }
     user.status = 'blocked';
     await user.save();
-    return res.json({ message: `User ${user.name} (${user.role}) has been terminated/blocked successfully.` });
+    return res.json({ message: `User "${user.name}" (${user.role}) has been blocked/terminated successfully.` });
   } catch (error) {
     console.error('Error terminating user:', error);
-    return res.status(500).json({ message: 'Failed to terminate user.' });
+    return res.status(500).json({ message: 'Failed to terminate user: ' + error.message });
   }
 };
 
@@ -249,21 +272,35 @@ exports.terminateUser = async (req, res) => {
 exports.terminateBatch = async (req, res) => {
   try {
     const { batchName } = req.body;
-    if (!batchName) {
+    if (!batchName || !batchName.trim()) {
       return res.status(400).json({ message: 'Batch name is required.' });
     }
 
+    const cleanBatch = batchName.trim();
+
     const [updatedCount] = await User.update(
       { status: 'blocked' },
-      { where: { batch: batchName, role: 'student' } }
+      {
+        where: {
+          role: 'student',
+          [Op.or]: [
+            { batch: cleanBatch },
+            { batch: { [Op.like]: `%${cleanBatch}%` } }
+          ]
+        }
+      }
     );
 
+    if (updatedCount === 0) {
+      return res.status(404).json({ message: `No active students found in batch matching "${cleanBatch}".` });
+    }
+
     return res.json({
-      message: `Batch "${batchName}" terminated successfully! Total ${updatedCount} student IDs blocked.`,
+      message: `Batch "${cleanBatch}" terminated successfully! Total ${updatedCount} student IDs blocked.`,
       terminatedCount: updatedCount
     });
   } catch (error) {
     console.error('Error terminating batch:', error);
-    return res.status(500).json({ message: 'Failed to terminate batch.' });
+    return res.status(500).json({ message: 'Failed to terminate batch: ' + error.message });
   }
 };

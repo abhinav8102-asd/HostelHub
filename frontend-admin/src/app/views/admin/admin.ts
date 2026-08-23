@@ -137,50 +137,61 @@ import { ComplaintService } from '../../services/complaint.service';
           <h4 class="page-title">👥 System Users & Batch Management</h4>
 
           <!-- Bulk Student Batch Import Section -->
-          <div class="card" style="margin-bottom: 20px; background: #0f172a; color: white; padding: 18px; border-radius: 16px; border: 1px solid #1e293b;">
+          <div class="card" style="margin-bottom: 20px; background: #0f172a; color: white; padding: 18px; border-radius: 16px; border: 1px solid #334155;">
             <h5 style="margin: 0 0 4px 0; color: #f8fafc; font-size: 15px; font-weight: 800;">📥 Bulk Student Batch Import (Excel / CSV)</h5>
             <p style="margin: 0 0 14px 0; color: #94a3b8; font-size: 11.5px;">Upload student Excel/CSV sheet to register a full batch at once</p>
 
-            <div *ngIf="batchImportSuccess" class="alert alert-success" style="margin-bottom: 12px;">{{ batchImportSuccess }}</div>
-            <div *ngIf="batchImportError" class="alert alert-danger" style="margin-bottom: 12px;">{{ batchImportError }}</div>
+            <div *ngIf="batchImportSuccess" class="alert alert-success" style="margin-bottom: 12px; font-weight: 700;">{{ batchImportSuccess }}</div>
+            <div *ngIf="batchImportError" class="alert alert-danger" style="margin-bottom: 12px; font-weight: 700;">{{ batchImportError }}</div>
 
-            <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 12px;">
-              <input type="text" class="form-input" style="flex: 1; min-width: 180px; background: #1e293b; border-color: #334155; color: white;" [(ngModel)]="bulkBatchName" placeholder="Target Batch Name (e.g. Batch 2025-2029)" />
-              <input type="file" accept=".csv, .xlsx, .json" (change)="onExcelFileSelected($event)" style="font-size: 12px; color: #94a3b8;" />
+            <div style="margin-bottom: 12px;">
+              <label style="display: block; font-size: 11px; font-weight: 700; color: #cbd5e1; margin-bottom: 4px;">Target Batch Name</label>
+              <input type="text" class="form-input" style="width: 100%; background: #1e293b; border: 1.5px solid #6366f1; color: white; border-radius: 8px; padding: 10px; font-weight: 700; box-sizing: border-box;" [(ngModel)]="bulkBatchName" placeholder="e.g. Batch 2025-2029" />
             </div>
 
-            <div *ngIf="excelParsedStudents.length > 0" style="margin-bottom: 12px; padding: 10px; background: #1e293b; border-radius: 8px; border: 1px solid #334155;">
+            <div style="margin-bottom: 12px;">
+              <label style="display: block; font-size: 11px; font-weight: 700; color: #cbd5e1; margin-bottom: 4px;">Upload Excel/CSV File</label>
+              <input type="file" accept=".csv, .xlsx, .json" (change)="onExcelFileSelected($event)" style="font-size: 12px; color: #cbd5e1; background: #1e293b; border: 1px dashed #6366f1; width: 100%; padding: 10px; border-radius: 8px; box-sizing: border-box;" />
+            </div>
+
+            <div *ngIf="excelParsedStudents.length > 0" style="margin-bottom: 12px; padding: 10px; background: #1e293b; border-radius: 8px; border: 1px solid #6366f1;">
               <span style="font-size: 12px; font-weight: 700; color: #818cf8;">📄 Preview Parsed Students: {{ excelParsedStudents.length }} records ready to import</span>
             </div>
 
-            <button type="button" class="btn btn-primary" (click)="uploadParsedBatch()" [disabled]="excelParsedStudents.length === 0 || importingBatch" style="width: 100%;">
+            <button type="button" class="btn btn-primary" (click)="uploadParsedBatch()" [disabled]="excelParsedStudents.length === 0 || importingBatch" style="width: 100%; font-weight: 800; padding: 12px; border-radius: 10px;">
               <span *ngIf="importingBatch">Importing Student Batch...</span>
               <span *ngIf="!importingBatch">🚀 Register {{ excelParsedStudents.length }} Students Now</span>
             </button>
           </div>
 
           <!-- Termination & Block Control Center -->
-          <div class="card" style="margin-bottom: 24px; background: #1e1b2e; border: 1px solid #7f1d1d; padding: 18px; border-radius: 16px;">
+          <div class="card" style="margin-bottom: 24px; background: #1e1b2e; border: 1.5px solid #991b1b; padding: 18px; border-radius: 16px;">
             <h5 style="margin: 0 0 4px 0; color: #fecdd3; font-size: 15px; font-weight: 800;">⛔ Termination & Block Control Center</h5>
             <p style="margin: 0 0 14px 0; color: #fda4af; font-size: 11.5px;">Terminate individual IDs or block an entire student batch instantly</p>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
               <!-- Single ID Termination -->
-              <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 10px; border: 1px solid rgba(239, 68, 68, 0.3);">
-                <label style="display: block; font-size: 11px; font-weight: 700; color: #cbd5e1; margin-bottom: 6px;">Single User ID Termination</label>
-                <div style="display: flex; gap: 6px;">
-                  <input type="number" class="form-input" style="flex: 1; background: #0f172a; border-color: #334155; color: white;" [(ngModel)]="terminateUserIdInput" placeholder="User ID #" />
-                  <button type="button" class="btn btn-delete-user" (click)="executeSingleUserTermination()" style="white-space: nowrap;">Terminate</button>
-                </div>
+              <div style="background: rgba(0,0,0,0.5); padding: 14px; border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.4);">
+                <label style="display: block; font-size: 11.5px; font-weight: 700; color: #fecdd3; margin-bottom: 6px;">1-Click Single User Termination</label>
+                <select class="form-input" style="width: 100%; background: #0f172a; border: 1.5px solid #ef4444; color: white; border-radius: 8px; padding: 8px; margin-bottom: 8px; font-weight: 600; box-sizing: border-box;" [(ngModel)]="terminateUserIdInput">
+                  <option [ngValue]="null">Select User to Block/Terminate</option>
+                  <option *ngFor="let u of users" [value]="u.id">{{ u.name }} ({{ u.role | uppercase }}) - ID #{{ u.id }}</option>
+                </select>
+                <button type="button" class="btn btn-delete-user" (click)="executeSingleUserTermination()" style="width: 100%; background: #ef4444; color: white; padding: 8px; font-weight: 800; border-radius: 8px;">🚫 Block / Terminate User</button>
               </div>
 
               <!-- Full Batch Termination -->
-              <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 10px; border: 1px solid rgba(239, 68, 68, 0.3);">
-                <label style="display: block; font-size: 11px; font-weight: 700; color: #cbd5e1; margin-bottom: 6px;">1-Click Full Batch Termination</label>
-                <div style="display: flex; gap: 6px;">
-                  <input type="text" class="form-input" style="flex: 1; background: #0f172a; border-color: #334155; color: white;" [(ngModel)]="terminateBatchNameInput" placeholder="Batch Name" />
-                  <button type="button" class="btn btn-delete-user" (click)="executeBatchTermination()" style="white-space: nowrap; background: #dc2626;">Block Batch</button>
-                </div>
+              <div style="background: rgba(0,0,0,0.5); padding: 14px; border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.4);">
+                <label style="display: block; font-size: 11.5px; font-weight: 700; color: #fecdd3; margin-bottom: 6px;">1-Click Full Batch Termination</label>
+                <select class="form-input" style="width: 100%; background: #0f172a; border: 1.5px solid #dc2626; color: white; border-radius: 8px; padding: 8px; margin-bottom: 8px; font-weight: 600; box-sizing: border-box;" [(ngModel)]="terminateBatchNameInput">
+                  <option value="">Select Batch to Terminate</option>
+                  <option value="Batch 2023-2027">Batch 2023-2027</option>
+                  <option value="Batch 2024-2028">Batch 2024-2028</option>
+                  <option value="Batch 2025-2029">Batch 2025-2029</option>
+                  <option value="Batch 2026-2030">Batch 2026-2030</option>
+                </select>
+                <input type="text" class="form-input" style="width: 100%; background: #0f172a; border: 1px solid #dc2626; color: white; border-radius: 8px; padding: 6px; font-size: 11px; margin-bottom: 8px; box-sizing: border-box;" [(ngModel)]="terminateBatchNameInput" placeholder="Or type custom batch name" />
+                <button type="button" class="btn btn-delete-user" (click)="executeBatchTermination()" style="width: 100%; background: #dc2626; color: white; padding: 8px; font-weight: 800; border-radius: 8px;">⚠️ Terminate Entire Batch</button>
               </div>
             </div>
           </div>
@@ -461,11 +472,9 @@ import { ComplaintService } from '../../services/complaint.service';
 
               <button type="submit" class="btn btn-primary btn-submit" [disabled]="!profileForm.form.valid || updatingProfile">
                 <span *ngIf="updatingProfile">Updating...</span>
-                <span          </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+                <span *ngIf="!updatingProfile">Save Changes</span>
+              </button>
+            </form>
           </div>
         </div>
 
@@ -1157,7 +1166,10 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   uploadParsedBatch(): void {
-    if (this.excelParsedStudents.length === 0) return;
+    if (this.excelParsedStudents.length === 0) {
+      alert('Please select a valid Excel or CSV file first.');
+      return;
+    }
     this.importingBatch = true;
     this.batchImportSuccess = '';
     this.batchImportError = '';
@@ -1173,7 +1185,8 @@ export class AdminDashboardComponent implements OnInit {
       },
       error: (err) => {
         this.importingBatch = false;
-        this.batchImportError = err.error?.message || 'Failed to import batch.';
+        const msg = err.error?.message || (typeof err.error === 'string' ? err.error : null) || err.message || 'Failed to import batch.';
+        this.batchImportError = `❌ ${msg}`;
         this.cdr.detectChanges();
       }
     });
@@ -1181,10 +1194,10 @@ export class AdminDashboardComponent implements OnInit {
 
   executeSingleUserTermination(): void {
     if (!this.terminateUserIdInput) {
-      alert('Please enter a valid User ID.');
+      alert('Please select or enter a valid User ID.');
       return;
     }
-    if (!confirm(`Are you sure you want to terminate User ID #${this.terminateUserIdInput}?`)) return;
+    if (!confirm(`Are you sure you want to block/terminate User ID #${this.terminateUserIdInput}?`)) return;
 
     this.complaintService.terminateUser(this.terminateUserIdInput).subscribe({
       next: (res) => {
@@ -1192,24 +1205,31 @@ export class AdminDashboardComponent implements OnInit {
         this.terminateUserIdInput = null;
         this.loadUsers();
       },
-      error: (err) => alert(err.error?.message || 'Failed to terminate user.')
+      error: (err) => {
+        const msg = err.error?.message || (typeof err.error === 'string' ? err.error : null) || err.message || 'Failed to terminate user.';
+        alert(`❌ ${msg}`);
+      }
     });
   }
 
   executeBatchTermination(): void {
     if (!this.terminateBatchNameInput.trim()) {
-      alert('Please enter a Batch Name to terminate.');
+      alert('Please select or enter a Batch Name to terminate.');
       return;
     }
-    if (!confirm(`⚠️ DANGER: Are you sure you want to block and terminate ALL students in "${this.terminateBatchNameInput}"?`)) return;
+    const targetBatch = this.terminateBatchNameInput.trim();
+    if (!confirm(`⚠️ DANGER: Are you sure you want to block and terminate ALL students in "${targetBatch}"?`)) return;
 
-    this.complaintService.terminateBatch(this.terminateBatchNameInput.trim()).subscribe({
+    this.complaintService.terminateBatch(targetBatch).subscribe({
       next: (res) => {
         alert(`✅ ${res.message}`);
         this.terminateBatchNameInput = '';
         this.loadUsers();
       },
-      error: (err) => alert(err.error?.message || 'Failed to terminate batch.')
+      error: (err) => {
+        const msg = err.error?.message || (typeof err.error === 'string' ? err.error : null) || err.message || 'Failed to terminate batch.';
+        alert(`❌ ${msg}`);
+      }
     });
   }
 }
