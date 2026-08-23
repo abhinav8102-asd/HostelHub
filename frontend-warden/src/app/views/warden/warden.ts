@@ -8,7 +8,6 @@ import { ComplaintService } from '../../services/complaint.service';
 import { SocketService, LiveNotification } from '../../services/socket.service';
 import { MessService } from '../../services/mess.service';
 import { AttendanceService } from '../../services/attendance.service';
-import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service';
 
 
 
@@ -847,224 +846,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
           </div>
         </div>
 
-        <!-- TAB 7: WARDEN BATCH & GENDER GROUP CHAT -->
-        <div *ngIf="activeTab === 'chat'" class="tab-panel animate-fade">
-          <h4 class="page-title">💬 Hostel Group Chat Channels</h4>
 
-          <!-- Group Room Selector Bar -->
-          <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 12px; scrollbar-width: thin;">
-            <button 
-              type="button"
-              *ngFor="let g of wardenChatGroups"
-              class="pill-btn"
-              [class.active]="activeWardenChatGroup?.id === g.id"
-              (click)="openWardenChatGroup(g)"
-              style="white-space: nowrap; font-size: 12px; padding: 6px 14px; position: relative; display: inline-flex; align-items: center; gap: 6px;"
-            >
-              {{ g.name.startsWith('Boys') ? '👦' : (g.name.startsWith('Girls') ? '👧' : '👥') }} {{ g.name }}
-              <span class="channel-badge animate-scale" *ngIf="unreadCounts[g.id] > 0">{{ unreadCounts[g.id] }}</span>
-            </button>
-          </div>
-
-          <!-- Chat Room Container Card -->
-          <div class="card mess-card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; height: calc(100vh - 240px); min-height: 480px;">
-            
-            <!-- Room Header -->
-            <div style="background: var(--primary-light); padding: 12px 18px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; min-height: 54px;">
-              <div *ngIf="!isMultiSelectMode">
-                <strong style="font-size: 15px; color: var(--primary-dark); display: flex; align-items: center; gap: 6px;">
-                  👥 {{ activeWardenChatGroup?.name || 'Group Chat Room' }}
-                </strong>
-                <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
-                  {{ activeWardenChatGroup?.description }}
-                </div>
-              </div>
-
-              <!-- Normal Mode Right Actions -->
-              <div *ngIf="!isMultiSelectMode" style="display: flex; align-items: center; gap: 8px;">
-                <button type="button" class="btn" style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); font-size: 11.5px; padding: 4px 10px; border-radius: 6px; font-weight: 600; cursor: pointer;" (click)="toggleMultiSelectMode()">
-                  ☑️ Select
-                </button>
-                <span class="day-badge" style="background: #ef4444; color: white;">WARDEN CHANNEL</span>
-              </div>
-
-              <!-- Multi-Select Action Bar -->
-              <div *ngIf="isMultiSelectMode" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                <span style="font-size: 13.5px; font-weight: 700; color: var(--primary-dark);">
-                  ☑️ {{ selectedMessageIds.size }} selected
-                </span>
-
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <button type="button" class="btn" style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); font-size: 12px; padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer;" (click)="bulkDeleteForMe()" [disabled]="selectedMessageIds.size === 0">
-                    🙈 Delete for Me ({{ selectedMessageIds.size }})
-                  </button>
-                  <button type="button" class="btn btn-primary" style="background: #ef4444; color: white; border: none; font-size: 12px; padding: 6px 12px; border-radius: 6px; font-weight: 700; cursor: pointer;" (click)="bulkDeleteForEveryone()" [disabled]="selectedMessageIds.size === 0">
-                    💥 Delete for Everyone ({{ selectedMessageIds.size }})
-                  </button>
-                  <button type="button" class="btn" style="background: transparent; border: none; color: var(--text-muted); font-size: 16px; padding: 4px 8px; cursor: pointer;" (click)="clearMessageSelection()">
-                    ✕
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Messages Stream Area -->
-            <div id="wardenChatFeed" (scroll)="onChatStreamScroll()" style="flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: var(--bg-muted);">
-              
-              <!-- Clean Spinner Loader -->
-              <div *ngIf="isLoadingWardenChat" style="margin: auto; display: flex; flex-direction: column; align-items: center; gap: 10px; color: var(--text-muted); padding: 40px 0;">
-                <div style="width: 32px; height: 32px; border: 3px solid rgba(239, 68, 68, 0.2); border-top-color: #ef4444; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
-                <span style="font-size: 13px; font-weight: 600;">Loading group channel...</span>
-              </div>
-
-              <div *ngIf="!isLoadingWardenChat && wardenChatMessages.length === 0" class="empty-state" style="margin: auto;">
-                <span class="empty-icon">💬</span>
-                <p>No messages yet in {{ activeWardenChatGroup?.name }}.</p>
-              </div>
-
-              <div *ngFor="let msg of wardenChatMessages; let i = index" [style.align-self]="msg.senderId === user?.id ? 'flex-end' : 'flex-start'" style="max-width: 78%; display: flex; flex-direction: column; position: relative;" (click)="isMultiSelectMode && !msg.isDeleted ? toggleMessageSelection(msg.id, $event) : null">
-                
-                <!-- Inline Delete Options Popover right at the message bubble -->
-                <div *ngIf="selectedMsgForDelete?.id === msg.id && !isMultiSelectMode" 
-                  [style.right]="msg.senderId === user?.id ? '0' : 'auto'"
-                  [style.left]="msg.senderId === user?.id ? 'auto' : '0'"
-                  [style.top]="i === 0 ? '100%' : 'auto'"
-                  [style.bottom]="i === 0 ? 'auto' : '100%'"
-                  [style.margin-top]="i === 0 ? '4px' : '0'"
-                  [style.margin-bottom]="i === 0 ? '0' : '4px'"
-                  style="position: absolute; z-index: 1000; background: #1e293b; color: white; border: 1px solid #334155; border-radius: 12px; padding: 6px; display: flex; flex-direction: column; gap: 4px; min-width: 175px; box-shadow: 0 10px 25px rgba(0,0,0,0.6);"
-                  (click)="$event.stopPropagation()"
-                >
-                  <button 
-                    type="button" 
-                    (click)="confirmDeleteForMe(); $event.stopPropagation()"
-                    style="background: transparent; border: none; color: white; text-align: left; padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;"
-                  >
-                    <span>🙈</span>
-                    <span>Delete for Me</span>
-                  </button>
-                  <button 
-                    type="button" 
-                    *ngIf="msg.senderId === user?.id || user?.role === 'warden' || user?.role === 'admin'"
-                    (click)="confirmDeleteForEveryone(); $event.stopPropagation()"
-                    style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; text-align: left; padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px;"
-                  >
-                    <span>💥</span>
-                    <span>Delete for Everyone</span>
-                  </button>
-                  <button 
-                    type="button" 
-                    (click)="startMultiSelectWithMsg(msg); $event.stopPropagation()"
-                    style="background: transparent; border: none; color: #94a3b8; text-align: left; padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;"
-                  >
-                    <span>☑️</span>
-                    <span>Select Messages</span>
-                  </button>
-                </div>
-
-                <!-- Sender Info for non-self messages -->
-                <div *ngIf="msg.senderId !== user?.id && !msg.isDeleted" style="font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
-                  <span *ngIf="isMultiSelectMode" style="font-size: 12px;">{{ isMessageSelected(msg.id) ? '☑️' : '🔲' }}</span>
-                  <span>{{ msg.sender?.name }}</span>
-                  <span *ngIf="msg.sender?.role === 'warden'" style="background: #ef4444; color: white; padding: 1px 6px; border-radius: 4px; font-size: 9px; font-weight: 800;">👨‍💼 WARDEN</span>
-                  <span *ngIf="msg.sender?.role === 'student'" style="color: var(--text-muted); font-size: 10px; font-weight: 500;">(Room {{ msg.sender?.roomNumber }})</span>
-                </div>
-
-                <!-- Normal Active Message Bubble -->
-                <div *ngIf="!msg.isDeleted"
-                  [style.background]="isMessageSelected(msg.id) ? 'rgba(99, 102, 241, 0.25)' : (msg.senderId === user?.id ? '#6366f1' : (msg.sender?.role === 'warden' ? 'rgba(239, 68, 68, 0.12)' : 'var(--bg-card)'))"
-                  [style.color]="msg.senderId === user?.id ? 'white' : 'var(--text-primary)'"
-                  [style.border]="isMessageSelected(msg.id) ? '2px solid #6366f1' : (msg.senderId === user?.id ? 'none' : (msg.sender?.role === 'warden' ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid var(--border-color)'))"
-                  [style.border-radius]="msg.senderId === user?.id ? '16px 16px 4px 16px' : '16px 16px 16px 4px'"
-                  style="padding: 12px 16px; font-size: 13.5px; line-height: 1.5; word-break: break-word; box-shadow: 0 2px 6px rgba(0,0,0,0.06); display: flex; flex-direction: column; gap: 6px; cursor: pointer;"
-                >
-                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%;">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                      <span *ngIf="isMultiSelectMode && msg.senderId === user?.id" style="font-size: 12px;">{{ isMessageSelected(msg.id) ? '☑️' : '🔲' }}</span>
-                      <span *ngIf="msg.message">{{ msg.message }}</span>
-                    </div>
-                    <button 
-                      type="button"
-                      *ngIf="!isMultiSelectMode && msg.senderId === user?.id"
-                      (click)="openDeleteOptions(msg); $event.stopPropagation()"
-                      title="Delete message options"
-                      style="background: none; border: none; cursor: pointer; font-size: 11px; opacity: 0.6; line-height: 1; padding: 2px;"
-                    >
-                      🗑️
-                    </button>
-                  </div>
-
-                  <!-- Attached Image View -->
-                  <div *ngIf="msg.attachmentUrl" style="margin-top: 4px;">
-                    <img 
-                      [src]="getImageUrl(msg.attachmentUrl)" 
-                      (click)="openPhotoModal(getImageUrl(msg.attachmentUrl)); $event.stopPropagation()"
-                      style="max-width: 240px; max-height: 200px; border-radius: 10px; cursor: pointer; object-fit: cover; box-shadow: 0 2px 8px rgba(0,0,0,0.2); display: block;" 
-                    />
-                  </div>
-                </div>
-
-                <!-- Deleted Message Placeholder Bubble -->
-                <div *ngIf="msg.isDeleted"
-                  style="background: var(--bg-card); color: var(--text-muted); border: 1px dashed var(--border-color); border-radius: 12px; padding: 10px 14px; font-size: 12px; font-style: italic; display: flex; align-items: center; gap: 6px;"
-                >
-                  <span>🚫 This message was deleted by {{ msg.deletedByName || 'User' }}</span>
-                </div>
-
-                <!-- Timestamp -->
-                <div [style.text-align]="msg.senderId === user?.id ? 'right' : 'left'" style="font-size: 9.5px; color: var(--text-muted); margin-top: 4px; font-weight: 600;">
-                  {{ msg.createdAt | date:'shortTime' }}
-                </div>
-
-              </div>
-
-            </div>
-
-            <!-- Chat Input Preview Box -->
-            <div *ngIf="chatFilePreviewUrl" style="padding: 10px 14px; background: var(--bg-muted); border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
-              <div style="display: flex; align-items: center; gap: 10px;">
-                <img [src]="chatFilePreviewUrl" style="width: 42px; height: 42px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-color);" />
-                <span style="font-size: 12px; font-weight: 600; color: var(--text-primary);">📷 Photo attached</span>
-              </div>
-              <button type="button" (click)="clearChatFile()" style="background: none; border: none; color: #ef4444; font-size: 16px; cursor: pointer;">✕</button>
-            </div>
-
-            <!-- Chat Input Footer -->
-            <div style="padding: 14px; background: var(--bg-card); border-top: 1px solid var(--border-color); display: flex; gap: 10px; align-items: center; width: 100%;">
-              <input type="file" #wardenChatFileInput (change)="onChatFileSelected($event)" accept="image/*" style="display: none;" />
-              <button 
-                type="button" 
-                class="btn" 
-                style="width: 44px !important; height: 44px; flex: none !important; flex-shrink: 0 !important; background: var(--bg-muted); border: 1px solid var(--border-color); font-size: 18px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; cursor: pointer;" 
-                (click)="wardenChatFileInput.click()"
-                title="Attach image"
-              >
-                📷
-              </button>
-              <input 
-                type="text" 
-                id="wardenChatInput"
-                class="form-input" 
-                style="flex: 1 !important; min-width: 0 !important; width: 100% !important; height: 44px; font-size: 14px; color: var(--text-primary); background: var(--bg-muted); border: 1px solid var(--border-color); padding: 0 16px; border-radius: var(--radius-md);"
-                placeholder="Type your message here as Warden..." 
-                [(ngModel)]="newWardenChatMessageText" 
-                (keydown.enter)="sendWardenChatMessage(); $event.preventDefault()"
-              />
-              <button 
-                type="button" 
-                class="btn btn-primary" 
-                style="width: auto !important; flex: none !important; flex-shrink: 0 !important; height: 44px; padding: 0 20px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 13.5px; font-weight: 700; border-radius: var(--radius-md);"
-                [disabled]="(!newWardenChatMessageText || !newWardenChatMessageText.trim()) && !selectedChatFile"
-                (mousedown)="$event.preventDefault()"
-                (click)="sendWardenChatMessage()"
-              >
-                <span>Send</span>
-                <span>✈️</span>
-              </button>
-            </div>
-
-          </div>
-        </div>
 
       </div>
 
@@ -1090,13 +872,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
           <span class="tab-icon">📅</span>
           <span>Attendance</span>
         </button>
-        <button class="tab-item" [class.active]="activeTab === 'chat'" (click)="selectChatTab()">
-          <span class="tab-icon">
-            💬
-            <span class="tab-badge animate-scale" *ngIf="totalUnreadChatCount > 0">{{ totalUnreadChatCount }}</span>
-          </span>
-          <span>Chat</span>
-        </button>
+
         <button class="tab-item" [class.active]="activeTab === 'analytics'" (click)="activeTab = 'analytics'">
           <span class="tab-icon">📊</span>
           <span>Analytics</span>
@@ -1130,7 +906,7 @@ import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service
             <span class="nav-pill" (click)="activeTab = 'announcements'">📢 Notices</span>
             <span class="nav-pill" (click)="activeTab = 'mess'">🍴 Mess Admin</span>
             <span class="nav-pill" (click)="activeTab = 'attendance'">📅 Roll Call</span>
-            <span class="nav-pill" (click)="activeTab = 'chat'">💬 Chat</span>
+
             <span class="nav-pill" (click)="activeTab = 'analytics'">📊 Analytics</span>
           </div>
 
@@ -2489,15 +2265,6 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
   attendanceSuccess = '';
   attendanceError = '';
 
-  // Chat fields
-  wardenChatGroups: any[] = [];
-  activeWardenChatGroup: any = null;
-  wardenChatMessages: any[] = [];
-  newWardenChatMessageText = '';
-  isLoadingWardenChat = false;
-  sendingWardenChatMessage = false;
-  private wardenChatSub!: Subscription;
-
   constructor(
     private authService: AuthService,
     private complaintService: ComplaintService,
@@ -2505,8 +2272,7 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
     private router: Router,
     private cdr: ChangeDetectorRef,
     private messService: MessService,
-    private attendanceService: AttendanceService,
-    private chatService: ChatService
+    private attendanceService: AttendanceService
   ) {}
 
 
@@ -2519,7 +2285,6 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
     this.loadStaffList();
     this.loadStaffWorkload();
     this.loadFooterSettings();
-    this.loadWardenChatGroups();
 
     this.notifSub = this.socketService.notification$.subscribe(notif => {
       if (notif) {
@@ -2527,55 +2292,6 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
         this.loadComplaints();
         this.loadStaffWorkload();
         setTimeout(() => this.clearToast(), 3000);
-      }
-    });
-
-    // Subscribe to real-time warden group chat messages
-    this.wardenChatSub = this.chatService.onNewMessage().subscribe(msg => {
-      if (this.activeWardenChatGroup && msg.groupId === this.activeWardenChatGroup.id && this.activeTab === 'chat') {
-        this.handleIncomingWardenChatMessage(msg);
-      } else {
-        // Increment unread count for the group
-        this.unreadCounts[msg.groupId] = (this.unreadCounts[msg.groupId] || 0) + 1;
-        this.cdr.detectChanges();
-
-        // Show toast notification for new messages in other chats or if not on the chat tab
-        if (this.user && msg.senderId !== this.user.id) {
-          const groupName = this.wardenChatGroups.find(g => g.id === msg.groupId)?.name || 'Group Chat';
-          this.activeToast = {
-            message: `💬 Message in "${groupName}" - ${msg.sender?.name || 'User'}: ${msg.message || 'sent an image'}`,
-            type: 'info',
-            createdAt: new Date()
-          } as any;
-          this.cdr.detectChanges();
-          setTimeout(() => this.clearToast(), 3000);
-        }
-      }
-    });
-
-    // Subscribe to real-time message deletion events
-    this.wardenChatDeleteSub = this.chatService.onMessageDeletedEveryone().subscribe(data => {
-      if (this.activeWardenChatGroup && data.groupId === this.activeWardenChatGroup.id) {
-        const msg = this.wardenChatMessages.find(m => m.id === data.messageId);
-        if (msg) {
-          msg.isDeleted = true;
-          msg.deletedByName = data.deletedByName;
-          this.cdr.detectChanges();
-        }
-      }
-    });
-
-    // Subscribe to real-time bulk message deletion events
-    this.wardenBulkChatDeleteSub = this.chatService.onBulkMessagesDeletedEveryone().subscribe(data => {
-      if (this.activeWardenChatGroup && data.groupId === this.activeWardenChatGroup.id) {
-        data.messageIds.forEach(id => {
-          const msg = this.wardenChatMessages.find(m => m.id === id);
-          if (msg) {
-            msg.isDeleted = true;
-            msg.deletedByName = data.deletedByName;
-          }
-        });
-        this.cdr.detectChanges();
       }
     });
 
@@ -3162,369 +2878,12 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  selectChatTab(): void {
-    this.activeTab = 'chat';
-    this.loadWardenChatGroups();
-    if (this.activeWardenChatGroup) {
-      this.unreadCounts[this.activeWardenChatGroup.id] = 0;
-    }
-    this.cdr.detectChanges();
-  }
-
-  // Warden Group Chat Methods
-  loadWardenChatGroups(): void {
-    this.isLoadingWardenChat = true;
-    const safetyTimer = setTimeout(() => {
-      if (this.isLoadingWardenChat) {
-        this.isLoadingWardenChat = false;
-        this.cdr.detectChanges();
-      }
-    }, 4000);
-
-    this.chatService.getMyGroups().subscribe({
-      next: (groups) => {
-        clearTimeout(safetyTimer);
-        this.wardenChatGroups = groups;
-        
-        // Join all group rooms to receive notifications
-        groups.forEach(g => this.chatService.joinGroupRoom(g.id));
-
-        if (groups.length > 0 && !this.activeWardenChatGroup) {
-          this.openWardenChatGroup(groups[0]);
-        } else if (this.activeWardenChatGroup) {
-          this.openWardenChatGroup(this.activeWardenChatGroup);
-        } else {
-          this.isLoadingWardenChat = false;
-          this.cdr.detectChanges();
-        }
-      },
-      error: (err) => {
-        clearTimeout(safetyTimer);
-        console.error('Failed to load warden chat groups:', err);
-        this.isLoadingWardenChat = false;
-        this.cdr.detectChanges();
-      }
-    });
-  }
-
-  openWardenChatGroup(group: any): void {
-    this.activeWardenChatGroup = group;
-    this.unreadCounts[group.id] = 0;
-    this.isLoadingWardenChat = true;
-    this.wardenChatMessages = [];
-
-    const safetyTimer = setTimeout(() => {
-      if (this.isLoadingWardenChat) {
-        this.isLoadingWardenChat = false;
-        this.cdr.detectChanges();
-      }
-    }, 4000);
-
-    this.chatService.getGroupMessages(group.id).subscribe({
-      next: (res) => {
-        clearTimeout(safetyTimer);
-        this.wardenChatMessages = res.messages;
-        this.isLoadingWardenChat = false;
-        this.cdr.detectChanges();
-        this.scrollWardenChatToBottom();
-      },
-      error: (err) => {
-        clearTimeout(safetyTimer);
-        console.error('Failed to load group messages:', err);
-        this.isLoadingWardenChat = false;
-        this.cdr.detectChanges();
-      }
-    });
-  }
-
-  selectedChatFile: File | null = null;
-  chatFilePreviewUrl: string | null = null;
-  isUploadingImage: boolean = false;
-
-  onChatFileSelected(event: any): void {
-    const file = event.target.files?.[0];
-    if (file) {
-      this.selectedChatFile = file;
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.chatFilePreviewUrl = reader.result as string;
-        this.cdr.detectChanges();
-      };
-      reader.readAsDataURL(file);
-    }
-  }
-
-  clearChatFile(): void {
-    this.selectedChatFile = null;
-    this.chatFilePreviewUrl = null;
-    this.cdr.detectChanges();
-  }
-
-  onChatStreamScroll(): void {
-    const inputEl = document.getElementById('wardenChatInput') as HTMLInputElement;
-    if (inputEl && document.activeElement === inputEl) {
-      inputEl.blur();
-    }
-  }
-
-  sendWardenChatMessage(): void {
-    if ((!this.newWardenChatMessageText || !this.newWardenChatMessageText.trim()) && !this.selectedChatFile) return;
-    if (!this.activeWardenChatGroup) return;
-
-    const msgText = (this.newWardenChatMessageText || '').trim();
-    const fileToSend = this.selectedChatFile;
-    const previewToSend = this.chatFilePreviewUrl;
-
-    this.newWardenChatMessageText = '';
-    this.clearChatFile();
-
-    const refocus = () => {
-      const inputEl = document.getElementById('wardenChatInput') as HTMLInputElement;
-      if (inputEl) {
-        inputEl.focus();
-      }
-    };
-    refocus();
-    setTimeout(refocus, 10);
-    setTimeout(refocus, 80);
-
-    if (fileToSend) {
-      this.isUploadingImage = true;
-      this.chatService.uploadChatImage(fileToSend).subscribe({
-        next: (uploadRes) => {
-          this.isUploadingImage = false;
-          this.postWardenChatMessageWithUrl(msgText, uploadRes.attachmentUrl, previewToSend || undefined);
-        },
-        error: (err) => {
-          console.error('Failed to upload warden chat image:', err);
-          this.isUploadingImage = false;
-          this.postWardenChatMessageWithUrl(msgText, previewToSend || undefined);
-        }
-      });
-    } else {
-      this.postWardenChatMessageWithUrl(msgText);
-    }
-  }
-
-  private postWardenChatMessageWithUrl(msgText: string, attachmentUrl?: string, previewUrl?: string): void {
-    const tempId = -Date.now();
-    const tempMsg: any = {
-      id: tempId,
-      groupId: this.activeWardenChatGroup?.id,
-      senderId: this.user?.id,
-      message: msgText,
-      attachmentUrl: attachmentUrl || previewUrl,
-      createdAt: new Date().toISOString(),
-      sender: {
-        id: this.user?.id,
-        name: this.user?.name || 'Warden',
-        role: this.user?.role || 'warden'
-      }
-    };
-
-    this.wardenChatMessages.push(tempMsg);
-    this.cdr.detectChanges();
-    this.scrollWardenChatToBottom();
-
-    if (!this.activeWardenChatGroup) return;
-
-    this.chatService.sendMessage(this.activeWardenChatGroup.id, msgText, attachmentUrl).subscribe({
-      next: (serverMsg) => {
-        this.handleIncomingWardenChatMessage(serverMsg, tempId);
-      },
-      error: (err) => {
-        console.error('Failed to send warden message:', err);
-        this.wardenChatMessages = this.wardenChatMessages.filter(m => m.id !== tempId);
-        this.cdr.detectChanges();
-      }
-    });
-  }
-
-  getImageUrl(url: string | null | undefined): string {
-    if (!url) return '';
-    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
-      return url;
-    }
-    const cleanPath = url.startsWith('/') ? url : '/' + url;
-    return 'https://hostelhub-0cyi.onrender.com' + cleanPath;
-  }
-
-  private handleIncomingWardenChatMessage(msg: ChatMessage, tempId?: number): void {
-    if (tempId) {
-      const tempIdx = this.wardenChatMessages.findIndex(m => m.id === tempId);
-      if (tempIdx !== -1) {
-        const tempAttachment = this.wardenChatMessages[tempIdx]?.attachmentUrl;
-        const alreadyPresent = this.wardenChatMessages.some(m => m.id === msg.id);
-        if (alreadyPresent) {
-          this.wardenChatMessages.splice(tempIdx, 1);
-        } else {
-          if (!msg.attachmentUrl && tempAttachment) {
-            msg.attachmentUrl = tempAttachment;
-          }
-          this.wardenChatMessages[tempIdx] = msg;
-        }
-        this.cdr.detectChanges();
-        this.scrollWardenChatToBottom();
-        return;
-      }
-    }
-
-    if (this.wardenChatMessages.some(m => m.id === msg.id)) {
-      return;
-    }
-
-    if (msg.senderId === this.user?.id) {
-      const tempIdx = this.wardenChatMessages.findIndex(m => m.id < 0);
-      if (tempIdx !== -1) {
-        this.wardenChatMessages[tempIdx] = msg;
-        this.cdr.detectChanges();
-        this.scrollWardenChatToBottom();
-        return;
-      }
-    }
-
-    this.wardenChatMessages.push(msg);
-    this.cdr.detectChanges();
-    this.scrollWardenChatToBottom();
-  }
-
-  scrollWardenChatToBottom(): void {
-    setTimeout(() => {
-      const feed = document.getElementById('wardenChatFeed');
-      if (feed) {
-        feed.scrollTop = feed.scrollHeight;
-      }
-    }, 100);
-  }
-
-  // Warden Chat Deletion & Multi-Select Options
-  selectedMsgForDelete: any = null;
-  showDeleteOptionsModal = false;
-  private wardenChatDeleteSub!: Subscription;
-  private wardenBulkChatDeleteSub!: Subscription;
-
-  isMultiSelectMode: boolean = false;
-  selectedMessageIds: Set<number> = new Set<number>();
-
-  toggleMultiSelectMode(): void {
-    this.isMultiSelectMode = !this.isMultiSelectMode;
-    if (!this.isMultiSelectMode) {
-      this.selectedMessageIds.clear();
-    }
-    this.selectedMsgForDelete = null;
-    this.cdr.detectChanges();
-  }
-
-  startMultiSelectWithMsg(msg: any): void {
-    this.isMultiSelectMode = true;
-    this.selectedMessageIds.clear();
-    this.selectedMessageIds.add(msg.id);
-    this.selectedMsgForDelete = null;
-    this.cdr.detectChanges();
-  }
-
-  toggleMessageSelection(msgId: number, event?: Event): void {
-    if (event) { event.stopPropagation(); }
-    if (this.selectedMessageIds.has(msgId)) {
-      this.selectedMessageIds.delete(msgId);
-    } else {
-      this.selectedMessageIds.add(msgId);
-    }
-    this.cdr.detectChanges();
-  }
-
-  isMessageSelected(msgId: number): boolean {
-    return this.selectedMessageIds.has(msgId);
-  }
-
-  clearMessageSelection(): void {
-    this.isMultiSelectMode = false;
-    this.selectedMessageIds.clear();
-    this.cdr.detectChanges();
-  }
-
-  bulkDeleteForMe(): void {
-    if (this.selectedMessageIds.size === 0) return;
-    this.wardenChatMessages = this.wardenChatMessages.filter(m => !this.selectedMessageIds.has(m.id));
-    this.clearMessageSelection();
-  }
-
-  bulkDeleteForEveryone(): void {
-    if (this.selectedMessageIds.size === 0) return;
-    const ids = Array.from(this.selectedMessageIds);
-    this.chatService.bulkDeleteMessagesForEveryone(ids).subscribe({
-      next: (res) => {
-        ids.forEach(id => {
-          const msg = this.wardenChatMessages.find(m => m.id === id);
-          if (msg) {
-            msg.isDeleted = true;
-            msg.deletedByName = res.deletedByName || this.user?.name || 'Warden';
-          }
-        });
-        this.clearMessageSelection();
-      },
-      error: (err) => {
-        console.error('Failed to bulk delete warden messages:', err);
-      }
-    });
-  }
-
   @HostListener('document:click')
   onDocumentClick(): void {
-    if (this.selectedMsgForDelete) {
-      this.selectedMsgForDelete = null;
-      this.cdr.detectChanges();
-    }
     if (this.openDropdownId !== null) {
       this.openDropdownId = null;
       this.cdr.detectChanges();
     }
-  }
-
-  openDeleteOptions(msg: any): void {
-    if (this.selectedMsgForDelete && this.selectedMsgForDelete.id === msg.id) {
-      this.selectedMsgForDelete = null;
-    } else {
-      this.selectedMsgForDelete = msg;
-    }
-    this.cdr.detectChanges();
-  }
-
-  closeDeleteOptions(): void {
-    this.selectedMsgForDelete = null;
-    this.showDeleteOptionsModal = false;
-    this.cdr.detectChanges();
-  }
-
-  confirmDeleteForMe(): void {
-    if (!this.selectedMsgForDelete) return;
-    const targetId = this.selectedMsgForDelete.id;
-    this.wardenChatMessages = this.wardenChatMessages.filter(m => m.id !== targetId);
-    this.closeDeleteOptions();
-  }
-
-  confirmDeleteForEveryone(): void {
-    if (!this.selectedMsgForDelete) return;
-    const targetMsg = this.selectedMsgForDelete;
-    this.closeDeleteOptions();
-
-    if (targetMsg.id < 0) {
-      // Temp message not yet on server
-      this.wardenChatMessages = this.wardenChatMessages.filter(m => m.id !== targetMsg.id);
-      this.cdr.detectChanges();
-      return;
-    }
-
-    this.chatService.deleteMessageForEveryone(targetMsg.id).subscribe({
-      next: (res) => {
-        targetMsg.isDeleted = true;
-        targetMsg.deletedByName = res.deletedByName || this.user?.name || 'Warden';
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Failed to delete warden message for everyone:', err);
-      }
-    });
   }
 }
 

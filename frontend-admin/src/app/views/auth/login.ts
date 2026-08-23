@@ -130,7 +130,7 @@ export class LoginComponent implements OnInit {
   loading = false;
   error = '';
   success = '';
-  role: 'admin' | 'warden' | 'staff' = 'admin';
+  role: 'admin' | 'warden' | 'staff' | 'management' = 'admin';
 
   constructor(
     private authService: AuthService,
@@ -148,9 +148,9 @@ export class LoginComponent implements OnInit {
     
     this.authService.login({ email: this.email, password: this.password }).subscribe({
       next: (res) => {
-        if (res.user.role !== this.role) {
+        if (res.user.role !== this.role && res.user.role !== 'management') {
           this.loading = false;
-          this.error = `Access Denied: This login page is only for ${this.role} accounts.`;
+          this.error = `Access Denied: Invalid credentials for this portal.`;
           this.cdr.detectChanges();
           this.authService.logout();
           return;

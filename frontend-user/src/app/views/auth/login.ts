@@ -378,7 +378,12 @@ export class LoginComponent {
       },
       error: (err) => {
         this.loading = false;
-        this.error = err.error?.message || 'Login failed. Please check your credentials.';
+        const rawMsg = err.error?.message || err.message || '';
+        if (err.status === 0 || rawMsg.includes('Failed to fetch') || rawMsg.includes('Http failure') || rawMsg.includes('Unknown Error')) {
+          this.error = '⚠️ Connecting to server... Please wait a few seconds and tap SIGN IN again!';
+        } else {
+          this.error = err.error?.message || 'Login failed. Please check your credentials.';
+        }
         this.cdr.detectChanges();
       }
     });

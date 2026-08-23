@@ -8,8 +8,6 @@ const MessMenu = require('./MessMenu');
 const MessFeedback = require('./MessFeedback');
 const MessSkip = require('./MessSkip');
 const Attendance = require('./Attendance');
-const GroupChat = require('./GroupChat');
-const ChatMessage = require('./ChatMessage');
 const PasswordResetOTP = require('./PasswordResetOTP');
 
 // User & Complaints Relations
@@ -41,13 +39,6 @@ MessSkip.belongsTo(User, { foreignKey: 'studentId', as: 'student' });
 User.hasMany(Attendance, { foreignKey: 'studentId', as: 'attendances' });
 Attendance.belongsTo(User, { foreignKey: 'studentId', as: 'student' });
 
-// GroupChat & ChatMessage Relations
-GroupChat.hasMany(ChatMessage, { foreignKey: 'groupId', as: 'messages' });
-ChatMessage.belongsTo(GroupChat, { foreignKey: 'groupId', as: 'group' });
-
-User.hasMany(ChatMessage, { foreignKey: 'senderId', as: 'sentMessages' });
-ChatMessage.belongsTo(User, { foreignKey: 'senderId', as: 'sender' });
-
 module.exports = {
   sequelize,
   User,
@@ -59,7 +50,5 @@ module.exports = {
   MessFeedback,
   MessSkip,
   Attendance,
-  GroupChat,
-  ChatMessage,
   PasswordResetOTP
 };

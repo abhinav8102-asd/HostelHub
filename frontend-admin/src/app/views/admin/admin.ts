@@ -48,6 +48,9 @@ import { ComplaintService } from '../../services/complaint.service';
           <button (click)="activeTab = 'create'" [class.active]="activeTab === 'create'">
             ➕ Create Staff
           </button>
+          <button (click)="activeTab = 'mgmt'; loadManagementAccounts()" [class.active]="activeTab === 'mgmt'">
+            🏢 Management
+          </button>
           <button (click)="activeTab = 'settings'" [class.active]="activeTab === 'settings'">
             ⚙️ Settings
           </button>
@@ -158,7 +161,7 @@ import { ComplaintService } from '../../services/complaint.service';
 
         <!-- TAB 2: CREATE STAFF / WARDEN -->
         <div *ngIf="activeTab === 'create'" class="tab-panel animate-fade">
-          <h4 class="page-title">➕ Add Warden / Staff</h4>
+          <h4 class="page-title">➕ Add Warden / Staff / Management</h4>
 
           <div class="form-container">
             <form (ngSubmit)="onCreateSubmit()" #createForm="ngForm">
@@ -181,6 +184,7 @@ import { ComplaintService } from '../../services/complaint.service';
                   <option value="" disabled selected>Select Role</option>
                   <option value="warden">Warden</option>
                   <option value="staff">Maintenance Staff</option>
+                  <option value="management">Executive Management</option>
                 </select>
               </div>
 
@@ -394,6 +398,104 @@ import { ComplaintService } from '../../services/complaint.service';
           </div>
         </div>
 
+        <!-- TAB 6: MANAGEMENT ACCOUNTS -->
+        <div *ngIf="activeTab === 'mgmt'" class="tab-panel animate-fade">
+          <h4 class="page-title">🏢 Create & Manage Management Accounts</h4>
+
+          <div class="card form-card" style="margin-bottom: 24px;">
+            <div class="card-header">
+              <h5>➕ Register New Management Executive</h5>
+              <p class="card-subtitle">Create accounts for higher management executives with full analytics access</p>
+            </div>
+            
+            <div *ngIf="mgmtSuccess" class="alert alert-success">{{ mgmtSuccess }}</div>
+            <div *ngIf="mgmtError" class="alert alert-danger">{{ mgmtError }}</div>
+
+            <form (ngSubmit)="onCreateManagementSubmit()" #mgmtForm="ngForm">
+              <div class="form-group">
+                <label class="form-label" for="mName">Full Name</label>
+                <input type="text" id="mName" name="mName" class="form-input" placeholder="e.g. Dr. Rajesh Sharma" [(ngModel)]="newMgmt.name" required />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="mEmail">Email Address</label>
+                <input type="email" id="mEmail" name="mEmail" class="form-input" placeholder="e.g. rajesh.management@hostelhub.com" [(ngModel)]="newMgmt.email" required email />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="mPhone">Phone Number</label>
+                <input type="text" id="mPhone" name="mPhone" class="form-input" placeholder="e.g. +91 98765 43210" [(ngModel)]="newMgmt.phone" required />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="mBio">Designation / Role Description</label>
+                <input type="text" id="mBio" name="mBio" class="form-input" placeholder="e.g. Chief Hostel Trustee / Director" [(ngModel)]="newMgmt.bio" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="mPass">Password</label>
+                <input type="password" id="mPass" name="mPass" class="form-input" placeholder="Set password" [(ngModel)]="newMgmt.password" required />
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-submit" [disabled]="!mgmtForm.form.valid || creatingMgmt">
+                <span *ngIf="creatingMgmt">Creating Account...</span>
+                <span *ngIf="!creatingMgmt">➕ Create Management ID</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Existing Management Accounts List -->
+          <div class="card table-card">
+            <div class="card-header">
+              <h5>📋 Existing Management Team Members</h5>
+            </div>
+
+            <div *ngIf="loadingMgmtAccounts" style="padding: 20px; text-align: center; color: var(--text-muted);">
+              Loading management accounts...
+            </div>
+
+            <div *ngIf="!loadingMgmtAccounts && mgmtAccounts.length === 0" style="padding: 20px; text-align: center; color: var(--text-muted);">
+              No management accounts created yet. Use the form above to add your first management executive.
+            </div>
+
+            <div class="table-responsive" *ngIf="!loadingMgmtAccounts && mgmtAccounts.length > 0">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email & Phone</th>
+                    <th>Designation</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let m of mgmtAccounts">
+                    <td>
+                      <strong>{{ m.name }}</strong>
+                    </td>
+                    <td>
+                      <div>{{ m.email }}</div>
+                      <small style="color: var(--text-muted);">{{ m.phone }}</small>
+                    </td>
+                    <td>{{ m.bio || 'Management Team Member' }}</td>
+                    <td>
+                      <span class="badge" [class.badge-active]="m.status === 'active'" [class.badge-danger]="m.status === 'blocked'">
+                        {{ m.status }}
+                      </span>
+                    </td>
+                    <td>
+                      <button type="button" class="btn-icon danger" (click)="deleteManagementAccount(m.id, m.name)" title="Delete Account">
+                        🗑️ Delete
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- Footer -->
@@ -420,41 +522,40 @@ import { ComplaintService } from '../../services/complaint.service';
     .header {
       background: var(--bg-header);
       color: #f8fafc;
-      padding: 14px 24px;
+      padding: 12px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid rgba(99, 102, 241, 0.3);
       box-shadow: 0 2px 20px rgba(0,0,0,0.2);
-      position: sticky;
-      top: 0;
-      z-index: 200;
+      width: 100%;
+      box-sizing: border-box;
     }
     .user-info { display: flex; align-items: center; gap: 12px; }
     .avatar-ring {
-      width: 42px; height: 42px;
+      width: 40px; height: 40px;
       background: rgba(99, 102, 241, 0.2);
       border: 1.5px solid rgba(99,102,241,0.6);
       border-radius: 50%;
       display: flex; justify-content: center; align-items: center;
       box-shadow: 0 0 14px rgba(99,102,241,0.25);
     }
-    .avatar { font-size: 20px; }
-    h3 { font-size: 15px; font-weight: 700; color: #f8fafc; }
-    .user-meta { font-size: 11px; color: rgba(248,250,252,0.55); margin-top: 2px; }
+    .avatar { font-size: 18px; }
+    h3 { font-size: 14px; font-weight: 700; color: #f8fafc; margin: 0; }
+    .user-meta { font-size: 10.5px; color: rgba(248,250,252,0.55); margin-top: 2px; }
     .header-actions { display: flex; align-items: center; gap: 6px; }
     .logout-btn {
       background: rgba(239,68,68,0.15);
       border: 1px solid rgba(239,68,68,0.35);
       color: #f87171;
-      padding: 7px 14px;
-      font-size: 12px;
+      padding: 6px 12px;
+      font-size: 11.5px;
       font-weight: 700;
       border-radius: var(--radius-full);
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       transition: all var(--transition-fast);
       font-family: var(--font-sans);
     }
@@ -462,36 +563,48 @@ import { ComplaintService } from '../../services/complaint.service';
 
     .tab-content-area {
       flex: 1;
-      padding: 24px 20px;
+      padding: 16px 12px;
       max-width: 900px;
       width: 100%;
       margin: 0 auto;
+      box-sizing: border-box;
       background-color: var(--bg-body);
     }
 
-    /* Admin Tab Nav */
+    /* Admin Tab Nav (Responsive Scrollable Bar) */
     .admin-tab-nav {
       display: flex;
       background-color: var(--bg-card);
-      padding: 4px;
+      padding: 6px;
       border-radius: var(--radius-md);
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       box-shadow: var(--shadow-sm);
       border: 1px solid var(--border-color);
-      gap: 4px;
+      gap: 6px;
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .admin-tab-nav::-webkit-scrollbar {
+      display: none;
     }
     .admin-tab-nav button {
-      flex: 1;
+      flex: 0 0 auto;
+      white-space: nowrap;
       background: none;
       border: none;
-      padding: 10px;
+      padding: 8px 14px;
       font-family: var(--font-sans);
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 12px;
+      font-weight: 700;
       color: var(--text-muted);
       border-radius: var(--radius-sm);
       cursor: pointer;
       transition: all var(--transition-fast);
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
     .admin-tab-nav button:hover { color: var(--primary); background: var(--primary-light); }
     .admin-tab-nav button.active {
@@ -996,6 +1109,64 @@ export class AdminDashboardComponent implements OnInit {
         this.updatingProfile = false;
         this.profileError = '❌ ' + (err.error?.message || 'Failed to update profile.');
         this.cdr.detectChanges();
+      }
+    });
+  }
+
+  // Management Account Methods
+  newMgmt = { name: '', email: '', phone: '', password: '', bio: '' };
+  mgmtAccounts: any[] = [];
+  loadingMgmtAccounts = false;
+  creatingMgmt = false;
+  mgmtError = '';
+  mgmtSuccess = '';
+
+  loadManagementAccounts(): void {
+    this.loadingMgmtAccounts = true;
+    this.complaintService.getManagementAccounts().subscribe({
+      next: (res) => {
+        this.mgmtAccounts = res;
+        this.loadingMgmtAccounts = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error loading management accounts:', err);
+        this.loadingMgmtAccounts = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  onCreateManagementSubmit(): void {
+    this.creatingMgmt = true;
+    this.mgmtError = '';
+    this.mgmtSuccess = '';
+    this.cdr.detectChanges();
+
+    this.complaintService.createManagementAccount(this.newMgmt).subscribe({
+      next: () => {
+        this.creatingMgmt = false;
+        this.mgmtSuccess = '✅ Management Account created successfully!';
+        this.newMgmt = { name: '', email: '', phone: '', password: '', bio: '' };
+        this.loadManagementAccounts();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.creatingMgmt = false;
+        this.mgmtError = err.error?.message || (typeof err.error === 'string' ? err.error : null) || err.message || 'Failed to create management account.';
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  deleteManagementAccount(id: number, name: string): void {
+    if (!confirm(`Are you sure you want to delete Management Account "${name}"?`)) return;
+    this.complaintService.deleteManagementAccount(id).subscribe({
+      next: () => {
+        this.loadManagementAccounts();
+      },
+      error: (err) => {
+        alert(err.error?.message || 'Failed to delete management account.');
       }
     });
   }

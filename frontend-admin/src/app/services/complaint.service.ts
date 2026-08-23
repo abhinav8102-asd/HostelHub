@@ -3,11 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 
+import { API_CONFIG } from '../config/api.config';
+
 @Injectable({
   providedIn: 'root'
 })
 export class ComplaintService {
-  private apiUrl = 'https://hostelhub-0cyi.onrender.com/api';
+  private apiUrl = `${API_CONFIG.baseUrl}/api`;
 
   constructor(
     private http: HttpClient,
@@ -198,6 +200,49 @@ export class ComplaintService {
     formData.append('pic', file);
     return this.http.post<any>(`${this.apiUrl}/settings/upload-dev-pic`, formData, {
       headers: this.authService.getAuthHeaders()
+    });
+  }
+
+  // Management API Methods
+  createManagementAccount(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/management/accounts`, data, {
+      headers: this.authService.getJsonHeaders()
+    });
+  }
+
+  getManagementAccounts(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/management/accounts`, {
+      headers: this.authService.getAuthHeaders()
+    });
+  }
+
+  deleteManagementAccount(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/management/accounts/${id}`, {
+      headers: this.authService.getAuthHeaders()
+    });
+  }
+
+  getManagementAnalytics(period: string = 'week'): Observable<any> {
+    return this.http.get(`${this.apiUrl}/management/analytics?period=${period}`, {
+      headers: this.authService.getAuthHeaders()
+    });
+  }
+
+  bulkImportStudents(students: any[], batchName: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/management/bulk-import`, { students, batchName }, {
+      headers: this.authService.getJsonHeaders()
+    });
+  }
+
+  terminateUser(userId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/management/terminate-user`, { userId }, {
+      headers: this.authService.getJsonHeaders()
+    });
+  }
+
+  terminateBatch(batchName: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/management/terminate-batch`, { batchName }, {
+      headers: this.authService.getJsonHeaders()
     });
   }
 }

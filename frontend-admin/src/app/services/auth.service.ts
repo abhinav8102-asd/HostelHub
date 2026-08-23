@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { tap, retry } from 'rxjs/operators';
 
 export interface User {
   id: number;
   name: string;
   email: string;
-  role: 'student' | 'warden' | 'staff' | 'admin';
+  role: 'student' | 'warden' | 'staff' | 'admin' | 'management';
   phone: string;
   roomNumber?: string;
   hostelBlock?: string;
@@ -43,6 +43,11 @@ export class AuthService {
         localStorage.removeItem(USER_KEY);
       }
     }
+    this.pingServer();
+  }
+
+  public pingServer(): void {
+    this.http.get('https://hostelhub-0cyi.onrender.com/').subscribe({ error: () => {} });
   }
 
   public get currentUserValue(): User | null {
@@ -82,6 +87,7 @@ export class AuthService {
 
   login(credentials: { email: string; password: Math | string }): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
+      retry({ count: 2, delay: 1500 }),
       tap(res => {
         if (res && res.token) {
           localStorage.setItem(TOKEN_KEY, res.token);

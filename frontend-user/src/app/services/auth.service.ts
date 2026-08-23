@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { tap, retry } from 'rxjs/operators';
 import { API_CONFIG } from '../config/api.config';
 import { Router } from '@angular/router';
 import { Preferences } from '@capacitor/preferences';
@@ -52,6 +52,13 @@ export class AuthService {
 
     // 2. Native SharedPreferences Load (Asynchronous, avoids Android WebView session resets)
     this.initNativeStorage();
+
+    // 3. Background server warm-up ping (wakes up sleeping Render backend)
+    this.pingServer();
+  }
+
+  public pingServer(): void {
+    this.http.get(`${API_CONFIG.baseUrl}/`).subscribe({ error: () => {} });
   }
 
   private async initNativeStorage() {
@@ -106,11 +113,14 @@ export class AuthService {
   }
 
   register(userData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register`, userData);
+    return this.http.post(`${this.apiUrl}/register`, userData).pipe(
+      retry({ count: 2, delay: 1500 })
+    );
   }
 
   login(credentials: { email: string; password: string }): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
+      retry({ count: 2, delay: 1500 }),
       tap(res => {
         if (res && res.token) {
           localStorage.setItem(TOKEN_KEY, res.token);

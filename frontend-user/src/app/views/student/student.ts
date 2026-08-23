@@ -9,7 +9,6 @@ import { ComplaintService } from '../../services/complaint.service';
 import { SocketService, LiveNotification } from '../../services/socket.service';
 import { MessService } from '../../services/mess.service';
 import { AttendanceService } from '../../services/attendance.service';
-import { ChatService, GroupChat, ChatMessage } from '../../services/chat.service';
 import { API_CONFIG } from '../../config/api.config';
 
 
@@ -969,254 +968,8 @@ import { API_CONFIG } from '../../config/api.config';
           </div>
         </div>
 
-        <!-- TAB 6: BATCH GROUP CHAT -->
-        <div *ngIf="activeTab === 'chat'" class="tab-panel animate-fade full-screen-chat-panel">
-
-          <!-- Group Room Selector Bar if multiple available -->
-          <div *ngIf="myChatGroups.length > 0" style="display: flex; gap: 8px; overflow-x: auto; padding: 14px 16px; background: var(--bg-card); border-bottom: 1px solid var(--border-color);">
-            <button 
-              type="button"
-              *ngFor="let g of myChatGroups"
-              (click)="openChatGroup(g)"
-              [style.background]="activeChatGroup?.id === g.id ? '#8a0d24' : 'var(--bg-muted)'"
-              [style.color]="activeChatGroup?.id === g.id ? 'white' : 'var(--text-primary)'"
-              style="padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color); font-size: 12.5px; font-weight: 700; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-sm);"
-            >
-              <span>👧 {{ g.name }}</span>
-              <span *ngIf="activeChatGroup?.id === g.id" style="width: 8px; height: 8px; background: #ef4444; border-radius: 50%;"></span>
-              <span class="channel-badge animate-scale" *ngIf="unreadCounts[g.id] > 0">{{ unreadCounts[g.id] }}</span>
-            </button>
-          </div>
-
-          <!-- Group Room Container Card -->
-          <div class="card chat-room-container" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; flex: 1; border-radius: 0; border: none; background: var(--bg-card);">
-            
-            <!-- Room Header -->
-            <div style="background: var(--bg-card); padding: 12px 16px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
-              <div *ngIf="!isMultiSelectMode" style="display: flex; align-items: center; gap: 10px;">
-                <button type="button" (click)="activeTab = 'home'" style="background: var(--bg-muted); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 50%; width: 34px; height: 34px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;" title="Back to Dashboard">
-                  ←
-                </button>
-                <div style="width: 38px; height: 38px; border-radius: 50%; background: var(--bg-muted); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">👥</div>
-                <div>
-                  <strong style="font-size: 14.5px; font-weight: 800; color: var(--text-primary); display: block;">
-                    {{ activeChatGroup?.name || 'Boys - Batch 2023-2027' }}
-                  </strong>
-                  <span style="font-size: 10.5px; color: var(--text-muted); display: block;">
-                    Official group chat for {{ activeChatGroup?.name || 'Batch 2023-2027 Boys' }}
-                  </span>
-                </div>
-              </div>
-
-              <!-- Normal Mode Right Action Bar -->
-              <div *ngIf="!isMultiSelectMode" style="display: flex; align-items: center; gap: 8px;">
-                <button type="button" class="btn" style="background: var(--bg-muted); color: var(--text-primary); border: 1px solid var(--border-color); font-size: 11.5px; font-weight: 700; padding: 6px 12px; border-radius: 12px; cursor: pointer;" (click)="toggleMultiSelectMode()">
-                  Select
-                </button>
-              </div>
-
-              <!-- Multi-Select Action Bar -->
-              <div *ngIf="isMultiSelectMode" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                <span style="font-size: 13.5px; font-weight: 700; color: #b31031;">
-                  ☑️ {{ selectedMessageIds.size }} selected
-                </span>
-
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <button type="button" class="btn" style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); font-size: 12px; padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer;" (click)="bulkDeleteForMe()" [disabled]="selectedMessageIds.size === 0">
-                    🙈 Delete for Me
-                  </button>
-                  <button type="button" class="btn btn-primary" style="background: #ef4444; color: white; border: none; font-size: 12px; padding: 6px 12px; border-radius: 6px; font-weight: 700; cursor: pointer;" (click)="bulkDeleteForEveryone()" [disabled]="selectedMessageIds.size === 0">
-                    💥 Delete for Everyone
-                  </button>
-                  <button type="button" class="btn" style="background: transparent; border: none; color: var(--text-muted); font-size: 16px; padding: 4px 8px; cursor: pointer;" (click)="clearMessageSelection()">
-                    ✕
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Messages Stream Area -->
-            <div id="studentChatFeed" style="flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; background: var(--bg-body);">
-
-              <!-- Centered Today Date Divider Pill -->
-              <div style="align-self: center; margin: 4px 0 8px 0; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); font-size: 11px; font-weight: 700; padding: 4px 14px; border-radius: 12px; box-shadow: var(--shadow-sm);">
-                Today
-              </div>
-
-              <!-- Clean Spinner Loader -->
-              <div *ngIf="isLoadingChat && chatMessages.length === 0" style="margin: auto; display: flex; flex-direction: column; align-items: center; gap: 10px; color: var(--text-muted); padding: 40px 0;">
-                <div style="width: 32px; height: 32px; border: 3px solid rgba(179, 16, 49, 0.2); border-top-color: #b31031; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
-                <span style="font-size: 13px; font-weight: 600;">Loading chat messages...</span>
-              </div>
-
-              <div *ngIf="!isLoadingChat && chatMessages.length === 0" class="empty-state" style="margin: auto;">
-                <span class="empty-icon">💬</span>
-                <p>No messages yet in this group chat. Be the first to say hello!</p>
-              </div>
-
-              <div *ngFor="let msg of chatMessages; let i = index" 
-                [style.align-self]="msg.senderId === user?.id ? 'flex-end' : 'flex-start'" 
-                style="max-width: 82%; display: flex; align-items: flex-start; gap: 8px; position: relative;" 
-                (click)="isMultiSelectMode ? toggleMessageSelection(msg.id, $event) : (!msg.isDeleted ? openDeleteOptions(msg) : null); $event.stopPropagation()"
-                (contextmenu)="!msg.isDeleted ? openDeleteOptions(msg) : null; $event.preventDefault(); $event.stopPropagation()"
-              >
-                
-                <!-- Left Circle Avatar (Non-Self Messages) -->
-                <div *ngIf="msg.senderId !== user?.id" [style.background]="msg.sender?.role === 'warden' ? '#fdf2f4' : '#b31031'" style="width: 34px; height: 34px; border-radius: 50%; color: white; font-weight: 800; font-size: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 14px;">
-                  <span *ngIf="msg.sender?.role === 'warden'" style="font-size: 16px;">👨‍💼</span>
-                  <span *ngIf="msg.sender?.role !== 'warden'">{{ getInitials(msg.sender?.name || 'ST') }}</span>
-                </div>
-
-                <div style="display: flex; flex-direction: column; flex: 1; min-width: 0;">
-
-                  <!-- Inline Delete Options Popover -->
-                  <div *ngIf="selectedMsgForDelete?.id === msg.id && !isMultiSelectMode" 
-                    [style.right]="msg.senderId === user?.id ? '0' : 'auto'"
-                    [style.left]="msg.senderId === user?.id ? 'auto' : '0'"
-                    [style.top]="i === 0 ? '100%' : 'auto'"
-                    [style.bottom]="i === 0 ? 'auto' : '100%'"
-                    style="position: absolute; z-index: 1000; background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 12px; padding: 6px; display: flex; flex-direction: column; gap: 4px; min-width: 175px; box-shadow: var(--shadow-lg);"
-                    (click)="$event.stopPropagation()"
-                  >
-                    <button type="button" (click)="confirmDeleteForMe(); $event.stopPropagation()" style="background: transparent; border: none; color: var(--text-primary); text-align: left; padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                      <span>🙈</span> Delete for Me
-                    </button>
-                    <button type="button" *ngIf="msg.senderId === user?.id || user?.role === 'warden' || user?.role === 'admin'" (click)="confirmDeleteForEveryone(); $event.stopPropagation()" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; text-align: left; padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                      <span>💥</span> Delete for Everyone
-                    </button>
-                    <button type="button" (click)="startMultiSelectWithMsg(msg); $event.stopPropagation()" style="background: transparent; border: none; color: #94a3b8; text-align: left; padding: 6px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                      <span>☑️</span> Select Multiple
-                    </button>
-                  </div>
-
-                  <!-- Sender Info for non-self messages -->
-                  <div *ngIf="msg.senderId !== user?.id && !msg.isDeleted" [style.color]="msg.sender?.role === 'warden' ? '#b31031' : '#b31031'" style="font-size: 11.5px; font-weight: 800; margin-bottom: 3px; display: flex; align-items: center; gap: 6px;">
-                    <span *ngIf="isMultiSelectMode" style="font-size: 12px;">{{ isMessageSelected(msg.id) ? '☑️' : '🔲' }}</span>
-                    <span>{{ msg.sender?.name }}</span>
-                  </div>
-
-                  <!-- Normal Active Message Bubble -->
-                  <div *ngIf="!msg.isDeleted"
-                    [style.background]="isMessageSelected(msg.id) ? 'rgba(179, 16, 49, 0.25)' : (msg.senderId === user?.id ? 'linear-gradient(135deg, #8a0d24 0%, #b31031 100%)' : (msg.sender?.role === 'warden' ? 'linear-gradient(135deg, #8a0d24 0%, #b31031 100%)' : 'var(--bg-card)'))"
-                    [style.color]="(msg.senderId === user?.id || msg.sender?.role === 'warden') ? 'white' : 'var(--text-primary)'"
-                    [style.border]="isMessageSelected(msg.id) ? '2px solid #b31031' : (msg.senderId === user?.id || msg.sender?.role === 'warden' ? 'none' : '1px solid var(--border-color)')"
-                    [style.border-radius]="msg.senderId === user?.id ? '18px 18px 4px 18px' : '18px 18px 18px 4px'"
-                    style="padding: 12px 16px; font-size: 13.5px; line-height: 1.45; word-break: break-word; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 4px; cursor: pointer; position: relative;"
-                  >
-                    <!-- Warden Tag Header inside Warden bubble -->
-                    <div *ngIf="msg.sender?.role === 'warden'" style="display: flex; align-items: center; justify-content: space-between; gap: 4px; font-size: 10px; font-weight: 800; opacity: 0.9; margin-bottom: 2px; color: white;">
-                      <span (click)="openDeleteOptions(msg); $event.stopPropagation()" style="cursor: pointer; opacity: 0.7; font-size: 12px;" title="Delete Options">🗑️</span>
-                      <div style="display: flex; align-items: center; gap: 4px;">
-                        <span>Warden</span>
-                        <span>🛡️</span>
-                      </div>
-                    </div>
-
-                    <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; width: 100%;">
-                      <span *ngIf="msg.message" style="flex: 1;">{{ msg.message }}</span>
-                      
-                      <!-- Timestamp inside bubble -->
-                      <span [style.color]="(msg.senderId === user?.id || msg.sender?.role === 'warden') ? 'rgba(255,255,255,0.75)' : 'var(--text-muted)'" style="font-size: 9.5px; font-weight: 600; white-space: nowrap; display: flex; align-items: center; gap: 4px;">
-                        <span>{{ msg.createdAt | date:'shortTime' }}</span>
-                        <span *ngIf="msg.senderId === user?.id" style="margin-left: 2px;">✓✓</span>
-                        <span *ngIf="msg.senderId !== user?.id && msg.sender?.role !== 'warden'" (click)="openDeleteOptions(msg); $event.stopPropagation()" style="cursor: pointer; opacity: 0.6; font-size: 11px;" title="Delete Options">🗑️</span>
-                      </span>
-                    </div>
-
-                    <!-- Attached Image View -->
-                    <div *ngIf="msg.attachmentUrl" style="margin-top: 6px; width: 100%; max-width: 100%; overflow: hidden; border-radius: 10px;">
-                      <img 
-                        [src]="getImageUrl(msg.attachmentUrl)" 
-                        (load)="scrollChatToBottom()"
-                        (click)="openPhotoModal(getImageUrl(msg.attachmentUrl)); $event.stopPropagation()"
-                        style="width: 100%; max-width: 100%; max-height: 220px; border-radius: 10px; cursor: pointer; object-fit: cover; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: block;" 
-                      />
-                    </div>
-                  </div>
-
-                  <!-- Reaction Tag if available -->
-                  <div *ngIf="!msg.isDeleted && msg.reactions?.length" style="align-self: flex-start; margin-top: -6px; margin-left: 10px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 2px 8px; font-size: 11px; display: flex; align-items: center; gap: 4px; box-shadow: var(--shadow-sm);">
-                    <span>👍</span>
-                    <span style="font-weight: 700; color: var(--text-muted);">{{ msg.reactions.length }}</span>
-                  </div>
-
-                  <!-- Deleted Message Placeholder Bubble -->
-                  <div *ngIf="msg.isDeleted"
-                    style="background: var(--bg-card); color: var(--text-muted); border: 1px dashed var(--border-color); border-radius: 14px; padding: 10px 14px; font-size: 12px; font-style: italic; display: flex; align-items: center; justify-content: space-between; gap: 8px;"
-                  >
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                      <span style="color: #ef4444;">🚫</span>
-                      <span>This message was deleted by {{ msg.deletedByName || 'Warden Test' }}</span>
-                    </div>
-                    <span style="font-size: 9.5px; color: var(--text-muted); font-style: normal;">{{ msg.createdAt | date:'shortTime' }}</span>
-                  </div>
-
-                </div>
-
-                <!-- Right Avatar Circle (Self Messages) -->
-                <div *ngIf="msg.senderId === user?.id" style="width: 34px; height: 34px; border-radius: 50%; background: #fdf2f4; border: 1px solid #b31031; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 4px;">
-                  <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" style="width: 100%; height: 100%; object-fit: cover;" />
-                  <span *ngIf="!user?.profilePicUrl" style="font-weight: 800; font-size: 11px; color: #b31031;">{{ getInitials(user?.name || 'ST') }}</span>
-                </div>
-
-              </div>
-
-            </div>
-
-            <!-- Chat Input Preview Box -->
-            <div *ngIf="chatFilePreviewUrl" style="padding: 10px 14px; background: var(--bg-muted); border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
-              <div style="display: flex; align-items: center; gap: 10px;">
-                <img [src]="chatFilePreviewUrl" style="width: 42px; height: 42px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-color);" />
-                <span style="font-size: 12px; font-weight: 600; color: var(--text-primary);">📷 Photo attached</span>
-              </div>
-              <button type="button" (click)="clearChatFile()" style="background: none; border: none; color: #ef4444; font-size: 16px; cursor: pointer;">✕</button>
-            </div>
-
-            <!-- Chat Input Dock (Image 2 Mockup Format) -->
-            <div style="padding: 12px 14px; background: var(--bg-card); border-top: 1px solid var(--border-color); display: flex; gap: 10px; align-items: center; width: 100%;">
-              <input type="file" #chatFileInput (change)="onChatFileSelected($event)" accept="image/*" style="display: none;" />
-              
-              <!-- Left Plus Button -->
-              <button 
-                type="button" 
-                (click)="selectPhoto('chat')"
-                style="width: 42px; height: 42px; border-radius: 50%; background: #b31031; color: white; border: none; font-size: 20px; font-weight: 700; flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(179, 16, 49, 0.3);"
-              >
-                +
-              </button>
-
-              <!-- Rounded Input Pill Container -->
-              <div style="flex: 1; min-width: 0; height: 44px; border-radius: 22px; background: var(--bg-muted); border: 1px solid var(--border-color); display: flex; align-items: center; padding: 0 14px; gap: 8px;">
-                <input 
-                  type="text" 
-                  id="studentChatInput"
-                  style="flex: 1; min-width: 0; border: none; background: transparent; outline: none; font-size: 13.5px; color: var(--text-primary);"
-                  placeholder="Type a message..." 
-                  [(ngModel)]="newChatMessageText" 
-                  (keydown.enter)="sendStudentChatMessage(); $event.preventDefault()"
-                />
-                <span (click)="selectPhoto('chat')" style="font-size: 16px; color: var(--text-muted); cursor: pointer;">📎</span>
-                <span (click)="selectPhoto('chat')" style="font-size: 16px; color: var(--text-muted); cursor: pointer;">📷</span>
-              </div>
-
-              <!-- Send Circle Button -->
-              <button 
-                type="button" 
-                (click)="sendStudentChatMessage()"
-                [disabled]="sendingChatMessage || (!newChatMessageText.trim() && !selectedChatFile)"
-                style="width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #8a0d24 0%, #b31031 100%); color: white; border: none; font-size: 16px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(138, 13, 36, 0.35);"
-              >
-                ➔
-              </button>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-
       <!-- Bottom Tab Navigation (displayed as top-nav by global CSS) -->
-      <div class="bottom-tabs" *ngIf="activeTab !== 'chat'">
+      <div class="bottom-tabs">
         <button type="button" class="tab-item" [class.active]="activeTab === 'home'" (click)="switchTab('home')">
           <span class="tab-icon">🏠</span>
           <span>Home</span>
@@ -1228,13 +981,6 @@ import { API_CONFIG } from '../../config/api.config';
         <button type="button" class="tab-item" [class.active]="activeTab === 'mess'" (click)="switchTab('mess')">
           <span class="tab-icon">🍴</span>
           <span>Mess</span>
-        </button>
-        <button type="button" class="tab-item" [class.active]="activeTab === 'chat'" (click)="switchTab('chat')">
-          <span class="tab-icon">
-            💬
-            <span class="tab-badge animate-scale" *ngIf="totalUnreadChatCount > 0">{{ totalUnreadChatCount }}</span>
-          </span>
-          <span>Chat</span>
         </button>
         <button type="button" class="tab-item" [class.active]="activeTab === 'my-complaints'" (click)="switchTab('my-complaints')">
           <span class="tab-icon">📋</span>
@@ -2067,19 +1813,6 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
   attendanceHistory: any[] = [];
   isLoadingAttendance = false;
 
-  // Chat fields
-  myChatGroups: any[] = [];
-  activeChatGroup: any = null;
-  chatMessages: any[] = [];
-  newChatMessageText = '';
-  isLoadingChat = false;
-  sendingChatMessage = false;
-  private chatSub!: Subscription;
-  unreadCounts: { [groupId: number]: number } = {};
-  get totalUnreadChatCount(): number {
-    return Object.values(this.unreadCounts).reduce((acc, val) => acc + val, 0);
-  }
-
   constructor(
     private authService: AuthService,
     private complaintService: ComplaintService,
@@ -2087,8 +1820,7 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     private router: Router,
     private cdr: ChangeDetectorRef,
     private messService: MessService,
-    private attendanceService: AttendanceService,
-    private chatService: ChatService
+    private attendanceService: AttendanceService
   ) {}
 
   switchTab(tab: string): void {
@@ -2098,12 +1830,6 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
       this.raiseSuccess = '';
     } else if (tab === 'mess') {
       this.loadMessInfo();
-    } else if (tab === 'chat') {
-      this.loadMyChatGroups();
-      if (this.activeChatGroup) {
-        this.unreadCounts[this.activeChatGroup.id] = 0;
-      }
-      this.scrollChatToBottom();
     } else if (tab === 'my-complaints') {
       this.loadComplaints();
     } else if (tab === 'profile') {
@@ -2113,14 +1839,9 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
       this.loadAttendanceStats();
     }
     try {
-      if (tab !== 'chat') {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (e) {}
     this.cdr.detectChanges();
-    if (tab === 'chat') {
-      this.scrollChatToBottom();
-    }
   }
 
   showExitAppModal: boolean = false;
@@ -2132,7 +1853,6 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     this.loadComplaints();
     this.loadNotifications();
     this.loadFooterSettings();
-    this.loadMyChatGroups();
     this.loadWardens();
     this.loadPublicSettings();
     this.setupBackButtonListener();
@@ -2152,55 +1872,6 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
         this.loadNotifications();
         this.loadComplaints();
         setTimeout(() => { this.clearToast(); }, 3000);
-      }
-    });
-
-    // Subscribe to real-time group chat messages
-    this.chatSub = this.chatService.onNewMessage().subscribe(msg => {
-      if (this.activeChatGroup && msg.groupId === this.activeChatGroup.id && this.activeTab === 'chat') {
-        this.handleIncomingStudentChatMessage(msg);
-      } else {
-        // Increment unread count for the group
-        this.unreadCounts[msg.groupId] = (this.unreadCounts[msg.groupId] || 0) + 1;
-        this.cdr.detectChanges();
-
-        // Show toast notification for new messages in other chats or if not on the chat tab
-        if (this.user && msg.senderId !== this.user.id) {
-          const groupName = this.myChatGroups.find(g => g.id === msg.groupId)?.name || 'Group Chat';
-          this.activeToast = {
-            message: `💬 Message in "${groupName}" - ${msg.sender?.name || 'User'}: ${msg.message || 'sent an image'}`,
-            type: 'complaint_update',
-            createdAt: new Date()
-          } as any;
-          this.cdr.detectChanges();
-          setTimeout(() => this.clearToast(), 3000);
-        }
-      }
-    });
-
-    // Subscribe to real-time message deletion events
-    this.chatDeleteSub = this.chatService.onMessageDeletedEveryone().subscribe(data => {
-      if (data) {
-        const msg = this.chatMessages.find(m => m.id === data.messageId);
-        if (msg) {
-          msg.isDeleted = true;
-          msg.deletedByName = data.deletedByName;
-          this.cdr.detectChanges();
-        }
-      }
-    });
-
-    // Subscribe to real-time bulk message deletion events
-    this.bulkChatDeleteSub = this.chatService.onBulkMessagesDeletedEveryone().subscribe(data => {
-      if (this.activeChatGroup && data.groupId === this.activeChatGroup.id) {
-        data.messageIds.forEach(id => {
-          const msg = this.chatMessages.find(m => m.id === id);
-          if (msg) {
-            msg.isDeleted = true;
-            msg.deletedByName = data.deletedByName;
-          }
-        });
-        this.cdr.detectChanges();
       }
     });
 
@@ -2273,13 +1944,6 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
         }
         if (this.showExitAppModal) {
           this.showExitAppModal = false;
-          this.cdr.detectChanges();
-          return;
-        }
-        if (this.isMultiSelectMode || this.selectedMsgForDelete) {
-          this.isMultiSelectMode = false;
-          this.selectedMessageIds.clear();
-          this.selectedMsgForDelete = null;
           this.cdr.detectChanges();
           return;
         }
@@ -2803,158 +2467,6 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Group Chat Methods
-  loadMyChatGroups(): void {
-    this.isLoadingChat = true;
-    const safetyTimer = setTimeout(() => {
-      if (this.isLoadingChat) {
-        this.isLoadingChat = false;
-        this.cdr.detectChanges();
-      }
-    }, 4000);
-
-    this.chatService.getMyGroups().subscribe({
-      next: (groups) => {
-        clearTimeout(safetyTimer);
-        this.myChatGroups = groups;
-        
-        // Join all group rooms to receive notifications
-        groups.forEach(g => this.chatService.joinGroupRoom(g.id));
-
-        if (groups.length > 0) {
-          this.openChatGroup(groups[0]);
-        } else {
-          this.isLoadingChat = false;
-          this.cdr.detectChanges();
-        }
-      },
-      error: (err) => {
-        clearTimeout(safetyTimer);
-        console.error('Failed to load chat groups:', err);
-        this.isLoadingChat = false;
-        this.cdr.detectChanges();
-      }
-    });
-  }
-
-  openChatGroup(group: any): void {
-    const isSameGroup = this.activeChatGroup && this.activeChatGroup.id === group.id;
-    this.activeChatGroup = group;
-    this.unreadCounts[group.id] = 0;
-    if (!isSameGroup) {
-      this.chatMessages = [];
-      this.isLoadingChat = true;
-    }
-
-    this.chatService.getGroupMessages(group.id).subscribe({
-      next: (res) => {
-        this.chatMessages = res.messages;
-        this.isLoadingChat = false;
-        this.cdr.detectChanges();
-        this.scrollChatToBottom();
-      },
-      error: (err) => {
-        console.error('Failed to load group messages:', err);
-        this.isLoadingChat = false;
-        this.cdr.detectChanges();
-      }
-    });
-  }
-
-  selectedChatFile: File | null = null;
-  chatFilePreviewUrl: string | null = null;
-  isUploadingImage: boolean = false;
-
-  onChatFileSelected(event: any): void {
-    const file = event.target.files?.[0];
-    if (file) {
-      this.selectedChatFile = file;
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.chatFilePreviewUrl = reader.result as string;
-        this.cdr.detectChanges();
-      };
-      reader.readAsDataURL(file);
-    }
-  }
-
-  clearChatFile(): void {
-    this.selectedChatFile = null;
-    this.chatFilePreviewUrl = null;
-    this.cdr.detectChanges();
-  }
-
-  onChatStreamScroll(): void {
-    const inputEl = document.getElementById('studentChatInput') as HTMLInputElement;
-    if (inputEl && document.activeElement === inputEl) {
-      inputEl.blur();
-    }
-  }
-
-  sendStudentChatMessage(): void {
-    if ((!this.newChatMessageText || !this.newChatMessageText.trim()) && !this.selectedChatFile) return;
-    if (!this.activeChatGroup) return;
-
-    const msgText = (this.newChatMessageText || '').trim();
-    const fileToSend = this.selectedChatFile;
-    const previewToSend = this.chatFilePreviewUrl;
-
-    this.newChatMessageText = '';
-    this.clearChatFile();
-
-    if (fileToSend) {
-      this.isUploadingImage = true;
-      this.chatService.uploadChatImage(fileToSend).subscribe({
-        next: (uploadRes) => {
-          this.isUploadingImage = false;
-          this.postChatMessageWithUrl(msgText, uploadRes.attachmentUrl, previewToSend || undefined);
-        },
-        error: (err) => {
-          console.error('Failed to upload chat image:', err);
-          this.isUploadingImage = false;
-          this.postChatMessageWithUrl(msgText, previewToSend || undefined);
-        }
-      });
-    } else {
-      this.postChatMessageWithUrl(msgText);
-    }
-  }
-
-  private postChatMessageWithUrl(msgText: string, attachmentUrl?: string, previewUrl?: string): void {
-    const tempId = -Date.now();
-    const tempMsg: any = {
-      id: tempId,
-      groupId: this.activeChatGroup?.id,
-      senderId: this.user?.id,
-      message: msgText,
-      attachmentUrl: attachmentUrl || previewUrl,
-      createdAt: new Date().toISOString(),
-      sender: {
-        id: this.user?.id,
-        name: this.user?.name || 'Student',
-        role: this.user?.role || 'student',
-        roomNumber: this.user?.roomNumber
-      }
-    };
-
-    this.chatMessages.push(tempMsg);
-    this.cdr.detectChanges();
-    this.scrollChatToBottom();
-
-    if (!this.activeChatGroup) return;
-
-    this.chatService.sendMessage(this.activeChatGroup.id, msgText, attachmentUrl).subscribe({
-      next: (serverMsg) => {
-        this.handleIncomingStudentChatMessage(serverMsg, tempId);
-      },
-      error: (err) => {
-        console.error('Failed to send student message:', err);
-        this.chatMessages = this.chatMessages.filter(m => m.id !== tempId);
-        this.cdr.detectChanges();
-      }
-    });
-  }
-
   getImageUrl(url: string | null | undefined): string {
     if (!url) return '';
     if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
@@ -2970,190 +2482,15 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  private handleIncomingStudentChatMessage(msg: ChatMessage, tempId?: number): void {
-    if (tempId) {
-      const tempIdx = this.chatMessages.findIndex(m => m.id === tempId);
-      if (tempIdx !== -1) {
-        const tempAttachment = this.chatMessages[tempIdx]?.attachmentUrl;
-        const alreadyPresent = this.chatMessages.some(m => m.id === msg.id);
-        if (alreadyPresent) {
-          this.chatMessages.splice(tempIdx, 1);
-        } else {
-          if (!msg.attachmentUrl && tempAttachment) {
-            msg.attachmentUrl = tempAttachment;
-          }
-          this.chatMessages[tempIdx] = msg;
-        }
-        this.cdr.detectChanges();
-        this.scrollChatToBottom();
-        return;
-      }
-    }
-
-    if (this.chatMessages.some(m => m.id === msg.id)) {
-      return;
-    }
-
-    if (msg.senderId === this.user?.id) {
-      const tempIdx = this.chatMessages.findIndex(m => m.id < 0);
-      if (tempIdx !== -1) {
-        this.chatMessages[tempIdx] = msg;
-        this.cdr.detectChanges();
-        this.scrollChatToBottom();
-        return;
-      }
-    }
-
-    this.chatMessages.push(msg);
-    this.cdr.detectChanges();
-    this.scrollChatToBottom();
-  }
-
-  scrollChatToBottom(): void {
-    const scrollFn = () => {
-      const feed = document.getElementById('studentChatFeed');
-      if (feed) {
-        feed.scrollTop = feed.scrollHeight;
-      }
-    };
-    scrollFn();
-    setTimeout(scrollFn, 50);
-    setTimeout(scrollFn, 150);
-    setTimeout(scrollFn, 300);
-    setTimeout(scrollFn, 500);
-  }
-
-  // Chat Deletion & Multi-Select Options
-  selectedMsgForDelete: any = null;
-  showDeleteOptionsModal = false;
-  private chatDeleteSub!: Subscription;
-  private bulkChatDeleteSub!: Subscription;
-
-  isMultiSelectMode: boolean = false;
-  selectedMessageIds: Set<number> = new Set<number>();
-
-  toggleMultiSelectMode(): void {
-    this.isMultiSelectMode = !this.isMultiSelectMode;
-    if (!this.isMultiSelectMode) {
-      this.selectedMessageIds.clear();
-    }
-    this.selectedMsgForDelete = null;
-    this.cdr.detectChanges();
-  }
-
-  startMultiSelectWithMsg(msg: any): void {
-    this.isMultiSelectMode = true;
-    this.selectedMessageIds.clear();
-    this.selectedMessageIds.add(msg.id);
-    this.selectedMsgForDelete = null;
-    this.cdr.detectChanges();
-  }
-
-  toggleMessageSelection(msgId: number, event?: Event): void {
-    if (event) { event.stopPropagation(); }
-    if (this.selectedMessageIds.has(msgId)) {
-      this.selectedMessageIds.delete(msgId);
-    } else {
-      this.selectedMessageIds.add(msgId);
-    }
-    this.cdr.detectChanges();
-  }
-
-  isMessageSelected(msgId: number): boolean {
-    return this.selectedMessageIds.has(msgId);
-  }
-
-  clearMessageSelection(): void {
-    this.isMultiSelectMode = false;
-    this.selectedMessageIds.clear();
-    this.cdr.detectChanges();
-  }
-
-  bulkDeleteForMe(): void {
-    if (this.selectedMessageIds.size === 0) return;
-    this.chatMessages = this.chatMessages.filter(m => !this.selectedMessageIds.has(m.id));
-    this.clearMessageSelection();
-  }
-
-  bulkDeleteForEveryone(): void {
-    if (this.selectedMessageIds.size === 0) return;
-    const ids = Array.from(this.selectedMessageIds);
-    this.chatService.bulkDeleteMessagesForEveryone(ids).subscribe({
-      next: (res) => {
-        ids.forEach(id => {
-          const msg = this.chatMessages.find(m => m.id === id);
-          if (msg) {
-            msg.isDeleted = true;
-            msg.deletedByName = res.deletedByName || this.user?.name || 'User';
-          }
-        });
-        this.clearMessageSelection();
-      },
-      error: (err) => {
-        console.error('Failed to bulk delete messages:', err);
-      }
-    });
-  }
-
   @HostListener('document:click')
   onDocumentClick(): void {
-    if (this.selectedMsgForDelete) {
-      this.selectedMsgForDelete = null;
-      this.cdr.detectChanges();
-    }
     if (this.isMessMealDropdownOpen) {
       this.isMessMealDropdownOpen = false;
       this.cdr.detectChanges();
     }
   }
 
-  openDeleteOptions(msg: any): void {
-    if (this.selectedMsgForDelete && this.selectedMsgForDelete.id === msg.id) {
-      this.selectedMsgForDelete = null;
-    } else {
-      this.selectedMsgForDelete = msg;
-    }
-    this.cdr.detectChanges();
-  }
-
-  closeDeleteOptions(): void {
-    this.selectedMsgForDelete = null;
-    this.showDeleteOptionsModal = false;
-    this.cdr.detectChanges();
-  }
-
-  confirmDeleteForMe(): void {
-    if (!this.selectedMsgForDelete) return;
-    const targetId = this.selectedMsgForDelete.id;
-    this.chatMessages = this.chatMessages.filter(m => m.id !== targetId);
-    this.closeDeleteOptions();
-  }
-
-  confirmDeleteForEveryone(): void {
-    if (!this.selectedMsgForDelete) return;
-    const targetMsg = this.selectedMsgForDelete;
-    this.closeDeleteOptions();
-
-    if (targetMsg.id < 0) {
-      // Temp message not yet on server
-      this.chatMessages = this.chatMessages.filter(m => m.id !== targetMsg.id);
-      this.cdr.detectChanges();
-      return;
-    }
-
-    this.chatService.deleteMessageForEveryone(targetMsg.id).subscribe({
-      next: (res) => {
-        targetMsg.isDeleted = true;
-        targetMsg.deletedByName = res.deletedByName || this.user?.name || 'User';
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Failed to delete message for everyone:', err);
-      }
-    });
-  }
-
-  async selectPhoto(type: 'complaint' | 'profile' | 'chat') {
+  async selectPhoto(type: 'complaint' | 'profile') {
     try {
       const { Camera, CameraResultType, CameraSource } = await import('@capacitor/camera');
       const image = await Camera.getPhoto({
@@ -3176,9 +2513,6 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
           } else if (type === 'profile') {
             this.selectedProfilePic = file;
             this.profilePreviewUrl = reader.result as string;
-          } else if (type === 'chat') {
-            this.selectedChatFile = file;
-            this.chatFilePreviewUrl = reader.result as string;
           }
           this.cdr.detectChanges();
         };
@@ -3191,9 +2525,6 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
         if (el) el.click();
       } else if (type === 'profile') {
         const el = document.getElementById('profilePicFile') as HTMLInputElement;
-        if (el) el.click();
-      } else if (type === 'chat') {
-        const el = document.getElementById('chatFileInput') as HTMLInputElement;
         if (el) el.click();
       }
     }

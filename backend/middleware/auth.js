@@ -32,7 +32,23 @@ const requireRole = (roles) => {
   };
 };
 
+const isAdmin = (req, res, next) => {
+  if (req.userRole !== 'admin') {
+    return res.status(403).json({ message: 'Forbidden! Admin access required.' });
+  }
+  next();
+};
+
+const isManagement = (req, res, next) => {
+  if (!['admin', 'management'].includes(req.userRole)) {
+    return res.status(403).json({ message: 'Forbidden! Management access required.' });
+  }
+  next();
+};
+
 module.exports = {
   verifyToken,
-  requireRole
+  requireRole,
+  isAdmin,
+  isManagement
 };

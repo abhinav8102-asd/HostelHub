@@ -56,8 +56,8 @@ exports.createWardenOrStaff = async (req, res) => {
   try {
     const { name, email, password, role, phone } = req.body;
 
-    if (!['warden', 'staff'].includes(role)) {
-      return res.status(400).json({ message: 'Role must be warden or staff.' });
+    if (!['warden', 'staff', 'management'].includes(role)) {
+      return res.status(400).json({ message: 'Role must be warden, staff, or management.' });
     }
 
     const existingUser = await User.findOne({ where: { email } });

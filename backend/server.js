@@ -43,7 +43,7 @@ const userRoutes = require('./routes/userRoutes');
 const settingRoutes = require('./routes/settingRoutes');
 const messRoutes = require('./routes/messRoutes');
 const attendanceRoutes = require('./routes/attendanceRoutes');
-const chatRoutes = require('./routes/chatRoutes');
+const managementRoutes = require('./routes/managementRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/complaints', complaintRoutes);
@@ -53,7 +53,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/settings', settingRoutes);
 app.use('/api/mess', messRoutes);
 app.use('/api/attendance', attendanceRoutes);
-app.use('/api/chat', chatRoutes);
+app.use('/api/management', managementRoutes);
 
 
 
@@ -72,23 +72,6 @@ io.on('connection', (socket) => {
       const roomName = `user_${userId}`;
       socket.join(roomName);
       console.log(`Socket ${socket.id} joined room: ${roomName}`);
-    }
-  });
-
-  // Group chat room join / leave
-  socket.on('join_chat_group', (groupId) => {
-    if (groupId) {
-      const roomName = `group_${groupId}`;
-      socket.join(roomName);
-      console.log(`Socket ${socket.id} joined group chat room: ${roomName}`);
-    }
-  });
-
-  socket.on('leave_chat_group', (groupId) => {
-    if (groupId) {
-      const roomName = `group_${groupId}`;
-      socket.leave(roomName);
-      console.log(`Socket ${socket.id} left group chat room: ${roomName}`);
     }
   });
 

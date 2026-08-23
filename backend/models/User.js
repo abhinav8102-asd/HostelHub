@@ -29,7 +29,7 @@ const User = sequelize.define('User', {
     field: 'google_id'
   },
   role: {
-    type: DataTypes.ENUM('student', 'warden', 'staff', 'admin'),
+    type: DataTypes.ENUM('student', 'warden', 'staff', 'admin', 'management'),
     allowNull: false,
     defaultValue: 'student'
   },

@@ -5,19 +5,27 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
 
-/* ── LIGHT MODE (Default) ── */
+/* ── LIGHT MODE (Default) — Crimson Gradient Theme ── */
 :root {
-  --primary: #6366f1;
-  --primary-dark: #4f46e5;
-  --primary-light: #e0e7ff;
-  --primary-glow: rgba(99, 102, 241, 0.25);
-  --secondary: #ec4899;
+  /* Crimson-to-Black Brand Colors */
+  --primary: #b31031;
+  --primary-dark: #8a0d24;
+  --primary-deeper: #690518;
+  --primary-light: #fde8ec;
+  --primary-glow: rgba(179, 16, 49, 0.25);
+  --secondary: #ff4b6e;
   --success: #10b981;
   --success-light: #d1fae5;
   --warning: #f59e0b;
   --danger: #ef4444;
   --danger-light: #fee2e2;
 
+  /* Crimson header gradient */
+  --gradient-brand: linear-gradient(180deg, #b31031 0%, #1a0208 100%);
+  --gradient-btn: linear-gradient(135deg, #b31031 0%, #690518 100%);
+  --gradient-card: linear-gradient(135deg, #b31031 0%, #8a0d24 100%);
+
+  /* Neutral palette */
   --neutral-900: #0f172a;
   --neutral-800: #1e293b;
   --neutral-700: #334155;
@@ -30,27 +38,37 @@
   --neutral-50: #f8fafc;
   --white: #ffffff;
 
-  --bg-body: #f1f5f9;
+  /* Surface colours (light) */
+  --bg-body: #f8f0f2;
   --bg-card: #ffffff;
-  --bg-header: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  --bg-header: linear-gradient(180deg, #b31031 0%, #1a0208 100%);
   --bg-nav: #ffffff;
   --bg-input: #ffffff;
-  --bg-muted: #f8fafc;
+  --bg-muted: #fdf3f5;
 
-  --text-primary: #0f172a;
+  /* Text colours (light) */
+  --text-primary: #1a0208;
   --text-secondary: #475569;
   --text-muted: #94a3b8;
+  --text-on-primary: #ffffff;
+
+  /* Border */
   --border-color: rgba(226, 232, 240, 0.9);
+  --border-focus: var(--primary);
 
-  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
-  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.04);
-  --shadow-lg: 0 10px 28px rgba(15, 23, 42, 0.10), 0 4px 8px rgba(15, 23, 42, 0.05);
-  --shadow-xl: 0 20px 40px rgba(15, 23, 42, 0.14), 0 8px 16px rgba(15, 23, 42, 0.06);
+  /* Shadows — crimson tinted */
+  --shadow-sm: 0 1px 3px rgba(179, 16, 49, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 12px rgba(179, 16, 49, 0.10), 0 2px 6px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 10px 28px rgba(179, 16, 49, 0.14), 0 4px 8px rgba(15, 23, 42, 0.05);
+  --shadow-xl: 0 20px 40px rgba(179, 16, 49, 0.18), 0 8px 16px rgba(15, 23, 42, 0.06);
   --shadow-glow: 0 0 0 4px var(--primary-glow);
+  --shadow-brand: 0 8px 24px rgba(179, 16, 49, 0.35);
 
+  /* Typography */
   --font-sans: 'Inter', 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-display: 'Outfit', 'Inter', sans-serif;
 
+  /* Border Radii */
   --radius-xs: 6px;
   --radius-sm: 10px;
   --radius-md: 14px;
@@ -59,17 +77,24 @@
   --radius-2xl: 32px;
   --radius-full: 9999px;
 
+  /* Transitions */
   --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-spring: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ── DARK MODE ── */
+/* ── DARK MODE — Charcoal Base + Crimson Accent ── */
 body.dark-mode {
-  --primary: #818cf8;
-  --primary-dark: #6366f1;
-  --primary-light: rgba(99, 102, 241, 0.15);
-  --primary-glow: rgba(129, 140, 248, 0.3);
+  --primary: #e8405a;
+  --primary-dark: #b31031;
+  --primary-deeper: #8a0d24;
+  --primary-light: rgba(179, 16, 49, 0.15);
+  --primary-glow: rgba(232, 64, 90, 0.25);
+  --secondary: #ff6b85;
+
+  --gradient-brand: linear-gradient(180deg, #b31031 0%, #1a0208 100%);
+  --gradient-btn: linear-gradient(135deg, #b31031 0%, #690518 100%);
+  --gradient-card: linear-gradient(135deg, #b31031 0%, #8a0d24 100%);
 
   --success: #34d399;
   --success-light: rgba(52, 211, 153, 0.12);
@@ -88,9 +113,9 @@ body.dark-mode {
   --neutral-50: #0a1120;
   --white: #1e293b;
 
-  --bg-body: #0a1120;
+  --bg-body: #0a0f1a;
   --bg-card: #111827;
-  --bg-header: linear-gradient(135deg, #0f172a 0%, #060d1a 100%);
+  --bg-header: linear-gradient(180deg, #b31031 0%, #1a0208 100%);
   --bg-nav: #111827;
   --bg-input: #1a2438;
   --bg-muted: #0f172a;
