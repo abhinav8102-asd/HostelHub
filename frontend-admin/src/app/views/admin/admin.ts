@@ -39,17 +39,14 @@ import { ComplaintService } from '../../services/complaint.service';
 
         <!-- Tab Navigation -->
         <div class="admin-tab-nav">
-          <button (click)="activeTab = 'stats'" [class.active]="activeTab === 'stats'">
+          <button (click)="activeTab = 'stats'; loadGraphicalAnalytics()" [class.active]="activeTab === 'stats'">
             📊 Analytics
           </button>
           <button (click)="activeTab = 'users'" [class.active]="activeTab === 'users'">
-            👥 Users
+            👥 Users & Batches
           </button>
           <button (click)="activeTab = 'create'" [class.active]="activeTab === 'create'">
             ➕ Create Staff
-          </button>
-          <button (click)="activeTab = 'mgmt'; loadManagementAccounts()" [class.active]="activeTab === 'mgmt'">
-            🏢 Management
           </button>
           <button (click)="activeTab = 'settings'" [class.active]="activeTab === 'settings'">
             ⚙️ Settings
@@ -93,6 +90,29 @@ import { ComplaintService } from '../../services/complaint.service';
             <div class="skeleton" style="height:80px; border-radius: 16px;"></div>
           </div>
 
+          <!-- Graphical Trend Analytics Card -->
+          <div class="card chart-card" style="margin-bottom: 24px; background: #0f172a; color: white; padding: 18px; border-radius: 16px; border: 1px solid #1e293b;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+              <div>
+                <h5 style="margin: 0; color: #f8fafc; font-size: 16px; font-weight: 800;">📈 Executive Analytics Trends</h5>
+                <p style="margin: 4px 0 0 0; color: #94a3b8; font-size: 11.5px;">Real-time complaint & resolution volume analysis</p>
+              </div>
+              <div style="display: flex; background: #1e293b; padding: 3px; border-radius: 8px; gap: 3px;">
+                <button type="button" (click)="switchPeriod('day')" [style.background]="period === 'day' ? '#6366f1' : 'transparent'" [style.color]="period === 'day' ? 'white' : '#94a3b8'" style="border: none; padding: 5px 12px; border-radius: 6px; font-weight: 700; font-size: 11px; cursor: pointer;">Day</button>
+                <button type="button" (click)="switchPeriod('week')" [style.background]="period === 'week' ? '#6366f1' : 'transparent'" [style.color]="period === 'week' ? 'white' : '#94a3b8'" style="border: none; padding: 5px 12px; border-radius: 6px; font-weight: 700; font-size: 11px; cursor: pointer;">Weekly</button>
+                <button type="button" (click)="switchPeriod('month')" [style.background]="period === 'month' ? '#6366f1' : 'transparent'" [style.color]="period === 'month' ? 'white' : '#94a3b8'" style="border: none; padding: 5px 12px; border-radius: 6px; font-weight: 700; font-size: 11px; cursor: pointer;">Monthly</button>
+              </div>
+            </div>
+
+            <div *ngIf="mgmtTrendData && mgmtTrendData.timeSeries" style="display: flex; align-items: flex-end; gap: 12px; height: 160px; padding-top: 20px; border-bottom: 1px solid #334155;">
+              <div *ngFor="let t of mgmtTrendData.timeSeries" style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end;">
+                <span style="font-size: 10px; font-weight: 800; color: #818cf8;">{{ t.complaints }}</span>
+                <div [style.height.%]="getTrendBarHeight(t.complaints)" style="width: 100%; max-width: 32px; background: linear-gradient(180deg, #6366f1 0%, #4338ca 100%); border-radius: 6px 6px 0 0; transition: height 0.4s ease;"></div>
+                <span style="font-size: 9.5px; color: #64748b; font-weight: 600; white-space: nowrap;">{{ t.label }}</span>
+              </div>
+            </div>
+          </div>
+
           <div class="category-breakdown-card" *ngIf="analytics">
             <h5>Category Breakdown</h5>
             <div class="cat-list">
@@ -112,9 +132,58 @@ import { ComplaintService } from '../../services/complaint.service';
           </div>
         </div>
 
-        <!-- TAB 1: USERS LIST -->
+        <!-- TAB 1: USERS LIST & BATCH MANAGEMENT -->
         <div *ngIf="activeTab === 'users'" class="tab-panel animate-fade">
-          <h4 class="page-title">👥 System Users</h4>
+          <h4 class="page-title">👥 System Users & Batch Management</h4>
+
+          <!-- Bulk Student Batch Import Section -->
+          <div class="card" style="margin-bottom: 20px; background: #0f172a; color: white; padding: 18px; border-radius: 16px; border: 1px solid #1e293b;">
+            <h5 style="margin: 0 0 4px 0; color: #f8fafc; font-size: 15px; font-weight: 800;">📥 Bulk Student Batch Import (Excel / CSV)</h5>
+            <p style="margin: 0 0 14px 0; color: #94a3b8; font-size: 11.5px;">Upload student Excel/CSV sheet to register a full batch at once</p>
+
+            <div *ngIf="batchImportSuccess" class="alert alert-success" style="margin-bottom: 12px;">{{ batchImportSuccess }}</div>
+            <div *ngIf="batchImportError" class="alert alert-danger" style="margin-bottom: 12px;">{{ batchImportError }}</div>
+
+            <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 12px;">
+              <input type="text" class="form-input" style="flex: 1; min-width: 180px; background: #1e293b; border-color: #334155; color: white;" [(ngModel)]="bulkBatchName" placeholder="Target Batch Name (e.g. Batch 2025-2029)" />
+              <input type="file" accept=".csv, .xlsx, .json" (change)="onExcelFileSelected($event)" style="font-size: 12px; color: #94a3b8;" />
+            </div>
+
+            <div *ngIf="excelParsedStudents.length > 0" style="margin-bottom: 12px; padding: 10px; background: #1e293b; border-radius: 8px; border: 1px solid #334155;">
+              <span style="font-size: 12px; font-weight: 700; color: #818cf8;">📄 Preview Parsed Students: {{ excelParsedStudents.length }} records ready to import</span>
+            </div>
+
+            <button type="button" class="btn btn-primary" (click)="uploadParsedBatch()" [disabled]="excelParsedStudents.length === 0 || importingBatch" style="width: 100%;">
+              <span *ngIf="importingBatch">Importing Student Batch...</span>
+              <span *ngIf="!importingBatch">🚀 Register {{ excelParsedStudents.length }} Students Now</span>
+            </button>
+          </div>
+
+          <!-- Termination & Block Control Center -->
+          <div class="card" style="margin-bottom: 24px; background: #1e1b2e; border: 1px solid #7f1d1d; padding: 18px; border-radius: 16px;">
+            <h5 style="margin: 0 0 4px 0; color: #fecdd3; font-size: 15px; font-weight: 800;">⛔ Termination & Block Control Center</h5>
+            <p style="margin: 0 0 14px 0; color: #fda4af; font-size: 11.5px;">Terminate individual IDs or block an entire student batch instantly</p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+              <!-- Single ID Termination -->
+              <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 10px; border: 1px solid rgba(239, 68, 68, 0.3);">
+                <label style="display: block; font-size: 11px; font-weight: 700; color: #cbd5e1; margin-bottom: 6px;">Single User ID Termination</label>
+                <div style="display: flex; gap: 6px;">
+                  <input type="number" class="form-input" style="flex: 1; background: #0f172a; border-color: #334155; color: white;" [(ngModel)]="terminateUserIdInput" placeholder="User ID #" />
+                  <button type="button" class="btn btn-delete-user" (click)="executeSingleUserTermination()" style="white-space: nowrap;">Terminate</button>
+                </div>
+              </div>
+
+              <!-- Full Batch Termination -->
+              <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 10px; border: 1px solid rgba(239, 68, 68, 0.3);">
+                <label style="display: block; font-size: 11px; font-weight: 700; color: #cbd5e1; margin-bottom: 6px;">1-Click Full Batch Termination</label>
+                <div style="display: flex; gap: 6px;">
+                  <input type="text" class="form-input" style="flex: 1; background: #0f172a; border-color: #334155; color: white;" [(ngModel)]="terminateBatchNameInput" placeholder="Batch Name" />
+                  <button type="button" class="btn btn-delete-user" (click)="executeBatchTermination()" style="white-space: nowrap; background: #dc2626;">Block Batch</button>
+                </div>
+              </div>
+            </div>
+          </div>
 
           <div class="users-list" *ngIf="users.length > 0; else noUsers">
             <div class="card user-card" *ngFor="let u of users">
@@ -392,103 +461,7 @@ import { ComplaintService } from '../../services/complaint.service';
 
               <button type="submit" class="btn btn-primary btn-submit" [disabled]="!profileForm.form.valid || updatingProfile">
                 <span *ngIf="updatingProfile">Updating...</span>
-                <span *ngIf="!updatingProfile">Save Changes</span>
-              </button>
-            </form>
-          </div>
-        </div>
-
-        <!-- TAB 6: MANAGEMENT ACCOUNTS -->
-        <div *ngIf="activeTab === 'mgmt'" class="tab-panel animate-fade">
-          <h4 class="page-title">🏢 Create & Manage Management Accounts</h4>
-
-          <div class="card form-card" style="margin-bottom: 24px;">
-            <div class="card-header">
-              <h5>➕ Register New Management Executive</h5>
-              <p class="card-subtitle">Create accounts for higher management executives with full analytics access</p>
-            </div>
-            
-            <div *ngIf="mgmtSuccess" class="alert alert-success">{{ mgmtSuccess }}</div>
-            <div *ngIf="mgmtError" class="alert alert-danger">{{ mgmtError }}</div>
-
-            <form (ngSubmit)="onCreateManagementSubmit()" #mgmtForm="ngForm">
-              <div class="form-group">
-                <label class="form-label" for="mName">Full Name</label>
-                <input type="text" id="mName" name="mName" class="form-input" placeholder="e.g. Dr. Rajesh Sharma" [(ngModel)]="newMgmt.name" required />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label" for="mEmail">Email Address</label>
-                <input type="email" id="mEmail" name="mEmail" class="form-input" placeholder="e.g. rajesh.management@hostelhub.com" [(ngModel)]="newMgmt.email" required email />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label" for="mPhone">Phone Number</label>
-                <input type="text" id="mPhone" name="mPhone" class="form-input" placeholder="e.g. +91 98765 43210" [(ngModel)]="newMgmt.phone" required />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label" for="mBio">Designation / Role Description</label>
-                <input type="text" id="mBio" name="mBio" class="form-input" placeholder="e.g. Chief Hostel Trustee / Director" [(ngModel)]="newMgmt.bio" />
-              </div>
-
-              <div class="form-group">
-                <label class="form-label" for="mPass">Password</label>
-                <input type="password" id="mPass" name="mPass" class="form-input" placeholder="Set password" [(ngModel)]="newMgmt.password" required />
-              </div>
-
-              <button type="submit" class="btn btn-primary btn-submit" [disabled]="!mgmtForm.form.valid || creatingMgmt">
-                <span *ngIf="creatingMgmt">Creating Account...</span>
-                <span *ngIf="!creatingMgmt">➕ Create Management ID</span>
-              </button>
-            </form>
-          </div>
-
-          <!-- Existing Management Accounts List -->
-          <div class="card table-card">
-            <div class="card-header">
-              <h5>📋 Existing Management Team Members</h5>
-            </div>
-
-            <div *ngIf="loadingMgmtAccounts" style="padding: 20px; text-align: center; color: var(--text-muted);">
-              Loading management accounts...
-            </div>
-
-            <div *ngIf="!loadingMgmtAccounts && mgmtAccounts.length === 0" style="padding: 20px; text-align: center; color: var(--text-muted);">
-              No management accounts created yet. Use the form above to add your first management executive.
-            </div>
-
-            <div class="table-responsive" *ngIf="!loadingMgmtAccounts && mgmtAccounts.length > 0">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Email & Phone</th>
-                    <th>Designation</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let m of mgmtAccounts">
-                    <td>
-                      <strong>{{ m.name }}</strong>
-                    </td>
-                    <td>
-                      <div>{{ m.email }}</div>
-                      <small style="color: var(--text-muted);">{{ m.phone }}</small>
-                    </td>
-                    <td>{{ m.bio || 'Management Team Member' }}</td>
-                    <td>
-                      <span class="badge" [class.badge-active]="m.status === 'active'" [class.badge-danger]="m.status === 'blocked'">
-                        {{ m.status }}
-                      </span>
-                    </td>
-                    <td>
-                      <button type="button" class="btn-icon danger" (click)="deleteManagementAccount(m.id, m.name)" title="Delete Account">
-                        🗑️ Delete
-                      </button>
-                    </td>
+                <span          </td>
                   </tr>
                 </tbody>
               </table>
@@ -956,6 +929,7 @@ export class AdminDashboardComponent implements OnInit {
       next: (res) => { this.analytics = res; this.cdr.detectChanges(); },
       error: (err) => console.error(err)
     });
+    this.loadGraphicalAnalytics();
   }
 
   loadUsers(): void {
@@ -1113,61 +1087,129 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  // Management Account Methods
-  newMgmt = { name: '', email: '', phone: '', password: '', bio: '' };
-  mgmtAccounts: any[] = [];
-  loadingMgmtAccounts = false;
-  creatingMgmt = false;
-  mgmtError = '';
-  mgmtSuccess = '';
+  // Executive Features (Graphical Analytics, Bulk Batch Import, Termination Controls)
+  period = 'week';
+  mgmtTrendData: any = null;
+  bulkBatchName = 'Batch 2025-2029';
+  excelParsedStudents: any[] = [];
+  importingBatch = false;
+  batchImportSuccess = '';
+  batchImportError = '';
+  terminateUserIdInput: number | null = null;
+  terminateBatchNameInput = '';
 
-  loadManagementAccounts(): void {
-    this.loadingMgmtAccounts = true;
-    this.complaintService.getManagementAccounts().subscribe({
+  switchPeriod(newPeriod: string): void {
+    this.period = newPeriod;
+    this.loadGraphicalAnalytics();
+  }
+
+  loadGraphicalAnalytics(): void {
+    this.complaintService.getManagementAnalytics(this.period).subscribe({
       next: (res) => {
-        this.mgmtAccounts = res;
-        this.loadingMgmtAccounts = false;
+        this.mgmtTrendData = res;
         this.cdr.detectChanges();
       },
-      error: (err) => {
-        console.error('Error loading management accounts:', err);
-        this.loadingMgmtAccounts = false;
-        this.cdr.detectChanges();
-      }
+      error: (err) => console.error('Error fetching analytics trend:', err)
     });
   }
 
-  onCreateManagementSubmit(): void {
-    this.creatingMgmt = true;
-    this.mgmtError = '';
-    this.mgmtSuccess = '';
+  getTrendBarHeight(val: number): number {
+    if (!this.mgmtTrendData || !this.mgmtTrendData.timeSeries) return 10;
+    const maxVal = Math.max(...this.mgmtTrendData.timeSeries.map((t: any) => t.complaints), 1);
+    return Math.max(Math.round((val / maxVal) * 100), 10);
+  }
+
+  onExcelFileSelected(event: any): void {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      try {
+        const text = e.target.result as string;
+        if (file.name.endsWith('.json')) {
+          this.excelParsedStudents = JSON.parse(text);
+        } else {
+          const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+          if (lines.length <= 1) return;
+          const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+          const parsed = [];
+          for (let i = 1; i < lines.length; i++) {
+            const cols = lines[i].split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+            if (cols.length >= 2) {
+              const obj: any = {};
+              headers.forEach((h, idx) => {
+                obj[h] = cols[idx] || '';
+              });
+              if (!obj.name && cols[0]) obj.name = cols[0];
+              if (!obj.email && cols[1]) obj.email = cols[1];
+              parsed.push(obj);
+            }
+          }
+          this.excelParsedStudents = parsed;
+        }
+        this.cdr.detectChanges();
+      } catch (err) {
+        alert('Failed to parse file. Please ensure it is a valid CSV or JSON file.');
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  uploadParsedBatch(): void {
+    if (this.excelParsedStudents.length === 0) return;
+    this.importingBatch = true;
+    this.batchImportSuccess = '';
+    this.batchImportError = '';
     this.cdr.detectChanges();
 
-    this.complaintService.createManagementAccount(this.newMgmt).subscribe({
-      next: () => {
-        this.creatingMgmt = false;
-        this.mgmtSuccess = '✅ Management Account created successfully!';
-        this.newMgmt = { name: '', email: '', phone: '', password: '', bio: '' };
-        this.loadManagementAccounts();
+    this.complaintService.bulkImportStudents(this.excelParsedStudents, this.bulkBatchName).subscribe({
+      next: (res) => {
+        this.importingBatch = false;
+        this.batchImportSuccess = `✅ ${res.message || 'Batch created successfully!'}`;
+        this.excelParsedStudents = [];
+        this.loadUsers();
         this.cdr.detectChanges();
       },
       error: (err) => {
-        this.creatingMgmt = false;
-        this.mgmtError = err.error?.message || (typeof err.error === 'string' ? err.error : null) || err.message || 'Failed to create management account.';
+        this.importingBatch = false;
+        this.batchImportError = err.error?.message || 'Failed to import batch.';
         this.cdr.detectChanges();
       }
     });
   }
 
-  deleteManagementAccount(id: number, name: string): void {
-    if (!confirm(`Are you sure you want to delete Management Account "${name}"?`)) return;
-    this.complaintService.deleteManagementAccount(id).subscribe({
-      next: () => {
-        this.loadManagementAccounts();
+  executeSingleUserTermination(): void {
+    if (!this.terminateUserIdInput) {
+      alert('Please enter a valid User ID.');
+      return;
+    }
+    if (!confirm(`Are you sure you want to terminate User ID #${this.terminateUserIdInput}?`)) return;
+
+    this.complaintService.terminateUser(this.terminateUserIdInput).subscribe({
+      next: (res) => {
+        alert(`✅ ${res.message}`);
+        this.terminateUserIdInput = null;
+        this.loadUsers();
       },
-      error: (err) => {
-        alert(err.error?.message || 'Failed to delete management account.');
-      }
+      error: (err) => alert(err.error?.message || 'Failed to terminate user.')
+    });
+  }
+
+  executeBatchTermination(): void {
+    if (!this.terminateBatchNameInput.trim()) {
+      alert('Please enter a Batch Name to terminate.');
+      return;
+    }
+    if (!confirm(`⚠️ DANGER: Are you sure you want to block and terminate ALL students in "${this.terminateBatchNameInput}"?`)) return;
+
+    this.complaintService.terminateBatch(this.terminateBatchNameInput.trim()).subscribe({
+      next: (res) => {
+        alert(`✅ ${res.message}`);
+        this.terminateBatchNameInput = '';
+        this.loadUsers();
+      },
+      error: (err) => alert(err.error?.message || 'Failed to terminate batch.')
     });
   }
 }

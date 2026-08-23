@@ -12,12 +12,7 @@ export const routes: Routes = [
     canActivate: [authGuard], 
     data: { roles: ['admin'] } 
   },
-  { 
-    path: 'management', 
-    component: ManagementDashboardComponent, 
-    canActivate: [authGuard], 
-    data: { roles: ['management', 'admin'] } 
-  },
+  { path: 'management', redirectTo: '/admin', pathMatch: 'full' },
   { path: '', redirectTo: '/admin/login', pathMatch: 'full' },
   { path: '**', redirectTo: '/admin/login' }
 ];
