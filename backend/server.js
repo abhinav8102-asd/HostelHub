@@ -59,7 +59,11 @@ app.use('/api/management', managementRoutes);
 
 // Base route
 app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to HostelHub API Service!' });
+  res.json({ message: 'Welcome to HostelHub API Service!', timestamp: Date.now() });
+});
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', uptime: process.uptime(), timestamp: Date.now() });
 });
 
 // Socket Connections
