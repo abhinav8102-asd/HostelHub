@@ -422,7 +422,7 @@ import { ComplaintService } from '../../services/complaint.service';
             <div class="glass-card" style="margin-top: 20px;">
               <div class="card-header-row">
                 <h3 class="card-title">All Staff Overview</h3>
-                <button class="btn btn-primary" (click)="switchTab('users')" style="width: auto; padding: 8px 14px;">+ Add Staff</button>
+                <button class="btn btn-primary" (click)="openAddStaffModal()" style="width: auto; padding: 8px 14px;">+ Add Staff / Warden</button>
               </div>
 
               <div class="table-responsive">
@@ -659,6 +659,59 @@ import { ComplaintService } from '../../services/complaint.service';
 
         </div>
 
+        <!-- ADD STAFF / WARDEN ID CREATION MODAL -->
+        <div *ngIf="showAddStaffModal" class="modal-overlay animate-fade">
+          <div class="modal-card">
+            <div class="modal-header">
+              <h3 style="margin: 0; font-size: 16px;">➕ Create Staff / Warden ID Account</h3>
+              <button class="close-btn" (click)="closeAddStaffModal()">✕</button>
+            </div>
+            <form (ngSubmit)="onCreateStaffSubmit()">
+              <div class="form-group" style="margin-bottom: 12px;">
+                <label class="form-label" style="display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px;">Full Name</label>
+                <input type="text" class="form-input" [(ngModel)]="newStaffForm.name" name="name" placeholder="e.g. Ramesh Sharma" required />
+              </div>
+              <div class="form-group" style="margin-bottom: 12px;">
+                <label class="form-label" style="display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px;">Email Address</label>
+                <input type="email" class="form-input" [(ngModel)]="newStaffForm.email" name="email" placeholder="e.g. ramesh@hostelhub.com" required />
+              </div>
+              <div class="form-group" style="margin-bottom: 12px;">
+                <label class="form-label" style="display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px;">Initial Password</label>
+                <input type="password" class="form-input" [(ngModel)]="newStaffForm.password" name="password" placeholder="Set secure password" required />
+              </div>
+              <div class="form-group" style="margin-bottom: 12px;">
+                <label class="form-label" style="display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px;">System Role</label>
+                <select class="form-input" [(ngModel)]="newStaffForm.role" name="role">
+                  <option value="staff">Maintenance / Support Staff</option>
+                  <option value="warden">Hostel Warden</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom: 12px;">
+                <label class="form-label" style="display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px;">Trade / Category</label>
+                <select class="form-input" [(ngModel)]="newStaffForm.bio" name="bio">
+                  <option value="Electrician">Electrician</option>
+                  <option value="Plumber">Plumber</option>
+                  <option value="Cleaner">Cleaner</option>
+                  <option value="Carpenter">Carpenter</option>
+                  <option value="Security Guard">Security Guard</option>
+                  <option value="Hostel Warden">Hostel Warden</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom: 16px;">
+                <label class="form-label" style="display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px;">Assigned Hostel Area</label>
+                <select class="form-input" [(ngModel)]="newStaffForm.hostelBlock" name="hostelBlock">
+                  <option value="All Hostels">All Hostels</option>
+                  <option value="Boys Hostel B-1">Boys Hostel B-1</option>
+                  <option value="Boys Hostel B-2">Boys Hostel B-2</option>
+                  <option value="Girls Hostel G-1">Girls Hostel G-1</option>
+                  <option value="Girls Hostel G-2">Girls Hostel G-2</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width: 100%; font-weight: 800; padding: 12px;">🚀 Create ID Account Now</button>
+            </form>
+          </div>
+        </div>
+
       </main>
 
     </div>
@@ -845,6 +898,12 @@ import { ComplaintService } from '../../services/complaint.service';
     .btn-primary { background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%); color: white; }
     .btn-delete-user { background: #ef4444; color: white; }
 
+    /* MODAL */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+    .modal-card { background: #0f172a; border: 1px solid #334155; border-radius: 18px; padding: 24px; max-width: 460px; width: 100%; color: white; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #334155; padding-bottom: 12px; }
+    .close-btn { background: #1e293b; border: 1px solid #334155; color: #94a3b8; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: 800; }
+
     @media (max-width: 900px) {
       .sidebar { display: none; }
       .grid-2-col { grid-template-columns: 1fr; }
@@ -880,6 +939,42 @@ export class AdminDashboardComponent implements OnInit {
 
   newTaskTitle = '';
   newTaskDesc = '';
+
+  showAddStaffModal = false;
+  newStaffForm = {
+    name: '',
+    email: '',
+    password: '',
+    role: 'staff',
+    bio: 'Electrician',
+    hostelBlock: 'All Hostels'
+  };
+
+  openAddStaffModal(): void {
+    this.showAddStaffModal = true;
+    this.cdr.detectChanges();
+  }
+
+  closeAddStaffModal(): void {
+    this.showAddStaffModal = false;
+    this.cdr.detectChanges();
+  }
+
+  onCreateStaffSubmit(): void {
+    if (!this.newStaffForm.name || !this.newStaffForm.email || !this.newStaffForm.password) {
+      alert('Please fill out all required fields.');
+      return;
+    }
+    this.complaintService.createStaffAccount(this.newStaffForm).subscribe({
+      next: (res: any) => {
+        alert('✅ Staff/Warden ID created successfully!');
+        this.closeAddStaffModal();
+        this.newStaffForm = { name: '', email: '', password: '', role: 'staff', bio: 'Electrician', hostelBlock: 'All Hostels' };
+        this.loadUsers();
+      },
+      error: (err: any) => alert(`❌ ${err.error?.message || 'Failed to create ID.'}`)
+    });
+  }
 
   constructor(
     private authService: AuthService,

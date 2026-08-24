@@ -203,7 +203,7 @@ export class ComplaintService {
     });
   }
 
-  // Management API Methods
+  // Staff & Warden Account Creation API Methods
   createStaffAccount(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/users/create-staff-warden`, data, {
       headers: this.authService.getJsonHeaders()
@@ -213,37 +213,6 @@ export class ComplaintService {
   getAllComplaints(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/complaints/warden`, {
       headers: this.authService.getNoCacheHeaders()
-    });
-  }
-
-  createManagementAccount(data: any): Observable<any> {
-    const payload = {
-      ...data,
-      role: 'management'
-    };
-    return this.http.post(`${this.apiUrl}/users/create-staff-warden`, payload, {
-      headers: this.authService.getJsonHeaders()
-    });
-  }
-
-  getManagementAccounts(): Observable<any[]> {
-    return new Observable((observer) => {
-      this.http.get<any[]>(`${this.apiUrl}/users/all`, {
-        headers: this.authService.getAuthHeaders()
-      }).subscribe({
-        next: (res) => {
-          const mgmtList = Array.isArray(res) ? res.filter((u: any) => u.role === 'management') : [];
-          observer.next(mgmtList);
-          observer.complete();
-        },
-        error: (err) => observer.error(err)
-      });
-    });
-  }
-
-  deleteManagementAccount(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/users/delete/${id}`, {
-      headers: this.authService.getAuthHeaders()
     });
   }
 
