@@ -45,6 +45,10 @@ const messRoutes = require('./routes/messRoutes');
 const attendanceRoutes = require('./routes/attendanceRoutes');
 const managementRoutes = require('./routes/managementRoutes');
 
+const messReviewRoutes = require('./routes/messReviewRoutes');
+const activityLogRoutes = require('./routes/activityLogRoutes');
+const staffTaskRoutes = require('./routes/staffTaskRoutes');
+
 app.use('/api/auth', authRoutes);
 app.use('/api/complaints', complaintRoutes);
 app.use('/api/announcements', announcementRoutes);
@@ -54,6 +58,9 @@ app.use('/api/settings', settingRoutes);
 app.use('/api/mess', messRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/management', managementRoutes);
+app.use('/api/mess-reviews', messReviewRoutes);
+app.use('/api/activity-logs', activityLogRoutes);
+app.use('/api/staff-tasks', staffTaskRoutes);
 
 
 

@@ -39,6 +39,18 @@ MessSkip.belongsTo(User, { foreignKey: 'studentId', as: 'student' });
 User.hasMany(Attendance, { foreignKey: 'studentId', as: 'attendances' });
 Attendance.belongsTo(User, { foreignKey: 'studentId', as: 'student' });
 
+const MessReview = require('./MessReview')(sequelize);
+const ActivityLog = require('./ActivityLog')(sequelize);
+const StaffTask = require('./StaffTask')(sequelize);
+
+// User & MessReview Relations
+User.hasMany(MessReview, { foreignKey: 'studentId', as: 'messReviews' });
+MessReview.belongsTo(User, { foreignKey: 'studentId', as: 'student' });
+
+// User & StaffTask Relations
+User.hasMany(StaffTask, { foreignKey: 'assignedStaffId', as: 'staffTasks' });
+StaffTask.belongsTo(User, { foreignKey: 'assignedStaffId', as: 'assignedStaff' });
+
 module.exports = {
   sequelize,
   User,
@@ -50,5 +62,8 @@ module.exports = {
   MessFeedback,
   MessSkip,
   Attendance,
-  PasswordResetOTP
+  PasswordResetOTP,
+  MessReview,
+  ActivityLog,
+  StaffTask
 };

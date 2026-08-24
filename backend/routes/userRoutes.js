@@ -17,6 +17,8 @@ router.get('/analytics', verifyToken, managementController.getManagementAnalytic
 router.post('/bulk-import', verifyToken, requireRole(['admin']), managementController.bulkCreateBatchFromExcel);
 router.post('/terminate-user', verifyToken, requireRole(['admin']), managementController.terminateUser);
 router.post('/terminate-batch', verifyToken, requireRole(['admin']), managementController.terminateBatch);
+router.get('/staff-performance', verifyToken, userController.getStaffPerformance);
+router.get('/attendance-stats', verifyToken, userController.getAttendanceStats);
 
 // Warden Student Approvals
 router.get('/debug-db', userController.debugDB);

@@ -258,6 +258,48 @@ export class ComplaintService {
       headers: this.authService.getJsonHeaders()
     });
   }
+
+  getStaffPerformance(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/users/staff-performance`, {
+      headers: this.authService.getAuthHeaders()
+    });
+  }
+
+  getAttendanceStats(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/users/attendance-stats`, {
+      headers: this.authService.getAuthHeaders()
+    });
+  }
+
+  getMessAnalytics(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/mess-reviews/analytics`, {
+      headers: this.authService.getAuthHeaders()
+    });
+  }
+
+  getActivityLogs(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/activity-logs/feed`, {
+      headers: this.authService.getAuthHeaders()
+    });
+  }
+
+  getStaffTasks(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/staff-tasks/all`, {
+      headers: this.authService.getAuthHeaders()
+    });
+  }
+
+  createStaffTask(taskData: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/staff-tasks/create`, taskData, {
+      headers: this.authService.getJsonHeaders()
+    });
+  }
+
+  updateStaffTaskStatus(id: number, status: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/staff-tasks/status/${id}`, { status }, {
+      headers: this.authService.getJsonHeaders()
+    });
+  }
 }
 
 
