@@ -29,3 +29,9 @@ Thumbs.db
 # Local uploads/media (unneeded in git)
 backend/uploads/*
 !backend/uploads/.gitkeep
+
+# Large Compiled APK Binaries & Temporary Reports
+*.apk
+*.pdf
+HostelHub_*.html
+scratch/
