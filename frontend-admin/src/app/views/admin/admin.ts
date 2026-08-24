@@ -499,7 +499,7 @@ import { ComplaintService } from '../../services/complaint.service';
     .page-title { font-weight: 900; font-size: 18px; margin-bottom: 14px; color: #f8fafc; }
   `]
 })
-export class AdminComponent implements OnInit {
+export class AdminDashboardComponent implements OnInit {
   user: User | null = null;
   activeTab: string = 'stats';
   isDarkMode = true;
@@ -544,7 +544,7 @@ export class AdminComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.user = this.authService.getCurrentUser();
+    this.user = this.authService.currentUserValue;
     this.loadGraphicalAnalytics();
     this.loadUsers();
     this.loadStaffPerformance();
@@ -643,12 +643,12 @@ export class AdminComponent implements OnInit {
 
   loadComplaints(): void {
     this.complaintService.getAllComplaints().subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.allComplaints = res;
         this.filterComplaints();
         this.cdr.detectChanges();
       },
-      error: (err) => console.error('Error complaints:', err)
+      error: (err: any) => console.error('Error complaints:', err)
     });
   }
 
@@ -774,12 +774,12 @@ export class AdminComponent implements OnInit {
 
   onCreateSubmit(): void {
     this.complaintService.createStaffAccount(this.createForm).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         alert('✅ Account created successfully!');
         this.createForm = { name: '', email: '', password: '', role: 'staff' };
         this.loadUsers();
       },
-      error: (err) => alert(`❌ ${err.error?.message || 'Failed to create account.'}`)
+      error: (err: any) => alert(`❌ ${err.error?.message || 'Failed to create account.'}`)
     });
   }
 

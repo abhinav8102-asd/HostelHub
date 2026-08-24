@@ -204,6 +204,18 @@ export class ComplaintService {
   }
 
   // Management API Methods
+  createStaffAccount(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/users/create-staff-warden`, data, {
+      headers: this.authService.getJsonHeaders()
+    });
+  }
+
+  getAllComplaints(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/complaints/warden`, {
+      headers: this.authService.getNoCacheHeaders()
+    });
+  }
+
   createManagementAccount(data: any): Observable<any> {
     const payload = {
       ...data,
