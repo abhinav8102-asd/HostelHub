@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "buildCommand": "npm --prefix frontend-admin run build",
+  "outputDirectory": "frontend-admin/dist/frontend-admin/browser",
+  "installCommand": "cd frontend-admin && npm install",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
