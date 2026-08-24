@@ -10,500 +10,855 @@ import { ComplaintService } from '../../services/complaint.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="dashboard-container">
-      <!-- Header -->
-      <div class="header">
-        <div class="user-info">
-          <div class="avatar-ring">
-            <span class="avatar" *ngIf="!user?.profilePicUrl">👨‍💻</span>
-            <img *ngIf="user?.profilePicUrl" [src]="'https://hostelhub-0cyi.onrender.com' + user.profilePicUrl" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
-          </div>
+    <div class="executive-layout" [class.light-theme]="!isDarkMode">
+      
+      <!-- LEFT SIDEBAR NAVIGATION -->
+      <aside class="sidebar">
+        <div class="brand-header">
+          <div class="brand-logo-shield">🛡️</div>
           <div>
-            <h3>Admin Console</h3>
-            <p class="user-meta">Full System Executive Control</p>
+            <h2 class="brand-title">Admin Console</h2>
+            <span class="brand-subtitle">Full System Executive Control</span>
           </div>
         </div>
-        <div class="header-actions">
-          <button class="theme-toggle-btn" (click)="toggleDarkMode()" [title]="isDarkMode ? 'Light Mode' : 'Dark Mode'">
-            {{ isDarkMode ? '☀️' : '🌙' }}
+
+        <div class="nav-section-label">EXECUTIVE</div>
+        <nav class="nav-menu">
+          <button (click)="switchTab('dashboard')" [class.active]="activeTab === 'dashboard'" class="nav-link">
+            <span class="nav-icon">🏠</span> <span>Dashboard</span>
           </button>
-          <button class="logout-btn" (click)="logout()">
-            <span>Logout</span>
-            <span>🚪</span>
+          <button (click)="switchTab('workflow')" [class.active]="activeTab === 'workflow'" class="nav-link">
+            <span class="nav-icon">🛠️</span> <span>Work Flow</span>
           </button>
-        </div>
-      </div>
+          <button (click)="switchTab('staff-stats')" [class.active]="activeTab === 'staff-stats'" class="nav-link">
+            <span class="nav-icon">👥</span> <span>Staff Stats</span>
+          </button>
+          <button (click)="switchTab('attendance')" [class.active]="activeTab === 'attendance'" class="nav-link">
+            <span class="nav-icon">🕒</span> <span>Attendance</span>
+          </button>
+          <button (click)="switchTab('feedback')" [class.active]="activeTab === 'feedback'" class="nav-link">
+            <span class="nav-icon">⭐</span> <span>Feedbacks & Mess</span>
+          </button>
+        </nav>
 
-      <!-- Tab Content Area -->
-      <div class="tab-content-area">
+        <div class="nav-section-label">OPERATIONS</div>
+        <nav class="nav-menu">
+          <button (click)="switchTab('complaints')" [class.active]="activeTab === 'complaints'" class="nav-link">
+            <span class="nav-icon">📋</span> <span>Complaints</span>
+          </button>
+          <button (click)="switchTab('tasks')" [class.active]="activeTab === 'tasks'" class="nav-link">
+            <span class="nav-icon">🔧</span> <span>Task Dispatcher</span>
+          </button>
+          <button (click)="switchTab('users')" [class.active]="activeTab === 'users'" class="nav-link">
+            <span class="nav-icon">👥</span> <span>Students & Roles</span>
+          </button>
+        </nav>
 
-        <!-- Tab Navigation (Horizontal Scrollable Bar) -->
-        <div class="admin-tab-nav">
-          <button (click)="switchTab('stats')" [class.active]="activeTab === 'stats'">📊 Dashboard</button>
-          <button (click)="switchTab('workflow')" [class.active]="activeTab === 'workflow'">🛠️ Work Flow</button>
-          <button (click)="switchTab('performance')" [class.active]="activeTab === 'performance'">👨‍🔧 Staff Stats</button>
-          <button (click)="switchTab('attendance')" [class.active]="activeTab === 'attendance'">🕒 Attendance</button>
-          <button (click)="switchTab('feedback')" [class.active]="activeTab === 'feedback'">⭐ Reviews & Mess</button>
-          <button (click)="switchTab('activity')" [class.active]="activeTab === 'activity'">📜 Activity Log</button>
-          <button (click)="switchTab('alerts')" [class.active]="activeTab === 'alerts'">🚨 Alerts Hub</button>
-          <button (click)="switchTab('users')" [class.active]="activeTab === 'users'">👥 Students & Users</button>
-          <button (click)="switchTab('tasks')" [class.active]="activeTab === 'tasks'">🗂️ Task Dispatcher</button>
-          <button (click)="switchTab('create')" [class.active]="activeTab === 'create'">➕ Create Staff</button>
-          <button (click)="switchTab('settings')" [class.active]="activeTab === 'settings'">⚙️ Settings</button>
-          <button (click)="switchTab('my-profile')" [class.active]="activeTab === 'my-profile'">👤 Profile</button>
-        </div>
+        <div class="nav-section-label">SYSTEM</div>
+        <nav class="nav-menu">
+          <button (click)="switchTab('activity')" [class.active]="activeTab === 'activity'" class="nav-link">
+            <span class="nav-icon">📜</span> <span>Audit Logs</span>
+          </button>
+          <button (click)="switchTab('settings')" [class.active]="activeTab === 'settings'" class="nav-link">
+            <span class="nav-icon">⚙️</span> <span>Settings</span>
+          </button>
+        </nav>
 
-        <!-- 1. DASHBOARD & REAL-TIME STATS -->
-        <div *ngIf="activeTab === 'stats'" class="tab-panel animate-fade">
-          <h4 class="page-title">📊 Executive Real-Time Dashboard</h4>
-
-          <!-- AI Insight Banner -->
-          <div style="background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%); color: white; padding: 14px 18px; border-radius: 14px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <span style="font-size: 22px;">🤖</span>
-              <div>
-                <strong style="font-size: 13px; display: block; color: #a5b4fc;">AI Executive Insight</strong>
-                <span style="font-size: 12px; color: #f8fafc;">Electrical issues volume up 40% in Boys Hostel B-1 this week. Maintenance dispatch recommended.</span>
-              </div>
-            </div>
-            <span style="background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 800;">LIVE</span>
+        <!-- System Status Heartbeat Card -->
+        <div class="system-status-card">
+          <div class="status-pulse-header">
+            <span class="pulse-dot"></span>
+            <span class="status-label">All Systems Operational</span>
           </div>
-
-          <!-- Real-Time Metrics Table Card -->
-          <div class="card" style="background: #0f172a; color: white; padding: 18px; border-radius: 16px; margin-bottom: 20px; border: 1px solid #1e293b;">
-            <h5 style="margin: 0 0 12px 0; color: #f8fafc; font-size: 15px; font-weight: 800;">System Operations Real-Time Metrics</h5>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px;">
-              <div style="background: #1e293b; padding: 12px; border-radius: 10px; border-left: 4px solid #6366f1;">
-                <span style="font-size: 11px; color: #94a3b8; display: block;">Total Complaints</span>
-                <strong style="font-size: 20px; color: #f8fafc;">{{ analytics?.summary?.total || 304 }}</strong>
-              </div>
-              <div style="background: #1e293b; padding: 12px; border-radius: 10px; border-left: 4px solid #22c55e;">
-                <span style="font-size: 11px; color: #94a3b8; display: block;">Resolved</span>
-                <strong style="font-size: 20px; color: #4ade80;">{{ analytics?.summary?.resolved || 221 }}</strong>
-              </div>
-              <div style="background: #1e293b; padding: 12px; border-radius: 10px; border-left: 4px solid #eab308;">
-                <span style="font-size: 11px; color: #94a3b8; display: block;">Pending</span>
-                <strong style="font-size: 20px; color: #fde047;">{{ analytics?.summary?.pending || 23 }}</strong>
-              </div>
-              <div style="background: #1e293b; padding: 12px; border-radius: 10px; border-left: 4px solid #3b82f6;">
-                <span style="font-size: 11px; color: #94a3b8; display: block;">Open / In-Progress</span>
-                <strong style="font-size: 20px; color: #60a5fa;">{{ (analytics?.summary?.inProgress || 0) + (analytics?.summary?.assigned || 0) || 60 }}</strong>
-              </div>
-              <div style="background: #1e293b; padding: 12px; border-radius: 10px; border-left: 4px solid #ef4444;">
-                <span style="font-size: 11px; color: #94a3b8; display: block;">Unassigned</span>
-                <strong style="font-size: 20px; color: #fca5a5;">8</strong>
-              </div>
-              <div style="background: #1e293b; padding: 12px; border-radius: 10px; border-left: 4px solid #a855f7;">
-                <span style="font-size: 11px; color: #94a3b8; display: block;">Escalated Warden</span>
-                <strong style="font-size: 20px; color: #c084fc;">12</strong>
-              </div>
-              <div style="background: #1e293b; padding: 12px; border-radius: 10px; border-left: 4px solid #14b8a6;">
-                <span style="font-size: 11px; color: #94a3b8; display: block;">Active Staff</span>
-                <strong style="font-size: 20px; color: #2dd4bf;">14 / 16</strong>
-              </div>
-              <div style="background: #1e293b; padding: 12px; border-radius: 10px; border-left: 4px solid #f97316;">
-                <span style="font-size: 11px; color: #94a3b8; display: block;">Active Wardens</span>
-                <strong style="font-size: 20px; color: #fb923c;">3 / 4</strong>
-              </div>
-            </div>
-          </div>
-
-          <!-- Graphical Trend Analytics Card -->
-          <div class="card chart-card" style="margin-bottom: 24px; background: #0f172a; color: white; padding: 18px; border-radius: 16px; border: 1px solid #1e293b;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
-              <div>
-                <h5 style="margin: 0; color: #f8fafc; font-size: 16px; font-weight: 800;">📈 Executive Analytics Trends</h5>
-                <p style="margin: 4px 0 0 0; color: #94a3b8; font-size: 11.5px;">Real-time complaint & resolution volume analysis</p>
-              </div>
-              <div style="display: flex; background: #1e293b; padding: 3px; border-radius: 8px; gap: 3px;">
-                <button (click)="switchPeriod('day')" [style.background]="period==='day'?'#6366f1':'transparent'" style="color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer;">Day</button>
-                <button (click)="switchPeriod('week')" [style.background]="period==='week'?'#6366f1':'transparent'" style="color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer;">Weekly</button>
-                <button (click)="switchPeriod('month')" [style.background]="period==='month'?'#6366f1':'transparent'" style="color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer;">Monthly</button>
-              </div>
-            </div>
-
-            <!-- Graphical Bar Representation -->
-            <div *ngIf="mgmtTrendData && mgmtTrendData.timeSeries" style="display: flex; align-items: flex-end; gap: 12px; height: 160px; padding: 10px 0; border-bottom: 1px solid #334155;">
-              <div *ngFor="let t of mgmtTrendData.timeSeries" style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; gap: 6px;">
-                <span style="font-size: 10px; color: #818cf8; font-weight: 800;">{{ t.complaints }}</span>
-                <div [style.height.%]="getTrendBarHeight(t.complaints)" style="width: 100%; max-width: 32px; background: linear-gradient(180deg, #6366f1 0%, #4338ca 100%); border-radius: 6px 6px 0 0; transition: height 0.4s ease;"></div>
-                <span style="font-size: 9.5px; color: #94a3b8; font-weight: 600; white-space: nowrap;">{{ t.label }}</span>
-              </div>
-            </div>
+          <div class="heartbeat-wave">
+            <svg viewBox="0 0 100 20" class="wave-svg">
+              <path d="M0 10 Q 15 10, 20 2 Q 25 18, 30 10 T 60 10 T 70 0 T 80 20 T 100 10" fill="none" stroke="#10b981" stroke-width="2"/>
+            </svg>
           </div>
         </div>
+      </aside>
 
-        <!-- 2. COMPLETE WORK FLOW (COMPLAINTS MATRIX) -->
-        <div *ngIf="activeTab === 'workflow'" class="tab-panel animate-fade">
-          <h4 class="page-title">🛠️ Complete Complaint Work Flow</h4>
-
-          <!-- Filter Matrix -->
-          <div style="background: #0f172a; padding: 14px; border-radius: 14px; margin-bottom: 16px; border: 1px solid #1e293b; display: flex; gap: 10px; flex-wrap: wrap;">
-            <select class="form-input" style="flex: 1; min-width: 130px; background: #1e293b; color: white;" [(ngModel)]="workflowStatusFilter" (change)="filterComplaints()">
-              <option value="all">All Statuses</option>
-              <option value="pending">Pending</option>
-              <option value="in_progress">In Progress</option>
-              <option value="resolved">Resolved</option>
-              <option value="escalated">Escalated to Warden</option>
-            </select>
-            <select class="form-input" style="flex: 1; min-width: 130px; background: #1e293b; color: white;" [(ngModel)]="workflowCategoryFilter" (change)="filterComplaints()">
-              <option value="all">All Categories</option>
-              <option value="plumbing">Plumbing</option>
-              <option value="electrical">Electrical</option>
-              <option value="carpentry">Carpentry</option>
-              <option value="cleaning">Cleaning</option>
-              <option value="internet">Internet</option>
-            </select>
+      <!-- MAIN CONTENT WRAPPER -->
+      <main class="main-wrapper">
+        
+        <!-- TOP NAVBAR -->
+        <header class="top-navbar">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" placeholder="Search anything... Ctrl /" [(ngModel)]="searchQuery" (input)="onSearch()" />
           </div>
 
-          <!-- Complaint Cards Stream -->
-          <div class="complaints-list">
-            <div *ngFor="let c of filteredComplaints" class="complaint-card" style="background: #0f172a; color: white; border: 1px solid #1e293b; padding: 16px; border-radius: 14px; margin-bottom: 12px;">
-              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                <div>
-                  <span style="font-size: 11px; background: #312e81; color: #a5b4fc; padding: 2px 8px; border-radius: 6px; font-weight: 800;">#HOST-{{ c.id }}</span>
-                  <h5 style="margin: 4px 0 2px 0; color: #f8fafc; font-size: 15px;">{{ c.title }}</h5>
-                  <span style="font-size: 11px; color: #94a3b8;">Student: {{ c.student?.name || 'Rahul Kumar' }} (Room {{ c.student?.roomNumber || '102' }})</span>
-                </div>
-                <span [class]="c.status" class="badge" style="text-transform: uppercase; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 8px;">{{ c.status }}</span>
-              </div>
-              <p style="font-size: 12px; color: #cbd5e1; margin-bottom: 10px;">{{ c.description }}</p>
-              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #1e293b; padding-top: 8px;">
-                <span>Assigned Staff: <strong style="color: #60a5fa;">{{ c.staff?.name || 'Ram Singh (Electrician)' }}</strong></span>
-                <span>Category: {{ c.category | uppercase }}</span>
+          <div class="top-navbar-right">
+            <div class="time-badge">
+              <span>📅 {{ currentDateStr }}</span>
+            </div>
+            
+            <button class="icon-btn" title="Notifications">
+              <span>🔔</span>
+              <span class="notification-badge">4</span>
+            </button>
+
+            <button class="icon-btn" (click)="toggleDarkMode()" [title]="isDarkMode ? 'Light Mode' : 'Dark Mode'">
+              <span>{{ isDarkMode ? '☀️' : '🌙' }}</span>
+            </button>
+
+            <div class="profile-chip" (click)="switchTab('my-profile')">
+              <img *ngIf="user?.profilePicUrl" [src]="'https://hostelhub-0cyi.onrender.com' + user?.profilePicUrl" class="user-avatar" />
+              <div *ngIf="!user?.profilePicUrl" class="user-avatar-fallback">👑</div>
+              <div class="user-meta-text">
+                <span class="user-name">{{ user?.name || 'Super Admin' }}</span>
+                <span class="user-role">Administrator</span>
               </div>
             </div>
-          </div>
-        </div>
 
-        <!-- 3. STAFF PERFORMANCE LEADERBOARD -->
-        <div *ngIf="activeTab === 'performance'" class="tab-panel animate-fade">
-          <h4 class="page-title">👨‍🔧 Maintenance Staff Performance Leaderboard</h4>
-
-          <div class="card" style="background: #0f172a; color: white; padding: 18px; border-radius: 16px; border: 1px solid #1e293b;">
-            <div style="overflow-x: auto;">
-              <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 12.5px;">
-                <thead>
-                  <tr style="border-bottom: 1.5px solid #334155; color: #94a3b8;">
-                    <th style="padding: 10px;">Staff Member</th>
-                    <th style="padding: 10px;">Trade / Category</th>
-                    <th style="padding: 10px;">Assigned</th>
-                    <th style="padding: 10px;">Resolved</th>
-                    <th style="padding: 10px;">Pending</th>
-                    <th style="padding: 10px;">Avg Resolution Time</th>
-                    <th style="padding: 10px;">Rating</th>
-                    <th style="padding: 10px;">Status Badge</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let s of staffPerformanceList" style="border-bottom: 1px solid #1e293b;">
-                    <td style="padding: 12px; font-weight: 700; color: #f8fafc;">{{ s.name }}</td>
-                    <td style="padding: 12px; color: #818cf8;">{{ s.category }}</td>
-                    <td style="padding: 12px;">{{ s.assigned }}</td>
-                    <td style="padding: 12px; color: #4ade80; font-weight: 700;">{{ s.resolved }}</td>
-                    <td style="padding: 12px; color: #fde047;">{{ s.pending }}</td>
-                    <td style="padding: 12px; color: #94a3b8;">{{ s.avgResolutionTime }}</td>
-                    <td style="padding: 12px; color: #facc15; font-weight: 800;">⭐ {{ s.rating }}</td>
-                    <td style="padding: 12px;">
-                      <span *ngIf="s.statusBadge==='excellent'" style="background: #14532d; color: #4ade80; padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 800;">EXCELLENT</span>
-                      <span *ngIf="s.statusBadge==='moderate'" style="background: #713f12; color: #fde047; padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 800;">MODERATE</span>
-                      <span *ngIf="s.statusBadge==='attention'" style="background: #7f1d1d; color: #fca5a5; padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 800;">NEEDS ATTENTION</span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- 4. REAL-TIME ATTENDANCE ANALYTICS -->
-        <div *ngIf="activeTab === 'attendance'" class="tab-panel animate-fade">
-          <h4 class="page-title">🕒 Real-Time Attendance Analytics</h4>
-
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 20px;">
-            <div style="background: #0f172a; padding: 16px; border-radius: 14px; border-left: 4px solid #22c55e; color: white;">
-              <span style="font-size: 11px; color: #94a3b8; display: block;">Student Today's Attendance</span>
-              <strong style="font-size: 24px; color: #4ade80;">{{ attendanceStats?.studentPercentage || 92 }}%</strong>
-              <span style="font-size: 11px; color: #cbd5e1; display: block; margin-top: 4px;">{{ attendanceStats?.presentStudents || 110 }} Present / {{ attendanceStats?.absentStudents || 10 }} Absent</span>
-            </div>
-            <div style="background: #0f172a; padding: 16px; border-radius: 14px; border-left: 4px solid #6366f1; color: white;">
-              <span style="font-size: 11px; color: #94a3b8; display: block;">Staff Today's Attendance</span>
-              <strong style="font-size: 24px; color: #818cf8;">{{ attendanceStats?.staffPercentage || 94 }}%</strong>
-              <span style="font-size: 11px; color: #cbd5e1; display: block; margin-top: 4px;">{{ attendanceStats?.staffPresent || 14 }} / {{ attendanceStats?.staffCount || 16 }} Present</span>
-            </div>
-          </div>
-
-          <!-- Block-wise Attendance Card -->
-          <div class="card" style="background: #0f172a; color: white; padding: 18px; border-radius: 16px; border: 1px solid #1e293b;">
-            <h5 style="margin: 0 0 12px 0; color: #f8fafc;">Hostel Block Breakdown</h5>
-            <div *ngFor="let b of attendanceStats?.blockWise" style="margin-bottom: 12px; background: #1e293b; padding: 12px; border-radius: 10px;">
-              <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
-                <span style="font-weight: 700; color: #f8fafc;">{{ b.block }}</span>
-                <span style="color: #4ade80; font-weight: 800;">{{ b.percentage }}% Present</span>
-              </div>
-              <div style="background: #0f172a; height: 8px; border-radius: 4px; overflow: hidden;">
-                <div [style.width.%]="b.percentage" style="background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%); height: 100%;"></div>
-              </div>
-              <div *ngIf="b.alert" style="margin-top: 6px; font-size: 10.5px; color: #fca5a5; font-weight: 700;">⚠️ {{ b.alert }}</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 5. FEEDBACK & REVIEWS (COMPLAINTS + MESS FOOD REVIEWS) -->
-        <div *ngIf="activeTab === 'feedback'" class="tab-panel animate-fade">
-          <h4 class="page-title">⭐ Feedback & Reviews (System + Mess Reviews)</h4>
-
-          <!-- Rating Breakdown Header -->
-          <div class="card" style="background: #0f172a; color: white; padding: 18px; border-radius: 16px; border: 1px solid #1e293b; margin-bottom: 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
-              <div>
-                <span style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Mess Food Quality Score</span>
-                <h2 style="margin: 4px 0 0 0; color: #facc15; font-size: 32px; font-weight: 900;">⭐ {{ messAnalytics?.summary?.avgRating || '4.2' }} <span style="font-size: 14px; color: #94a3b8;">/ 5.0</span></h2>
-                <span style="font-size: 11.5px; color: #cbd5e1;">Based on {{ messAnalytics?.summary?.totalReviews || 128 }} student reviews this week</span>
-              </div>
-              <div style="flex: 1; max-width: 250px;">
-                <div style="font-size: 11px; color: #94a3b8; margin-bottom: 4px;">5-Star Distribution</div>
-                <div style="display: flex; align-items: center; gap: 6px; font-size: 11px;">
-                  <span>5⭐</span>
-                  <div style="flex: 1; background: #1e293b; height: 6px; border-radius: 3px; overflow: hidden;"><div style="width: 70%; background: #facc15; height: 100%;"></div></div>
-                </div>
-                <div style="display: flex; align-items: center; gap: 6px; font-size: 11px;">
-                  <span>4⭐</span>
-                  <div style="flex: 1; background: #1e293b; height: 6px; border-radius: 3px; overflow: hidden;"><div style="width: 20%; background: #facc15; height: 100%;"></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Student Reviews Stream -->
-          <div class="card" style="background: #0f172a; color: white; padding: 18px; border-radius: 16px; border: 1px solid #1e293b;">
-            <h5 style="margin: 0 0 12px 0; color: #f8fafc;">Recent Student Mess & Complaint Reviews</h5>
-            <div *ngFor="let r of messAnalytics?.reviews" style="background: #1e293b; padding: 12px; border-radius: 10px; margin-bottom: 10px;">
-              <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
-                <strong style="color: #f8fafc;">{{ r.student?.name || 'Student' }} ({{ r.mealType | uppercase }})</strong>
-                <span style="color: #facc15; font-weight: 800;">⭐ {{ r.foodQuality }}/5</span>
-              </div>
-              <p style="font-size: 11.5px; color: #cbd5e1; margin: 0;">{{ r.comments || 'Food quality and cleanliness was good.' }}</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- 6. LIVE ACTIVITY FEED -->
-        <div *ngIf="activeTab === 'activity'" class="tab-panel animate-fade">
-          <h4 class="page-title">📜 Live System Activity Feed</h4>
-
-          <div class="card" style="background: #0f172a; color: white; padding: 18px; border-radius: 16px; border: 1px solid #1e293b;">
-            <div *ngFor="let log of activityLogs" style="display: flex; gap: 12px; border-bottom: 1px solid #1e293b; padding: 10px 0; align-items: center;">
-              <span style="font-size: 18px;">⚡</span>
-              <div>
-                <span style="font-size: 12px; font-weight: 700; color: #818cf8;">{{ log.actorName || 'System' }} ({{ log.actorRole | uppercase }})</span>
-                <p style="margin: 2px 0 0 0; font-size: 11.5px; color: #cbd5e1;">{{ log.description }}</p>
-                <span style="font-size: 10px; color: #64748b;">{{ log.createdAt | date:'shortTime' }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 7. CRITICAL ALERTS HUB -->
-        <div *ngIf="activeTab === 'alerts'" class="tab-panel animate-fade">
-          <h4 class="page-title">🚨 Critical Alerts & Attention Hub</h4>
-
-          <div style="display: flex; flex-direction: column; gap: 12px;">
-            <div style="background: #450a0a; border: 1.5px solid #ef4444; padding: 16px; border-radius: 14px; color: white;">
-              <strong style="color: #fca5a5; font-size: 14px;">⚠️ Unassigned Complaint Timeout Alert</strong>
-              <p style="margin: 4px 0 0 0; font-size: 12px; color: #fecdd3;">8 complaints pending assignment for > 2 hours in Block B.</p>
-            </div>
-            <div style="background: #422006; border: 1.5px solid #eab308; padding: 16px; border-radius: 14px; color: white;">
-              <strong style="color: #fde047; font-size: 14px;">⚡ High Absentees Alert</strong>
-              <p style="margin: 4px 0 0 0; font-size: 12px; color: #fef08a;">Boys Hostel B-1 reported 23% student absent rate today.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- 8. STUDENTS & USERS MANAGEMENT DIRECTORY -->
-        <div *ngIf="activeTab === 'users'" class="tab-panel animate-fade">
-          <h4 class="page-title">👥 System Users & Batch Management</h4>
-
-          <!-- Bulk Student Batch Import Section -->
-          <div class="card" style="margin-bottom: 20px; background: #0f172a; color: white; padding: 18px; border-radius: 16px; border: 1px solid #334155;">
-            <h5 style="margin: 0 0 4px 0; color: #f8fafc; font-size: 15px; font-weight: 800;">📥 Bulk Student Batch Import (Excel / CSV)</h5>
-            <p style="margin: 0 0 14px 0; color: #94a3b8; font-size: 11.5px;">Upload student Excel/CSV sheet to register a full batch at once</p>
-
-            <div *ngIf="batchImportSuccess" class="alert alert-success" style="margin-bottom: 12px; font-weight: 700;">{{ batchImportSuccess }}</div>
-            <div *ngIf="batchImportError" class="alert alert-danger" style="margin-bottom: 12px; font-weight: 700;">{{ batchImportError }}</div>
-
-            <div style="margin-bottom: 12px;">
-              <label style="display: block; font-size: 11px; font-weight: 700; color: #cbd5e1; margin-bottom: 4px;">Target Batch Name</label>
-              <input type="text" class="form-input" style="width: 100%; background: #1e293b; border: 1.5px solid #6366f1; color: white; border-radius: 8px; padding: 10px; font-weight: 700; box-sizing: border-box;" [(ngModel)]="bulkBatchName" placeholder="e.g. Batch 2025-2029" />
-            </div>
-
-            <div style="margin-bottom: 12px;">
-              <label style="display: block; font-size: 11px; font-weight: 700; color: #cbd5e1; margin-bottom: 4px;">Upload Excel/CSV File</label>
-              <input type="file" accept=".csv, .xlsx, .json" (change)="onExcelFileSelected($event)" style="font-size: 12px; color: #cbd5e1; background: #1e293b; border: 1px dashed #6366f1; width: 100%; padding: 10px; border-radius: 8px; box-sizing: border-box;" />
-            </div>
-
-            <div *ngIf="excelParsedStudents.length > 0" style="margin-bottom: 12px; padding: 10px; background: #1e293b; border-radius: 8px; border: 1px solid #6366f1;">
-              <span style="font-size: 12px; font-weight: 700; color: #818cf8;">📄 Preview Parsed Students: {{ excelParsedStudents.length }} records ready to import</span>
-            </div>
-
-            <button type="button" class="btn btn-primary" (click)="uploadParsedBatch()" [disabled]="excelParsedStudents.length === 0 || importingBatch" style="width: 100%; font-weight: 800; padding: 12px; border-radius: 10px;">
-              <span *ngIf="importingBatch">Importing Student Batch...</span>
-              <span *ngIf="!importingBatch">🚀 Register {{ excelParsedStudents.length }} Students Now</span>
+            <button class="logout-btn" (click)="logout()" title="Logout">
+              <span>🚪</span>
             </button>
           </div>
+        </header>
 
-          <!-- Termination & Block Control Center -->
-          <div class="card" style="margin-bottom: 24px; background: #1e1b2e; border: 1.5px solid #991b1b; padding: 18px; border-radius: 16px;">
-            <h5 style="margin: 0 0 4px 0; color: #fecdd3; font-size: 15px; font-weight: 800;">⛔ Termination & Block Control Center</h5>
-            <p style="margin: 0 0 14px 0; color: #fda4af; font-size: 11.5px;">Terminate individual IDs or block an entire student batch instantly</p>
+        <!-- DASHBOARD BODY CONTAINER -->
+        <div class="content-body">
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
-              <!-- Single ID Termination -->
-              <div style="background: rgba(0,0,0,0.5); padding: 14px; border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.4);">
-                <label style="display: block; font-size: 11.5px; font-weight: 700; color: #fecdd3; margin-bottom: 6px;">1-Click Single User Termination</label>
-                <select class="form-input" style="width: 100%; background: #0f172a; border: 1.5px solid #ef4444; color: white; border-radius: 8px; padding: 8px; margin-bottom: 8px; font-weight: 600; box-sizing: border-box;" [(ngModel)]="terminateUserIdInput">
-                  <option [ngValue]="null">Select User to Block/Terminate</option>
-                  <option *ngFor="let u of users" [value]="u.id">{{ u.name }} ({{ u.role | uppercase }}) - ID #{{ u.id }}</option>
-                </select>
-                <button type="button" class="btn btn-delete-user" (click)="executeSingleUserTermination()" style="width: 100%; background: #ef4444; color: white; padding: 8px; font-weight: 800; border-radius: 8px;">🚫 Block / Terminate User</button>
+          <!-- 1. MAIN DASHBOARD VIEW (IMAGE 2) -->
+          <div *ngIf="activeTab === 'dashboard'" class="tab-view animate-fade">
+            
+            <!-- Hero Welcome Card with 3D Isometric Graphic -->
+            <div class="welcome-hero-card">
+              <div class="hero-text-content">
+                <span class="hero-greeting">Welcome back,</span>
+                <h1 class="hero-user-name">{{ user?.name || 'Super Admin' }} 👋</h1>
+                <p class="hero-subtitle">Here's what's happening in your system today.</p>
               </div>
-
-              <!-- Full Batch Termination -->
-              <div style="background: rgba(0,0,0,0.5); padding: 14px; border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.4);">
-                <label style="display: block; font-size: 11.5px; font-weight: 700; color: #fecdd3; margin-bottom: 6px;">1-Click Full Batch Termination</label>
-                <select class="form-input" style="width: 100%; background: #0f172a; border: 1.5px solid #dc2626; color: white; border-radius: 8px; padding: 8px; margin-bottom: 8px; font-weight: 600; box-sizing: border-box;" [(ngModel)]="terminateBatchNameInput">
-                  <option value="">Select Batch to Terminate</option>
-                  <option value="Batch 2023-2027">Batch 2023-2027</option>
-                  <option value="Batch 2024-2028">Batch 2024-2028</option>
-                  <option value="Batch 2025-2029">Batch 2025-2029</option>
-                  <option value="Batch 2026-2030">Batch 2026-2030</option>
-                </select>
-                <input type="text" class="form-input" style="width: 100%; background: #0f172a; border: 1px solid #dc2626; color: white; border-radius: 8px; padding: 6px; font-size: 11px; margin-bottom: 8px; box-sizing: border-box;" [(ngModel)]="terminateBatchNameInput" placeholder="Or type custom batch name" />
-                <button type="button" class="btn btn-delete-user" (click)="executeBatchTermination()" style="width: 100%; background: #dc2626; color: white; padding: 8px; font-weight: 800; border-radius: 8px;">⚠️ Terminate Entire Batch</button>
+              <div class="hero-building-graphic">
+                <div class="isometric-building">🏢✨</div>
               </div>
             </div>
+
+            <!-- Top 4 Metric Cards (Glow & Trend Stats) -->
+            <div class="metrics-grid">
+              <div class="metric-card purple-glow">
+                <div class="metric-header">
+                  <span class="metric-title">Total Complaints</span>
+                  <span class="metric-icon purple">📋</span>
+                </div>
+                <div class="metric-value">{{ analytics?.summary?.total || 304 }}</div>
+                <div class="metric-trend green">↑ 18% vs last week</div>
+              </div>
+
+              <div class="metric-card green-glow">
+                <div class="metric-header">
+                  <span class="metric-title">Resolved</span>
+                  <span class="metric-icon green">✅</span>
+                </div>
+                <div class="metric-value">{{ analytics?.summary?.resolved || 221 }}</div>
+                <div class="metric-trend green">↑ 24% vs last week</div>
+              </div>
+
+              <div class="metric-card yellow-glow">
+                <div class="metric-header">
+                  <span class="metric-title">Pending</span>
+                  <span class="metric-icon yellow">⏳</span>
+                </div>
+                <div class="metric-value">{{ analytics?.summary?.pending || 23 }}</div>
+                <div class="metric-trend red">↓ 8% vs last week</div>
+              </div>
+
+              <div class="metric-card blue-glow">
+                <div class="metric-header">
+                  <span class="metric-title">Open / In-Progress</span>
+                  <span class="metric-icon blue">🔧</span>
+                </div>
+                <div class="metric-value">{{ (analytics?.summary?.inProgress || 0) + (analytics?.summary?.assigned || 0) || 60 }}</div>
+                <div class="metric-trend green">↑ 12% vs last week</div>
+              </div>
+            </div>
+
+            <!-- AI Executive Insight Card -->
+            <div class="ai-executive-card">
+              <div class="ai-avatar-box">🤖</div>
+              <div class="ai-text-content">
+                <div class="ai-header-row">
+                  <span class="ai-title">AI Executive Insight</span>
+                  <span class="live-pill">● LIVE</span>
+                </div>
+                <p class="ai-description">Electrical issues volume up 40% in Boys Hostel B-1 this week. Maintenance dispatch recommended to reduce resolution time.</p>
+              </div>
+              <button class="ai-report-btn" (click)="switchTab('workflow')">View AI Report →</button>
+            </div>
+
+            <!-- Main Dashboard Grid -->
+            <div class="grid-2-col">
+              
+              <!-- Left Chart Card: Complaints Overview & KPIs -->
+              <div class="glass-card">
+                <div class="card-header-row">
+                  <div>
+                    <h3 class="card-title">Complaints Overview</h3>
+                    <span class="card-subtitle">Total complaints vs resolved trend</span>
+                  </div>
+                  <div class="period-selector">
+                    <button (click)="switchPeriod('week')" [class.active]="period==='week'">Weekly</button>
+                    <button (click)="switchPeriod('month')" [class.active]="period==='month'">Monthly</button>
+                  </div>
+                </div>
+
+                <!-- Custom Dual SVG Area Chart -->
+                <div class="chart-container">
+                  <svg viewBox="0 0 500 150" class="area-chart-svg">
+                    <defs>
+                      <linearGradient id="purpleGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#818cf8" stop-opacity="0.4"/>
+                        <stop offset="100%" stop-color="#818cf8" stop-opacity="0"/>
+                      </linearGradient>
+                      <linearGradient id="greenGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#34d399" stop-opacity="0.4"/>
+                        <stop offset="100%" stop-color="#34d399" stop-opacity="0"/>
+                      </linearGradient>
+                    </defs>
+                    <path d="M 0 120 Q 100 60 200 80 T 400 30 L 500 40 L 500 150 L 0 150 Z" fill="url(#purpleGrad)" />
+                    <path d="M 0 120 Q 100 60 200 80 T 400 30 L 500 40" fill="none" stroke="#818cf8" stroke-width="3" />
+                    
+                    <path d="M 0 140 Q 100 90 200 110 T 400 60 L 500 70 L 500 150 L 0 150 Z" fill="url(#greenGrad)" />
+                    <path d="M 0 140 Q 100 90 200 110 T 400 60 L 500 70" fill="none" stroke="#34d399" stroke-width="3" />
+                  </svg>
+                  <div class="chart-legend">
+                    <span><span class="dot purple"></span> Total Complaints (304)</span>
+                    <span><span class="dot green"></span> Resolved (221)</span>
+                  </div>
+                </div>
+
+                <!-- Bottom KPI Chips -->
+                <div class="kpi-chips-row">
+                  <div class="kpi-chip">
+                    <span class="kpi-lbl">Avg. Resolution Time</span>
+                    <strong class="kpi-val">18.5 hrs <span class="green-text">▲ 11%</span></strong>
+                  </div>
+                  <div class="kpi-chip">
+                    <span class="kpi-lbl">SLA Compliance</span>
+                    <strong class="kpi-val">92% <span class="green-text">▲ 5%</span></strong>
+                  </div>
+                  <div class="kpi-chip">
+                    <span class="kpi-lbl">Customer Satisfaction</span>
+                    <strong class="kpi-val">4.6 / 5 <span class="green-text">▲ 0.3</span></strong>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Quick Actions Panel -->
+              <div class="glass-card">
+                <h3 class="card-title" style="margin-bottom: 14px;">Quick Actions</h3>
+                <div class="quick-actions-list">
+                  <button class="action-item" (click)="switchTab('tasks')">
+                    <span class="action-icon">📣</span>
+                    <span>Create Announcement</span>
+                    <span class="arrow">›</span>
+                  </button>
+                  <button class="action-item" (click)="switchTab('workflow')">
+                    <span class="action-icon">🛠️</span>
+                    <span>Assign Maintenance</span>
+                    <span class="arrow">›</span>
+                  </button>
+                  <button class="action-item" (click)="switchTab('workflow')">
+                    <span class="action-icon">⚠️</span>
+                    <span>View Escalations</span>
+                    <span class="badge-count red">12</span>
+                  </button>
+                  <button class="action-item" (click)="switchTab('activity')">
+                    <span class="action-icon">📄</span>
+                    <span>Generate Audit Report</span>
+                    <span class="arrow">›</span>
+                  </button>
+                  <button class="action-item" (click)="switchTab('users')">
+                    <span class="action-icon">📊</span>
+                    <span>Export Student Batch Analytics</span>
+                    <span class="arrow">›</span>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Categories & Hostel Progress Bars Grid -->
+            <div class="grid-2-col" style="margin-top: 20px;">
+              
+              <!-- Complaints by Category -->
+              <div class="glass-card">
+                <h3 class="card-title" style="margin-bottom: 14px;">Complaints by Category</h3>
+                <div class="category-progress-list">
+                  <div class="cat-bar-item">
+                    <div class="cat-bar-header">
+                      <span>⚡ Electrical</span>
+                      <strong>40% (122)</strong>
+                    </div>
+                    <div class="progress-track"><div class="progress-fill purple" style="width: 40%;"></div></div>
+                  </div>
+                  <div class="cat-bar-item">
+                    <div class="cat-bar-header">
+                      <span>🚰 Plumbing</span>
+                      <strong>22% (67)</strong>
+                    </div>
+                    <div class="progress-track"><div class="progress-fill blue" style="width: 22%;"></div></div>
+                  </div>
+                  <div class="cat-bar-item">
+                    <div class="cat-bar-header">
+                      <span>🧹 Cleaning</span>
+                      <strong>18% (55)</strong>
+                    </div>
+                    <div class="progress-track"><div class="progress-fill green" style="width: 18%;"></div></div>
+                  </div>
+                  <div class="cat-bar-item">
+                    <div class="cat-bar-header">
+                      <span>📶 Internet</span>
+                      <strong>12% (36)</strong>
+                    </div>
+                    <div class="progress-track"><div class="progress-fill yellow" style="width: 12%;"></div></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Top Hostels by Complaints -->
+              <div class="glass-card">
+                <h3 class="card-title" style="margin-bottom: 14px;">Top Hostels by Complaints</h3>
+                <div class="category-progress-list">
+                  <div class="cat-bar-item">
+                    <div class="cat-bar-header">
+                      <span>🏢 Boys Hostel B-1</span>
+                      <strong>40% (122)</strong>
+                    </div>
+                    <div class="progress-track"><div class="progress-fill purple" style="width: 40%;"></div></div>
+                  </div>
+                  <div class="cat-bar-item">
+                    <div class="cat-bar-header">
+                      <span>🏢 Boys Hostel B-2</span>
+                      <strong>26% (79)</strong>
+                    </div>
+                    <div class="progress-track"><div class="progress-fill blue" style="width: 26%;"></div></div>
+                  </div>
+                  <div class="cat-bar-item">
+                    <div class="cat-bar-header">
+                      <span>👧 Girls Hostel G-1</span>
+                      <strong>20% (61)</strong>
+                    </div>
+                    <div class="progress-track"><div class="progress-fill green" style="width: 20%;"></div></div>
+                  </div>
+                  <div class="cat-bar-item">
+                    <div class="cat-bar-header">
+                      <span>👧 Girls Hostel G-2</span>
+                      <strong>14% (42)</strong>
+                    </div>
+                    <div class="progress-track"><div class="progress-fill pink" style="width: 14%;"></div></div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
           </div>
 
-          <!-- User Directory List -->
-          <div class="user-list">
-            <div *ngFor="let u of users" class="user-card" style="background: #0f172a; color: white; border: 1px solid #1e293b; padding: 14px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+          <!-- 2. STAFF STATS OVERVIEW (IMAGE 1) -->
+          <div *ngIf="activeTab === 'staff-stats'" class="tab-view animate-fade">
+            
+            <div class="view-header">
               <div>
-                <strong style="color: #f8fafc;">{{ u.name }}</strong>
-                <span style="font-size: 11px; color: #94a3b8; display: block;">{{ u.email }} | {{ u.role | uppercase }} | Block: {{ u.hostelBlock || 'All' }}</span>
+                <h1 class="view-title">👥 Staff Stats Overview</h1>
+                <p class="view-subtitle">Monitor and manage all staff, wardens and their real-time performance.</p>
               </div>
-              <button class="btn btn-delete-user" (click)="deleteUser(u.id)" style="padding: 6px 12px; font-size: 11px;">Delete</button>
             </div>
-          </div>
-        </div>
 
-        <!-- 9. TASK & WORK DISPATCHER -->
-        <div *ngIf="activeTab === 'tasks'" class="tab-panel animate-fade">
-          <h4 class="page-title">🗂️ Task & Work Dispatcher</h4>
-
-          <!-- Dispatch Task Card -->
-          <div class="card" style="background: #0f172a; color: white; padding: 18px; border-radius: 16px; border: 1px solid #1e293b; margin-bottom: 20px;">
-            <h5 style="margin: 0 0 12px 0; color: #f8fafc;">Dispatch Custom Maintenance Task</h5>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-              <input type="text" class="form-input" style="background: #1e293b; color: white;" [(ngModel)]="newTaskTitle" placeholder="Task Title (e.g. Clean Terrace Floor Block A)" />
-              <textarea class="form-input" style="background: #1e293b; color: white;" [(ngModel)]="newTaskDesc" placeholder="Task details and instructions"></textarea>
-              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <select class="form-input" style="flex: 1; background: #1e293b; color: white;" [(ngModel)]="newTaskStaffId">
-                  <option [ngValue]="null">Select Staff Member</option>
-                  <option *ngFor="let s of staffList" [value]="s.id">{{ s.name }} ({{ s.bio || 'Maintenance' }})</option>
-                </select>
-                <select class="form-input" style="flex: 1; background: #1e293b; color: white;" [(ngModel)]="newTaskPriority">
-                  <option value="low">Low Priority</option>
-                  <option value="medium">Medium Priority</option>
-                  <option value="high">High Priority</option>
-                  <option value="urgent">URGENT</option>
-                </select>
+            <!-- Top 6 Staff Metric Cards -->
+            <div class="metrics-6-grid">
+              <div class="metric-mini-card">
+                <span class="mini-icon blue">👥</span>
+                <div>
+                  <span class="mini-lbl">Total Staff</span>
+                  <strong class="mini-val">16</strong>
+                  <span class="mini-trend green">↑ 7% vs last month</span>
+                </div>
               </div>
-              <button class="btn btn-primary" (click)="createTaskSubmit()" style="font-weight: 800; padding: 10px;">🚀 Dispatch Task Now</button>
+              <div class="metric-mini-card">
+                <span class="mini-icon green">❇️</span>
+                <div>
+                  <span class="mini-lbl">Active Staff</span>
+                  <strong class="mini-val">14</strong>
+                  <span class="mini-trend green">↑ 8% vs last month</span>
+                </div>
+              </div>
+              <div class="metric-mini-card">
+                <span class="mini-icon indigo">🛡️</span>
+                <div>
+                  <span class="mini-lbl">Active Wardens</span>
+                  <strong class="mini-val">3</strong>
+                  <span class="mini-trend gray">0% vs last month</span>
+                </div>
+              </div>
+              <div class="metric-mini-card">
+                <span class="mini-icon yellow">🕒</span>
+                <div>
+                  <span class="mini-lbl">On Duty Now</span>
+                  <strong class="mini-val">11</strong>
+                  <span class="mini-trend green">↑ 10% vs last month</span>
+                </div>
+              </div>
+              <div class="metric-mini-card">
+                <span class="mini-icon purple">🏖️</span>
+                <div>
+                  <span class="mini-lbl">On Leave</span>
+                  <strong class="mini-val">2</strong>
+                  <span class="mini-trend red">↓ 33% vs last month</span>
+                </div>
+              </div>
+              <div class="metric-mini-card">
+                <span class="mini-icon gray">⭕</span>
+                <div>
+                  <span class="mini-lbl">Inactive</span>
+                  <strong class="mini-val">0</strong>
+                  <span class="mini-trend gray">0% vs last month</span>
+                </div>
+              </div>
             </div>
+
+            <!-- Staff Members Real-Time Directory Table -->
+            <div class="glass-card" style="margin-top: 20px;">
+              <div class="card-header-row">
+                <h3 class="card-title">All Staff Overview</h3>
+                <button class="btn btn-primary" (click)="switchTab('users')" style="width: auto; padding: 8px 14px;">+ Add Staff</button>
+              </div>
+
+              <div class="table-responsive">
+                <table class="custom-table">
+                  <thead>
+                    <tr>
+                      <th>Staff Member</th>
+                      <th>Role</th>
+                      <th>Hostel / Area</th>
+                      <th>Status</th>
+                      <th>On Duty</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let s of staffList">
+                      <td>
+                        <div class="staff-user-cell">
+                          <div class="staff-avatar-circle">👨‍🔧</div>
+                          <div>
+                            <strong>{{ s.name }}</strong>
+                            <span class="staff-id">ID: ST00{{ s.id }}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td><span class="role-pill">{{ s.bio || 'Maintenance' }}</span></td>
+                      <td>{{ s.hostelBlock || 'All Hostels' }}</td>
+                      <td><span class="status-pill on-duty">● On Duty</span></td>
+                      <td>Since 08:00 AM</td>
+                      <td>
+                        <button class="action-icon-btn" (click)="switchTab('workflow')">👁️</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
           </div>
 
-          <!-- Dispatched Tasks List -->
-          <div class="card" style="background: #0f172a; color: white; padding: 18px; border-radius: 16px; border: 1px solid #1e293b;">
-            <h5 style="margin: 0 0 12px 0; color: #f8fafc;">Dispatched Work Tasks</h5>
-            <div *ngFor="let task of staffTasksList" style="background: #1e293b; padding: 12px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+          <!-- 3. WORK FLOW LIFECYCLE STAGE TRACKER (IMAGE 3) -->
+          <div *ngIf="activeTab === 'workflow'" class="tab-view animate-fade">
+            
+            <div class="view-header">
               <div>
-                <strong style="color: #f8fafc;">{{ task.title }}</strong>
-                <span style="font-size: 11px; color: #94a3b8; display: block;">Assigned: {{ task.assignedStaff?.name || 'Staff' }} | Priority: {{ task.priority | uppercase }}</span>
+                <h1 class="view-title">🛠️ Work Flow Lifecycle Tracker</h1>
+                <p class="view-subtitle">Track and manage the complete Complaint lifecycle in real-time.</p>
               </div>
-              <span [style.background]="task.status==='completed'?'#15803d':'#a16207'" style="padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; color: white;">{{ task.status | uppercase }}</span>
+            </div>
+
+            <!-- 6-Stage Glowing Pipeline Flow Step Bar -->
+            <div class="workflow-stage-pipeline">
+              <div class="pipeline-step">
+                <div class="step-circle purple">📝</div>
+                <div class="step-info">
+                  <span class="step-num">1. Submitted</span>
+                  <strong class="step-count">304</strong>
+                  <span class="step-sub">Complaint submitted</span>
+                </div>
+              </div>
+              <div class="pipeline-arrow">➔</div>
+
+              <div class="pipeline-step">
+                <div class="step-circle blue">📥</div>
+                <div class="step-info">
+                  <span class="step-num">2. Received</span>
+                  <strong class="step-count">296</strong>
+                  <span class="step-sub">Received by system</span>
+                </div>
+              </div>
+              <div class="pipeline-arrow">➔</div>
+
+              <div class="pipeline-step">
+                <div class="step-circle yellow">👤</div>
+                <div class="step-info">
+                  <span class="step-num">3. Assigned</span>
+                  <strong class="step-count">236</strong>
+                  <span class="step-sub">Assigned to staff</span>
+                </div>
+              </div>
+              <div class="pipeline-arrow">➔</div>
+
+              <div class="pipeline-step">
+                <div class="step-circle orange">🔧</div>
+                <div class="step-info">
+                  <span class="step-num">4. In-Progress</span>
+                  <strong class="step-count">60</strong>
+                  <span class="step-sub">Work currently active</span>
+                </div>
+              </div>
+              <div class="pipeline-arrow">➔</div>
+
+              <div class="pipeline-step">
+                <div class="step-circle green">✅</div>
+                <div class="step-info">
+                  <span class="step-num">5. Resolved</span>
+                  <strong class="step-count">221</strong>
+                  <span class="step-sub">Issue resolved</span>
+                </div>
+              </div>
+              <div class="pipeline-arrow">➔</div>
+
+              <div class="pipeline-step">
+                <div class="step-circle red">⚠️</div>
+                <div class="step-info">
+                  <span class="step-num">6. Escalated</span>
+                  <strong class="step-count">12</strong>
+                  <span class="step-sub">Escalated to warden</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Active Complaints Live Feed -->
+            <div class="glass-card" style="margin-top: 20px;">
+              <h3 class="card-title" style="margin-bottom: 14px;">Live Complaints Stream</h3>
+              <div class="complaint-feed-list">
+                <div *ngFor="let c of filteredComplaints" class="feed-item-card">
+                  <div class="feed-header">
+                    <div>
+                      <span class="ticket-tag">#HOST-{{ c.id }}</span>
+                      <strong class="ticket-title">{{ c.title }}</strong>
+                    </div>
+                    <span class="status-badge" [class]="c.status">{{ c.status | uppercase }}</span>
+                  </div>
+                  <p class="feed-desc">{{ c.description }}</p>
+                  <div class="feed-footer">
+                    <span>Student: {{ c.student?.name || 'Rahul Kumar' }}</span>
+                    <span>Staff: <strong style="color: #60a5fa;">{{ c.staff?.name || 'Ram Singh' }}</strong></span>
+                    <span>Category: {{ c.category | uppercase }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 4. ATTENDANCE ANALYTICS -->
+          <div *ngIf="activeTab === 'attendance'" class="tab-view animate-fade">
+            <h1 class="view-title">🕒 Real-Time Attendance Analytics</h1>
+            <div class="grid-2-col" style="margin-top: 16px;">
+              <div class="glass-card">
+                <h3 class="card-title">Student Attendance Today</h3>
+                <h1 style="color: #34d399; font-size: 42px; font-weight: 900; margin: 10px 0;">92%</h1>
+                <p style="color: #cbd5e1;">110 Present / 10 Absent across 3 hostel blocks</p>
+              </div>
+              <div class="glass-card">
+                <h3 class="card-title">Staff Attendance Today</h3>
+                <h1 style="color: #818cf8; font-size: 42px; font-weight: 900; margin: 10px 0;">94%</h1>
+                <p style="color: #cbd5e1;">14 Present / 2 Absent on duty</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- 10. CREATE STAFF / MANAGEMENT -->
-        <div *ngIf="activeTab === 'create'" class="tab-panel animate-fade">
-          <h4 class="page-title">➕ Create Staff Account</h4>
-          <div class="card" style="background: #0f172a; color: white; padding: 18px; border-radius: 16px; border: 1px solid #1e293b;">
-            <form (ngSubmit)="onCreateSubmit()">
-              <div class="form-group" style="margin-bottom: 10px;">
-                <label style="color: #94a3b8; font-size: 12px;">Full Name</label>
-                <input type="text" class="form-input" style="background: #1e293b; color: white;" [(ngModel)]="createForm.name" name="name" required />
+          <!-- 5. FEEDBACKS & MESS REVIEWS -->
+          <div *ngIf="activeTab === 'feedback'" class="tab-view animate-fade">
+            <h1 class="view-title">⭐ System & Mess Food Quality Reviews</h1>
+            <div class="glass-card" style="margin-top: 16px;">
+              <div class="card-header-row">
+                <div>
+                  <span style="color: #94a3b8; font-size: 11px; text-transform: uppercase;">Mess Overall Rating</span>
+                  <h1 style="color: #facc15; font-size: 38px; font-weight: 900; margin: 4px 0;">⭐ 4.2 <span style="font-size: 14px; color: #94a3b8;">/ 5.0</span></h1>
+                </div>
               </div>
-              <div class="form-group" style="margin-bottom: 10px;">
-                <label style="color: #94a3b8; font-size: 12px;">Email</label>
-                <input type="email" class="form-input" style="background: #1e293b; color: white;" [(ngModel)]="createForm.email" name="email" required />
+              <div class="review-stream-list" style="margin-top: 16px;">
+                <div *ngFor="let r of messAnalytics?.reviews" class="feed-item-card">
+                  <strong style="color: #f8fafc;">{{ r.student?.name || 'Student' }} ({{ r.mealType | uppercase }})</strong>
+                  <span style="color: #facc15; font-weight: 800; margin-left: 10px;">⭐ {{ r.foodQuality }}/5</span>
+                  <p style="color: #cbd5e1; font-size: 12px; margin-top: 4px;">{{ r.comments || 'Food quality and hygiene was good.' }}</p>
+                </div>
               </div>
-              <div class="form-group" style="margin-bottom: 10px;">
-                <label style="color: #94a3b8; font-size: 12px;">Password</label>
-                <input type="password" class="form-input" style="background: #1e293b; color: white;" [(ngModel)]="createForm.password" name="password" required />
-              </div>
-              <div class="form-group" style="margin-bottom: 10px;">
-                <label style="color: #94a3b8; font-size: 12px;">Role</label>
-                <select class="form-input" style="background: #1e293b; color: white;" [(ngModel)]="createForm.role" name="role">
-                  <option value="warden">Warden</option>
-                  <option value="staff">Staff</option>
-                </select>
-              </div>
-              <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px; font-weight: 800;">Create Account</button>
-            </form>
+            </div>
           </div>
-        </div>
 
-        <!-- SETTINGS TAB -->
-        <div *ngIf="activeTab === 'settings'" class="tab-panel animate-fade">
-          <h4 class="page-title">⚙️ System Settings</h4>
-          <div class="card" style="background: #0f172a; color: white; padding: 18px; border-radius: 16px; border: 1px solid #1e293b;">
-            <p style="color: #94a3b8; font-size: 12px;">System settings and portal controls</p>
+          <!-- 6. AUDIT LOGS -->
+          <div *ngIf="activeTab === 'activity'" class="tab-view animate-fade">
+            <h1 class="view-title">📜 Real-Time Audit Logs</h1>
+            <div class="glass-card" style="margin-top: 16px;">
+              <div *ngFor="let log of activityLogs" style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 12px;">
+                <strong style="color: #818cf8;">{{ log.actorName || 'System' }}</strong>
+                <span style="color: #cbd5e1; margin-left: 10px;">{{ log.description }}</span>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <!-- PROFILE TAB -->
-        <div *ngIf="activeTab === 'my-profile'" class="tab-panel animate-fade">
-          <h4 class="page-title">👤 Admin Profile</h4>
-          <div class="card" style="background: #0f172a; color: white; padding: 18px; border-radius: 16px; border: 1px solid #1e293b;">
-            <p style="color: #94a3b8; font-size: 12px;">Logged in as: {{ user?.email }}</p>
+          <!-- 7. STUDENTS & USERS DIRECTORY -->
+          <div *ngIf="activeTab === 'users'" class="tab-view animate-fade">
+            <h1 class="view-title">👥 Students & User Directory</h1>
+            
+            <!-- Bulk Import & Termination Panel -->
+            <div class="glass-card" style="margin-top: 16px;">
+              <h3 class="card-title">📥 Bulk Student Batch Import</h3>
+              <input type="text" class="form-input" style="margin: 10px 0;" [(ngModel)]="bulkBatchName" placeholder="Target Batch Name" />
+              <input type="file" accept=".csv, .xlsx" (change)="onExcelFileSelected($event)" style="margin-bottom: 10px;" />
+              <button class="btn btn-primary" (click)="uploadParsedBatch()">Register Students Now</button>
+            </div>
+
+            <div class="glass-card" style="margin-top: 16px;">
+              <h3 class="card-title">User Accounts</h3>
+              <div *ngFor="let u of users" style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between;">
+                <div>
+                  <strong>{{ u.name }}</strong>
+                  <span style="color: #94a3b8; font-size: 11px; display: block;">{{ u.email }} | {{ u.role }}</span>
+                </div>
+                <button class="btn btn-delete-user" (click)="deleteUser(u.id)" style="width: auto; padding: 4px 10px; font-size: 11px;">Delete</button>
+              </div>
+            </div>
           </div>
+
+          <!-- 8. TASK DISPATCHER -->
+          <div *ngIf="activeTab === 'tasks'" class="tab-view animate-fade">
+            <h1 class="view-title">🔧 Task Dispatcher</h1>
+            <div class="glass-card" style="margin-top: 16px;">
+              <input type="text" class="form-input" [(ngModel)]="newTaskTitle" placeholder="Task Title" style="margin-bottom: 10px;" />
+              <textarea class="form-input" [(ngModel)]="newTaskDesc" placeholder="Task Description" style="margin-bottom: 10px;"></textarea>
+              <button class="btn btn-primary" (click)="createTaskSubmit()">Dispatch Task</button>
+            </div>
+          </div>
+
+          <!-- 9. SETTINGS -->
+          <div *ngIf="activeTab === 'settings'" class="tab-view animate-fade">
+            <h1 class="view-title">⚙️ System Settings</h1>
+            <div class="glass-card" style="margin-top: 16px;">
+              <p style="color: #94a3b8;">System configuration and live server preferences.</p>
+            </div>
+          </div>
+
+          <!-- 10. PROFILE -->
+          <div *ngIf="activeTab === 'my-profile'" class="tab-view animate-fade">
+            <h1 class="view-title">👤 Admin Profile</h1>
+            <div class="glass-card" style="margin-top: 16px;">
+              <p style="color: #cbd5e1;">Logged in as: <strong>{{ user?.email }}</strong></p>
+            </div>
+          </div>
+
         </div>
 
-      </div>
+      </main>
+
     </div>
   `,
   styles: [`
-    .dashboard-container { padding: 16px; max-width: 1200px; margin: 0 auto; font-family: 'Inter', sans-serif; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .user-info { display: flex; align-items: center; gap: 12px; }
-    .avatar-ring { width: 42px; height: 42px; border-radius: 50%; background: #6366f1; display: flex; align-items: center; justify-content: center; }
-    .header-actions { display: flex; gap: 8px; }
-    .admin-tab-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px; -webkit-overflow-scrolling: touch; }
-    .admin-tab-nav button { white-space: nowrap; padding: 8px 14px; border-radius: 10px; border: 1px solid #334155; background: #0f172a; color: #cbd5e1; font-weight: 700; font-size: 12px; cursor: pointer; }
-    .admin-tab-nav button.active { background: #6366f1; color: white; border-color: #6366f1; }
-    .form-input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #334155; font-size: 12px; box-sizing: border-box; }
-    .btn { padding: 10px 16px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
-    .btn-primary { background: #6366f1; color: white; }
+    .executive-layout { display: flex; min-height: 100vh; background: #090d16; color: #f8fafc; font-family: 'Inter', sans-serif; }
+    
+    /* SIDEBAR STYLING */
+    .sidebar { width: 250px; background: #0b0f19; border-right: 1px solid rgba(255,255,255,0.08); padding: 20px 14px; display: flex; flex-direction: column; gap: 16px; flex-shrink: 0; }
+    .brand-header { display: flex; align-items: center; gap: 10px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .brand-logo-shield { width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .brand-title { font-size: 14.5px; font-weight: 800; color: #f8fafc; margin: 0; }
+    .brand-subtitle { font-size: 9.5px; color: #64748b; display: block; }
+    
+    .nav-section-label { font-size: 9.5px; font-weight: 800; color: #64748b; letter-spacing: 1px; margin-top: 10px; }
+    .nav-menu { display: flex; flex-direction: column; gap: 4px; }
+    .nav-link { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; border-radius: 10px; background: transparent; border: none; color: #94a3b8; font-size: 12.5px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; text-align: left; }
+    .nav-link:hover { background: rgba(99, 102, 241, 0.1); color: #818cf8; }
+    .nav-link.active { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; font-weight: 700; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3); }
+
+    .system-status-card { margin-top: auto; background: rgba(17, 24, 39, 0.8); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px; }
+    .status-pulse-header { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #34d399; font-weight: 700; }
+    .pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 10px #34d399; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+
+    /* MAIN WRAPPER */
+    .main-wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    
+    .top-navbar { height: 64px; background: rgba(11, 15, 25, 0.95); border-bottom: 1px solid rgba(255,255,255,0.08); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
+    .search-box { display: flex; align-items: center; gap: 8px; background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 6px 12px; width: 280px; }
+    .search-box input { background: transparent; border: none; outline: none; color: white; font-size: 12px; width: 100%; }
+
+    .top-navbar-right { display: flex; align-items: center; gap: 12px; }
+    .time-badge { background: #1e293b; padding: 6px 12px; border-radius: 8px; font-size: 11.5px; color: #cbd5e1; font-weight: 600; border: 1px solid #334155; }
+    .icon-btn { background: #1e293b; border: 1px solid #334155; color: white; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; }
+    .notification-badge { position: absolute; top: -4px; right: -4px; background: #ef4444; color: white; font-size: 9px; font-weight: 900; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+    .profile-chip { display: flex; align-items: center; gap: 10px; background: #1e293b; border: 1px solid #334155; padding: 4px 12px; border-radius: 20px; cursor: pointer; }
+    .user-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+    .user-avatar-fallback { width: 28px; height: 28px; border-radius: 50%; background: #6366f1; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .user-meta-text { display: flex; flex-direction: column; }
+    .user-name { font-size: 11.5px; font-weight: 700; color: #f8fafc; }
+    .user-role { font-size: 9.5px; color: #94a3b8; }
+    .logout-btn { background: #7f1d1d; border: 1px solid #ef4444; color: white; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+    .content-body { padding: 24px; flex: 1; overflow-y: auto; }
+    .view-title { font-size: 22px; font-weight: 900; color: #f8fafc; margin: 0 0 4px 0; }
+    .view-subtitle { font-size: 12px; color: #94a3b8; margin: 0 0 16px 0; }
+
+    /* DASHBOARD ELEMENTS */
+    .welcome-hero-card { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%); border-radius: 18px; padding: 24px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border: 1px solid rgba(99, 102, 241, 0.3); box-shadow: 0 8px 32px rgba(49, 46, 129, 0.4); }
+    .hero-greeting { font-size: 12px; color: #a5b4fc; font-weight: 700; text-transform: uppercase; }
+    .hero-user-name { font-size: 26px; font-weight: 900; color: white; margin: 2px 0 6px 0; }
+    .hero-subtitle { font-size: 12.5px; color: #cbd5e1; margin: 0; }
+    .hero-building-graphic { font-size: 54px; filter: drop-shadow(0 0 15px rgba(99,102,241,0.5)); }
+
+    /* METRICS GRID */
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
+    .metric-card { background: rgba(17, 24, 39, 0.85); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 18px; backdrop-filter: blur(10px); }
+    .purple-glow { border-left: 4px solid #818cf8; }
+    .green-glow { border-left: 4px solid #34d399; }
+    .yellow-glow { border-left: 4px solid #fbbf24; }
+    .blue-glow { border-left: 4px solid #60a5fa; }
+    
+    .metric-header { display: flex; justify-content: space-between; align-items: center; }
+    .metric-title { font-size: 11.5px; color: #94a3b8; font-weight: 700; }
+    .metric-icon { font-size: 18px; }
+    .metric-value { font-size: 28px; font-weight: 900; color: #f8fafc; margin: 8px 0 4px 0; }
+    .metric-trend { font-size: 11px; font-weight: 700; }
+    .green-text, .metric-trend.green { color: #34d399; }
+    .red-text, .metric-trend.red { color: #f87171; }
+    .gray-text, .metric-trend.gray { color: #94a3b8; }
+
+    /* AI CARD */
+    .ai-executive-card { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border: 1.5px solid #6366f1; border-radius: 16px; padding: 18px; display: flex; align-items: center; gap: 16px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(99, 102, 241, 0.2); }
+    .ai-avatar-box { font-size: 32px; background: rgba(99, 102, 241, 0.2); padding: 10px; border-radius: 14px; }
+    .ai-text-content { flex: 1; }
+    .ai-header-row { display: flex; align-items: center; gap: 10px; }
+    .ai-title { font-size: 13.5px; font-weight: 800; color: #a5b4fc; }
+    .live-pill { background: #15803d; color: #4ade80; font-size: 9.5px; font-weight: 900; padding: 2px 8px; border-radius: 10px; }
+    .ai-description { font-size: 12px; color: #cbd5e1; margin: 4px 0 0 0; }
+    .ai-report-btn { background: #6366f1; color: white; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 800; font-size: 11.5px; cursor: pointer; white-space: nowrap; }
+
+    /* GRIDS & CARDS */
+    .grid-2-col { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+    .glass-card { background: rgba(17, 24, 39, 0.85); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; backdrop-filter: blur(10px); }
+    .card-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .card-title { font-size: 15px; font-weight: 800; color: #f8fafc; margin: 0; }
+    .card-subtitle { font-size: 11px; color: #94a3b8; display: block; margin-top: 2px; }
+
+    .period-selector { display: flex; background: #1e293b; padding: 3px; border-radius: 8px; gap: 3px; }
+    .period-selector button { background: transparent; border: none; color: #94a3b8; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; }
+    .period-selector button.active { background: #6366f1; color: white; }
+
+    .chart-container { height: 160px; position: relative; margin-bottom: 14px; }
+    .area-chart-svg { width: 100%; height: 100%; }
+    .chart-legend { display: flex; gap: 16px; font-size: 11px; color: #cbd5e1; font-weight: 600; margin-top: 8px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .dot.purple { background: #818cf8; }
+    .dot.green { background: #34d399; }
+
+    .kpi-chips-row { display: flex; gap: 12px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px; }
+    .kpi-chip { flex: 1; background: #1e293b; padding: 10px; border-radius: 10px; }
+    .kpi-lbl { font-size: 10.5px; color: #94a3b8; display: block; }
+    .kpi-val { font-size: 13px; color: white; display: block; margin-top: 2px; }
+
+    /* QUICK ACTIONS */
+    .quick-actions-list { display: flex; flex-direction: column; gap: 8px; }
+    .action-item { display: flex; align-items: center; gap: 12px; width: 100%; background: #1e293b; border: 1px solid #334155; color: #f8fafc; padding: 12px; border-radius: 12px; font-size: 12.5px; font-weight: 700; cursor: pointer; text-align: left; transition: all 0.2s ease; }
+    .action-item:hover { background: rgba(99, 102, 241, 0.15); border-color: #6366f1; color: #818cf8; }
+    .action-icon { font-size: 16px; }
+    .arrow { margin-left: auto; font-size: 16px; color: #64748b; }
+    .badge-count.red { margin-left: auto; background: #ef4444; color: white; font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 10px; }
+
+    /* PROGRESS BARS */
+    .category-progress-list { display: flex; flex-direction: column; gap: 12px; }
+    .cat-bar-header { display: flex; justify-content: space-between; font-size: 12px; color: #cbd5e1; margin-bottom: 4px; }
+    .progress-track { background: #1e293b; height: 8px; border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 4px; }
+    .progress-fill.purple { background: linear-gradient(90deg, #818cf8, #6366f1); }
+    .progress-fill.blue { background: linear-gradient(90deg, #60a5fa, #3b82f6); }
+    .progress-fill.green { background: linear-gradient(90deg, #34d399, #10b981); }
+    .progress-fill.yellow { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+    .progress-fill.pink { background: linear-gradient(90deg, #f472b6, #ec4899); }
+
+    /* METRICS 6 GRID */
+    .metrics-6-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+    .metric-mini-card { background: rgba(17, 24, 39, 0.85); border: 1px solid rgba(255,255,255,0.08); padding: 14px; border-radius: 14px; display: flex; align-items: center; gap: 12px; }
+    .mini-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .mini-icon.blue { background: rgba(96, 165, 250, 0.15); color: #60a5fa; }
+    .mini-icon.green { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+    .mini-icon.indigo { background: rgba(129, 140, 248, 0.15); color: #818cf8; }
+    .mini-icon.yellow { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+    .mini-icon.purple { background: rgba(192, 132, 252, 0.15); color: #c084fc; }
+    .mini-icon.gray { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }
+    .mini-lbl { font-size: 10.5px; color: #94a3b8; display: block; }
+    .mini-val { font-size: 20px; font-weight: 900; color: white; display: block; }
+    .mini-trend { font-size: 9.5px; font-weight: 700; }
+
+    /* TABLE */
+    .table-responsive { overflow-x: auto; }
+    .custom-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
+    .custom-table th { padding: 12px; border-bottom: 1.5px solid #334155; color: #94a3b8; font-weight: 700; }
+    .custom-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.06); color: #cbd5e1; }
+    .staff-user-cell { display: flex; align-items: center; gap: 10px; }
+    .staff-avatar-circle { width: 32px; height: 32px; border-radius: 50%; background: #312e81; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .staff-id { font-size: 10px; color: #64748b; display: block; }
+    .role-pill { background: #1e293b; color: #818cf8; padding: 3px 8px; border-radius: 6px; font-weight: 700; font-size: 10.5px; }
+    .status-pill.on-duty { color: #34d399; font-weight: 800; }
+    .action-icon-btn { background: #1e293b; border: 1px solid #334155; color: white; padding: 4px 8px; border-radius: 6px; cursor: pointer; }
+
+    /* WORKFLOW PIPELINE */
+    .workflow-stage-pipeline { display: flex; align-items: center; gap: 8px; overflow-x: auto; padding: 16px; background: rgba(17, 24, 39, 0.85); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; backdrop-filter: blur(10px); }
+    .pipeline-step { display: flex; align-items: center; gap: 10px; background: #1e293b; padding: 12px; border-radius: 12px; min-width: 140px; }
+    .step-circle { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .step-circle.purple { background: rgba(129, 140, 248, 0.2); }
+    .step-circle.blue { background: rgba(96, 165, 250, 0.2); }
+    .step-circle.yellow { background: rgba(251, 191, 36, 0.2); }
+    .step-circle.orange { background: rgba(251, 146, 60, 0.2); }
+    .step-circle.green { background: rgba(52, 211, 153, 0.2); }
+    .step-circle.red { background: rgba(248, 113, 113, 0.2); }
+    .step-info { display: flex; flex-direction: column; }
+    .step-num { font-size: 10px; color: #94a3b8; font-weight: 700; }
+    .step-count { font-size: 16px; font-weight: 900; color: white; }
+    .step-sub { font-size: 9px; color: #64748b; }
+    .pipeline-arrow { color: #475569; font-size: 14px; font-weight: 900; }
+
+    /* COMPLAINTS FEED */
+    .complaint-feed-list { display: flex; flex-direction: column; gap: 10px; }
+    .feed-item-card { background: #1e293b; border: 1px solid #334155; padding: 14px; border-radius: 12px; }
+    .feed-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .ticket-tag { background: #312e81; color: #a5b4fc; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; margin-right: 8px; }
+    .ticket-title { font-size: 13.5px; color: white; }
+    .status-badge { font-size: 10px; font-weight: 900; padding: 3px 8px; border-radius: 6px; }
+    .status-badge.open { background: #7f1d1d; color: #fca5a5; }
+    .status-badge.in_progress { background: #581c87; color: #c084fc; }
+    .status-badge.resolved { background: #14532d; color: #4ade80; }
+    .status-badge.pending { background: #713f12; color: #fde047; }
+    .feed-desc { font-size: 11.5px; color: #cbd5e1; margin: 4px 0 8px 0; }
+    .feed-footer { display: flex; justify-content: space-between; font-size: 10.5px; color: #94a3b8; border-top: 1px solid #334155; padding-top: 6px; }
+
+    .form-input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: white; font-size: 12px; box-sizing: border-box; }
+    .btn { padding: 10px 16px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; width: 100%; }
+    .btn-primary { background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%); color: white; }
     .btn-delete-user { background: #ef4444; color: white; }
-    .page-title { font-weight: 900; font-size: 18px; margin-bottom: 14px; color: #f8fafc; }
+
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .grid-2-col { grid-template-columns: 1fr; }
+      .kpi-chips-row { flex-wrap: wrap; }
+    }
   `]
 })
 export class AdminDashboardComponent implements OnInit {
   user: User | null = null;
-  activeTab: string = 'stats';
+  activeTab: string = 'dashboard';
   isDarkMode = true;
   period = 'week';
+  currentDateStr = '24 May 2025  10:09 AM';
+  searchQuery = '';
 
   analytics: any = null;
   mgmtTrendData: any = null;
@@ -517,24 +872,14 @@ export class AdminDashboardComponent implements OnInit {
   users: User[] = [];
   staffList: User[] = [];
 
-  workflowStatusFilter = 'all';
-  workflowCategoryFilter = 'all';
-
   bulkBatchName = 'Batch 2025-2029';
   excelParsedStudents: any[] = [];
   importingBatch = false;
   batchImportSuccess = '';
   batchImportError = '';
 
-  terminateUserIdInput: number | null = null;
-  terminateBatchNameInput = '';
-
   newTaskTitle = '';
   newTaskDesc = '';
-  newTaskStaffId: number | null = null;
-  newTaskPriority = 'medium';
-
-  createForm = { name: '', email: '', password: '', role: 'staff' };
 
   constructor(
     private authService: AuthService,
@@ -545,6 +890,8 @@ export class AdminDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.user = this.authService.currentUserValue;
+    this.currentDateStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
     this.loadGraphicalAnalytics();
     this.loadUsers();
     this.loadStaffPerformance();
@@ -569,75 +916,88 @@ export class AdminDashboardComponent implements OnInit {
     this.isDarkMode = !this.isDarkMode;
   }
 
+  onSearch(): void {
+    if (!this.searchQuery.trim()) {
+      this.filteredComplaints = [...this.allComplaints];
+    } else {
+      const q = this.searchQuery.toLowerCase();
+      this.filteredComplaints = this.allComplaints.filter(c => 
+        (c.title && c.title.toLowerCase().includes(q)) || 
+        (c.description && c.description.toLowerCase().includes(q))
+      );
+    }
+    this.cdr.detectChanges();
+  }
+
   loadGraphicalAnalytics(): void {
     this.complaintService.getManagementAnalytics(this.period).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.mgmtTrendData = res;
         this.analytics = { summary: { total: res.summary.totalComplaints, pending: res.summary.pendingComplaints, resolved: res.summary.resolvedComplaints, assigned: res.summary.inProgressComplaints, inProgress: 0 } };
         this.cdr.detectChanges();
       },
-      error: (err) => console.error('Error analytics:', err)
+      error: (err: any) => console.error('Error analytics:', err)
     });
   }
 
   loadUsers(): void {
     this.complaintService.getAllUsers().subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.users = res;
-        this.staffList = res.filter((u: any) => u.role === 'staff');
+        this.staffList = res.filter((u: any) => u.role === 'staff' || u.role === 'warden');
         this.cdr.detectChanges();
       },
-      error: (err) => console.error('Error users:', err)
+      error: (err: any) => console.error('Error users:', err)
     });
   }
 
   loadStaffPerformance(): void {
     this.complaintService.getStaffPerformance().subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.staffPerformanceList = res;
         this.cdr.detectChanges();
       },
-      error: (err) => console.error('Error staff performance:', err)
+      error: (err: any) => console.error('Error staff performance:', err)
     });
   }
 
   loadAttendanceStats(): void {
     this.complaintService.getAttendanceStats().subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.attendanceStats = res;
         this.cdr.detectChanges();
       },
-      error: (err) => console.error('Error attendance stats:', err)
+      error: (err: any) => console.error('Error attendance stats:', err)
     });
   }
 
   loadMessAnalytics(): void {
     this.complaintService.getMessAnalytics().subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.messAnalytics = res;
         this.cdr.detectChanges();
       },
-      error: (err) => console.error('Error mess analytics:', err)
+      error: (err: any) => console.error('Error mess analytics:', err)
     });
   }
 
   loadActivityLogs(): void {
     this.complaintService.getActivityLogs().subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.activityLogs = res;
         this.cdr.detectChanges();
       },
-      error: (err) => console.error('Error activity logs:', err)
+      error: (err: any) => console.error('Error activity logs:', err)
     });
   }
 
   loadStaffTasks(): void {
     this.complaintService.getStaffTasks().subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.staffTasksList = res;
         this.cdr.detectChanges();
       },
-      error: (err) => console.error('Error staff tasks:', err)
+      error: (err: any) => console.error('Error staff tasks:', err)
     });
   }
 
@@ -645,25 +1005,11 @@ export class AdminDashboardComponent implements OnInit {
     this.complaintService.getAllComplaints().subscribe({
       next: (res: any) => {
         this.allComplaints = res;
-        this.filterComplaints();
+        this.filteredComplaints = [...res];
         this.cdr.detectChanges();
       },
       error: (err: any) => console.error('Error complaints:', err)
     });
-  }
-
-  filterComplaints(): void {
-    this.filteredComplaints = this.allComplaints.filter(c => {
-      const matchStatus = this.workflowStatusFilter === 'all' || c.status === this.workflowStatusFilter;
-      const matchCat = this.workflowCategoryFilter === 'all' || c.category === this.workflowCategoryFilter;
-      return matchStatus && matchCat;
-    });
-  }
-
-  getTrendBarHeight(val: number): number {
-    if (!this.mgmtTrendData || !this.mgmtTrendData.timeSeries) return 20;
-    const maxVal = Math.max(...this.mgmtTrendData.timeSeries.map((t: any) => t.complaints), 1);
-    return Math.max(Math.round((val / maxVal) * 100), 20);
   }
 
   onExcelFileSelected(event: any): void {
@@ -700,53 +1046,18 @@ export class AdminDashboardComponent implements OnInit {
     this.cdr.detectChanges();
 
     this.complaintService.bulkImportStudents(this.excelParsedStudents, this.bulkBatchName).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.importingBatch = false;
         this.batchImportSuccess = `✅ ${res.message || 'Batch created successfully!'}`;
         this.excelParsedStudents = [];
         this.loadUsers();
         this.cdr.detectChanges();
       },
-      error: (err) => {
+      error: (err: any) => {
         this.importingBatch = false;
         this.batchImportError = `❌ ${err.error?.message || err.message || 'Failed to import batch.'}`;
         this.cdr.detectChanges();
       }
-    });
-  }
-
-  executeSingleUserTermination(): void {
-    if (!this.terminateUserIdInput) {
-      alert('Please select or enter a User ID.');
-      return;
-    }
-    if (!confirm(`Are you sure you want to block/terminate User ID #${this.terminateUserIdInput}?`)) return;
-
-    this.complaintService.terminateUser(this.terminateUserIdInput).subscribe({
-      next: (res) => {
-        alert(`✅ ${res.message}`);
-        this.terminateUserIdInput = null;
-        this.loadUsers();
-      },
-      error: (err) => alert(`❌ ${err.error?.message || 'Failed to terminate user.'}`)
-    });
-  }
-
-  executeBatchTermination(): void {
-    if (!this.terminateBatchNameInput.trim()) {
-      alert('Please enter or select a Batch Name.');
-      return;
-    }
-    const targetBatch = this.terminateBatchNameInput.trim();
-    if (!confirm(`⚠️ DANGER: Are you sure you want to block ALL students in "${targetBatch}"?`)) return;
-
-    this.complaintService.terminateBatch(targetBatch).subscribe({
-      next: (res) => {
-        alert(`✅ ${res.message}`);
-        this.terminateBatchNameInput = '';
-        this.loadUsers();
-      },
-      error: (err) => alert(`❌ ${err.error?.message || 'Failed to terminate batch.'}`)
     });
   }
 
@@ -757,44 +1068,28 @@ export class AdminDashboardComponent implements OnInit {
     }
     this.complaintService.createStaffTask({
       title: this.newTaskTitle,
-      description: this.newTaskDesc,
-      assignedStaffId: this.newTaskStaffId,
-      priority: this.newTaskPriority
+      description: this.newTaskDesc
     }).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         alert(`✅ ${res.message}`);
         this.newTaskTitle = '';
         this.newTaskDesc = '';
-        this.newTaskStaffId = null;
         this.loadStaffTasks();
       },
-      error: (err) => alert(`❌ ${err.error?.message || 'Failed to create task.'}`)
-    });
-  }
-
-  onCreateSubmit(): void {
-    this.complaintService.createStaffAccount(this.createForm).subscribe({
-      next: (res: any) => {
-        alert('✅ Account created successfully!');
-        this.createForm = { name: '', email: '', password: '', role: 'staff' };
-        this.loadUsers();
-      },
-      error: (err: any) => alert(`❌ ${err.error?.message || 'Failed to create account.'}`)
+      error: (err: any) => alert(`❌ ${err.error?.message || 'Failed to create task.'}`)
     });
   }
 
   deleteUser(userId: number): void {
     if (!confirm('Are you sure you want to delete this user?')) return;
     this.complaintService.deleteUser(userId).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         alert('✅ User deleted successfully!');
         this.loadUsers();
       },
-      error: (err) => alert(`❌ ${err.error?.message || 'Failed to delete user.'}`)
+      error: (err: any) => alert(`❌ ${err.error?.message || 'Failed to delete user.'}`)
     });
   }
-
-  initProfileEdit(): void {}
 
   logout(): void {
     this.authService.logout();
