@@ -236,25 +236,25 @@ export class ComplaintService {
   }
 
   getManagementAnalytics(period: string = 'week'): Observable<any> {
-    return this.http.get(`${this.apiUrl}/management/analytics?period=${period}`, {
+    return this.http.get(`${this.apiUrl}/users/analytics?period=${period}`, {
       headers: this.authService.getAuthHeaders()
     });
   }
 
   bulkImportStudents(students: any[], batchName: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/management/bulk-import`, { students, batchName }, {
+    return this.http.post(`${this.apiUrl}/users/bulk-import`, { students, batchName }, {
       headers: this.authService.getJsonHeaders()
     });
   }
 
   terminateUser(userId: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/management/terminate-user`, { userId }, {
+    return this.http.post(`${this.apiUrl}/users/terminate-user`, { userId }, {
       headers: this.authService.getJsonHeaders()
     });
   }
 
   terminateBatch(batchName: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/management/terminate-batch`, { batchName }, {
+    return this.http.post(`${this.apiUrl}/users/terminate-batch`, { batchName }, {
       headers: this.authService.getJsonHeaders()
     });
   }

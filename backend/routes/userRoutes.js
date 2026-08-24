@@ -3,12 +3,20 @@ const router = express.Router();
 const userController = require('../controllers/userController');
 const { verifyToken, requireRole } = require('../middleware/auth');
 
+const managementController = require('../controllers/managementController');
+
 router.get('/staff', verifyToken, requireRole(['warden', 'admin']), userController.getStaffList);
 router.get('/all', verifyToken, requireRole(['admin']), userController.getAllUsers);
 router.put('/status/:userId', verifyToken, requireRole(['admin']), userController.updateUserStatus);
 router.post('/create-staff-warden', verifyToken, requireRole(['admin']), userController.createWardenOrStaff);
 router.get('/wardens', verifyToken, userController.getWardenList);
 router.delete('/delete/:userId', verifyToken, requireRole(['admin']), userController.deleteUser);
+
+// Executive Management & Admin endpoints mounted under /api/users
+router.get('/analytics', verifyToken, managementController.getManagementAnalytics);
+router.post('/bulk-import', verifyToken, requireRole(['admin']), managementController.bulkCreateBatchFromExcel);
+router.post('/terminate-user', verifyToken, requireRole(['admin']), managementController.terminateUser);
+router.post('/terminate-batch', verifyToken, requireRole(['admin']), managementController.terminateBatch);
 
 // Warden Student Approvals
 router.get('/debug-db', userController.debugDB);
