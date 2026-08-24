@@ -446,10 +446,35 @@ import { ComplaintService } from '../../services/complaint.service';
                 <input type="password" class="form-input" [(ngModel)]="createForm.password" name="password" required placeholder="Set password" />
               </div>
               <div class="form-group">
+                <label class="form-label">Phone Number (Optional)</label>
+                <input type="text" class="form-input" [(ngModel)]="createForm.phone" name="phone" placeholder="e.g. 9876543210" />
+              </div>
+              <div class="form-group">
                 <label class="form-label">Role</label>
                 <select class="form-input" [(ngModel)]="createForm.role" name="role">
                   <option value="staff">Maintenance Staff</option>
                   <option value="warden">Warden</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Trade / Category</label>
+                <select class="form-input" [(ngModel)]="createForm.bio" name="bio">
+                  <option value="Electrician">Electrician</option>
+                  <option value="Plumber">Plumber</option>
+                  <option value="Cleaner">Cleaner</option>
+                  <option value="Carpenter">Carpenter</option>
+                  <option value="Security Guard">Security Guard</option>
+                  <option value="Hostel Warden">Hostel Warden</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Assigned Hostel Area</label>
+                <select class="form-input" [(ngModel)]="createForm.hostelBlock" name="hostelBlock">
+                  <option value="All Hostels">All Hostels</option>
+                  <option value="Boys Hostel B-1">Boys Hostel B-1</option>
+                  <option value="Boys Hostel B-2">Boys Hostel B-2</option>
+                  <option value="Girls Hostel G-1">Girls Hostel G-1</option>
+                  <option value="Girls Hostel G-2">Girls Hostel G-2</option>
                 </select>
               </div>
               <button type="submit" class="btn btn-primary" style="margin-top: 10px;">🚀 Create Account Now</button>
@@ -627,7 +652,7 @@ export class AdminDashboardComponent implements OnInit {
   newTaskStaffId: number | null = null;
   newTaskPriority = 'medium';
 
-  createForm = { name: '', email: '', password: '', role: 'staff' };
+  createForm = { name: '', email: '', password: '', role: 'staff', phone: '', bio: 'Electrician', hostelBlock: 'All Hostels' };
 
   constructor(
     private authService: AuthService,
@@ -893,13 +918,17 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   onCreateSubmit(): void {
+    if (!this.createForm.name || !this.createForm.email || !this.createForm.password) {
+      alert('Please fill out Name, Email, and Password.');
+      return;
+    }
     this.complaintService.createStaffAccount(this.createForm).subscribe({
       next: (res: any) => {
-        alert('✅ Account created successfully!');
-        this.createForm = { name: '', email: '', password: '', role: 'staff' };
+        alert(`✅ ${res.message || 'Account created successfully!'}`);
+        this.createForm = { name: '', email: '', password: '', role: 'staff', phone: '', bio: 'Electrician', hostelBlock: 'All Hostels' };
         this.loadUsers();
       },
-      error: (err: any) => alert(`❌ ${err.error?.message || 'Failed to create account.'}`)
+      error: (err: any) => alert(`❌ ${err.error?.message || err.message || 'Failed to create account.'}`)
     });
   }
 

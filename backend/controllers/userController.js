@@ -54,7 +54,7 @@ exports.updateUserStatus = async (req, res) => {
 
 exports.createWardenOrStaff = async (req, res) => {
   try {
-    const { name, email, password, role, phone, bio } = req.body;
+    const { name, email, password, role, phone, bio, hostelBlock, gender, batch } = req.body;
 
     const userRole = role || 'staff';
     if (!['warden', 'staff', 'management'].includes(userRole)) {
@@ -74,8 +74,11 @@ exports.createWardenOrStaff = async (req, res) => {
       email,
       password: passwordHash,
       role: userRole,
-      phone,
-      bio: bio || (userRole === 'management' ? 'Management Team Member' : null),
+      phone: phone || '0000000000',
+      bio: bio || (userRole === 'warden' ? 'Hostel Warden' : 'Maintenance Staff'),
+      hostelBlock: hostelBlock || 'All Hostels',
+      gender: gender || 'male',
+      batch: batch || 'Staff',
       status: 'active'
     });
 
@@ -85,7 +88,7 @@ exports.createWardenOrStaff = async (req, res) => {
     });
   } catch (error) {
     console.error('Create User Error:', error);
-    res.status(500).json({ message: 'Internal server error creating user.' });
+    res.status(500).json({ message: error?.message || 'Internal server error creating user.' });
   }
 };
 
