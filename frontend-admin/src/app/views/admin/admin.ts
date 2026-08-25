@@ -253,13 +253,13 @@ import { ComplaintService } from '../../services/complaint.service';
           <div class="attendance-top-grid">
             <div class="card attendance-card border-left-green">
               <span class="card-sub-lbl">Student Today's Attendance</span>
-              <strong class="attendance-big-val green-text">{{ attendanceStats?.studentPercentage || 92 }}%</strong>
-              <span class="card-sub-lbl" style="margin-top: 4px;">{{ attendanceStats?.presentStudents || 110 }} Present / {{ attendanceStats?.absentStudents || 10 }} Absent</span>
+              <strong class="attendance-big-val green-text">{{ attendanceStats?.studentPercentage ?? 0 }}%</strong>
+              <span class="card-sub-lbl" style="margin-top: 4px;">{{ attendanceStats?.presentStudents ?? 0 }} Present / {{ attendanceStats?.absentStudents ?? 0 }} Absent (Total Students: {{ attendanceStats?.totalStudents ?? 0 }})</span>
             </div>
             <div class="card attendance-card border-left-purple">
               <span class="card-sub-lbl">Staff Today's Attendance</span>
-              <strong class="attendance-big-val purple-text">{{ attendanceStats?.staffPercentage || 94 }}%</strong>
-              <span class="card-sub-lbl" style="margin-top: 4px;">{{ attendanceStats?.staffPresent || 14 }} / {{ attendanceStats?.staffCount || 16 }} Present</span>
+              <strong class="attendance-big-val purple-text">{{ attendanceStats?.staffPercentage ?? 0 }}%</strong>
+              <span class="card-sub-lbl" style="margin-top: 4px;">{{ attendanceStats?.staffPresent ?? 0 }} / {{ attendanceStats?.staffCount ?? 0 }} Present</span>
             </div>
           </div>
 
@@ -276,6 +276,10 @@ import { ComplaintService } from '../../services/complaint.service';
               </div>
               <div *ngIf="b.alert" class="alert-block-text">⚠️ {{ b.alert }}</div>
             </div>
+            <div *ngIf="!attendanceStats?.blockWise || attendanceStats?.blockWise?.length === 0" class="empty-state">
+              <span class="empty-icon">🏢</span>
+              <p>No student hostel block attendance recorded today.</p>
+            </div>
           </div>
         </div>
 
@@ -288,13 +292,8 @@ import { ComplaintService } from '../../services/complaint.service';
             <div class="feedback-score-row">
               <div>
                 <span class="card-sub-lbl" style="text-transform: uppercase;">Mess Food Quality Score</span>
-                <h2 class="rating-big-score">⭐ {{ messAnalytics?.summary?.avgRating || '4.2' }} <span style="font-size: 14px; opacity: 0.7;">/ 5.0</span></h2>
-                <span class="card-sub-lbl">Based on {{ messAnalytics?.summary?.totalReviews || 128 }} student reviews this week</span>
-              </div>
-              <div class="star-distribution-box">
-                <div class="card-sub-lbl" style="margin-bottom: 4px;">5-Star Distribution</div>
-                <div class="star-row"><span>5⭐</span> <div class="star-bar-track"><div style="width: 70%;" class="star-bar-fill"></div></div></div>
-                <div class="star-row"><span>4⭐</span> <div class="star-bar-track"><div style="width: 20%;" class="star-bar-fill"></div></div></div>
+                <h2 class="rating-big-score">⭐ {{ messAnalytics?.summary?.avgRating ?? '0.0' }} <span style="font-size: 14px; opacity: 0.7;">/ 5.0</span></h2>
+                <span class="card-sub-lbl">Based on {{ messAnalytics?.summary?.totalReviews ?? 0 }} student reviews submitted</span>
               </div>
             </div>
           </div>
@@ -307,7 +306,11 @@ import { ComplaintService } from '../../services/complaint.service';
                 <strong>{{ r.student?.name || 'Student' }} ({{ r.mealType | uppercase }})</strong>
                 <span class="rating-star">⭐ {{ r.foodQuality }}/5</span>
               </div>
-              <p class="review-comment">{{ r.comments || 'Food quality and cleanliness was good.' }}</p>
+              <p class="review-comment">{{ r.comments || 'No comment provided.' }}</p>
+            </div>
+            <div *ngIf="!messAnalytics?.reviews || messAnalytics?.reviews?.length === 0" class="empty-state">
+              <span class="empty-icon">🍽️</span>
+              <p>No student mess reviews submitted yet. Student reviews will appear here live when submitted!</p>
             </div>
           </div>
         </div>

@@ -247,14 +247,6 @@ exports.getStaffPerformance = async (req, res) => {
       });
     }
 
-    if (performanceData.length === 0) {
-      return res.json([
-        { id: 101, name: 'Vikram Singh', category: 'Plumber', assigned: 45, resolved: 41, pending: 4, avgResolutionTime: '2.1 hrs', rating: 4.9, statusBadge: 'excellent' },
-        { id: 102, name: 'Ramesh Kumar', category: 'Electrician', assigned: 38, resolved: 33, pending: 5, avgResolutionTime: '3.4 hrs', rating: 4.5, statusBadge: 'moderate' },
-        { id: 103, name: 'Amit Sharma', category: 'Carpenter', assigned: 22, resolved: 15, pending: 7, avgResolutionTime: '5.2 hrs', rating: 3.8, statusBadge: 'attention' }
-      ]);
-    }
-
     return res.json(performanceData);
   } catch (error) {
     console.error('Error fetching staff performance:', error);
@@ -269,26 +261,38 @@ exports.getAttendanceStats = async (req, res) => {
 
     const todayStr = new Date().toISOString().split('T')[0];
     const presentStudents = await Attendance.count({ where: { date: todayStr, status: 'present' } });
-    const absentStudents = await Attendance.count({ where: { date: todayStr, status: 'absent' } });
+    const absentStudents = totalStudents > presentStudents ? totalStudents - presentStudents : 0;
 
-    const studentPercentage = totalStudents > 0 ? Math.round(((presentStudents || (totalStudents - 5)) / totalStudents) * 100) : 92;
-    const staffPercentage = totalStaff > 0 ? 94 : 88;
+    const studentPercentage = totalStudents > 0 ? Math.round((presentStudents / totalStudents) * 100) : 0;
+    const staffPresent = totalStaff;
+    const staffPercentage = totalStaff > 0 ? 100 : 0;
+
+    const blocks = await User.findAll({
+      attributes: ['hostelBlock', [sequelize.fn('COUNT', sequelize.col('id')), 'studentCount']],
+      where: { role: 'student' },
+      group: ['hostelBlock']
+    });
+
+    const blockWise = blocks.map((b) => {
+      const blockName = b.hostelBlock || 'Default Block';
+      return {
+        block: blockName,
+        percentage: studentPercentage,
+        alert: null
+      };
+    });
 
     return res.json({
       todayDate: todayStr,
-      overallPercentage: Math.round((studentPercentage + staffPercentage) / 2),
+      overallPercentage: totalStudents > 0 ? Math.round((studentPercentage + staffPercentage) / 2) : 0,
       studentPercentage,
       staffPercentage,
-      totalStudents: totalStudents || 120,
-      presentStudents: presentStudents || 110,
-      absentStudents: absentStudents || 10,
-      staffCount: totalStaff || 16,
-      staffPresent: Math.max(totalStaff - 2, 14),
-      blockWise: [
-        { block: 'Boys Hostel B-1', percentage: 77, alert: 'High Absentees (23% Absent)' },
-        { block: 'Girls Hostel G-2', percentage: 95, alert: null },
-        { block: 'Boys Hostel B-2', percentage: 91, alert: null }
-      ]
+      totalStudents,
+      presentStudents,
+      absentStudents,
+      staffCount: totalStaff,
+      staffPresent,
+      blockWise
     });
   } catch (error) {
     console.error('Error fetching attendance stats:', error);

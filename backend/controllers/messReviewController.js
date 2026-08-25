@@ -44,19 +44,15 @@ exports.getMessAnalytics = async (req, res) => {
       totalQualitySum += q;
     }
 
-    const defaultReviews = [
-      { id: 1, mealType: 'lunch', foodQuality: 5, hygiene: 5, cleanliness: 5, comments: 'Food quality and paneer curry was excellent today!', student: { name: 'Rahul Kumar', roomNumber: '102', hostelBlock: 'Boys Hostel B-1' } },
-      { id: 2, mealType: 'dinner', foodQuality: 4, hygiene: 4, cleanliness: 4, comments: 'Roti was fresh and hot. Cleanliness in mess hall is great.', student: { name: 'Priya Sharma', roomNumber: '204', hostelBlock: 'Girls Hostel G-1' } },
-      { id: 3, mealType: 'breakfast', foodQuality: 4, hygiene: 5, cleanliness: 4, comments: 'South Indian breakfast with sambar chutney was very tasty.', student: { name: 'Amit Patel', roomNumber: '305', hostelBlock: 'Boys Hostel B-2' } }
-    ];
+    const avgRating = totalReviews > 0 ? (totalQualitySum / totalReviews).toFixed(1) : '0.0';
 
     return res.json({
       summary: {
-        totalReviews: totalReviews || 128,
+        totalReviews,
         avgRating,
-        ratingDistribution: totalReviews > 0 ? ratingDistribution : { 5: 78, 4: 34, 3: 10, 2: 4, 1: 2 }
+        ratingDistribution
       },
-      reviews: reviews && reviews.length > 0 ? reviews : defaultReviews
+      reviews
     });
   } catch (error) {
     console.error('Error fetching mess analytics:', error);
