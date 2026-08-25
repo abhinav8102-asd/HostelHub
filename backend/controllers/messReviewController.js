@@ -1,4 +1,4 @@
-const { MessReview, User, sequelize } = require('../models');
+const { MessReview, MessFeedback, User } = require('../models');
 
 // Submit student mess review
 exports.submitMessReview = async (req, res) => {
@@ -22,24 +22,49 @@ exports.submitMessReview = async (req, res) => {
   }
 };
 
-// Get Mess Review Analytics & Reviews List
+// Get Mess Review Analytics & Reviews List (Aggregating both MessFeedback & MessReview)
 exports.getMessAnalytics = async (req, res) => {
   try {
-    const reviews = await MessReview.findAll({
+    const feedbackList = await MessFeedback.findAll({
       include: [{ model: User, as: 'student', attributes: ['name', 'email', 'roomNumber', 'hostelBlock'] }],
       order: [['createdAt', 'DESC']],
       limit: 50
     });
 
-    const totalReviews = await MessReview.count();
-    
-    // Rating distribution (1 to 5 stars)
-    const ratingDistribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-    let totalQualitySum = 0;
+    const reviewsList = await MessReview.findAll({
+      include: [{ model: User, as: 'student', attributes: ['name', 'email', 'roomNumber', 'hostelBlock'] }],
+      order: [['createdAt', 'DESC']],
+      limit: 50
+    });
 
-    const allReviews = await MessReview.findAll({ attributes: ['foodQuality'] });
+    const normalizedFeedbacks = feedbackList.map(f => ({
+      id: f.id,
+      mealType: f.mealType,
+      foodQuality: f.rating,
+      comments: f.comment,
+      student: f.student,
+      createdAt: f.createdAt
+    }));
+
+    const normalizedReviews = reviewsList.map(r => ({
+      id: r.id,
+      mealType: r.mealType,
+      foodQuality: r.foodQuality,
+      comments: r.comments,
+      student: r.student,
+      createdAt: r.createdAt
+    }));
+
+    const allReviews = [...normalizedFeedbacks, ...normalizedReviews].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    const totalReviews = allReviews.length;
+    let totalQualitySum = 0;
+    const ratingDistribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+
     for (const r of allReviews) {
-      const q = Math.min(Math.max(r.foodQuality, 1), 5);
+      const q = Math.min(Math.max(Number(r.foodQuality) || 5, 1), 5);
       ratingDistribution[q] = (ratingDistribution[q] || 0) + 1;
       totalQualitySum += q;
     }
@@ -52,7 +77,7 @@ exports.getMessAnalytics = async (req, res) => {
         avgRating,
         ratingDistribution
       },
-      reviews
+      reviews: allReviews
     });
   } catch (error) {
     console.error('Error fetching mess analytics:', error);

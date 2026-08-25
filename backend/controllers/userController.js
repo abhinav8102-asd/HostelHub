@@ -212,6 +212,34 @@ exports.debugDB = async (req, res) => {
   }
 };
 
+exports.updateUserDetails = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { name, email, phone, role, bio, hostelBlock, status, roomNumber } = req.body;
+
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (phone !== undefined) user.phone = phone;
+    if (role) user.role = role;
+    if (bio !== undefined) user.bio = bio;
+    if (hostelBlock !== undefined) user.hostelBlock = hostelBlock;
+    if (status) user.status = status;
+    if (roomNumber !== undefined) user.roomNumber = roomNumber;
+
+    await user.save();
+
+    res.status(200).json({ message: 'User details updated successfully!', user });
+  } catch (error) {
+    console.error('Update User Error:', error);
+    res.status(500).json({ message: error?.message || 'Failed to update user details.' });
+  }
+};
+
 exports.getStaffPerformance = async (req, res) => {
   try {
     const staffMembers = await User.findAll({
@@ -222,12 +250,33 @@ exports.getStaffPerformance = async (req, res) => {
     const performanceData = [];
     for (const staff of staffMembers) {
       const assigned = await Complaint.count({ where: { staffId: staff.id } });
-      const resolved = await Complaint.count({ where: { staffId: staff.id, status: 'resolved' } });
+      const resolvedComplaints = await Complaint.findAll({
+        where: { staffId: staff.id, status: 'resolved' },
+        attributes: ['createdAt', 'updatedAt', 'feedbackRating']
+      });
+      const resolved = resolvedComplaints.length;
       const pending = await Complaint.count({ where: { staffId: staff.id, status: { [Op.ne]: 'resolved' } } });
 
       const category = staff.bio || 'Maintenance';
-      const avgResolutionTime = resolved > 0 ? '2.5 hrs' : '3.1 hrs';
-      const rating = resolved > 5 ? 4.8 : (resolved > 0 ? 4.5 : 4.2);
+
+      let avgResolutionTime = 'N/A';
+      if (resolved > 0) {
+        let totalMs = 0;
+        resolvedComplaints.forEach(c => {
+          const diffMs = new Date(c.updatedAt).getTime() - new Date(c.createdAt).getTime();
+          totalMs += Math.max(diffMs, 0);
+        });
+        const avgHours = (totalMs / resolved / (1000 * 60 * 60)).toFixed(1);
+        avgResolutionTime = `${avgHours} hrs`;
+      }
+
+      let rating = '0.0';
+      const ratedComplaints = resolvedComplaints.filter(c => c.feedbackRating && c.feedbackRating > 0);
+      if (ratedComplaints.length > 0) {
+        const sumRating = ratedComplaints.reduce((acc, c) => acc + c.feedbackRating, 0);
+        rating = (sumRating / ratedComplaints.length).toFixed(1);
+      }
+
       let statusBadge = 'excellent';
       if (pending > 3) statusBadge = 'moderate';
       if (pending > 6) statusBadge = 'attention';

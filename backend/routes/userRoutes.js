@@ -8,6 +8,7 @@ const managementController = require('../controllers/managementController');
 router.get('/staff', verifyToken, requireRole(['warden', 'admin']), userController.getStaffList);
 router.get('/all', verifyToken, requireRole(['admin']), userController.getAllUsers);
 router.put('/status/:userId', verifyToken, requireRole(['admin']), userController.updateUserStatus);
+router.put('/edit/:userId', verifyToken, requireRole(['admin']), userController.updateUserDetails);
 router.post('/create-staff-warden', verifyToken, requireRole(['admin']), userController.createWardenOrStaff);
 router.get('/wardens', verifyToken, userController.getWardenList);
 router.delete('/delete/:userId', verifyToken, requireRole(['admin']), userController.deleteUser);

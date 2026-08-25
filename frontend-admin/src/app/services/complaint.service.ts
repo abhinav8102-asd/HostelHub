@@ -95,6 +95,11 @@ export class ComplaintService {
     });
   }
 
+  updateUserDetails(userId: number, data: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/users/edit/${userId}`, data, {
+      headers: this.authService.getJsonHeaders()
+    });
+  }
 
   createStaffOrWarden(userData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/users/create-staff-warden`, userData, {
@@ -102,10 +107,22 @@ export class ComplaintService {
     });
   }
 
-  // Announcements
+  // Announcements / Notices
   getAnnouncements(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/announcements/list`, {
       headers: this.authService.getNoCacheHeaders()
+    });
+  }
+
+  createAnnouncement(formData: FormData): Observable<any> {
+    return this.http.post(`${this.apiUrl}/announcements/create`, formData, {
+      headers: this.authService.getAuthHeaders()
+    });
+  }
+
+  deleteAnnouncement(announcementId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/announcements/delete/${announcementId}`, {
+      headers: this.authService.getAuthHeaders()
     });
   }
 

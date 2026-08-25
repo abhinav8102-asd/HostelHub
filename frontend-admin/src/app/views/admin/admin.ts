@@ -45,6 +45,7 @@ import { ComplaintService } from '../../services/complaint.service';
           <button (click)="switchTab('performance')" [class.active]="activeTab === 'performance'">👨‍🔧 Staff Stats</button>
           <button (click)="switchTab('attendance')" [class.active]="activeTab === 'attendance'">🕒 Attendance</button>
           <button (click)="switchTab('feedback')" [class.active]="activeTab === 'feedback'">⭐ Reviews & Mess</button>
+          <button (click)="switchTab('notices')" [class.active]="activeTab === 'notices'">📢 Notices</button>
           <button (click)="switchTab('activity')" [class.active]="activeTab === 'activity'">📜 Activity Log</button>
           <button (click)="switchTab('alerts')" [class.active]="activeTab === 'alerts'">🚨 Alerts Hub</button>
           <button (click)="switchTab('users')" [class.active]="activeTab === 'users'">👥 Students & Users</button>
@@ -238,7 +239,10 @@ import { ComplaintService } from '../../services/complaint.service';
                       <span *ngIf="s.statusBadge==='moderate' || (s.resolved < s.pending && s.pending > 0)" class="status-tag status-moderate">MODERATE</span>
                       <span *ngIf="s.statusBadge==='attention'" class="status-tag status-attention">NEEDS ATTENTION</span>
                     </td>
-                    <td><button class="btn btn-secondary" (click)="openStaffDetail(s); $event.stopPropagation();" style="padding: 4px 8px; font-size: 11px;">View Profile 👤</button></td>
+                    <td>
+                      <button class="btn btn-secondary" (click)="openStaffDetail(s); $event.stopPropagation();" style="padding: 4px 8px; font-size: 11px;">View Profile 👤</button>
+                      <button class="btn btn-secondary" (click)="openEditUserModal(s); $event.stopPropagation();" style="padding: 4px 8px; font-size: 11px; margin-left: 4px;">Edit ✏️</button>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -358,6 +362,67 @@ import { ComplaintService } from '../../services/complaint.service';
           </div>
         </div>
 
+        <!-- NOTICES & BROADCASTS TAB -->
+        <div *ngIf="activeTab === 'notices'" class="tab-panel animate-fade">
+          <h4 class="page-title">📢 Official Notices & Broadcasts</h4>
+
+          <!-- Create Notice Form -->
+          <div class="card shadow-card" style="margin-bottom: 20px;">
+            <h5 class="card-section-title">Broadcast New Official Notice</h5>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div>
+                <label class="form-label">Notice Title</label>
+                <input type="text" class="form-input" [(ngModel)]="newNotice.title" placeholder="e.g. Water Supply Maintenance Schedule" />
+              </div>
+              <div>
+                <label class="form-label">Notice Content / Description</label>
+                <textarea class="form-input" rows="3" [(ngModel)]="newNotice.content" placeholder="Type official notice details here..."></textarea>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div>
+                  <label class="form-label">Target Hostel Block</label>
+                  <select class="form-input" [(ngModel)]="newNotice.hostelBlock">
+                    <option value="All Hostels">All Hostel Blocks</option>
+                    <option value="Boys Hostel B-1">Boys Hostel B-1</option>
+                    <option value="Boys Hostel B-2">Boys Hostel B-2</option>
+                    <option value="Girls Hostel G-1">Girls Hostel G-1</option>
+                    <option value="Girls Hostel G-2">Girls Hostel G-2</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="form-label">Attachment Image (Optional)</label>
+                  <input type="file" accept="image/*" (change)="onNoticePhotoSelected($event)" style="font-size: 12px; width: 100%;" />
+                </div>
+              </div>
+              <button class="btn btn-primary" (click)="postNotice()" [disabled]="!newNotice.title || !newNotice.content">
+                📢 Broadcast Notice Now
+              </button>
+            </div>
+          </div>
+
+          <!-- All Active Notices Stream -->
+          <div class="card shadow-card">
+            <h5 class="card-section-title">All Broadcasted Notices</h5>
+            <div *ngFor="let notice of announcementsList" class="card complaint-card-item" style="margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                  <span class="ticket-badge">📢 Notice #{{ notice.id }}</span>
+                  <h5 class="complaint-item-title" style="margin-top: 4px;">{{ notice.title }}</h5>
+                  <span class="card-sub-lbl">Target: <strong>{{ notice.hostelBlock || 'All Hostels' }}</strong> | Posted on {{ notice.createdAt | date:'medium' }}</span>
+                </div>
+                <button class="btn btn-delete-user" (click)="deleteNotice(notice.id)" style="width: auto; padding: 4px 8px; font-size: 11px;">Delete 🗑️</button>
+              </div>
+              <p class="complaint-desc-text" style="margin-top: 8px;">{{ notice.content }}</p>
+              <img *ngIf="notice.photoUrl" [src]="'https://hostelhub-0cyi.onrender.com' + notice.photoUrl" style="max-width: 100%; max-height: 200px; border-radius: 8px; margin-top: 8px; object-fit: cover;" />
+            </div>
+
+            <div *ngIf="announcementsList.length === 0" class="empty-state">
+              <span class="empty-icon">📢</span>
+              <p>No official notices broadcasted yet.</p>
+            </div>
+          </div>
+        </div>
+
         <!-- 6. LIVE ACTIVITY FEED -->
         <div *ngIf="activeTab === 'activity'" class="tab-panel animate-fade">
           <h4 class="page-title">📜 Live System Activity Feed</h4>
@@ -454,7 +519,10 @@ import { ComplaintService } from '../../services/complaint.service';
                 <strong class="font-bold">{{ u.name }}</strong>
                 <span class="card-sub-lbl" style="display: block;">{{ u.email }} | {{ u.role | uppercase }} | Block: {{ u.hostelBlock || 'All' }}</span>
               </div>
-              <button class="btn btn-delete-user" (click)="deleteUser(u.id)" style="width: auto; padding: 6px 12px; font-size: 11px;">Delete</button>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-secondary" (click)="openEditUserModal(u)" style="width: auto; padding: 6px 12px; font-size: 11px;">Edit ✏️</button>
+                <button class="btn btn-delete-user" (click)="deleteUser(u.id)" style="width: auto; padding: 6px 12px; font-size: 11px;">Delete</button>
+              </div>
             </div>
           </div>
         </div>
@@ -696,6 +764,71 @@ import { ComplaintService } from '../../services/complaint.service';
       </div>
     </div>
 
+    <!-- INTERACTIVE EDIT USER MODAL -->
+    <div *ngIf="showEditUserModal && selectedUserForEdit" class="modal-overlay animate-fade">
+      <div class="modal-card" style="max-width: 500px;">
+        <div class="modal-header">
+          <h3 style="margin: 0; font-size: 16px;">✏️ Edit User Details (ID #{{ selectedUserForEdit.id }})</h3>
+          <button class="close-btn" (click)="closeEditUserModal()">✕</button>
+        </div>
+        <div class="modal-body-scroll">
+          <form (ngSubmit)="saveUserEdit()">
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input type="text" class="form-input" [(ngModel)]="editUserForm.name" name="editName" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input type="email" class="form-input" [(ngModel)]="editUserForm.email" name="editEmail" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone Number</label>
+              <input type="text" class="form-input" [(ngModel)]="editUserForm.phone" name="editPhone" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Role</label>
+              <select class="form-input" [(ngModel)]="editUserForm.role" name="editRole">
+                <option value="student">Student</option>
+                <option value="staff">Maintenance Staff</option>
+                <option value="warden">Warden</option>
+                <option value="admin">Administrator</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Trade / Category / Bio</label>
+              <input type="text" class="form-input" [(ngModel)]="editUserForm.bio" name="editBio" placeholder="e.g. Electrician, Plumber, Hostel Warden" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hostel Block</label>
+              <select class="form-input" [(ngModel)]="editUserForm.hostelBlock" name="editHostelBlock">
+                <option value="All Hostels">All Hostels</option>
+                <option value="Boys Hostel B-1">Boys Hostel B-1</option>
+                <option value="Boys Hostel B-2">Boys Hostel B-2</option>
+                <option value="Girls Hostel G-1">Girls Hostel G-1</option>
+                <option value="Girls Hostel G-2">Girls Hostel G-2</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Room Number (Students)</label>
+              <input type="text" class="form-input" [(ngModel)]="editUserForm.roomNumber" name="editRoomNumber" placeholder="e.g. 102" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Account Status</label>
+              <select class="form-input" [(ngModel)]="editUserForm.status" name="editStatus">
+                <option value="active">Active</option>
+                <option value="suspended">Suspended</option>
+                <option value="terminated">Terminated</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top: 12px;" [disabled]="savingUserEdit">
+              <span *ngIf="savingUserEdit">Saving Changes...</span>
+              <span *ngIf="!savingUserEdit">💾 Save Changes Now</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
   `,
   styles: [`
     .dashboard-container { padding: 16px; max-width: 1200px; margin: 0 auto; font-family: var(--font-sans); }
@@ -885,6 +1018,16 @@ export class AdminDashboardComponent implements OnInit {
   selectedAttendanceMonth = new Date().toISOString().slice(0, 7);
   monthlyAttendanceReport: any = null;
 
+  // Edit User Modal State
+  showEditUserModal = false;
+  selectedUserForEdit: any = null;
+  editUserForm = { name: '', email: '', phone: '', role: 'student', bio: '', hostelBlock: 'All Hostels', roomNumber: '', status: 'active' };
+  savingUserEdit = false;
+
+  // Notices State
+  announcementsList: any[] = [];
+  newNotice = { title: '', content: '', hostelBlock: 'All Hostels', photoFile: null as File | null };
+
   onRoleChange(): void {
     if (this.createForm.role === 'warden') {
       this.createForm.bio = 'Hostel Warden';
@@ -914,6 +1057,7 @@ export class AdminDashboardComponent implements OnInit {
     this.loadActivityLogs();
     this.loadStaffTasks();
     this.loadComplaints();
+    this.loadAnnouncementsList();
   }
 
   switchTab(tab: string): void {
@@ -1292,6 +1436,97 @@ export class AdminDashboardComponent implements OnInit {
         this.loadUsers();
       },
       error: (err: any) => alert(`❌ ${err.error?.message || 'Failed to delete user.'}`)
+    });
+  }
+
+  // Edit User Modal Handlers
+  openEditUserModal(user: any): void {
+    this.selectedUserForEdit = user;
+    this.editUserForm = {
+      name: user.name || '',
+      email: user.email || '',
+      phone: user.phone || '',
+      role: user.role || 'student',
+      bio: user.bio || user.category || '',
+      hostelBlock: user.hostelBlock || 'All Hostels',
+      roomNumber: user.roomNumber || '',
+      status: user.status || 'active'
+    };
+    this.showEditUserModal = true;
+    this.cdr.detectChanges();
+  }
+
+  closeEditUserModal(): void {
+    this.showEditUserModal = false;
+    this.selectedUserForEdit = null;
+    this.savingUserEdit = false;
+    this.cdr.detectChanges();
+  }
+
+  saveUserEdit(): void {
+    if (!this.selectedUserForEdit) return;
+    this.savingUserEdit = true;
+    this.complaintService.updateUserDetails(this.selectedUserForEdit.id, this.editUserForm).subscribe({
+      next: (res: any) => {
+        this.savingUserEdit = false;
+        alert('✅ User details updated successfully!');
+        this.closeEditUserModal();
+        this.loadUsers();
+        this.loadStaffPerformance();
+      },
+      error: (err: any) => {
+        this.savingUserEdit = false;
+        alert(`❌ ${err.error?.message || 'Failed to update user details.'}`);
+      }
+    });
+  }
+
+  // Notices Handlers
+  loadAnnouncementsList(): void {
+    this.complaintService.getAnnouncements().subscribe({
+      next: (res: any[]) => {
+        this.announcementsList = res;
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => console.error('Error fetching announcements:', err)
+    });
+  }
+
+  onNoticePhotoSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.newNotice.photoFile = file;
+    }
+  }
+
+  postNotice(): void {
+    if (!this.newNotice.title || !this.newNotice.content) return;
+    const formData = new FormData();
+    formData.append('title', this.newNotice.title);
+    formData.append('content', this.newNotice.content);
+    formData.append('hostelBlock', this.newNotice.hostelBlock);
+    if (this.newNotice.photoFile) {
+      formData.append('photo', this.newNotice.photoFile);
+    }
+
+    this.complaintService.createAnnouncement(formData).subscribe({
+      next: (res: any) => {
+        alert('📢 Notice broadcasted successfully!');
+        this.newNotice = { title: '', content: '', hostelBlock: 'All Hostels', photoFile: null };
+        this.loadAnnouncementsList();
+      },
+      error: (err: any) => alert(`❌ ${err.error?.message || 'Failed to post notice.'}`)
+    });
+  }
+
+  deleteNotice(announcementId: number): void {
+    if (!confirm('Are you sure you want to delete this notice?')) return;
+    this.complaintService.deleteAnnouncement(announcementId).subscribe({
+      next: () => {
+        alert('🗑️ Notice deleted successfully!');
+        this.loadAnnouncementsList();
+      },
+      error: (err: any) => alert(`❌ ${err.error?.message || 'Failed to delete notice.'}`)
     });
   }
 
