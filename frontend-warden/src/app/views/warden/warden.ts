@@ -2790,6 +2790,16 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
     this.attendanceSuccess = '';
     this.attendanceError = '';
 
+  // Load students and pre-fill attendance map with persistent absent roll-forward
+  loadDailyRollCall(): void {
+    this.isLoadingRollCall = true;
+    this.attendanceSuccess = '';
+    this.attendanceError = '';
+
+    const prevDate = new Date(this.rollCallDate);
+    prevDate.setDate(prevDate.getDate() - 1);
+    const prevDateStr = prevDate.toISOString().split('T')[0];
+
     // Load active students
     this.attendanceService.getStudents().subscribe({
       next: (students) => {
@@ -2801,20 +2811,37 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
           this.attendanceRemarksMap[s.id] = '';
         });
 
-        // Load existing summary for that date
-        this.attendanceService.getDailySummary(this.rollCallDate).subscribe({
-          next: (summaryRecords) => {
-            summaryRecords.forEach(rec => {
-              if (this.attendanceMarkMap[rec.studentId] !== undefined) {
-                this.attendanceMarkMap[rec.studentId] = rec.status;
-                this.attendanceRemarksMap[rec.studentId] = rec.remarks || '';
+        // First check previous day's attendance to roll forward 'absent' status
+        this.attendanceService.getDailySummary(prevDateStr).subscribe({
+          next: (prevRecords) => {
+            if (prevRecords && Array.isArray(prevRecords)) {
+              prevRecords.forEach(rec => {
+                if (rec.status === 'absent' && this.attendanceMarkMap[rec.studentId] !== undefined) {
+                  this.attendanceMarkMap[rec.studentId] = 'absent';
+                }
+              });
+            }
+
+            // Load existing summary for selected date
+            this.attendanceService.getDailySummary(this.rollCallDate).subscribe({
+              next: (summaryRecords) => {
+                summaryRecords.forEach(rec => {
+                  if (this.attendanceMarkMap[rec.studentId] !== undefined) {
+                    this.attendanceMarkMap[rec.studentId] = rec.status;
+                    this.attendanceRemarksMap[rec.studentId] = rec.remarks || '';
+                  }
+                });
+                this.isLoadingRollCall = false;
+                this.cdr.detectChanges();
+              },
+              error: (err) => {
+                console.error('Error fetching attendance summary:', err);
+                this.isLoadingRollCall = false;
+                this.cdr.detectChanges();
               }
             });
-            this.isLoadingRollCall = false;
-            this.cdr.detectChanges();
           },
-          error: (err) => {
-            console.error('Error fetching attendance summary:', err);
+          error: () => {
             this.isLoadingRollCall = false;
             this.cdr.detectChanges();
           }

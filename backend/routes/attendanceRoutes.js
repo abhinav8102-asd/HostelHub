@@ -7,6 +7,7 @@ const { verifyToken, requireRole } = require('../middleware/auth');
 router.get('/students', verifyToken, requireRole(['warden', 'admin']), attendanceController.getStudentsList);
 router.post('/mark', verifyToken, requireRole(['warden', 'admin']), attendanceController.markBulkAttendance);
 router.get('/summary', verifyToken, requireRole(['warden', 'admin']), attendanceController.getDailyAttendanceSummary);
+router.get('/monthly-report', verifyToken, requireRole(['warden', 'admin']), attendanceController.getMonthlyAttendanceReport);
 
 // Student routes
 router.get('/my-stats', verifyToken, requireRole(['student']), attendanceController.getStudentStats);

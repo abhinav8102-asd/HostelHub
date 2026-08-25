@@ -248,23 +248,66 @@ import { ComplaintService } from '../../services/complaint.service';
 
         <!-- 4. REAL-TIME ATTENDANCE ANALYTICS -->
         <div *ngIf="activeTab === 'attendance'" class="tab-panel animate-fade">
-          <h4 class="page-title">🕒 Real-Time Attendance Analytics</h4>
+          <h4 class="page-title">🕒 Student Attendance Analytics & Monthly Ledger</h4>
 
           <div class="attendance-top-grid">
             <div class="card attendance-card border-left-green">
-              <span class="card-sub-lbl">Student Today's Attendance</span>
+              <span class="card-sub-lbl">Student Today's Live Attendance</span>
               <strong class="attendance-big-val green-text">{{ attendanceStats?.studentPercentage ?? 0 }}%</strong>
-              <span class="card-sub-lbl" style="margin-top: 4px;">{{ attendanceStats?.presentStudents ?? 0 }} Present / {{ attendanceStats?.absentStudents ?? 0 }} Absent (Total Students: {{ attendanceStats?.totalStudents ?? 0 }})</span>
+              <span class="card-sub-lbl" style="margin-top: 4px;">{{ attendanceStats?.presentStudents ?? 0 }} Present / {{ attendanceStats?.absentStudents ?? 0 }} Absent (Total Active Students: {{ attendanceStats?.totalStudents ?? 0 }})</span>
             </div>
-            <div class="card attendance-card border-left-purple">
-              <span class="card-sub-lbl">Staff Today's Attendance</span>
-              <strong class="attendance-big-val purple-text">{{ attendanceStats?.staffPercentage ?? 0 }}%</strong>
-              <span class="card-sub-lbl" style="margin-top: 4px;">{{ attendanceStats?.staffPresent ?? 0 }} / {{ attendanceStats?.staffCount ?? 0 }} Present</span>
+          </div>
+
+          <!-- Monthly Attendance History Ledger Card -->
+          <div class="card shadow-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+              <div>
+                <h5 class="card-section-title" style="margin: 0;">📅 Student Monthly Attendance History Ledger</h5>
+                <span class="card-sub-lbl">View month-by-month present & absent day counts per student</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <label class="form-label" style="margin: 0;">Select Month:</label>
+                <input type="month" class="form-input" style="width: auto;" [(ngModel)]="selectedAttendanceMonth" (change)="loadMonthlyAttendanceReport()" />
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Student Name</th>
+                    <th>Room & Hostel Block</th>
+                    <th>Days Present</th>
+                    <th>Days Absent</th>
+                    <th>Outing Days</th>
+                    <th>Monthly Attendance %</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of monthlyAttendanceReport?.report">
+                    <td class="font-bold">{{ item.student?.name }}</td>
+                    <td>Room {{ item.student?.roomNumber || 'N/A' }} ({{ item.student?.hostelBlock || 'Block' }})</td>
+                    <td class="green-text font-bold">{{ item.presentDays }} days</td>
+                    <td class="red-text font-bold">{{ item.absentDays }} days</td>
+                    <td class="yellow-text">{{ item.outingDays }} days</td>
+                    <td>
+                      <span [class]="item.percentage >= 75 ? 'status-tag status-excellent' : 'status-tag status-attention'">
+                        {{ item.percentage }}%
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div *ngIf="!monthlyAttendanceReport?.report || monthlyAttendanceReport?.report?.length === 0" class="empty-state">
+              <span class="empty-icon">📅</span>
+              <p>No student attendance history recorded for {{ selectedAttendanceMonth }}.</p>
             </div>
           </div>
 
           <!-- Block-wise Attendance Card -->
-          <div class="card shadow-card">
+          <div class="card shadow-card" style="margin-top: 20px;">
             <h5 class="card-section-title">Hostel Block Breakdown</h5>
             <div *ngFor="let b of attendanceStats?.blockWise" class="block-attendance-item">
               <div class="block-att-header">
@@ -839,6 +882,9 @@ export class AdminDashboardComponent implements OnInit {
   showStaffDetailModal = false;
   selectedStaffDetail: any = null;
 
+  selectedAttendanceMonth = new Date().toISOString().slice(0, 7);
+  monthlyAttendanceReport: any = null;
+
   onRoleChange(): void {
     if (this.createForm.role === 'warden') {
       this.createForm.bio = 'Hostel Warden';
@@ -863,6 +909,7 @@ export class AdminDashboardComponent implements OnInit {
     this.loadUsers();
     this.loadStaffPerformance();
     this.loadAttendanceStats();
+    this.loadMonthlyAttendanceReport();
     this.loadMessAnalytics();
     this.loadActivityLogs();
     this.loadStaffTasks();
@@ -1040,6 +1087,16 @@ export class AdminDashboardComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err: any) => console.error('Error attendance stats:', err)
+    });
+  }
+
+  loadMonthlyAttendanceReport(): void {
+    this.complaintService.getMonthlyAttendanceReport(this.selectedAttendanceMonth).subscribe({
+      next: (res: any) => {
+        this.monthlyAttendanceReport = res;
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => console.error('Error monthly attendance report:', err)
     });
   }
 

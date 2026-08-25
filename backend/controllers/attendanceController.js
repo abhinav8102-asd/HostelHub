@@ -107,11 +107,59 @@ exports.getStudentStats = async (req, res) => {
     });
 
     // Percentage of attendance (present / (total - outings) or simply present / total, let's do present / total for standard percentage)
-    summary.percentage = summary.total ? Math.round((summary.present / summary.total) * 100) : 100;
+// 5. Get Monthly Attendance Report for all Students (Admin / Warden)
+exports.getMonthlyAttendanceReport = async (req, res) => {
+  try {
+    const { month } = req.query; // Format: 'YYYY-MM' e.g. '2026-08'
+    const targetMonth = month || new Date().toISOString().slice(0, 7);
+    const { Op } = require('sequelize');
 
-    res.status(200).json({ summary, history: attendances });
+    const students = await User.findAll({
+      where: { role: 'student', status: 'active' },
+      attributes: ['id', 'name', 'email', 'roomNumber', 'hostelBlock', 'batch'],
+      order: [['name', 'ASC']]
+    });
+
+    const monthAttendances = await Attendance.findAll({
+      where: {
+        date: {
+          [Op.like]: `${targetMonth}%`
+        }
+      }
+    });
+
+    const report = students.map(student => {
+      const studentRecords = monthAttendances.filter(a => a.studentId === student.id);
+      const presentDays = studentRecords.filter(a => a.status === 'present').length;
+      const absentDays = studentRecords.filter(a => a.status === 'absent').length;
+      const outingDays = studentRecords.filter(a => a.status === 'outing').length;
+      const recordedDays = studentRecords.length;
+      const percentage = recordedDays > 0 ? Math.round((presentDays / recordedDays) * 100) : 100;
+
+      return {
+        student: {
+          id: student.id,
+          name: student.name,
+          email: student.email,
+          roomNumber: student.roomNumber,
+          hostelBlock: student.hostelBlock,
+          batch: student.batch
+        },
+        presentDays,
+        absentDays,
+        outingDays,
+        recordedDays,
+        percentage
+      };
+    });
+
+    res.status(200).json({
+      month: targetMonth,
+      totalStudents: students.length,
+      report
+    });
   } catch (error) {
-    console.error('Error fetching student attendance stats:', error);
-    res.status(500).json({ message: 'Error retrieving student attendance statistics.' });
+    console.error('Error fetching monthly attendance report:', error);
+    res.status(500).json({ message: 'Error generating monthly attendance report.' });
   }
 };

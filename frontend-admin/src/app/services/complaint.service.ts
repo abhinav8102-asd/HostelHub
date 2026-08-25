@@ -283,6 +283,12 @@ export class ComplaintService {
     });
   }
 
+  getMonthlyAttendanceReport(monthStr: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/attendance/monthly-report?month=${monthStr}`, {
+      headers: this.authService.getAuthHeaders()
+    });
+  }
+
   getMessAnalytics(): Observable<any> {
     return this.http.get(`${this.apiUrl}/mess-reviews/analytics`, {
       headers: this.authService.getAuthHeaders()
