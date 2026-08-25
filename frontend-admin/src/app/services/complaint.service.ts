@@ -196,33 +196,9 @@ export class ComplaintService {
     });
   }
 
-  getFooterSettings(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/settings/footer`, {
-      headers: this.authService.getAuthHeaders()
-    });
-  }
-
-  updateFooterSettings(settings: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/settings/footer`, settings, {
-      headers: this.authService.getJsonHeaders()
-    });
-  }
-
   getWardenList(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/users/wardens`, {
       headers: this.authService.getAuthHeaders()
-    });
-  }
-
-  getPublicSettings(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/settings/public`, {
-      headers: this.authService.getAuthHeaders()
-    });
-  }
-
-  updatePublicSettings(settings: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/settings/public`, settings, {
-      headers: this.authService.getJsonHeaders()
     });
   }
 

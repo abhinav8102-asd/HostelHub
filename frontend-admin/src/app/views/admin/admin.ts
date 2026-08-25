@@ -1506,7 +1506,7 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  createTaskSubmit(): void {
+  createStaffTask(): void {
     if (!this.newTaskTitle) {
       alert('Please enter a task title.');
       return;
