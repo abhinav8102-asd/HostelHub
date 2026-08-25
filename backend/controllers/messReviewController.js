@@ -25,32 +25,42 @@ exports.submitMessReview = async (req, res) => {
 // Get Mess Review Analytics & Reviews List (Aggregating both MessFeedback & MessReview)
 exports.getMessAnalytics = async (req, res) => {
   try {
-    const feedbackList = await MessFeedback.findAll({
-      include: [{ model: User, as: 'student', attributes: ['name', 'email', 'roomNumber', 'hostelBlock'] }],
-      order: [['createdAt', 'DESC']],
-      limit: 50
-    });
+    let feedbackList = [];
+    try {
+      feedbackList = await MessFeedback.findAll({
+        include: [{ model: User, as: 'student', attributes: ['name', 'email', 'roomNumber', 'hostelBlock'] }],
+        order: [['createdAt', 'DESC']],
+        limit: 100
+      });
+    } catch (e) {
+      console.error('Error fetching MessFeedback:', e);
+    }
 
-    const reviewsList = await MessReview.findAll({
-      include: [{ model: User, as: 'student', attributes: ['name', 'email', 'roomNumber', 'hostelBlock'] }],
-      order: [['createdAt', 'DESC']],
-      limit: 50
-    });
+    let reviewsList = [];
+    try {
+      reviewsList = await MessReview.findAll({
+        include: [{ model: User, as: 'student', attributes: ['name', 'email', 'roomNumber', 'hostelBlock'] }],
+        order: [['createdAt', 'DESC']],
+        limit: 100
+      });
+    } catch (e) {
+      console.error('Error fetching MessReview:', e);
+    }
 
-    const normalizedFeedbacks = feedbackList.map(f => ({
+    const normalizedFeedbacks = (feedbackList || []).map(f => ({
       id: f.id,
       mealType: f.mealType,
       foodQuality: f.rating,
-      comments: f.comment,
+      comments: f.comment || '',
       student: f.student,
       createdAt: f.createdAt
     }));
 
-    const normalizedReviews = reviewsList.map(r => ({
+    const normalizedReviews = (reviewsList || []).map(r => ({
       id: r.id,
       mealType: r.mealType,
       foodQuality: r.foodQuality,
-      comments: r.comments,
+      comments: r.comments || '',
       student: r.student,
       createdAt: r.createdAt
     }));
@@ -81,6 +91,6 @@ exports.getMessAnalytics = async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching mess analytics:', error);
-    return res.status(500).json({ message: 'Failed to fetch mess analytics.' });
+    return res.status(500).json({ message: 'Failed to fetch mess analytics: ' + error.message });
   }
 };

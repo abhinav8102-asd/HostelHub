@@ -1177,6 +1177,20 @@ export class AdminDashboardComponent implements OnInit {
 
   switchTab(tab: string): void {
     this.activeTab = tab;
+    if (tab === 'feedback') {
+      this.loadMessAnalytics();
+    } else if (tab === 'notices') {
+      this.loadAnnouncementsList();
+    } else if (tab === 'attendance') {
+      this.loadAttendanceStats();
+      this.loadMonthlyAttendanceReport();
+    } else if (tab === 'users') {
+      this.loadUsers();
+    } else if (tab === 'performance') {
+      this.loadStaffPerformance();
+    } else if (tab === 'settings') {
+      this.loadSystemSettings();
+    }
     this.cdr.detectChanges();
   }
 
