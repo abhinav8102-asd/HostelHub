@@ -107,7 +107,7 @@ exports.getFeedbackStats = async (req, res) => {
         }
       ],
       order: [['createdAt', 'DESC']],
-      limit: 100
+      limit: 5000
     });
 
     // Calculate average ratings
