@@ -127,6 +127,31 @@ export class ComplaintService {
     });
   }
 
+  // System Settings Management
+  getFooterSettings(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/settings/footer`, {
+      headers: this.authService.getNoCacheHeaders()
+    });
+  }
+
+  updateFooterSettings(data: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/settings/footer`, data, {
+      headers: this.authService.getJsonHeaders()
+    });
+  }
+
+  getPublicSettings(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/settings/public`, {
+      headers: this.authService.getNoCacheHeaders()
+    });
+  }
+
+  updatePublicSettings(data: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/settings/public`, data, {
+      headers: this.authService.getJsonHeaders()
+    });
+  }
+
   getStaffWorkload(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/complaints/staff-workload`, {
       headers: this.authService.getNoCacheHeaders()

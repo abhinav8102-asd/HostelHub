@@ -413,7 +413,7 @@ import { ComplaintService } from '../../services/complaint.service';
                 <button class="btn btn-delete-user" (click)="deleteNotice(notice.id)" style="width: auto; padding: 4px 8px; font-size: 11px;">Delete 🗑️</button>
               </div>
               <p class="complaint-desc-text" style="margin-top: 8px;">{{ notice.content }}</p>
-              <img *ngIf="notice.photoUrl" [src]="'https://hostelhub-0cyi.onrender.com' + notice.photoUrl" style="max-width: 100%; max-height: 200px; border-radius: 8px; margin-top: 8px; object-fit: cover;" />
+              <img *ngIf="notice.photoUrl" [src]="getImageUrl(notice.photoUrl)" style="max-width: 100%; max-height: 250px; border-radius: 12px; margin-top: 10px; object-fit: cover; border: 1px solid var(--border-color);" />
             </div>
 
             <div *ngIf="announcementsList.length === 0" class="empty-state">
@@ -542,26 +542,31 @@ import { ComplaintService } from '../../services/complaint.service';
                   <option [ngValue]="null">Select Staff Member</option>
                   <option *ngFor="let s of staffList" [value]="s.id">{{ s.name }} ({{ s.bio || 'Maintenance' }})</option>
                 </select>
-                <select class="form-input" style="flex: 1;" [(ngModel)]="newTaskPriority">
+                <select class="form-input" style="width: 140px;" [(ngModel)]="newTaskPriority">
                   <option value="low">Low Priority</option>
-                  <option value="medium">Medium Priority</option>
+                  <option value="medium">Medium</option>
                   <option value="high">High Priority</option>
                   <option value="urgent">URGENT</option>
                 </select>
               </div>
-              <button class="btn btn-primary" (click)="createTaskSubmit()">🚀 Dispatch Task Now</button>
+              <button class="btn btn-primary" (click)="createStaffTask()">🚀 Dispatch Task to Staff</button>
             </div>
           </div>
 
-          <!-- Dispatched Tasks List -->
+          <!-- All Dispatched Tasks Stream -->
           <div class="card shadow-card">
-            <h5 class="card-section-title">Dispatched Work Tasks</h5>
+            <h5 class="card-section-title">All Dispatched Maintenance Tasks</h5>
             <div *ngFor="let task of staffTasksList" class="task-item-row">
               <div>
-                <strong class="font-bold">{{ task.title }}</strong>
-                <span class="card-sub-lbl" style="display: block;">Assigned: {{ task.assignedStaff?.name || 'Staff' }} | Priority: {{ task.priority | uppercase }}</span>
+                <strong style="font-size: 13px;">{{ task.title }}</strong>
+                <span class="card-sub-lbl" style="display: block;">Assigned to: <strong>{{ task.assignedStaff?.name || 'Staff' }}</strong> | Priority: <strong [class]="'priority-' + task.priority">{{ task.priority | uppercase }}</strong></span>
+                <p style="margin: 4px 0 0 0; font-size: 12px; color: var(--text-secondary);">{{ task.description }}</p>
               </div>
-              <span class="status-tag status-excellent">{{ task.status | uppercase }}</span>
+              <span [class]="'status-tag status-' + task.status">{{ task.status | uppercase }}</span>
+            </div>
+            <div *ngIf="staffTasksList.length === 0" class="empty-state">
+              <span class="empty-icon">🗂️</span>
+              <p>No custom maintenance tasks dispatched yet.</p>
             </div>
           </div>
         </div>
@@ -628,12 +633,91 @@ import { ComplaintService } from '../../services/complaint.service';
           </div>
         </div>
 
-        <!-- SETTINGS TAB -->
+        <!-- SETTINGS TAB (FULL APP & FOOTER CONTENT MANAGEMENT) -->
         <div *ngIf="activeTab === 'settings'" class="tab-panel animate-fade">
-          <h4 class="page-title">⚙️ System Settings</h4>
-          <div class="card shadow-card">
-            <p class="card-sub-lbl">System settings and portal control center.</p>
+          <h4 class="page-title">⚙️ System Settings & App Content Control Center</h4>
+          <p class="card-sub-lbl" style="margin-bottom: 16px;">Edit User App Home Page overview, Footer contact details, and Developer Team info. All changes are saved permanently in PostgreSQL Database.</p>
+
+          <div *ngIf="settingsSaveSuccess" class="alert alert-success" style="margin-bottom: 14px;">{{ settingsSaveSuccess }}</div>
+          <div *ngIf="settingsSaveError" class="alert alert-danger" style="margin-bottom: 14px;">{{ settingsSaveError }}</div>
+
+          <!-- Section 1: User App Footer Details -->
+          <div class="card shadow-card" style="margin-bottom: 20px;">
+            <h5 class="card-section-title">📄 User App Footer Details</h5>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div>
+                <label class="form-label">Footer Header Text</label>
+                <input type="text" class="form-input" [(ngModel)]="systemFooterSettings.footer_text" placeholder="e.g. Hostel Maintenance & Support Portal" />
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div>
+                  <label class="form-label">Support Email</label>
+                  <input type="email" class="form-input" [(ngModel)]="systemFooterSettings.footer_email" placeholder="e.g. support@hostelhub.com" />
+                </div>
+                <div>
+                  <label class="form-label">Helpline Phone Number</label>
+                  <input type="text" class="form-input" [(ngModel)]="systemFooterSettings.footer_phone" placeholder="e.g. +91 98765 43210" />
+                </div>
+              </div>
+              <div>
+                <label class="form-label">Copyright Line</label>
+                <input type="text" class="form-input" [(ngModel)]="systemFooterSettings.footer_copyright" placeholder="e.g. © 2026 HostelHub. All rights reserved." />
+              </div>
+            </div>
           </div>
+
+          <!-- Section 2: User App Home Page Overview & Instructions -->
+          <div class="card shadow-card" style="margin-bottom: 20px;">
+            <h5 class="card-section-title">🏠 User App Home Page Overview & Guide</h5>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div>
+                <label class="form-label">What is HostelHub? (Overview Description)</label>
+                <textarea class="form-input" rows="3" [(ngModel)]="systemPublicSettings.app_about" placeholder="Describe the HostelHub platform..."></textarea>
+              </div>
+              <div>
+                <label class="form-label">How It Works (Step-by-Step Instructions)</label>
+                <textarea class="form-input" rows="4" [(ngModel)]="systemPublicSettings.app_how_it_works" placeholder="1. Raise Ticket... 2. Automated Routing..."></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Developer Team Information -->
+          <div class="card shadow-card" style="margin-bottom: 20px;">
+            <h5 class="card-section-title">👨‍💻 Meet the Developer Team Information</h5>
+            <div *ngFor="let dev of systemPublicSettings.developer_team; let i = index" class="card" style="background: var(--bg-muted); margin-bottom: 12px; border: 1px solid var(--border-color);">
+              <h6 style="margin: 0 0 10px 0; font-size: 14px; font-weight: 700; color: var(--text-primary);">Developer Member #{{ i + 1 }}</h6>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;">
+                <div>
+                  <label class="form-label">Name</label>
+                  <input type="text" class="form-input" [(ngModel)]="dev.name" placeholder="Developer Name" />
+                </div>
+                <div>
+                  <label class="form-label">Role Title</label>
+                  <input type="text" class="form-input" [(ngModel)]="dev.role" placeholder="e.g. Lead Full-Stack Developer" />
+                </div>
+              </div>
+              <div style="margin-bottom: 8px;">
+                <label class="form-label">Short Description / Bio</label>
+                <input type="text" class="form-input" [(ngModel)]="dev.description" placeholder="Description" />
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                  <label class="form-label">GitHub URL</label>
+                  <input type="text" class="form-input" [(ngModel)]="dev.github" placeholder="https://github.com/..." />
+                </div>
+                <div>
+                  <label class="form-label">LinkedIn URL</label>
+                  <input type="text" class="form-input" [(ngModel)]="dev.linkedin" placeholder="https://linkedin.com/in/..." />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Save Button -->
+          <button class="btn btn-primary" (click)="saveAllSystemSettings()" [disabled]="savingSettings" style="font-size: 14px; padding: 12px 24px;">
+            <span *ngIf="savingSettings">Saving Settings to Database...</span>
+            <span *ngIf="!savingSettings">💾 Save All System Settings Permanently</span>
+          </button>
         </div>
 
         <!-- PROFILE TAB -->
@@ -1028,6 +1112,36 @@ export class AdminDashboardComponent implements OnInit {
   announcementsList: any[] = [];
   newNotice = { title: '', content: '', hostelBlock: 'All Hostels', photoFile: null as File | null };
 
+  // System Settings State
+  systemFooterSettings = {
+    footer_text: 'Hostel Maintenance & Support Portal',
+    footer_email: 'support@hostelhub.com',
+    footer_phone: '+91 98765 43210',
+    footer_copyright: '© 2026 HostelHub. All rights reserved.'
+  };
+
+  systemPublicSettings = {
+    app_about: '',
+    app_how_it_works: '',
+    developer_team: [
+      { name: 'Abhinav Kumar', role: 'Lead Full-Stack Developer', description: 'Expert in Node.js, Express, Sequelize, and Angular architecture.', pic: '', github: '', linkedin: '', instagram: '', twitter: '', email: '' },
+      { name: 'Saransh Singh', role: 'UI/UX Designer', description: 'Specializes in crafting premium dark/light mode interfaces and custom transitions.', pic: '', github: '', linkedin: '', instagram: '', twitter: '', email: '' }
+    ]
+  };
+
+  savingSettings = false;
+  settingsSaveSuccess = '';
+  settingsSaveError = '';
+
+  getImageUrl(url: string | null | undefined): string {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+      return url;
+    }
+    const cleanPath = url.startsWith('/') ? url : '/' + url;
+    return 'https://hostelhub-0cyi.onrender.com' + cleanPath;
+  }
+
   onRoleChange(): void {
     if (this.createForm.role === 'warden') {
       this.createForm.bio = 'Hostel Warden';
@@ -1058,6 +1172,7 @@ export class AdminDashboardComponent implements OnInit {
     this.loadStaffTasks();
     this.loadComplaints();
     this.loadAnnouncementsList();
+    this.loadSystemSettings();
   }
 
   switchTab(tab: string): void {
@@ -1527,6 +1642,66 @@ export class AdminDashboardComponent implements OnInit {
         this.loadAnnouncementsList();
       },
       error: (err: any) => alert(`❌ ${err.error?.message || 'Failed to delete notice.'}`)
+    });
+  }
+
+  loadSystemSettings(): void {
+    this.complaintService.getFooterSettings().subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.systemFooterSettings = {
+            footer_text: res.footer_text || 'Hostel Maintenance & Support Portal',
+            footer_email: res.footer_email || 'support@hostelhub.com',
+            footer_phone: res.footer_phone || '+91 98765 43210',
+            footer_copyright: res.footer_copyright || '© 2026 HostelHub. All rights reserved.'
+          };
+        }
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => console.error('Error fetching footer settings:', err)
+    });
+
+    this.complaintService.getPublicSettings().subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.systemPublicSettings.app_about = res.app_about || '';
+          this.systemPublicSettings.app_how_it_works = res.app_how_it_works || '';
+          if (Array.isArray(res.developer_team)) {
+            this.systemPublicSettings.developer_team = res.developer_team;
+          }
+        }
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => console.error('Error fetching public settings:', err)
+    });
+  }
+
+  saveAllSystemSettings(): void {
+    this.savingSettings = true;
+    this.settingsSaveSuccess = '';
+    this.settingsSaveError = '';
+
+    this.complaintService.updateFooterSettings(this.systemFooterSettings).subscribe({
+      next: () => {
+        this.complaintService.updatePublicSettings(this.systemPublicSettings).subscribe({
+          next: () => {
+            this.savingSettings = false;
+            this.settingsSaveSuccess = '✅ All System Settings & App Details saved permanently in Database!';
+            this.cdr.detectChanges();
+            setTimeout(() => { this.settingsSaveSuccess = ''; this.cdr.detectChanges(); }, 4000);
+          },
+          error: (err: any) => {
+            this.savingSettings = false;
+            this.settingsSaveError = `❌ ${err.error?.message || 'Failed to save public settings.'}`;
+            this.cdr.detectChanges();
+          }
+        });
+      },
+      error: (err: any) => {
+        this.savingSettings = false;
+        this.settingsSaveError = `❌ ${err.error?.message || 'Failed to save footer settings.'}`;
+        this.cdr.detectChanges();
+      }
     });
   }
 

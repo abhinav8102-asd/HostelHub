@@ -26,6 +26,9 @@ const upload = multer({ storage });
 // Get footer settings (authenticated users)
 router.get('/footer', verifyToken, settingController.getFooterSettings);
 
+// Update footer settings (admin only)
+router.put('/footer', verifyToken, requireRole(['admin']), settingController.updateFooterSettings);
+
 // Get public settings (authenticated users)
 router.get('/public', verifyToken, settingController.getPublicSettings);
 
