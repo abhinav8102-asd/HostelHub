@@ -25,10 +25,10 @@ const upload = multer({ storage });
 
 router.post('/raise', verifyToken, requireRole(['student']), upload.single('photo'), complaintController.raiseComplaint);
 router.get('/student', verifyToken, requireRole(['student']), complaintController.getStudentComplaints);
-router.get('/warden', verifyToken, requireRole(['warden']), complaintController.getWardenComplaints);
-router.get('/staff', verifyToken, requireRole(['staff']), complaintController.getStaffComplaints);
-router.put('/assign/:complaintId', verifyToken, requireRole(['warden']), complaintController.assignComplaint);
-router.put('/update-status/:complaintId', verifyToken, requireRole(['staff']), upload.single('completionPhoto'), complaintController.updateStatus);
+router.get('/warden', verifyToken, requireRole(['warden', 'admin']), complaintController.getWardenComplaints);
+router.get('/staff', verifyToken, requireRole(['staff', 'admin']), complaintController.getStaffComplaints);
+router.put('/assign/:complaintId', verifyToken, requireRole(['warden', 'admin']), complaintController.assignComplaint);
+router.put('/update-status/:complaintId', verifyToken, requireRole(['staff', 'warden', 'admin']), upload.single('completionPhoto'), complaintController.updateStatus);
 router.put('/feedback/:complaintId', verifyToken, requireRole(['student']), complaintController.addFeedback);
 router.get('/details/:complaintId', verifyToken, complaintController.getComplaintDetails);
 router.get('/analytics', verifyToken, requireRole(['admin', 'warden']), complaintController.getAnalytics);
