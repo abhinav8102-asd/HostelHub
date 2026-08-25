@@ -309,6 +309,7 @@ export class ComplaintService {
             foodQuality: f.rating,
             comments: f.comment || '',
             student: f.student || { name: 'Student', roomNumber: 'N/A', hostelBlock: 'Block' },
+            date: f.date,
             createdAt: f.createdAt
           }));
           return {

@@ -347,13 +347,27 @@ import { ComplaintService } from '../../services/complaint.service';
 
           <!-- Student Reviews Stream -->
           <div class="card shadow-card">
-            <h5 class="card-section-title">Recent Student Mess & Complaint Reviews</h5>
-            <div *ngFor="let r of messAnalytics?.reviews" class="review-item-box">
-              <div class="review-item-header">
-                <strong>{{ r.student?.name || 'Student' }} ({{ r.mealType | uppercase }})</strong>
-                <span class="rating-star">⭐ {{ r.foodQuality }}/5</span>
+            <h5 class="card-section-title">All Student Mess Food Feedbacks & Ratings</h5>
+            <div *ngFor="let r of messAnalytics?.reviews" class="review-item-box" style="margin-bottom: 12px; padding: 14px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-color);">
+              <div class="review-item-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                <div>
+                  <strong style="font-size: 14.5px; color: var(--text-primary);">{{ r.student?.name || 'Student' }}</strong>
+                  <span class="card-sub-lbl" style="display: block; font-size: 11.5px; color: var(--text-secondary);">Room {{ r.student?.roomNumber || 'N/A' }} | {{ r.student?.hostelBlock || 'Hostel Block' }}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="status-tag status-moderate" style="font-size: 10px; text-transform: uppercase;">{{ r.mealType }}</span>
+                  <span class="rating-star" style="font-size: 14px; font-weight: 800; color: #f59e0b; background: rgba(245, 158, 11, 0.1); padding: 2px 8px; border-radius: 6px;">⭐ {{ r.foodQuality }}/5</span>
+                </div>
               </div>
-              <p class="review-comment">{{ r.comments || 'No comment provided.' }}</p>
+              <p class="review-comment" style="margin: 6px 0; font-size: 13px; color: var(--text-primary); font-style: italic; background: var(--bg-muted); padding: 8px 12px; border-radius: 8px;">"{{ r.comments || 'No comment provided.' }}"</p>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+                <span class="card-sub-lbl" style="font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 4px;">
+                  📅 Recorded Date: <strong>{{ (r.date || r.createdAt) | date:'mediumDate' }}</strong>
+                </span>
+                <span *ngIf="r.createdAt" class="card-sub-lbl" style="font-size: 10.5px; color: var(--text-muted);">
+                  🕒 {{ r.createdAt | date:'shortTime' }}
+                </span>
+              </div>
             </div>
             <div *ngIf="!messAnalytics?.reviews || messAnalytics?.reviews?.length === 0" class="empty-state">
               <span class="empty-icon">🍽️</span>
