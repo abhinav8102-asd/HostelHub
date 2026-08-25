@@ -475,7 +475,7 @@ import { ComplaintService } from '../../services/complaint.service';
               </div>
               <div class="form-group">
                 <label class="form-label">Role</label>
-                <select class="form-input" [(ngModel)]="createForm.role" name="role">
+                <select class="form-input" [(ngModel)]="createForm.role" (change)="onRoleChange()" name="role">
                   <option value="staff">Maintenance Staff</option>
                   <option value="warden">Warden</option>
                 </select>
@@ -485,8 +485,16 @@ import { ComplaintService } from '../../services/complaint.service';
                 <select class="form-input" [(ngModel)]="createForm.bio" name="bio">
                   <option value="Electrician">Electrician</option>
                   <option value="Plumber">Plumber</option>
-                  <option value="Cleaner">Cleaner</option>
                   <option value="Carpenter">Carpenter</option>
+                  <option value="Painter">Painter</option>
+                  <option value="Mason">Mason</option>
+                  <option value="AC / AC Technician">AC / AC Technician</option>
+                  <option value="Appliance Technician">Appliance Technician</option>
+                  <option value="Generator / DG Operator">Generator / DG Operator</option>
+                  <option value="RO / Water Purifier Technician">RO / Water Purifier Technician</option>
+                  <option value="Lift Operator / Technician">Lift Operator / Technician</option>
+                  <option value="Wifi Operator / IT Technician">Wifi Operator / IT Technician</option>
+                  <option value="Cleaner / Housekeeping">Cleaner / Housekeeping</option>
                   <option value="Security Guard">Security Guard</option>
                   <option value="Hostel Warden">Hostel Warden</option>
                 </select>
@@ -827,6 +835,14 @@ export class AdminDashboardComponent implements OnInit {
 
   showStaffDetailModal = false;
   selectedStaffDetail: any = null;
+
+  onRoleChange(): void {
+    if (this.createForm.role === 'warden') {
+      this.createForm.bio = 'Hostel Warden';
+    } else if (this.createForm.role === 'staff' && this.createForm.bio === 'Hostel Warden') {
+      this.createForm.bio = 'Electrician';
+    }
+  }
 
   constructor(
     private authService: AuthService,
