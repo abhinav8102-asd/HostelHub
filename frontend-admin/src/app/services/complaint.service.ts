@@ -114,21 +114,10 @@ export class ComplaintService {
     });
   }
 
-  createAnnouncement(formData: FormData): Observable<any> {
-    return this.http.post(`${this.apiUrl}/announcements/create`, formData, {
-      headers: this.authService.getAuthHeaders()
-    });
-  }
-
-  deleteAnnouncement(announcementId: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/announcements/delete/${announcementId}`, {
-      headers: this.authService.getAuthHeaders()
-    });
-  }
-
-  createAnnouncement(announcement: { title: string; content: string; hostelBlock?: string }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/announcements/create`, announcement, {
-      headers: this.authService.getJsonHeaders()
+  createAnnouncement(announcementData: any): Observable<any> {
+    const isFormData = announcementData instanceof FormData;
+    return this.http.post(`${this.apiUrl}/announcements/create`, announcementData, {
+      headers: isFormData ? this.authService.getAuthHeaders() : this.authService.getJsonHeaders()
     });
   }
 
