@@ -138,6 +138,47 @@ import { API_CONFIG } from '../../config/api.config';
             </div>
           </div>
 
+          <!-- 1.5 Official Hostel Notices & Broadcasts Stream -->
+          <div class="section-header" style="margin-top: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+              <div>
+                <h4 style="margin: 0; font-size: 16px; font-weight: 800;">📢 Official Hostel Notices & Broadcasts</h4>
+                <p class="section-subtitle" style="margin: 2px 0 0 0;">Important announcements broadcasted by Wardens & Administration.</p>
+              </div>
+              <button class="btn" (click)="switchTab('notices')" style="background: rgba(179, 16, 49, 0.1); color: #b31031; font-size: 11.5px; font-weight: 700; padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(179, 16, 49, 0.2);">
+                View All Notices ({{ announcements.length }})
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="isLoadingAnnouncements" class="skeleton-list">
+            <div class="skeleton skeleton-card"></div>
+          </div>
+
+          <div *ngIf="!isLoadingAnnouncements && announcements.length > 0" style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
+            <div *ngFor="let notice of announcements.slice(0, 3)" class="card animate-hover" style="border: 1px solid var(--border-color); padding: 16px; border-radius: 16px; background: var(--bg-card); cursor: pointer;" (click)="openNoticeModal(notice)">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span class="notice-block-tag" style="background: #fdf2f4; color: #b31031; font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 6px; text-transform: uppercase;">
+                  {{ notice.hostelBlock === 'All' ? '🌐 All Hostels' : '🏠 ' + notice.hostelBlock }}
+                </span>
+                <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">
+                  📅 {{ notice.createdAt | date:'d MMM, h:mm a' }}
+                </span>
+              </div>
+              <h5 style="margin: 4px 0 6px 0; font-size: 15px; font-weight: 800; color: var(--text-primary);">{{ notice.title }}</h5>
+              <p style="margin: 0; font-size: 12.5px; color: var(--text-secondary); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                {{ notice.content }}
+              </p>
+              <div *ngIf="notice.photoUrl" style="margin-top: 10px;">
+                <img [src]="getImageUrl(notice.photoUrl)" style="width: 100%; max-height: 160px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border-color);" />
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="!isLoadingAnnouncements && announcements.length === 0" class="empty-state" style="padding: 20px; text-align: center;">
+            <span style="font-size: 28px;">📢</span>
+            <p style="font-size: 13px; color: var(--text-muted); margin-top: 6px;">No active hostel notices posted yet.</p>
+          </div>
 
           <!-- 2. Dynamic Warden Section -->
           <div class="section-header" style="margin-top: 32px;">
@@ -968,11 +1009,75 @@ import { API_CONFIG } from '../../config/api.config';
           </div>
         </div>
 
+        <!-- TAB NOTICES: OFFICIAL ANNOUNCEMENTS & BROADCASTS -->
+        <div *ngIf="activeTab === 'notices'" class="tab-panel animate-fade">
+          <h4 class="page-title">📢 Official Hostel Notices & Broadcasts</h4>
+          <p class="section-subtitle" style="margin-bottom: 16px;">Stay updated with official maintenance, water supply, mess schedules, and hostel rules broadcasted by administration.</p>
+
+          <div *ngIf="isLoadingAnnouncements" class="skeleton-list">
+            <div class="skeleton skeleton-card"></div>
+            <div class="skeleton skeleton-card"></div>
+          </div>
+
+          <div *ngIf="!isLoadingAnnouncements && announcements.length > 0" style="display: flex; flex-direction: column; gap: 14px;">
+            <div *ngFor="let notice of announcements" class="card" style="border: 1px solid var(--border-color); padding: 18px; border-radius: 18px; background: var(--bg-card); box-shadow: var(--shadow-sm);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="background: #fdf2f4; color: #b31031; font-size: 11px; font-weight: 800; padding: 4px 12px; border-radius: 8px; text-transform: uppercase; border: 1px solid rgba(179,16,49,0.2);">
+                  {{ notice.hostelBlock === 'All' ? '🌐 All Hostel Blocks' : '🏠 ' + notice.hostelBlock }}
+                </span>
+                <span style="font-size: 11.5px; color: var(--text-muted); font-weight: 600;">
+                  📅 {{ notice.createdAt | date:'d MMM yyyy, h:mm a' }}
+                </span>
+              </div>
+
+              <h4 style="margin: 6px 0 8px 0; font-size: 16px; font-weight: 800; color: var(--text-primary);">{{ notice.title }}</h4>
+              <p style="margin: 0 0 12px 0; font-size: 13.5px; color: var(--text-secondary); line-height: 1.5; white-space: pre-line;">
+                {{ notice.content }}
+              </p>
+
+              <!-- Attached Notice Image -->
+              <div *ngIf="notice.photoUrl" style="margin-top: 10px; margin-bottom: 12px;">
+                <img 
+                  [src]="getImageUrl(notice.photoUrl)" 
+                  style="max-width: 100%; max-height: 260px; object-fit: cover; border-radius: 12px; border: 1px solid var(--border-color); cursor: pointer;" 
+                  (click)="openPhotoModal(getImageUrl(notice.photoUrl))"
+                  alt="Notice Attachment"
+                />
+                <div style="margin-top: 8px;">
+                  <a 
+                    [href]="getImageUrl(notice.photoUrl)" 
+                    target="_blank" 
+                    download 
+                    class="btn"
+                    style="background: var(--bg-muted); color: var(--text-primary); font-size: 11.5px; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border-color);"
+                  >
+                    📥 Download Attachment Image
+                  </a>
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--border-color); font-size: 11.5px; color: var(--text-muted);">
+                <span>Posted by: <strong>{{ notice.creator?.name || 'Hostel Administration' }}</strong></span>
+                <span class="purple-text font-bold" style="cursor: pointer;" (click)="openNoticeModal(notice)">View Full Notice 🔍</span>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="!isLoadingAnnouncements && announcements.length === 0" class="empty-state">
+            <span class="empty-icon">📢</span>
+            <p>No official notices broadcasted yet. Official announcements will appear here live!</p>
+          </div>
+        </div>
+
       <!-- Bottom Tab Navigation (displayed as top-nav by global CSS) -->
       <div class="bottom-tabs">
         <button type="button" class="tab-item" [class.active]="activeTab === 'home'" (click)="switchTab('home')">
           <span class="tab-icon">🏠</span>
           <span>Home</span>
+        </button>
+        <button type="button" class="tab-item" [class.active]="activeTab === 'notices'" (click)="switchTab('notices')">
+          <span class="tab-icon">📢</span>
+          <span>Notices</span>
         </button>
         <button type="button" class="tab-item" [class.active]="activeTab === 'raise'" (click)="switchTab('raise')">
           <span class="tab-icon">➕</span>
@@ -1828,6 +1933,11 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     if (tab === 'raise') {
       this.raiseError = '';
       this.raiseSuccess = '';
+    } else if (tab === 'notices') {
+      this.loadAnnouncements();
+    } else if (tab === 'home') {
+      this.loadAnnouncements();
+      this.loadComplaints();
     } else if (tab === 'mess') {
       this.loadMessInfo();
     } else if (tab === 'my-complaints') {
