@@ -1173,18 +1173,18 @@ import { API_CONFIG } from '../../config/api.config';
         </div>
       </div>
 
-      <!-- Original Clean Footer -->
-      <footer class="footer animate-fade" *ngIf="activeTab !== 'chat'">
-        <div class="footer-content" style="text-align: center; padding: 18px 14px; border-top: 1px solid var(--border-color); margin-top: 24px; background: var(--bg-card); border-radius: 16px;">
-          <p class="footer-title" style="margin: 0 0 6px 0; font-size: 13.5px; font-weight: 800; color: var(--text-primary);">{{ footerSettings?.footer_text || 'HostelHub - Modern Hostel Management' }}</p>
-          <div class="footer-meta" style="display: flex; justify-content: center; align-items: center; gap: 14px; font-size: 12px; color: var(--text-muted); flex-wrap: wrap;">
+      <!-- Modern Ultra-Compact Sleek Footer -->
+      <footer class="footer animate-fade" *ngIf="activeTab !== 'chat'" style="margin-top: 20px; padding: 0 12px 16px 12px;">
+        <div class="footer-content" style="text-align: center; padding: 12px 16px; border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 14px; box-shadow: var(--shadow-sm); max-width: 480px; margin: 0 auto;">
+          <h6 style="margin: 0 0 4px 0; font-size: 12.5px; font-weight: 800; color: var(--text-primary);">{{ footerSettings?.footer_text || 'HostelHub - Hostel Management Portal' }}</h6>
+          <div style="display: flex; justify-content: center; align-items: center; gap: 12px; font-size: 11px; color: var(--text-muted); flex-wrap: wrap;">
             <span>📧 {{ footerSettings?.footer_email || 'support@hostelhub.com' }}</span>
+            <span>·</span>
             <span>📞 {{ footerSettings?.footer_phone || '+91 98765 43210' }}</span>
           </div>
-          <div style="margin-top: 8px; font-size: 11.5px; color: var(--text-muted); font-weight: 600;">
-            Developed by HostelHub Engineering Team 💻
+          <div style="margin-top: 4px; font-size: 10px; color: var(--text-muted); opacity: 0.85;">
+            Developed by HostelHub Engineering Team 💻 · {{ footerSettings?.footer_copyright || '© 2026 HostelHub Inc.' }}
           </div>
-          <p class="footer-copyright" style="margin: 8px 0 0 0; font-size: 10.5px; color: var(--text-muted);">{{ footerSettings?.footer_copyright || '© 2026 HostelHub Inc. All rights reserved.' }}</p>
         </div>
       </footer>
     </div>
@@ -2562,11 +2562,16 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     return this.selectedMessMeal;
   }
 
-  downloadImage(imageUrl: string, fileName: string = 'hostelhub-attachment.jpg'): void {
+  downloadImage(imageUrl: string | null | undefined, fileName: string = 'Notice-Attachment.jpg'): void {
     if (!imageUrl) return;
     const fullUrl = this.getImageUrl(imageUrl);
-    fetch(fullUrl)
-      .then(res => res.blob())
+
+    // 1. Try Blob fetch download with explicit CORS mode
+    fetch(fullUrl, { mode: 'cors' })
+      .then(res => {
+        if (!res.ok) throw new Error('HTTP status ' + res.status);
+        return res.blob();
+      })
       .then(blob => {
         const blobUrl = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -2575,11 +2580,22 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
       })
       .catch(err => {
-        console.error('Blob download failed, opening in browser tab:', err);
-        window.open(fullUrl, '_blank');
+        console.warn('Blob fetch failed, falling back to direct anchor/browser open:', err);
+        try {
+          const a = document.createElement('a');
+          a.href = fullUrl;
+          a.target = '_blank';
+          a.download = fileName;
+          a.rel = 'noopener noreferrer';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        } catch (e) {
+          window.open(fullUrl, '_blank');
+        }
       });
   }
 

@@ -76,24 +76,39 @@ exports.submitFeedback = async (req, res) => {
       where: { studentId, mealType, date }
     });
 
-    if (feedback) {
-      // Update existing feedback
-      feedback.rating = rating;
-      feedback.comment = comment;
-      if (photoUrl) {
-        feedback.photoUrl = photoUrl;
+    try {
+      if (feedback) {
+        feedback.rating = rating;
+        feedback.comment = comment;
+        if (photoUrl) {
+          feedback.photoUrl = photoUrl;
+        }
+        await feedback.save();
+      } else {
+        feedback = await MessFeedback.create({
+          studentId,
+          mealType,
+          date,
+          rating,
+          comment,
+          photoUrl
+        });
       }
-      await feedback.save();
-    } else {
-      // Create new feedback
-      feedback = await MessFeedback.create({
-        studentId,
-        mealType,
-        date,
-        rating,
-        comment,
-        photoUrl
-      });
+    } catch (saveError) {
+      console.error('Initial feedback save failed, retrying without photoUrl:', saveError.message);
+      if (feedback) {
+        feedback.rating = rating;
+        feedback.comment = comment;
+        await feedback.save();
+      } else {
+        feedback = await MessFeedback.create({
+          studentId,
+          mealType,
+          date,
+          rating,
+          comment
+        });
+      }
     }
 
     res.status(200).json({ message: 'Feedback submitted successfully!', feedback });

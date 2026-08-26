@@ -31,8 +31,16 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static uploads
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Serve static uploads with explicit CORS headers for native Android WebView downloads
+app.use('/uploads', (req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', '*');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+}, express.static(path.join(__dirname, 'uploads')));
 
 // Routes registration
 const authRoutes = require('./routes/authRoutes');
@@ -99,6 +107,14 @@ const startServer = async () => {
     // Authenticate database
     await sequelize.authenticate();
     console.log('Database connected successfully.');
+
+    // Auto migration check for mess_feedbacks table photo_url column
+    try {
+      await sequelize.query('ALTER TABLE mess_feedbacks ADD COLUMN IF NOT EXISTS photo_url VARCHAR(255);');
+      console.log('Migration check: mess_feedbacks photo_url column ready.');
+    } catch (e) {
+      console.log('Note on photo_url migration check:', e.message);
+    }
 
     // Start listening
     server.listen(PORT, () => {
