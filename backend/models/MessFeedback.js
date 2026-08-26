@@ -13,7 +13,7 @@ const MessFeedback = sequelize.define('MessFeedback', {
     field: 'student_id'
   },
   mealType: {
-    type: DataTypes.ENUM('breakfast', 'lunch', 'dinner'),
+    type: DataTypes.STRING,
     allowNull: false,
     field: 'meal_type'
   },

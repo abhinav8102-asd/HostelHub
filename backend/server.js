@@ -113,12 +113,13 @@ const startServer = async () => {
         await sequelize.authenticate();
         console.log('Database connected successfully.');
 
-        // Auto migration check for mess_feedbacks table photo_url column
+        // Auto migration check for mess_feedbacks table photo_url column & meal_type column
         try {
           await sequelize.query('ALTER TABLE mess_feedbacks ADD COLUMN IF NOT EXISTS photo_url VARCHAR(255);');
-          console.log('Migration check: mess_feedbacks photo_url column ready.');
+          await sequelize.query('ALTER TABLE mess_feedbacks ALTER COLUMN meal_type TYPE VARCHAR(255);');
+          console.log('Migration check: mess_feedbacks columns ready.');
         } catch (e) {
-          console.log('Note on photo_url migration check:', e.message);
+          console.log('Note on mess_feedbacks migration check:', e.message);
         }
 
         // Run seed check in background

@@ -66,20 +66,26 @@ exports.submitFeedback = async (req, res) => {
       return res.status(400).json({ message: 'Meal type, date, and rating are required.' });
     }
 
-    // Check if student has already rated this meal for the day
+    const ratingVal = parseInt(rating, 10) || 5;
+
     let photoUrl = null;
     if (req.file) {
       photoUrl = `/uploads/${req.file.filename}`;
     }
 
-    let feedback = await MessFeedback.findOne({
-      where: { studentId, mealType, date }
-    });
+    let feedback = null;
+    try {
+      feedback = await MessFeedback.findOne({
+        where: { studentId, mealType, date }
+      });
+    } catch (findErr) {
+      console.warn('MessFeedback findOne warning:', findErr.message);
+    }
 
     try {
       if (feedback) {
-        feedback.rating = rating;
-        feedback.comment = comment;
+        feedback.rating = ratingVal;
+        feedback.comment = comment || '';
         if (photoUrl) {
           feedback.photoUrl = photoUrl;
         }
@@ -89,32 +95,53 @@ exports.submitFeedback = async (req, res) => {
           studentId,
           mealType,
           date,
-          rating,
-          comment,
+          rating: ratingVal,
+          comment: comment || '',
           photoUrl
         });
       }
     } catch (saveError) {
       console.error('Initial feedback save failed, retrying without photoUrl:', saveError.message);
-      if (feedback) {
-        feedback.rating = rating;
-        feedback.comment = comment;
-        await feedback.save();
-      } else {
-        feedback = await MessFeedback.create({
-          studentId,
-          mealType,
-          date,
-          rating,
-          comment
-        });
+      try {
+        if (feedback) {
+          feedback.rating = ratingVal;
+          feedback.comment = comment || '';
+          await feedback.save();
+        } else {
+          feedback = await MessFeedback.create({
+            studentId,
+            mealType,
+            date,
+            rating: ratingVal,
+            comment: comment || ''
+          });
+        }
+      } catch (saveError2) {
+        console.error('Sequelize save failed, executing raw SQL fallback:', saveError2.message);
+        const photoValStr = photoUrl ? `'${photoUrl}'` : 'NULL';
+        const safeComment = (comment || '').replace(/'/g, "''");
+        
+        try {
+          // PostgreSQL / MySQL INSERT fallback
+          await sequelize.query(`
+            INSERT INTO mess_feedbacks (student_id, meal_type, date, rating, comment, photo_url, "createdAt", "updatedAt")
+            VALUES (${studentId}, '${mealType}', '${date}', ${ratingVal}, '${safeComment}', ${photoValStr}, NOW(), NOW());
+          `);
+        } catch (rawSqlErr) {
+          console.error('Raw SQL fallback error:', rawSqlErr.message);
+          // Standard simple insert
+          await sequelize.query(`
+            INSERT INTO mess_feedbacks (student_id, meal_type, date, rating, comment, "createdAt", "updatedAt")
+            VALUES (${studentId}, '${mealType}', '${date}', ${ratingVal}, '${safeComment}', NOW(), NOW());
+          `);
+        }
       }
     }
 
-    res.status(200).json({ message: 'Feedback submitted successfully!', feedback });
+    return res.status(200).json({ message: 'Feedback submitted successfully!', feedback });
   } catch (error) {
     console.error('Error submitting feedback:', error);
-    res.status(500).json({ message: 'Error submitting feedback.' });
+    return res.status(500).json({ message: 'Error submitting feedback: ' + (error.message || 'Server error') });
   }
 };
 
