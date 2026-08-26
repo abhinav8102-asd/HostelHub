@@ -4,7 +4,7 @@ const syncDB = async () => {
   try {
     console.log('Syncing database tables safely (preserving data)...');
     try {
-      await sequelize.query('DROP TABLE IF EXISTS `users_backup`;');
+      await sequelize.query('DROP TABLE IF EXISTS "users_backup";');
     } catch (e) {}
     await sequelize.sync({ alter: true }); 
     console.log('Database synced successfully.');

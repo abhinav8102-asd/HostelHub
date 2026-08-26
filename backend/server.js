@@ -104,25 +104,31 @@ const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
   try {
-    // Authenticate database
-    await sequelize.authenticate();
-    console.log('Database connected successfully.');
-
-    // Auto migration check for mess_feedbacks table photo_url column
-    try {
-      await sequelize.query('ALTER TABLE mess_feedbacks ADD COLUMN IF NOT EXISTS photo_url VARCHAR(255);');
-      console.log('Migration check: mess_feedbacks photo_url column ready.');
-    } catch (e) {
-      console.log('Note on photo_url migration check:', e.message);
-    }
-
-    // Start listening
-    server.listen(PORT, () => {
+    // Start listening immediately so Render health check passes instantly
+    server.listen(PORT, async () => {
       console.log(`HostelHub Server running on port ${PORT}`);
+
+      // Async DB initialization & migrations
+      try {
+        await sequelize.authenticate();
+        console.log('Database connected successfully.');
+
+        // Auto migration check for mess_feedbacks table photo_url column
+        try {
+          await sequelize.query('ALTER TABLE mess_feedbacks ADD COLUMN IF NOT EXISTS photo_url VARCHAR(255);');
+          console.log('Migration check: mess_feedbacks photo_url column ready.');
+        } catch (e) {
+          console.log('Note on photo_url migration check:', e.message);
+        }
+
+        // Run seed check in background
+        require('./scripts/seed.js');
+      } catch (dbErr) {
+        console.error('Database async initialization error:', dbErr.message);
+      }
     });
   } catch (error) {
-    console.error('Database connection failed:', error);
-    process.exit(1);
+    console.error('Failed to start server:', error);
   }
 };
 
