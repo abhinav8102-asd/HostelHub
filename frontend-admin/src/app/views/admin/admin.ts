@@ -35,6 +35,14 @@ import { ComplaintService } from '../../services/complaint.service';
         </div>
       </div>
 
+      <!-- Photo Zoom Modal -->
+      <div class="modal-overlay" *ngIf="zoomPhotoUrl" (click)="closePhotoModal()" style="z-index: 99999;">
+        <div class="modal-card" (click)="$event.stopPropagation()" style="max-width: 90vw; max-height: 90vh; text-align: center; background: rgba(0,0,0,0.9); padding: 16px; border-radius: 18px; position: relative;">
+          <button class="close-btn" (click)="closePhotoModal()" style="position: absolute; top: 12px; right: 12px; z-index: 10;">✕</button>
+          <img [src]="zoomPhotoUrl" alt="Zoomed View" style="max-width: 100%; max-height: 80vh; border-radius: 12px; object-fit: contain;" />
+        </div>
+      </div>
+
       <!-- TAB CONTENT AREA -->
       <div class="tab-content-area">
 
@@ -364,6 +372,9 @@ import { ComplaintService } from '../../services/complaint.service';
                   </div>
                 </div>
                 <p class="review-comment" style="margin: 6px 0; font-size: 13px; color: var(--text-primary); font-style: italic; background: var(--bg-muted); padding: 8px 12px; border-radius: 8px;">"{{ r.comments || 'No comment provided.' }}"</p>
+                <div *ngIf="r.photoUrl" style="margin: 8px 0;">
+                  <img [src]="getImageUrl(r.photoUrl)" style="max-width: 100%; max-height: 180px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-color); cursor: pointer;" (click)="openPhotoModal(getImageUrl(r.photoUrl))" alt="Mess food feedback photo" />
+                </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
                   <span class="card-sub-lbl" style="font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 4px;">
                     📅 Recorded Date: <strong>{{ (r.date || r.createdAt) | date:'mediumDate' }}</strong>
@@ -1073,6 +1084,10 @@ export class AdminDashboardComponent implements OnInit {
   activeTab: string = 'stats';
   isDarkMode = true;
   period = 'week';
+
+  zoomPhotoUrl: string | null = null;
+  openPhotoModal(url: string): void { this.zoomPhotoUrl = url; }
+  closePhotoModal(): void { this.zoomPhotoUrl = null; }
 
   analytics: any = null;
   mgmtTrendData: any = null;

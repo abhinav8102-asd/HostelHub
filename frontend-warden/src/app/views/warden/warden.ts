@@ -700,6 +700,9 @@ import { AttendanceService } from '../../services/attendance.service';
                     <span class="comment-date">{{ f.date | date:'mediumDate' }}</span>
                   </div>
                   <p class="comment-text" *ngIf="f.comment">"{{ f.comment }}"</p>
+                  <div *ngIf="f.photoUrl" style="margin-top: 8px;">
+                    <img [src]="getImageUrl(f.photoUrl)" style="max-width: 100%; max-height: 180px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-color); cursor: pointer;" (click)="openPhotoModal(getImageUrl(f.photoUrl))" alt="Mess food photo" />
+                  </div>
                   <div class="comment-author">
                     👨‍🎓 {{ f.student?.name }} · Room {{ f.student?.roomNumber }} · {{ f.student?.hostelBlock }}
                   </div>

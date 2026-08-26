@@ -310,6 +310,7 @@ export class ComplaintService {
             comments: f.comment || '',
             student: f.student || { name: 'Student', roomNumber: 'N/A', hostelBlock: 'Block' },
             date: f.date,
+            photoUrl: f.photoUrl,
             createdAt: f.createdAt
           }));
           return {

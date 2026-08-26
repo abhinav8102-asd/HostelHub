@@ -67,6 +67,11 @@ exports.submitFeedback = async (req, res) => {
     }
 
     // Check if student has already rated this meal for the day
+    let photoUrl = null;
+    if (req.file) {
+      photoUrl = `/uploads/${req.file.filename}`;
+    }
+
     let feedback = await MessFeedback.findOne({
       where: { studentId, mealType, date }
     });
@@ -75,6 +80,9 @@ exports.submitFeedback = async (req, res) => {
       // Update existing feedback
       feedback.rating = rating;
       feedback.comment = comment;
+      if (photoUrl) {
+        feedback.photoUrl = photoUrl;
+      }
       await feedback.save();
     } else {
       // Create new feedback
@@ -83,7 +91,8 @@ exports.submitFeedback = async (req, res) => {
         mealType,
         date,
         rating,
-        comment
+        comment,
+        photoUrl
       });
     }
 

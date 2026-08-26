@@ -3,12 +3,25 @@ const router = express.Router();
 const messController = require('../controllers/messController');
 const { verifyToken, requireRole } = require('../middleware/auth');
 
+const path = require('path');
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, '../uploads'));
+  },
+  filename: (req, file, cb) => {
+    cb(null, `mess-${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`);
+  }
+});
+const upload = multer({ storage });
+
 // Menu routes
 router.get('/menu', verifyToken, messController.getMenu);
 router.put('/menu/:id', verifyToken, requireRole(['warden', 'admin']), messController.updateMenu);
 
 // Feedback routes
-router.post('/feedback', verifyToken, requireRole(['student']), messController.submitFeedback);
+router.post('/feedback', verifyToken, requireRole(['student']), upload.single('photo'), messController.submitFeedback);
 router.get('/feedback/stats', verifyToken, requireRole(['warden', 'admin']), messController.getFeedbackStats);
 
 // Skip meal routes

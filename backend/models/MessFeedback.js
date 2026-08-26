@@ -32,6 +32,11 @@ const MessFeedback = sequelize.define('MessFeedback', {
   comment: {
     type: DataTypes.TEXT,
     allowNull: true
+  },
+  photoUrl: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    field: 'photo_url'
   }
 }, {
   tableName: 'mess_feedbacks'

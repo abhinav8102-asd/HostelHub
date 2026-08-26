@@ -58,8 +58,13 @@ export class MessService {
     });
   }
 
-  submitFeedback(feedback: MessFeedback): Observable<any> {
-    return this.http.post(`${this.apiUrl}/feedback`, feedback, {
+  submitFeedback(feedbackData: FormData | MessFeedback): Observable<any> {
+    if (feedbackData instanceof FormData) {
+      return this.http.post(`${this.apiUrl}/feedback`, feedbackData, {
+        headers: this.authService.getAuthHeaders()
+      });
+    }
+    return this.http.post(`${this.apiUrl}/feedback`, feedbackData, {
       headers: this.authService.getJsonHeaders()
     });
   }

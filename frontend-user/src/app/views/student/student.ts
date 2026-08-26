@@ -63,15 +63,14 @@ import { API_CONFIG } from '../../config/api.config';
               (click)="openPhotoModal(getImageUrl(selectedNotice.photoUrl))"
             />
             <div style="margin-top: 10px;">
-              <a 
-                [href]="getImageUrl(selectedNotice.photoUrl)" 
-                target="_blank" 
-                download 
+              <button 
+                type="button" 
+                (click)="downloadImage(selectedNotice.photoUrl, 'Notice-Attachment.jpg')" 
                 class="btn"
                 style="background: var(--neutral-100); color: var(--neutral-800); font-size: 12px; padding: 7px 14px; border-radius: 6px; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; border: 1px solid var(--neutral-200);"
               >
                 📥 Download Image
-              </a>
+              </button>
             </div>
           </div>
 
@@ -1001,6 +1000,35 @@ import { API_CONFIG } from '../../config/api.config';
                   </textarea>
                 </div>
 
+                <!-- Optional Mess Food Image Attachment -->
+                <div class="form-group" style="margin-top: 12px;">
+                  <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>📷 Food Photo (Optional)</span>
+                    <span style="font-size: 10.5px; color: var(--text-muted);">Attach food photo</span>
+                  </label>
+                  
+                  <input type="file" (change)="onMessPhotoSelected($event)" accept="image/*" class="file-input" id="messPhotoInput" style="display: none;" />
+
+                  <!-- Dual Photo Source Buttons: Camera & Gallery -->
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                    <button type="button" (click)="selectMessPhoto('camera')" class="btn" style="background: rgba(179, 16, 49, 0.08); color: #b31031; border: 1px dashed rgba(179, 16, 49, 0.3); padding: 9px; border-radius: 10px; font-size: 11.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer;">
+                      <span>📷 Real-time Camera</span>
+                    </button>
+                    <button type="button" (click)="selectMessPhoto('gallery')" class="btn" style="background: var(--bg-muted); color: var(--text-primary); border: 1px dashed var(--border-color); padding: 9px; border-radius: 10px; font-size: 11.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer;">
+                      <span>🖼️ Import Gallery</span>
+                    </button>
+                  </div>
+
+                  <!-- Image Preview Box -->
+                  <div *ngIf="messPhotoPreviewUrl" style="margin-top: 8px; position: relative; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); background: var(--bg-muted); padding: 8px; text-align: center;">
+                    <img [src]="messPhotoPreviewUrl" style="max-width: 100%; max-height: 180px; border-radius: 8px; object-fit: cover;" alt="Mess food photo preview" />
+                    <div style="margin-top: 6px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px;">
+                      <span style="font-size: 11px; color: #166534; font-weight: 700;">✓ Food photo attached</span>
+                      <button type="button" (click)="clearMessPhoto()" style="background: none; border: none; color: #ef4444; font-size: 12px; font-weight: 700; cursor: pointer;">✕ Remove Photo</button>
+                    </div>
+                  </div>
+                </div>
+
                 <button type="submit" class="btn btn-primary submit-feedback-btn">
                   Submit Feedback
                 </button>
@@ -1044,15 +1072,14 @@ import { API_CONFIG } from '../../config/api.config';
                   alt="Notice Attachment"
                 />
                 <div style="margin-top: 8px;">
-                  <a 
-                    [href]="getImageUrl(notice.photoUrl)" 
-                    target="_blank" 
-                    download 
+                  <button 
+                    type="button" 
+                    (click)="downloadImage(notice.photoUrl, 'Notice-Attachment.jpg')" 
                     class="btn"
-                    style="background: var(--bg-muted); color: var(--text-primary); font-size: 11.5px; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border-color);"
+                    style="background: var(--bg-muted); color: var(--text-primary); font-size: 11.5px; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border-color); cursor: pointer;"
                   >
                     📥 Download Attachment Image
-                  </a>
+                  </button>
                 </div>
               </div>
 
@@ -1850,6 +1877,9 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
   isLoadingComplaints = true;
   isLoadingAnnouncements = true;
 
+  messPhotoFile: File | null = null;
+  messPhotoPreviewUrl: string | null = null;
+
   // Dynamic Home Page Sections
   wardens: any[] = [];
   publicSettings: any = {
@@ -2532,23 +2562,99 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     return this.selectedMessMeal;
   }
 
+  downloadImage(imageUrl: string, fileName: string = 'hostelhub-attachment.jpg'): void {
+    if (!imageUrl) return;
+    const fullUrl = this.getImageUrl(imageUrl);
+    fetch(fullUrl)
+      .then(res => res.blob())
+      .then(blob => {
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+      })
+      .catch(err => {
+        console.error('Blob download failed, opening in browser tab:', err);
+        window.open(fullUrl, '_blank');
+      });
+  }
+
+  onMessPhotoSelected(event: any): void {
+    if (event.target.files && event.target.files.length > 0) {
+      const file = event.target.files[0];
+      this.messPhotoFile = file;
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.messPhotoPreviewUrl = reader.result as string;
+        this.cdr.detectChanges();
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  async selectMessPhoto(sourceType: 'camera' | 'gallery'): Promise<void> {
+    try {
+      const { Camera, CameraResultType, CameraSource } = await import('@capacitor/camera');
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.Uri,
+        source: sourceType === 'camera' ? CameraSource.Camera : CameraSource.Photos
+      });
+
+      if (image && image.webPath) {
+        const response = await fetch(image.webPath);
+        const blob = await response.blob();
+        const file = new File([blob], `mess-photo-${Date.now()}.jpg`, { type: 'image/jpeg' });
+
+        const reader = new FileReader();
+        reader.onload = () => {
+          this.messPhotoFile = file;
+          this.messPhotoPreviewUrl = reader.result as string;
+          this.cdr.detectChanges();
+        };
+        reader.readAsDataURL(file);
+      }
+    } catch (err) {
+      console.log('Capacitor camera/gallery failed or cancelled, using browser file input:', err);
+      const el = document.getElementById('messPhotoInput') as HTMLInputElement;
+      if (el) el.click();
+    }
+  }
+
+  clearMessPhoto(): void {
+    this.messPhotoFile = null;
+    this.messPhotoPreviewUrl = null;
+    const el = document.getElementById('messPhotoInput') as HTMLInputElement;
+    if (el) el.value = '';
+    this.cdr.detectChanges();
+  }
+
   // Submit Feedback
   submitMessFeedback(): void {
     this.messSuccess = '';
     this.messError = '';
     const date = this.getTodayDateString();
-    const feedbackData = {
-      mealType: this.selectedMessMeal,
-      date,
-      rating: this.tempMessRating,
-      comment: this.tempMessComment
-    };
+    
+    const formData = new FormData();
+    formData.append('mealType', this.selectedMessMeal);
+    formData.append('date', date);
+    formData.append('rating', this.tempMessRating.toString());
+    formData.append('comment', this.tempMessComment || '');
+    if (this.messPhotoFile) {
+      formData.append('photo', this.messPhotoFile);
+    }
 
-    this.messService.submitFeedback(feedbackData).subscribe({
+    this.messService.submitFeedback(formData).subscribe({
       next: (res) => {
         this.messSuccess = '✅ ' + res.message;
         this.tempMessComment = '';
         this.tempMessRating = 5;
+        this.clearMessPhoto();
         this.cdr.detectChanges();
         setTimeout(() => { this.messSuccess = ''; this.cdr.detectChanges(); }, 3000);
       },
