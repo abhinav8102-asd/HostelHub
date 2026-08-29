@@ -269,14 +269,14 @@ import { ComplaintService } from '../../services/complaint.service';
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 14px;">
               <div>
                 <span class="card-sub-lbl" style="text-transform: uppercase; font-weight: 700;">Mess Food Quality Overall Score</span>
-                <h2 class="rating-big-score" style="margin: 4px 0;">⭐ {{ messAnalytics?.summary?.avgRating ?? '0.0' }} <span style="font-size: 14px; opacity: 0.7;">/ 5.0</span></h2>
-                <span class="card-sub-lbl">Based on {{ messAnalytics?.summary?.totalReviews ?? 0 }} student reviews submitted</span>
+                <h2 class="rating-big-score" style="margin: 4px 0;">⭐ {{ getMessMealStats().overallAvg }} <span style="font-size: 14px; opacity: 0.7;">/ 5.0</span></h2>
+                <span class="card-sub-lbl">Based on {{ getMessMealStats().total }} student reviews submitted</span>
               </div>
               <span class="clickable-hint">💡 Tap metric box below to filter meal type</span>
             </div>
 
             <!-- Meal Quality Filter Metric Cards -->
-            <div class="metrics-grid-auto" *ngIf="messAnalytics?.summary">
+            <div class="metrics-grid-auto">
               <div 
                 class="metric-box clickable-box" 
                 [style.border]="selectedMealFilter === 'all' ? '2px solid #b31031' : '1px solid var(--border-color)'"
@@ -284,8 +284,8 @@ import { ComplaintService } from '../../services/complaint.service';
                 (click)="filterMealReviews('all')"
               >
                 <span class="metric-lbl">All Reviews</span>
-                <strong class="metric-val purple-text">⭐ {{ messAnalytics.summary.avgRating || '0.0' }}</strong>
-                <span class="detail-link-text">{{ getFilteredMessReviews().length }} Reviews →</span>
+                <strong class="metric-val purple-text">⭐ {{ getMessMealStats().overallAvg }}</strong>
+                <span class="detail-link-text">{{ getMessMealStats().total }} Reviews →</span>
               </div>
 
               <div 
@@ -295,8 +295,8 @@ import { ComplaintService } from '../../services/complaint.service';
                 (click)="filterMealReviews('breakfast')"
               >
                 <span class="metric-lbl">Breakfast</span>
-                <strong class="metric-val green-text">🍳 {{ messAnalytics.summary.breakfastAvg || '0.0' }}</strong>
-                <span class="detail-link-text">Filter Breakfast →</span>
+                <strong class="metric-val green-text">🍳 {{ getMessMealStats().bCount }}</strong>
+                <span class="detail-link-text">⭐ {{ getMessMealStats().bAvg }} Avg →</span>
               </div>
 
               <div 
@@ -306,8 +306,8 @@ import { ComplaintService } from '../../services/complaint.service';
                 (click)="filterMealReviews('lunch')"
               >
                 <span class="metric-lbl">Lunch</span>
-                <strong class="metric-val blue-text">🍛 {{ messAnalytics.summary.lunchAvg || '0.0' }}</strong>
-                <span class="detail-link-text">Filter Lunch →</span>
+                <strong class="metric-val blue-text">🍛 {{ getMessMealStats().lCount }}</strong>
+                <span class="detail-link-text">⭐ {{ getMessMealStats().lAvg }} Avg →</span>
               </div>
 
               <div 
@@ -317,8 +317,8 @@ import { ComplaintService } from '../../services/complaint.service';
                 (click)="filterMealReviews('snacks')"
               >
                 <span class="metric-lbl">Snacks</span>
-                <strong class="metric-val yellow-text">☕ {{ messAnalytics.summary.snacksAvg || '0.0' }}</strong>
-                <span class="detail-link-text">Filter Snacks →</span>
+                <strong class="metric-val yellow-text">☕ {{ getMessMealStats().sCount }}</strong>
+                <span class="detail-link-text">⭐ {{ getMessMealStats().sAvg }} Avg →</span>
               </div>
 
               <div 
@@ -328,8 +328,8 @@ import { ComplaintService } from '../../services/complaint.service';
                 (click)="filterMealReviews('dinner')"
               >
                 <span class="metric-lbl">Dinner</span>
-                <strong class="metric-val orange-text">🍽️ {{ messAnalytics.summary.dinnerAvg || '0.0' }}</strong>
-                <span class="detail-link-text">Filter Dinner →</span>
+                <strong class="metric-val orange-text">🍽️ {{ getMessMealStats().dCount }}</strong>
+                <span class="detail-link-text">⭐ {{ getMessMealStats().dAvg }} Avg →</span>
               </div>
             </div>
           </div>
@@ -1167,9 +1167,43 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   getFilteredMessReviews(): any[] {
-    if (!this.messAnalytics || !this.messAnalytics.reviews) return [];
-    if (this.selectedMealFilter === 'all') return this.messAnalytics.reviews;
-    return this.messAnalytics.reviews.filter((r: any) => (r.mealType || '').toLowerCase() === this.selectedMealFilter.toLowerCase());
+    const reviews = (this.messAnalytics?.reviews || this.messAnalytics?.feedbacks || []);
+    if (this.selectedMealFilter === 'all') return reviews;
+    return reviews.filter((r: any) => (r.mealType || '').toLowerCase().trim() === this.selectedMealFilter.toLowerCase());
+  }
+
+  getMessMealStats() {
+    const reviews = (this.messAnalytics?.reviews || this.messAnalytics?.feedbacks || []);
+    const total = reviews.length;
+    
+    let totalSum = 0;
+    let bCount = 0, lCount = 0, sCount = 0, dCount = 0;
+    let bSum = 0, lSum = 0, sSum = 0, dSum = 0;
+
+    reviews.forEach((r: any) => {
+      const rating = Number(r.rating || r.foodQuality) || 0;
+      totalSum += rating;
+      const m = (r.mealType || '').toLowerCase().trim();
+      if (m === 'breakfast') { bCount++; bSum += rating; }
+      else if (m === 'lunch') { lCount++; lSum += rating; }
+      else if (m === 'snacks') { sCount++; sSum += rating; }
+      else if (m === 'dinner') { dCount++; dSum += rating; }
+    });
+
+    const overallAvg = total > 0 ? (totalSum / total).toFixed(1) : '0.0';
+    const bAvg = bCount > 0 ? (bSum / bCount).toFixed(1) : '0.0';
+    const lAvg = lCount > 0 ? (lSum / lCount).toFixed(1) : '0.0';
+    const sAvg = sCount > 0 ? (sSum / sCount).toFixed(1) : '0.0';
+    const dAvg = dCount > 0 ? (dSum / dCount).toFixed(1) : '0.0';
+
+    return {
+      total,
+      overallAvg,
+      bCount, bAvg,
+      lCount, lAvg,
+      sCount, sAvg,
+      dCount, dAvg
+    };
   }
 
   constructor(
