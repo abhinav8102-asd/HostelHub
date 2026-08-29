@@ -1189,14 +1189,14 @@ import { API_CONFIG } from '../../config/api.config';
 
 
       <!-- Sleek Exit App Confirmation Modal -->
-      <div *ngIf="showExitAppModal" class="photo-modal" (click)="showExitAppModal = false" style="z-index: 99999;">
+      <div *ngIf="showExitAppModal" class="photo-modal" (click)="cancelExitModal($event)" style="z-index: 99999;">
         <div class="card" (click)="$event.stopPropagation()" style="width: 88%; max-width: 340px; border-radius: 24px; padding: 24px; text-align: center; background: var(--bg-card); border: 1px solid var(--border-color); box-shadow: 0 20px 40px rgba(0,0,0,0.5); animation: modalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);">
           <div style="width: 56px; height: 56px; border-radius: 50%; background: #fee2e2; color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 14px;">🚪</div>
           <h3 style="margin: 0 0 6px 0; font-size: 18px; font-weight: 800; color: var(--text-primary);">Exit HostelHub?</h3>
           <p style="margin: 0 0 20px 0; font-size: 13px; color: var(--text-muted); line-height: 1.4;">Are you sure you want to exit the application?</p>
           
           <div style="display: flex; gap: 10px;">
-            <button type="button" (click)="showExitAppModal = false" style="flex: 1; padding: 12px; border-radius: 14px; border: 1px solid var(--border-color); background: var(--bg-muted); color: var(--text-primary); font-size: 13.5px; font-weight: 700; cursor: pointer;">
+            <button type="button" (click)="cancelExitModal($event)" style="flex: 1; padding: 12px; border-radius: 14px; border: 1px solid var(--border-color); background: var(--bg-muted); color: var(--text-primary); font-size: 13.5px; font-weight: 700; cursor: pointer;">
               No, Cancel
             </button>
             <button type="button" (click)="confirmExitApp()" style="flex: 1; padding: 12px; border-radius: 14px; border: none; background: linear-gradient(135deg, #8a0d24 0%, #b31031 100%); color: white; font-size: 13.5px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(179, 16, 49, 0.35);">
@@ -2301,7 +2301,17 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
     }
   }
 
+  cancelExitModal(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.showExitAppModal = false;
+    this.cdr.detectChanges();
+  }
+
   confirmExitApp(): void {
+    this.showExitAppModal = false;
+    this.cdr.detectChanges();
     try {
       App.exitApp();
     } catch (e) {
