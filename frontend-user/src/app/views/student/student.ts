@@ -94,90 +94,102 @@ import { API_CONFIG } from '../../config/api.config';
       <!-- MAIN TABS CONTAINER -->
       <div class="tab-content-area">
 
-        <!-- TAB 0: HOME / NOTICES -->
+        <!-- TAB 0: HOME / COMMAND CENTER -->
         <div *ngIf="activeTab === 'home'" class="tab-panel animate-fade">
           
-          <!-- Live Status Indicator Pill -->
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 4px;">
-            <div style="display: flex; align-items: center; gap: 6px; background: rgba(37, 99, 235, 0.08); padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(37, 99, 235, 0.2);">
-              <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981; display: inline-block;"></span>
-              <span style="font-size: 11px; font-weight: 800; color: #2563eb; letter-spacing: 0.3px;">LIVE CONNECTED · {{ user?.hostelBlock || 'Hostel Grid' }}</span>
+          <!-- Live Status Pill Bar -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding: 0 2px;">
+            <div style="display: flex; align-items: center; gap: 8px; background: rgba(37, 99, 235, 0.1); padding: 5px 14px; border-radius: 20px; border: 1px solid rgba(37, 99, 235, 0.25);">
+              <span style="width: 9px; height: 9px; border-radius: 50%; background: #10b981; animation: livePulseDot 1.8s infinite; display: inline-block;"></span>
+              <span style="font-size: 11px; font-weight: 800; color: #2563eb; letter-spacing: 0.4px;">LIVE GRID · {{ user?.hostelBlock || 'HOSTEL' }}</span>
             </div>
-            <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">👋 Engineering Portal</span>
+            <span style="font-size: 11.5px; font-weight: 700; color: var(--text-muted);">🎓 Student Portal</span>
           </div>
 
-          <!-- 1. Student 3D Animated Hero Banner -->
-          <div class="card student-profile-card">
+          <!-- 1. Cyber Mesh Animated 3D Hero Banner -->
+          <div class="card hero-banner-cyber">
             <div class="profile-card-pattern"></div>
-            <div class="profile-card-content">
-              <div class="profile-user-img-wrapper" style="border: 3px solid #38bdf8; box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);">
-                <span class="profile-avatar-emoji" *ngIf="!user?.profilePicUrl">🎓</span>
+            <div class="profile-card-content" style="position: relative; z-index: 2;">
+              <div class="profile-user-img-wrapper" style="width: 76px; height: 76px; border: 3.5px solid #38bdf8; box-shadow: 0 0 24px rgba(56, 189, 248, 0.5);">
+                <span class="profile-avatar-emoji" *ngIf="!user?.profilePicUrl" style="font-size: 38px;">🎓</span>
                 <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" class="profile-user-img" />
               </div>
               <div class="profile-user-details">
-                <div class="welcome-tag" style="color: #93c5fd; font-weight: 700; letter-spacing: 0.5px;">Welcome Back 👋</div>
-                <h4 class="profile-user-name" style="font-size: 24px; font-weight: 800; text-shadow: 0 2px 8px rgba(0,0,0,0.2);">{{ user?.name }}</h4>
+                <div class="welcome-tag" style="color: #93c5fd; font-weight: 800; font-size: 12px; letter-spacing: 0.8px;">WELCOME BACK 👋</div>
+                <h4 class="profile-user-name" style="font-size: 26px; font-weight: 900; letter-spacing: -0.5px; margin: 2px 0 6px 0; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">{{ user?.name }}</h4>
                 <div class="profile-pills">
-                  <span class="profile-pill block-pill" style="background: rgba(255,255,255,0.18); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3);">🏢 {{ user?.hostelBlock || 'N/A' }}</span>
-                  <span class="profile-pill room-pill" style="background: rgba(255,255,255,0.18); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3);">🔑 Room {{ user?.roomNumber || 'N/A' }}</span>
-                  <span class="profile-pill batch-pill" style="background: rgba(255,255,255,0.18); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3);">🎓 {{ user?.batch || 'Batch 2025' }}</span>
+                  <span class="profile-pill block-pill" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.35); font-weight: 700;">🏢 {{ user?.hostelBlock || 'N/A' }}</span>
+                  <span class="profile-pill room-pill" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.35); font-weight: 700;">🔑 Room {{ user?.roomNumber || 'N/A' }}</span>
+                  <span class="profile-pill batch-pill" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.35); font-weight: 700;">🎓 {{ user?.batch || 'Batch 2025' }}</span>
                 </div>
               </div>
-              <div class="profile-quick-stats">
-                <div class="stat-item clickable" (click)="switchTab('my-complaints')" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.3); border-radius: 16px; padding: 10px 16px;">
-                  <span class="stat-count" style="font-size: 20px; font-weight: 800; color: #ffffff;">{{ complaints.length }}</span>
-                  <span class="stat-label" style="font-size: 10.5px; color: #93c5fd; font-weight: 700; text-transform: uppercase;">Total Tickets</span>
+              <div class="profile-quick-stats" style="gap: 10px;">
+                <div class="stat-item clickable" (click)="switchTab('my-complaints')" style="background: rgba(255,255,255,0.18); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.35); border-radius: 18px; padding: 12px 18px; transition: transform 0.2s ease;">
+                  <span class="stat-count" style="font-size: 22px; font-weight: 900; color: #ffffff;">{{ complaints.length }}</span>
+                  <span class="stat-label" style="font-size: 10px; color: #93c5fd; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Tickets</span>
                 </div>
-                <div class="stat-item resolved clickable" (click)="switchTab('my-complaints')" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.3); border-radius: 16px; padding: 10px 16px;">
-                  <span class="stat-count" style="font-size: 20px; font-weight: 800; color: #34d399;">{{ getResolvedCount() }}</span>
-                  <span class="stat-label" style="font-size: 10.5px; color: #a7f3d0; font-weight: 700; text-transform: uppercase;">Resolved</span>
+                <div class="stat-item resolved clickable" (click)="switchTab('my-complaints')" style="background: rgba(255,255,255,0.18); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.35); border-radius: 18px; padding: 12px 18px; transition: transform 0.2s ease;">
+                  <span class="stat-count" style="font-size: 22px; font-weight: 900; color: #34d399;">{{ getResolvedCount() }}</span>
+                  <span class="stat-label" style="font-size: 10px; color: #a7f3d0; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Resolved</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- 1.2 Interactive 3D Quick Action Launchpad -->
-          <div style="margin-top: 24px; margin-bottom: 24px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <h4 style="margin: 0; font-size: 16.5px; font-weight: 800; color: var(--text-primary);">⚡ Quick Student Launchpad</h4>
-              <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">1-Tap Access</span>
+          <!-- 2. Vibrant 3D Quick Action Grid Launchpad -->
+          <div style="margin-top: 28px; margin-bottom: 28px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <h4 style="margin: 0; font-size: 17px; font-weight: 800; color: var(--text-primary);">⚡ Quick Student Launchpad</h4>
+              <span style="font-size: 11.5px; font-weight: 800; color: #2563eb;">1-Tap Access</span>
             </div>
 
-            <div class="action-grid-3d">
+            <div class="action-grid-3d" style="gap: 14px;">
               <!-- Action 1: Raise Complaint -->
-              <div class="action-card-3d blue-glow" (click)="switchTab('raise')">
-                <div>
-                  <span class="action-icon-3d">🚀</span>
-                  <div class="action-card-title">Raise Complaint</div>
+              <div class="action-tile-3d tile-blue" (click)="switchTab('raise')">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white;">🚀</div>
+                  <span style="font-size: 10.5px; font-weight: 800; color: #2563eb; background: rgba(37,99,235,0.12); padding: 3px 8px; border-radius: 10px;">URGENT</span>
                 </div>
-                <div class="action-card-sub">Submit maintenance request & track live repair</div>
+                <div>
+                  <div class="action-card-title" style="font-size: 15px; font-weight: 800;">Raise Issue</div>
+                  <div class="action-card-sub" style="color: #475569;">Submit ticket to staff</div>
+                </div>
               </div>
 
               <!-- Action 2: Mess Review -->
-              <div class="action-card-3d" (click)="switchTab('mess')" style="background: linear-gradient(145deg, #ffffff 0%, #ecfdf5 100%); border: 1px solid rgba(16, 185, 129, 0.3);">
-                <div>
-                  <span class="action-icon-3d" style="animation-duration: 4s;">⭐</span>
-                  <div class="action-card-title">Mess Review</div>
+              <div class="action-tile-3d tile-green" (click)="switchTab('mess')">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #10b981, #059669); color: white;">⭐</div>
+                  <span style="font-size: 10.5px; font-weight: 800; color: #059669; background: rgba(16,185,129,0.12); padding: 3px 8px; border-radius: 10px;">DAILY</span>
                 </div>
-                <div class="action-card-sub">Rate daily food quality & upload photos</div>
+                <div>
+                  <div class="action-card-title" style="font-size: 15px; font-weight: 800;">Mess Review</div>
+                  <div class="action-card-sub" style="color: #047857;">Rate meal & upload photo</div>
+                </div>
               </div>
 
               <!-- Action 3: Notices & Broadcasts -->
-              <div class="action-card-3d" (click)="switchTab('notices')" style="background: linear-gradient(145deg, #ffffff 0%, #f5f3ff 100%); border: 1px solid rgba(139, 92, 246, 0.3);">
-                <div>
-                  <span class="action-icon-3d" style="animation-duration: 3.2s;">📢</span>
-                  <div class="action-card-title">Hostel Notices</div>
+              <div class="action-tile-3d tile-purple" (click)="switchTab('notices')">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white;">📢</div>
+                  <span style="font-size: 10.5px; font-weight: 800; color: #6d28d9; background: rgba(139,92,246,0.12); padding: 3px 8px; border-radius: 10px;">{{ announcements.length }} NEW</span>
                 </div>
-                <div class="action-card-sub">Read official Warden announcements ({{ announcements.length }})</div>
+                <div>
+                  <div class="action-card-title" style="font-size: 15px; font-weight: 800;">Hostel Notices</div>
+                  <div class="action-card-sub" style="color: #5b21b6;">Warden official broadcasts</div>
+                </div>
               </div>
 
               <!-- Action 4: My Tickets -->
-              <div class="action-card-3d" (click)="switchTab('my-complaints')" style="background: linear-gradient(145deg, #ffffff 0%, #fff7ed 100%); border: 1px solid rgba(245, 158, 11, 0.3);">
-                <div>
-                  <span class="action-icon-3d" style="animation-duration: 4.5s;">📋</span>
-                  <div class="action-card-title">My Tickets</div>
+              <div class="action-tile-3d tile-amber" (click)="switchTab('my-complaints')">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;">📋</div>
+                  <span style="font-size: 10.5px; font-weight: 800; color: #b45309; background: rgba(245,158,11,0.15); padding: 3px 8px; border-radius: 10px;">{{ getActiveTicketsCount() }} ACTIVE</span>
                 </div>
-                <div class="action-card-sub">Track active status ({{ getActiveTicketsCount() }} Pending)</div>
+                <div>
+                  <div class="action-card-title" style="font-size: 15px; font-weight: 800;">My Tickets</div>
+                  <div class="action-card-sub" style="color: #78350f;">Track live repair progress</div>
+                </div>
               </div>
             </div>
           </div>
