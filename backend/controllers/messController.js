@@ -3,22 +3,72 @@ const sequelize = require('../config/db');
 const { MessMenu, MessFeedback, MessSkip, User } = require('../models');
 const { Op } = require('sequelize');
 
-// Self-healing default menu seed data
+// Official Hostel Mess Menu Data
 const defaultMenu = [
-  { dayOfWeek: 'Monday', breakfast: 'Aloo Paratha with Curd & Pickle', lunch: 'Rajma Masala, Steamed Rice, Roti, Salad', snacks: 'Samosa & Hot Chai', dinner: 'Mix Veg, Dal Tadka, Roti, Kheer' },
-  { dayOfWeek: 'Tuesday', breakfast: 'Idli, Wada with Sambar & Coconut Chutney', lunch: 'Kadhi Pakoda, Jeera Rice, Roti, Aloo Jeera', snacks: 'Veg Pakora & Tea', dinner: 'Paneer Bhurji, Dal Fry, Roti, Gulab Jamun' },
-  { dayOfWeek: 'Wednesday', breakfast: 'Poha with Sev, Tea/Milk & Fruits', lunch: 'Veg Biryani, Veg Raita, Roti, Papad', snacks: 'Bread Cutlet & Coffee', dinner: 'Dal Makhani, Egg Curry / Paneer Pasanda, Roti, Ice Cream' },
-  { dayOfWeek: 'Thursday', breakfast: 'Puri Bhaji & Tea/Coffee', lunch: 'Chole Bhature, Boondi Raita, Onion Salad', snacks: 'Suji Halwa & Chai', dinner: 'Aloo Gobi Matar, Yellow Dal, Roti, Custard' },
-  { dayOfWeek: 'Friday', breakfast: 'Uttapam with Tomato & Coconut Chutney', lunch: 'Dal Fry, Rice, Seasonal Dry Veg, Roti', snacks: 'Kachori & Tea', dinner: 'Shahi Paneer, Butter Naan / Roti, Dal Fry, Halwa' },
-  { dayOfWeek: 'Saturday', breakfast: 'Bread Butter, Jam & Omelette / Sprouts', lunch: 'Veg Pulao, Kadhi, Roti, French Fries', snacks: 'Veg Roll & Coffee', dinner: 'Pav Bhaji, Pulao, Salad, Rasgulla' },
-  { dayOfWeek: 'Sunday', breakfast: 'Chole Kulche, Pickle & Lassi', lunch: 'Special Veg Thali (Paneer Butter Masala, Dal Makhani, Pulao, Roti, Sweet)', snacks: 'Cream Roll & Milk', dinner: 'Aloo Shimla Mirch, Khichdi / Roti, Curd' }
+  {
+    dayOfWeek: 'Monday',
+    breakfast: 'PLAIN PARATHA-03, ALU CHANA SABJI & TEA',
+    lunch: 'RICE, DAL, GREEN SABJI & GREEN CHATNI ACHAR',
+    snacks: 'SAMOSA-(02PCS) CHATNI & TEA (100ML)',
+    dinner: 'ROTI, RICE, CHANA DAL TADKA & MIX BHUJIYA'
+  },
+  {
+    dayOfWeek: 'Tuesday',
+    breakfast: 'PLAIN ROTI -04 PC, GHOOGHNI & TEA',
+    lunch: 'RICE, CURRY BARRY(04PCS) & ALU GREEN VEG BHUJIYA',
+    snacks: 'VEG CHOWMEIN-01 PLATE, TEA',
+    dinner: 'JEERA RICE, ROTI-5, CHANA DAL & GREEN VEG'
+  },
+  {
+    dayOfWeek: 'Wednesday',
+    breakfast: 'PURI 05 PCS, ALU CHANA SABJI, BUNDIYA & TEA',
+    lunch: 'RICE, DAL, RAJMA SABJI & PAPAD',
+    snacks: 'TOAST - 04PCS/MIXTURE & TEA',
+    dinner: 'ROTI, RICE, DAL, & FISH-02 PCS / BUTTER PANEER MASALA'
+  },
+  {
+    dayOfWeek: 'Thursday',
+    breakfast: 'IDLI- 03 PCS, SHAMBER AND CHANA DAL CHATNI & TEA',
+    lunch: 'RICE, DAL & GREEN VEG & ACHAR/CHATNI',
+    snacks: 'ALU CHOP(2Nos), CHATNI & TEA',
+    dinner: 'PURI ALU CHANA SABJI & KHEER'
+  },
+  {
+    dayOfWeek: 'Friday',
+    breakfast: 'SATTU PARATHA -02 PCS, ALU CHANA DAAL-SABJI & TEA',
+    lunch: 'RICE, DAL, SEASONAL VEG & SALAD',
+    snacks: 'PASTA -01 PLATE & TEA',
+    dinner: 'ROTI 4pcs, JEERA RICE, DAL & CHANA MASALA / EGG CURRY-01 + ALU PCS'
+  },
+  {
+    dayOfWeek: 'Saturday',
+    breakfast: 'METHI PARATHA-02, GREEN CHATNI & TEA',
+    lunch: 'KHICHRI, CHOKHA, PAPAD & ACHAR',
+    snacks: 'PAKODI/NIMKI & TEA',
+    dinner: 'ROTI, RICE, DAL & ALU DAM / MIX VEG'
+  },
+  {
+    dayOfWeek: 'Sunday',
+    breakfast: 'CHHOLA BHATHURA-02 PCS & TEA',
+    lunch: 'RICE, DAL, MIX VEG, RAITA',
+    snacks: 'TEA',
+    dinner: 'PULAO, ROTI-5 PCS, CHANA DAL, CHICKEN-03 PCS / MUTTER PANEER & SWEETS'
+  }
 ];
 
 const checkAndSeedMenu = async () => {
-  const count = await MessMenu.count();
-  if (count === 0) {
-    console.log('Seeding default Mess Menu...');
-    await MessMenu.bulkCreate(defaultMenu);
+  try {
+    for (const item of defaultMenu) {
+      const existing = await MessMenu.findOne({ where: { dayOfWeek: item.dayOfWeek } });
+      if (existing) {
+        await existing.update(item);
+      } else {
+        await MessMenu.create(item);
+      }
+    }
+    console.log('Official Mess Menu synchronized successfully.');
+  } catch (err) {
+    console.error('Error synchronizing mess menu:', err.message);
   }
 };
 
