@@ -759,7 +759,7 @@ import { AttendanceService } from '../../services/attendance.service';
                   </div>
                   <p class="comment-text" *ngIf="f.comment">"{{ f.comment }}"</p>
                   <div *ngIf="f.photoUrl || f.photo_url" style="margin-top: 8px;">
-                    <img [src]="getImageUrl(f.photoUrl || f.photo_url)" style="max-width: 100%; max-height: 200px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-color); cursor: pointer;" (click)="openPhotoModal(getImageUrl(f.photoUrl || f.photo_url))" alt="Mess food photo" />
+                    <img [src]="getImageUrl(f.photoUrl || f.photo_url)" style="max-width: 100%; max-height: 200px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-color); cursor: pointer;" (click)="openPhotoModal(getImageUrl(f.photoUrl || f.photo_url))" (error)="onImgError($event)" alt="Mess food photo" />
                   </div>
                   <div class="comment-author">
                     👨‍🎓 {{ f.student?.name || 'Student' }} · Room {{ f.student?.roomNumber || 'N/A' }} · {{ f.student?.hostelBlock || 'Hostel Block' }}
@@ -2995,6 +2995,12 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
     if (this.openDropdownId !== null) {
       this.openDropdownId = null;
       this.cdr.detectChanges();
+    }
+  }
+
+  onImgError(event: any): void {
+    if (event && event.target) {
+      event.target.style.display = 'none';
     }
   }
 }

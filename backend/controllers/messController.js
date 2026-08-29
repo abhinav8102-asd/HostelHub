@@ -1,3 +1,4 @@
+const fs = require('fs');
 const { MessMenu, MessFeedback, MessSkip, User } = require('../models');
 const { Op } = require('sequelize');
 
@@ -68,9 +69,27 @@ exports.submitFeedback = async (req, res) => {
 
     const ratingVal = parseInt(rating, 10) || 5;
 
-    let photoUrl = null;
+    let photoUrl = req.body.photoUrl || req.body.photo || null;
     if (req.file) {
-      photoUrl = `/uploads/${req.file.filename}`;
+      try {
+        const mimeType = req.file.mimetype || 'image/jpeg';
+        let base64Str = null;
+        if (req.file.buffer) {
+          base64Str = req.file.buffer.toString('base64');
+        } else if (req.file.path && fs.existsSync(req.file.path)) {
+          base64Str = fs.readFileSync(req.file.path).toString('base64');
+        }
+        if (base64Str) {
+          photoUrl = `data:${mimeType};base64,${base64Str}`;
+        } else if (req.file.filename) {
+          photoUrl = `/uploads/${req.file.filename}`;
+        }
+      } catch (fileErr) {
+        console.error('Error converting file to base64:', fileErr);
+        if (req.file.filename) {
+          photoUrl = `/uploads/${req.file.filename}`;
+        }
+      }
     }
 
     let feedback = null;

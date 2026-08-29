@@ -34,7 +34,7 @@ const MessFeedback = sequelize.define('MessFeedback', {
     allowNull: true
   },
   photoUrl: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: true,
     field: 'photo_url'
   }

@@ -922,6 +922,7 @@ import { API_CONFIG } from '../../config/api.config';
                       [src]="getImageUrl(f.photoUrl || f.photo_url)" 
                       style="max-width: 100%; max-height: 220px; border-radius: 10px; object-fit: cover; border: 1px solid var(--border-color); cursor: pointer; box-shadow: var(--shadow-sm);" 
                       (click)="openPhotoModal(getImageUrl(f.photoUrl || f.photo_url))" 
+                      (error)="onImgError($event)"
                       alt="Mess food photo" 
                     />
                   </div>

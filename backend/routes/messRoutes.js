@@ -6,14 +6,7 @@ const { verifyToken, requireRole } = require('../middleware/auth');
 const path = require('path');
 const multer = require('multer');
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '../uploads'));
-  },
-  filename: (req, file, cb) => {
-    cb(null, `mess-${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`);
-  }
-});
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 // Menu routes
