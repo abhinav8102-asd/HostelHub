@@ -2511,36 +2511,97 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     if (!imageUrl) return;
     const fullUrl = this.getImageUrl(imageUrl);
 
-    // 1. Try Blob fetch download with explicit CORS mode
+    // Show instant toast notification
+    this.activeToast = {
+      message: '📥 Downloading image to Gallery...',
+      type: 'info',
+      createdAt: new Date()
+    };
+    this.cdr.detectChanges();
+
+    const triggerDownload = (dataUrl: string) => {
+      try {
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        this.activeToast = {
+          message: '✅ Image downloaded to Gallery!',
+          type: 'success',
+          createdAt: new Date()
+        };
+        this.cdr.detectChanges();
+        setTimeout(() => this.clearToast(), 4000);
+      } catch (err) {
+        console.error('Download link trigger failed:', err);
+        window.open(dataUrl, '_blank');
+        this.activeToast = {
+          message: '✅ Image opened / downloaded!',
+          type: 'success',
+          createdAt: new Date()
+        };
+        this.cdr.detectChanges();
+        setTimeout(() => this.clearToast(), 4000);
+      }
+    };
+
+    // 1. Base64 URL direct trigger
+    if (fullUrl.startsWith('data:image')) {
+      triggerDownload(fullUrl);
+      return;
+    }
+
+    // 2. Canvas conversion (Reliable across Android WebView)
+    const img = new Image();
+    img.crossOrigin = 'Anonymous';
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth || img.width;
+        canvas.height = img.naturalHeight || img.height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+          triggerDownload(dataUrl);
+          return;
+        }
+      } catch (canvasErr) {
+        console.warn('Canvas conversion failed, fallback to fetch:', canvasErr);
+      }
+      this.fetchBlobDownload(fullUrl, fileName, triggerDownload);
+    };
+
+    img.onerror = () => {
+      this.fetchBlobDownload(fullUrl, fileName, triggerDownload);
+    };
+
+    img.src = fullUrl;
+  }
+
+  private fetchBlobDownload(fullUrl: string, fileName: string, callback: (dataUrl: string) => void): void {
     fetch(fullUrl, { mode: 'cors' })
-      .then(res => {
-        if (!res.ok) throw new Error('HTTP status ' + res.status);
-        return res.blob();
-      })
+      .then(res => res.blob())
       .then(blob => {
-        const blobUrl = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = blobUrl;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          callback(reader.result as string);
+        };
+        reader.readAsDataURL(blob);
       })
       .catch(err => {
-        console.warn('Blob fetch failed, falling back to direct anchor/browser open:', err);
-        try {
-          const a = document.createElement('a');
-          a.href = fullUrl;
-          a.target = '_blank';
-          a.download = fileName;
-          a.rel = 'noopener noreferrer';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-        } catch (e) {
-          window.open(fullUrl, '_blank');
-        }
+        console.warn('Fetch blob download fallback failed:', err);
+        window.open(fullUrl, '_blank');
+        this.activeToast = {
+          message: '✅ Image opened in browser for download!',
+          type: 'success',
+          createdAt: new Date()
+        };
+        this.cdr.detectChanges();
+        setTimeout(() => this.clearToast(), 4000);
       });
   }
 
