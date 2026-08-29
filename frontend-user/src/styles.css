@@ -215,33 +215,33 @@ body {
   z-index: 200;
 }
 
-/* ── CLEAN NATIVE MOBILE BOTTOM NAVIGATION BAR ── */
+/* ── NATIVE FIXED MOBILE BOTTOM NAVIGATION BAR ── */
 .bottom-tabs {
   position: fixed !important;
   bottom: 0 !important;
   top: auto !important;
   left: 0 !important;
   right: 0 !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  transform: none !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
   height: 62px !important;
   background: var(--bg-card) !important;
-  border-top: 1px solid var(--border-color) !important;
+  border-top: 1.5px solid var(--border-color) !important;
   border-bottom: none !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-around !important;
   padding: 0 4px !important;
-  z-index: 9990 !important;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08) !important;
+  z-index: 99999 !important;
+  order: unset !important;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1) !important;
   overflow: visible !important;
 }
 
 body.dark-mode .bottom-tabs {
   background: #0f172a !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4) !important;
+  border-top: 1.5px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5) !important;
 }
 
 .bottom-tabs::-webkit-scrollbar {
@@ -836,24 +836,24 @@ body.dark-mode .badge-resolved {
 
   /* Reposition tabs to the bottom of the screen (App-like navigation) */
   .bottom-tabs {
-    order: 4 !important;
     position: fixed !important;
     bottom: 0 !important;
     top: auto !important;
     left: 0 !important;
     right: 0 !important;
-    width: 100% !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
     height: 62px !important;
-    background-color: var(--bg-nav) !important;
-    border-top: 1px solid var(--border-color) !important;
+    background-color: var(--bg-card) !important;
+    border-top: 1.5px solid var(--border-color) !important;
     border-bottom: none !important;
     display: flex !important;
     align-items: center !important;
     justify-content: space-around !important;
     gap: 0 !important;
     padding: 0 4px !important;
-    z-index: 999 !important;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05) !important;
+    z-index: 99999 !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1) !important;
   }
 
   /* Adjust tab items for vertical stacking */
