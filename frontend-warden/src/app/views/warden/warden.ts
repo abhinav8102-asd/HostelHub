@@ -668,32 +668,90 @@ import { AttendanceService } from '../../services/attendance.service';
 
             <!-- 3. Student Feedback Reports -->
             <div class="card mess-card">
-              <h5>⭐ Student Mess Food Feedback</h5>
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+                <h5 style="margin: 0;">⭐ Student Mess Food Feedback</h5>
+                <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">Click card to filter by meal type</span>
+              </div>
               
-              <!-- Metrics Cards -->
+              <!-- Metrics Cards (Interactive Click-to-Filter by Meal) -->
               <div class="feedback-metrics" *ngIf="feedbackStats">
-                <div class="metric-box">
-                  <div class="metric-val">⭐ {{ feedbackStats.overallAvg }}</div>
-                  <div class="metric-lbl">Overall Quality</div>
+                <div 
+                  class="metric-box" 
+                  [style.border]="selectedMealFilter === 'all' ? '2px solid #b31031' : '1px solid var(--border-color)'"
+                  [style.background]="selectedMealFilter === 'all' ? 'rgba(179, 16, 49, 0.08)' : 'var(--bg-card)'"
+                  style="cursor: pointer; transition: all 0.2s ease; border-radius: 12px; padding: 10px;"
+                  (click)="filterByMeal('all')"
+                >
+                  <div class="metric-val" style="font-weight: 800; font-size: 16px; color: #b31031;">⭐ {{ feedbackStats.overallAvg }}</div>
+                  <div class="metric-lbl" style="font-size: 10.5px; font-weight: 700; color: var(--text-primary); margin-top: 2px;">All Reviews</div>
                 </div>
-                <div class="metric-box">
-                  <div class="metric-val">🍳 {{ feedbackStats.breakfastAvg }}</div>
-                  <div class="metric-lbl">Breakfast</div>
+
+                <div 
+                  class="metric-box" 
+                  [style.border]="selectedMealFilter === 'breakfast' ? '2px solid #b31031' : '1px solid var(--border-color)'"
+                  [style.background]="selectedMealFilter === 'breakfast' ? 'rgba(179, 16, 49, 0.08)' : 'var(--bg-card)'"
+                  style="cursor: pointer; transition: all 0.2s ease; border-radius: 12px; padding: 10px;"
+                  (click)="filterByMeal('breakfast')"
+                >
+                  <div class="metric-val" style="font-weight: 800; font-size: 16px; color: var(--text-primary);">🍳 {{ feedbackStats.breakfastAvg }}</div>
+                  <div class="metric-lbl" style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-top: 2px;">Breakfast</div>
                 </div>
-                <div class="metric-box">
-                  <div class="metric-val">🍛 {{ feedbackStats.lunchAvg }}</div>
-                  <div class="metric-lbl">Lunch</div>
+
+                <div 
+                  class="metric-box" 
+                  [style.border]="selectedMealFilter === 'lunch' ? '2px solid #b31031' : '1px solid var(--border-color)'"
+                  [style.background]="selectedMealFilter === 'lunch' ? 'rgba(179, 16, 49, 0.08)' : 'var(--bg-card)'"
+                  style="cursor: pointer; transition: all 0.2s ease; border-radius: 12px; padding: 10px;"
+                  (click)="filterByMeal('lunch')"
+                >
+                  <div class="metric-val" style="font-weight: 800; font-size: 16px; color: var(--text-primary);">🍛 {{ feedbackStats.lunchAvg }}</div>
+                  <div class="metric-lbl" style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-top: 2px;">Lunch</div>
                 </div>
-                <div class="metric-box">
-                  <div class="metric-val">🍽️ {{ feedbackStats.dinnerAvg }}</div>
-                  <div class="metric-lbl">Dinner</div>
+
+                <div 
+                  class="metric-box" 
+                  [style.border]="selectedMealFilter === 'dinner' ? '2px solid #b31031' : '1px solid var(--border-color)'"
+                  [style.background]="selectedMealFilter === 'dinner' ? 'rgba(179, 16, 49, 0.08)' : 'var(--bg-card)'"
+                  style="cursor: pointer; transition: all 0.2s ease; border-radius: 12px; padding: 10px;"
+                  (click)="filterByMeal('dinner')"
+                >
+                  <div class="metric-val" style="font-weight: 800; font-size: 16px; color: var(--text-primary);">🍽️ {{ feedbackStats.dinnerAvg }}</div>
+                  <div class="metric-lbl" style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-top: 2px;">Dinner</div>
                 </div>
               </div>
 
-              <!-- Reviews List -->
-              <h6 style="margin-top: 18px; margin-bottom: 8px;">Recent Comments & Ratings</h6>
-              <div class="comments-list" *ngIf="feedbacks.length > 0; else noReviews">
-                <div class="comment-item" *ngFor="let f of feedbacks">
+              <!-- Dual Filter Bar: Hostel Block Filter Dropdown + Meal Filter Badge -->
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; margin-bottom: 12px; gap: 10px; flex-wrap: wrap;">
+                <!-- Hostel Block Filter Dropdown -->
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span style="font-size: 12px; font-weight: 700; color: var(--text-muted);">🏠 Hostel:</span>
+                  <select 
+                    class="form-input" 
+                    [(ngModel)]="selectedHostelFilter" 
+                    (change)="cdr.detectChanges()"
+                    style="height: 36px; padding: 0 10px; font-size: 12px; font-weight: 700; border-radius: 8px; background: var(--bg-muted); border: 1px solid var(--border-color); color: var(--text-primary); cursor: pointer;"
+                  >
+                    <option value="all">🌐 All Hostels</option>
+                    <option value="Boys Hostel 1">🏠 Boys Hostel 1</option>
+                    <option value="Boys Hostel 2">🏠 Boys Hostel 2</option>
+                    <option value="Girls Hostel 1">🏠 Girls Hostel 1</option>
+                    <option value="Girls Hostel 2">🏠 Girls Hostel 2</option>
+                  </select>
+                </div>
+
+                <!-- Active Meal Filter Badge Indicator -->
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Filtered:</span>
+                  <span style="background: rgba(179, 16, 49, 0.12); color: #b31031; font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 20px; border: 1px solid rgba(179, 16, 49, 0.2);">
+                    {{ selectedMealFilter === 'all' ? 'ALL REVIEWS (' + filteredFeedbacks.length + ')' : (selectedMealFilter | uppercase) + ' (' + filteredFeedbacks.length + ')' }}
+                  </span>
+                  <button *ngIf="selectedMealFilter !== 'all' || selectedHostelFilter !== 'all'" (click)="selectedMealFilter = 'all'; selectedHostelFilter = 'all'; cdr.detectChanges()" style="background: none; border: none; color: #ef4444; font-size: 11px; font-weight: 700; cursor: pointer; text-decoration: underline;">Reset ✕</button>
+                </div>
+              </div>
+
+              <!-- Reviews List Filtered -->
+              <div class="comments-list" *ngIf="filteredFeedbacks.length > 0; else noReviews">
+                <div class="comment-item" *ngFor="let f of filteredFeedbacks">
                   <div class="comment-header">
                     <span class="rating-stars">⭐ {{ f.rating }}/5</span>
                     <span class="comment-meal">{{ f.mealType | titlecase }}</span>
@@ -2273,7 +2331,7 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
     private complaintService: ComplaintService,
     private socketService: SocketService,
     private router: Router,
-    private cdr: ChangeDetectorRef,
+    public cdr: ChangeDetectorRef,
     private messService: MessService,
     private attendanceService: AttendanceService
   ) {}
@@ -2708,6 +2766,28 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
         this.profileError = '❌ ' + (err.error?.message || 'Failed to update profile.');
         this.cdr.detectChanges();
       }
+    });
+  }
+
+  selectedMealFilter: 'all' | 'breakfast' | 'lunch' | 'snacks' | 'dinner' = 'all';
+  selectedHostelFilter: string = 'all';
+
+  filterByMeal(meal: 'all' | 'breakfast' | 'lunch' | 'snacks' | 'dinner'): void {
+    if (this.selectedMealFilter === meal) {
+      this.selectedMealFilter = 'all';
+    } else {
+      this.selectedMealFilter = meal;
+    }
+    this.cdr.detectChanges();
+  }
+
+  get filteredFeedbacks(): any[] {
+    return (this.feedbacks || []).filter(f => {
+      const matchMeal = this.selectedMealFilter === 'all' || (f.mealType || '').toLowerCase() === this.selectedMealFilter.toLowerCase();
+      const studentBlock = (f.student?.hostelBlock || '').toLowerCase().trim();
+      const filterBlock = this.selectedHostelFilter.toLowerCase().trim();
+      const matchHostel = this.selectedHostelFilter === 'all' || studentBlock.includes(filterBlock) || filterBlock.includes(studentBlock);
+      return matchMeal && matchHostel;
     });
   }
 
