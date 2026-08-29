@@ -697,14 +697,14 @@ import { AttendanceService } from '../../services/attendance.service';
                   <div class="comment-header">
                     <span class="rating-stars">⭐ {{ f.rating }}/5</span>
                     <span class="comment-meal">{{ f.mealType | titlecase }}</span>
-                    <span class="comment-date">{{ f.date | date:'mediumDate' }}</span>
+                    <span class="comment-date">{{ (f.createdAt || f.date) | date:'MMM d, y, h:mm a' }}</span>
                   </div>
                   <p class="comment-text" *ngIf="f.comment">"{{ f.comment }}"</p>
-                  <div *ngIf="f.photoUrl" style="margin-top: 8px;">
-                    <img [src]="getImageUrl(f.photoUrl)" style="max-width: 100%; max-height: 180px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-color); cursor: pointer;" (click)="openPhotoModal(getImageUrl(f.photoUrl))" alt="Mess food photo" />
+                  <div *ngIf="f.photoUrl || f.photo_url" style="margin-top: 8px;">
+                    <img [src]="getImageUrl(f.photoUrl || f.photo_url)" style="max-width: 100%; max-height: 200px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-color); cursor: pointer;" (click)="openPhotoModal(getImageUrl(f.photoUrl || f.photo_url))" alt="Mess food photo" />
                   </div>
                   <div class="comment-author">
-                    👨‍🎓 {{ f.student?.name }} · Room {{ f.student?.roomNumber }} · {{ f.student?.hostelBlock }}
+                    👨‍🎓 {{ f.student?.name || 'Student' }} · Room {{ f.student?.roomNumber || 'N/A' }} · {{ f.student?.hostelBlock || 'Hostel Block' }}
                   </div>
                 </div>
               </div>

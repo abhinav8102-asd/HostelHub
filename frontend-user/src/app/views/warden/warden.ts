@@ -846,15 +846,30 @@ import { API_CONFIG } from '../../config/api.config';
               <!-- Reviews List -->
               <h6 style="margin-top: 18px; margin-bottom: 8px;">Recent Comments & Ratings</h6>
               <div class="comments-list" *ngIf="feedbacks.length > 0; else noReviews">
-                <div class="comment-item" *ngFor="let f of feedbacks">
-                  <div class="comment-header">
-                    <span class="rating-stars">⭐ {{ f.rating }}/5</span>
-                    <span class="comment-meal">{{ f.mealType | titlecase }}</span>
-                    <span class="comment-date">{{ f.date | date:'mediumDate' }}</span>
+                <div class="comment-item" *ngFor="let f of feedbacks" style="margin-bottom: 12px; padding: 14px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-color);">
+                  <div class="comment-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span class="rating-stars" style="font-weight: 800; color: #f59e0b;">⭐ {{ f.rating }}/5</span>
+                      <span class="comment-meal" style="background: rgba(179, 16, 49, 0.1); color: #b31031; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase;">{{ f.mealType }}</span>
+                    </div>
+                    <span class="comment-date" style="font-size: 11px; color: var(--text-muted); font-weight: 600;">
+                      📅 {{ (f.createdAt || f.date) | date:'MMM d, y, h:mm a' }}
+                    </span>
                   </div>
-                  <p class="comment-text" *ngIf="f.comment">"{{ f.comment }}"</p>
-                  <div class="comment-author">
-                    👨‍🎓 {{ f.student?.name }} · Room {{ f.student?.roomNumber }} · {{ f.student?.hostelBlock }}
+                  <p class="comment-text" *ngIf="f.comment" style="font-style: italic; font-size: 13.5px; margin: 8px 0; color: var(--text-primary);">"{{ f.comment }}"</p>
+                  
+                  <!-- Food Photo Attachment with Click-to-Zoom (Same as Notice Photo) -->
+                  <div *ngIf="f.photoUrl || f.photo_url" style="margin-top: 10px; margin-bottom: 10px;">
+                    <img 
+                      [src]="getImageUrl(f.photoUrl || f.photo_url)" 
+                      style="max-width: 100%; max-height: 220px; border-radius: 10px; object-fit: cover; border: 1px solid var(--border-color); cursor: pointer; box-shadow: var(--shadow-sm);" 
+                      (click)="openPhotoModal(getImageUrl(f.photoUrl || f.photo_url))" 
+                      alt="Mess food photo" 
+                    />
+                  </div>
+
+                  <div class="comment-author" style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">
+                    👨‍🎓 <strong>{{ f.student?.name || 'Student' }}</strong> · Room {{ f.student?.roomNumber || 'N/A' }} · {{ f.student?.hostelBlock || 'Hostel Block' }}
                   </div>
                 </div>
               </div>

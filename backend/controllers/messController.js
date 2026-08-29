@@ -195,7 +195,15 @@ exports.getFeedbackStats = async (req, res) => {
     stats.lunchAvg = stats.lunchCount ? +(lRating / stats.lunchCount).toFixed(1) : 0;
     stats.dinnerAvg = stats.dinnerCount ? +(dRating / stats.dinnerCount).toFixed(1) : 0;
 
-    res.status(200).json({ stats, feedbacks });
+    const formattedFeedbacks = feedbacks.map(f => {
+      const plain = f.get({ plain: true });
+      return {
+        ...plain,
+        photoUrl: plain.photoUrl || plain.photo_url || null
+      };
+    });
+
+    res.status(200).json({ stats, feedbacks: formattedFeedbacks });
   } catch (error) {
     console.error('Error fetching feedback stats:', error);
     res.status(500).json({ message: 'Error retrieving feedback stats.' });
