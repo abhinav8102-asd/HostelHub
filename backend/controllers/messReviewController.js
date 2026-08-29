@@ -34,17 +34,33 @@ exports.getMessAnalytics = async (req, res) => {
         }
       ],
       order: [['createdAt', 'DESC']],
-      limit: 100
+      limit: 500
     });
 
     let totalRating = 0;
+    let bTotal = 0, bCount = 0;
+    let lTotal = 0, lCount = 0;
+    let sTotal = 0, sCount = 0;
+    let dTotal = 0, dCount = 0;
+
     const normalizedFeedbacks = (feedbacks || []).map(f => {
-      totalRating += (f.rating || 0);
+      const rating = Number(f.rating) || 0;
+      totalRating += rating;
+
+      const m = (f.mealType || '').toLowerCase().trim();
+      if (m === 'breakfast') { bTotal += rating; bCount++; }
+      else if (m === 'lunch') { lTotal += rating; lCount++; }
+      else if (m === 'snacks') { sTotal += rating; sCount++; }
+      else if (m === 'dinner') { dTotal += rating; dCount++; }
+
       return {
         id: f.id,
-        mealType: f.mealType,
+        mealType: f.mealType || 'General',
         foodQuality: f.rating,
+        rating: f.rating,
         comments: f.comment || '',
+        comment: f.comment || '',
+        photoUrl: f.photoUrl || f.photo_url || null,
         student: f.student ? f.student.toJSON() : { name: 'Student', roomNumber: 'N/A', hostelBlock: 'Block' },
         createdAt: f.createdAt
       };
@@ -52,11 +68,19 @@ exports.getMessAnalytics = async (req, res) => {
 
     const totalReviews = normalizedFeedbacks.length;
     const avgRating = totalReviews > 0 ? (totalRating / totalReviews).toFixed(1) : '0.0';
+    const breakfastAvg = bCount > 0 ? (bTotal / bCount).toFixed(1) : '0.0';
+    const lunchAvg = lCount > 0 ? (lTotal / lCount).toFixed(1) : '0.0';
+    const snacksAvg = sCount > 0 ? (sTotal / sCount).toFixed(1) : '0.0';
+    const dinnerAvg = dCount > 0 ? (dTotal / dCount).toFixed(1) : '0.0';
 
     return res.json({
       summary: {
         totalReviews,
-        avgRating
+        avgRating,
+        breakfastAvg,
+        lunchAvg,
+        snacksAvg,
+        dinnerAvg
       },
       reviews: normalizedFeedbacks
     });
