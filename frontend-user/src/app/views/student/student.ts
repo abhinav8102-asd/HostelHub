@@ -177,7 +177,7 @@ import { API_CONFIG } from '../../config/api.config';
         <div *ngIf="activeTab === 'home'" class="tab-panel animate-fade">
           
           <!-- 1. Sleek Compact Glass Greeting Banner -->
-          <div style="background: linear-gradient(135deg, rgba(37,99,235,0.08) 0%, rgba(56,189,248,0.12) 100%); border-radius: 20px; padding: 16px 20px; border: 1.5px solid rgba(37,99,235,0.2); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 8px 24px rgba(37,99,235,0.06);">
+          <div class="stagger-1 cyber-card-shimmer" style="background: linear-gradient(135deg, rgba(37,99,235,0.08) 0%, rgba(56,189,248,0.12) 100%); border-radius: 20px; padding: 16px 20px; border: 1.5px solid rgba(37,99,235,0.2); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 8px 24px rgba(37,99,235,0.06);">
             <div>
               <span style="font-size: 11px; font-weight: 800; color: #2563eb; letter-spacing: 0.6px; text-transform: uppercase; display: block; margin-bottom: 2px;">⚡ Student Command Center</span>
               <h4 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--text-primary);">Hello, {{ user?.name }}! 👋</h4>
@@ -191,64 +191,64 @@ import { API_CONFIG } from '../../config/api.config';
 
           <!-- 2. Vibrant 3D Quick Action Grid Launchpad -->
           <div style="margin-top: 10px; margin-bottom: 28px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <div class="stagger-2" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
               <h4 style="margin: 0; font-size: 17px; font-weight: 900; color: var(--text-primary);">🚀 Quick Launchpad</h4>
               <span style="font-size: 11.5px; font-weight: 800; color: #2563eb;">1-Tap Access</span>
             </div>
 
             <div class="action-grid-3d" style="gap: 14px;">
               <!-- Action 1: Raise Complaint -->
-              <div class="action-tile-3d tile-blue" (click)="switchTab('raise')">
+              <div class="cyber-action-card neon-blue-card cyber-card-shimmer stagger-2" (click)="switchTab('raise')">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white;">🚀</div>
-                  <span style="font-size: 10.5px; font-weight: 800; color: #2563eb; background: rgba(37,99,235,0.12); padding: 3px 8px; border-radius: 10px;">URGENT</span>
+                  <div class="cyber-icon-glow" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white;">🚀</div>
+                  <span style="font-size: 10.5px; font-weight: 900; color: #2563eb; background: rgba(37,99,235,0.12); padding: 3px 8px; border-radius: 10px;">URGENT</span>
                 </div>
-                <div>
-                  <div class="action-card-title" style="font-size: 15px; font-weight: 800;">Raise Issue</div>
-                  <div class="action-card-sub" style="color: #475569;">Submit ticket to staff</div>
+                <div style="margin-top: 12px;">
+                  <div class="action-card-title" style="font-size: 16px; font-weight: 900;">Raise Issue</div>
+                  <div class="action-card-sub" style="color: #475569; font-size: 12px;">Submit ticket to staff</div>
                 </div>
               </div>
 
               <!-- Action 2: Mess Review -->
-              <div class="action-tile-3d tile-green" (click)="switchTab('mess')">
+              <div class="cyber-action-card neon-green-card cyber-card-shimmer stagger-3" (click)="switchTab('mess')">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #10b981, #059669); color: white;">⭐</div>
-                  <span style="font-size: 10.5px; font-weight: 800; color: #059669; background: rgba(16,185,129,0.12); padding: 3px 8px; border-radius: 10px;">DAILY</span>
+                  <div class="cyber-icon-glow" style="background: linear-gradient(135deg, #10b981, #059669); color: white;">⭐</div>
+                  <span style="font-size: 10.5px; font-weight: 900; color: #059669; background: rgba(16,185,129,0.12); padding: 3px 8px; border-radius: 10px;">DAILY</span>
                 </div>
-                <div>
-                  <div class="action-card-title" style="font-size: 15px; font-weight: 800;">Mess Review</div>
-                  <div class="action-card-sub" style="color: #047857;">Rate meal & upload photo</div>
+                <div style="margin-top: 12px;">
+                  <div class="action-card-title" style="font-size: 16px; font-weight: 900;">Mess Review</div>
+                  <div class="action-card-sub" style="color: #047857; font-size: 12px;">Rate meal & upload photo</div>
                 </div>
               </div>
 
               <!-- Action 3: Notices & Broadcasts -->
-              <div class="action-tile-3d tile-purple" (click)="switchTab('notices')">
+              <div class="cyber-action-card neon-purple-card cyber-card-shimmer stagger-4" (click)="switchTab('notices')">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white;">📢</div>
-                  <span style="font-size: 10.5px; font-weight: 800; color: #6d28d9; background: rgba(139,92,246,0.12); padding: 3px 8px; border-radius: 10px;">{{ announcements.length }} NEW</span>
+                  <div class="cyber-icon-glow" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white;">📢</div>
+                  <span style="font-size: 10.5px; font-weight: 900; color: #6d28d9; background: rgba(139,92,246,0.12); padding: 3px 8px; border-radius: 10px;">{{ announcements.length }} NEW</span>
                 </div>
-                <div>
-                  <div class="action-card-title" style="font-size: 15px; font-weight: 800;">Hostel Notices</div>
-                  <div class="action-card-sub" style="color: #5b21b6;">Warden official broadcasts</div>
+                <div style="margin-top: 12px;">
+                  <div class="action-card-title" style="font-size: 16px; font-weight: 900;">Hostel Notices</div>
+                  <div class="action-card-sub" style="color: #5b21b6; font-size: 12px;">Warden official broadcasts</div>
                 </div>
               </div>
 
               <!-- Action 4: My Tickets -->
-              <div class="action-tile-3d tile-amber" (click)="switchTab('my-complaints')">
+              <div class="cyber-action-card neon-amber-card cyber-card-shimmer stagger-5" (click)="switchTab('my-complaints')">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;">📋</div>
-                  <span style="font-size: 10.5px; font-weight: 800; color: #b45309; background: rgba(245,158,11,0.15); padding: 3px 8px; border-radius: 10px;">{{ getActiveTicketsCount() }} ACTIVE</span>
+                  <div class="cyber-icon-glow" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;">📋</div>
+                  <span style="font-size: 10.5px; font-weight: 900; color: #b45309; background: rgba(245,158,11,0.15); padding: 3px 8px; border-radius: 10px;">{{ getActiveTicketsCount() }} ACTIVE</span>
                 </div>
-                <div>
-                  <div class="action-card-title" style="font-size: 15px; font-weight: 800;">My Tickets</div>
-                  <div class="action-card-sub" style="color: #78350f;">Track live repair progress</div>
+                <div style="margin-top: 12px;">
+                  <div class="action-card-title" style="font-size: 16px; font-weight: 900;">My Tickets</div>
+                  <div class="action-card-sub" style="color: #78350f; font-size: 12px;">Track live repair progress</div>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- 3. Futuristic Horizontal Notice Reel Stream -->
-          <div class="section-header" style="margin-top: 24px;">
+          <div class="section-header stagger-4" style="margin-top: 24px;">
             <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
               <div>
                 <h4 style="margin: 0; font-size: 16.5px; font-weight: 900; color: var(--text-primary);">📢 Official Notice Reel</h4>
