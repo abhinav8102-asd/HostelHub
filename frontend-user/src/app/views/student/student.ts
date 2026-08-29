@@ -68,104 +68,25 @@ import { API_CONFIG } from '../../config/api.config';
         </div>
       </div>
 
-      <!-- FUTURISTIC GLASS SIDEBAR DRAWER OVERLAY -->
-      <div class="sidebar-backdrop animate-fade" *ngIf="isSidebarOpen" (click)="closeSidebar()">
-        <div class="sidebar-drawer" (click)="$event.stopPropagation()">
-          <!-- Sidebar Header -->
-          <div class="sidebar-header">
-            <div class="sidebar-user-info">
-              <div class="sidebar-avatar-ring">
-                <span class="sidebar-avatar" *ngIf="!user?.profilePicUrl">🎓</span>
-                <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" class="sidebar-avatar-img" />
-              </div>
-              <div>
-                <h4 class="sidebar-user-name">{{ user?.name }}</h4>
-                <span class="sidebar-user-role">🎓 Student · Room {{ user?.roomNumber }}</span>
-                <span class="sidebar-user-block">🏢 {{ user?.hostelBlock || 'Hostel' }}</span>
-              </div>
-            </div>
-            <button type="button" class="sidebar-close-btn" (click)="closeSidebar()">✕</button>
+      <!-- HEADER -->
+      <div class="header" *ngIf="activeTab !== 'chat'">
+        <div class="user-info" (click)="switchTab('my-profile')" style="cursor: pointer;" title="View Profile">
+          <div class="avatar-ring">
+            <span class="avatar" *ngIf="!user?.profilePicUrl">🎓</span>
+            <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" (error)="onAvatarError($event)" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
           </div>
-
-          <!-- Navigation Links List -->
-          <div class="sidebar-nav-menu">
-            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'home'" (click)="switchTab('home'); closeSidebar()">
-              <span class="sidebar-nav-icon">🏠</span>
-              <span>Home Dashboard</span>
-            </button>
-
-            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'notices'" (click)="switchTab('notices'); closeSidebar()">
-              <span class="sidebar-nav-icon">📢</span>
-              <span>Official Notices</span>
-              <span class="sidebar-badge" *ngIf="getUnreadNoticesCount() > 0">{{ getUnreadNoticesCount() }}</span>
-            </button>
-
-            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'raise'" (click)="switchTab('raise'); closeSidebar()">
-              <span class="sidebar-nav-icon">🚀</span>
-              <span>Raise Complaint</span>
-            </button>
-
-            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'mess'" (click)="switchTab('mess'); closeSidebar()">
-              <span class="sidebar-nav-icon">🍴</span>
-              <span>Mess Food Reviews</span>
-            </button>
-
-            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'my-complaints'" (click)="switchTab('my-complaints'); closeSidebar()">
-              <span class="sidebar-nav-icon">📋</span>
-              <span>My Tickets Tracker</span>
-              <span class="sidebar-badge" *ngIf="getActiveTicketsCount() > 0">{{ getActiveTicketsCount() }}</span>
-            </button>
-
-            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'profile'" (click)="switchTab('profile'); closeSidebar()">
-              <span class="sidebar-nav-icon">🔔</span>
-              <span>Notifications & Alerts</span>
-              <span class="sidebar-badge" *ngIf="getUnreadNotificationsCount() > 0">{{ getUnreadNotificationsCount() }}</span>
-            </button>
-
-            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'my-profile'" (click)="switchTab('my-profile'); closeSidebar()">
-              <span class="sidebar-nav-icon">👤</span>
-              <span>Account Profile</span>
-            </button>
-          </div>
-
-          <!-- Sidebar Footer Logout Button -->
-          <div class="sidebar-footer-box">
-            <button type="button" class="sidebar-logout-btn" (click)="logout()">
-              <span>🚪 Logout Account</span>
-            </button>
+          <div>
+            <h3>{{ user?.name }}</h3>
+            <p class="user-meta">{{ user?.hostelBlock }} · Room {{ user?.roomNumber }}</p>
           </div>
         </div>
-      </div>
-
-      <!-- FUTURISTIC 2026 CYBER COMMAND BAR -->
-      <div class="cyber-header-bar" *ngIf="activeTab !== 'chat'">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <!-- ☰ Hamburger Drawer Toggle Button -->
-          <button type="button" class="hamburger-btn" (click)="toggleSidebar()" title="Open Navigation Menu">
-            <span>☰</span>
-          </button>
-
-          <!-- User Pill -->
-          <div class="cyber-user-pill" (click)="switchTab('my-profile')" title="View Profile">
-            <div class="cyber-avatar-ring">
-              <span class="cyber-avatar" *ngIf="!user?.profilePicUrl">🎓</span>
-              <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" (error)="onAvatarError($event)" class="cyber-avatar-img" />
-              <span class="cyber-online-dot"></span>
-            </div>
-            <div class="cyber-user-greeting">
-              <span class="cyber-user-name">{{ user?.name }}</span>
-              <span class="cyber-block-badge">🏢 {{ user?.hostelBlock || 'Hostel' }} · Room {{ user?.roomNumber }}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="cyber-actions-right">
-          <div class="cyber-stat-chip clickable" (click)="switchTab('my-complaints')" title="View Tickets">
-            <span class="chip-num">{{ complaints.length }}</span>
-            <span class="chip-label">TICKETS</span>
-          </div>
-          <button class="cyber-icon-btn" (click)="toggleDarkMode()" [title]="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+        <div class="header-actions">
+          <button class="theme-toggle-btn" (click)="toggleDarkMode()" [title]="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
             {{ isDarkMode ? '☀️' : '🌙' }}
+          </button>
+          <button class="logout-btn" (click)="logout()">
+            <span>Logout</span>
+            <span>🚪</span>
           </button>
         </div>
       </div>
@@ -173,89 +94,48 @@ import { API_CONFIG } from '../../config/api.config';
       <!-- MAIN TABS CONTAINER -->
       <div class="tab-content-area">
 
-        <!-- TAB 0: HOME / COMMAND CENTER -->
+        <!-- TAB 0: HOME / NOTICES -->
         <div *ngIf="activeTab === 'home'" class="tab-panel animate-fade">
           
-          <!-- 1. Sleek Compact Glass Greeting Banner -->
-          <div style="background: linear-gradient(135deg, rgba(37,99,235,0.08) 0%, rgba(56,189,248,0.12) 100%); border-radius: 20px; padding: 16px 20px; border: 1.5px solid rgba(37,99,235,0.2); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 8px 24px rgba(37,99,235,0.06);">
-            <div>
-              <span style="font-size: 11px; font-weight: 800; color: #2563eb; letter-spacing: 0.6px; text-transform: uppercase; display: block; margin-bottom: 2px;">⚡ Student Command Center</span>
-              <h4 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--text-primary);">Hello, {{ user?.name }}! 👋</h4>
-            </div>
-            <div style="display: flex; gap: 8px;">
-              <span style="background: #eff6ff; color: #2563eb; border: 1px solid rgba(37,99,235,0.2); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 800;">
-                🎓 {{ user?.batch || 'Batch 2025' }}
-              </span>
-            </div>
-          </div>
-
-          <!-- 2. Vibrant 3D Quick Action Grid Launchpad (Clean - No Flashing Animations) -->
-          <div style="margin-top: 10px; margin-bottom: 28px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-              <h4 style="margin: 0; font-size: 17px; font-weight: 900; color: var(--text-primary);">🚀 Quick Launchpad</h4>
-              <span style="font-size: 11.5px; font-weight: 800; color: #2563eb;">1-Tap Access</span>
-            </div>
-
-            <div class="action-grid-3d" style="gap: 14px;">
-              <!-- Action 1: Raise Complaint -->
-              <div class="action-tile-3d tile-blue" (click)="switchTab('raise')">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white;">🚀</div>
-                  <span style="font-size: 10.5px; font-weight: 800; color: #2563eb; background: rgba(37,99,235,0.12); padding: 3px 8px; border-radius: 10px;">URGENT</span>
-                </div>
-                <div>
-                  <div class="action-card-title" style="font-size: 15px; font-weight: 800;">Raise Issue</div>
-                  <div class="action-card-sub" style="color: #475569;">Submit ticket to staff</div>
+          <!-- 1. Student Profile Card (Top Widget) -->
+          <div class="card student-profile-card">
+            <div class="profile-card-pattern"></div>
+            <div class="profile-card-content">
+              <div class="profile-user-img-wrapper">
+                <span class="profile-avatar-emoji" *ngIf="!user?.profilePicUrl">🎓</span>
+                <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" class="profile-user-img" />
+              </div>
+              <div class="profile-user-details">
+                <div class="welcome-tag">Welcome back,</div>
+                <h4 class="profile-user-name">{{ user?.name }}</h4>
+                <div class="profile-pills">
+                  <span class="profile-pill block-pill">🏢 {{ user?.hostelBlock || 'N/A' }}</span>
+                  <span class="profile-pill room-pill">🔑 Room {{ user?.roomNumber || 'N/A' }}</span>
+                  <span class="profile-pill batch-pill">🎓 {{ user?.batch || 'Batch 2025' }}</span>
                 </div>
               </div>
-
-              <!-- Action 2: Mess Review -->
-              <div class="action-tile-3d tile-green" (click)="switchTab('mess')">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #10b981, #059669); color: white;">⭐</div>
-                  <span style="font-size: 10.5px; font-weight: 800; color: #059669; background: rgba(16,185,129,0.12); padding: 3px 8px; border-radius: 10px;">DAILY</span>
+              <div class="profile-quick-stats">
+                <div class="stat-item clickable" (click)="switchTab('my-complaints')">
+                  <span class="stat-count">{{ complaints.length }}</span>
+                  <span class="stat-label">Total Tickets</span>
                 </div>
-                <div>
-                  <div class="action-card-title" style="font-size: 15px; font-weight: 800;">Mess Review</div>
-                  <div class="action-card-sub" style="color: #047857;">Rate meal & upload photo</div>
-                </div>
-              </div>
-
-              <!-- Action 3: Notices & Broadcasts -->
-              <div class="action-tile-3d tile-purple" (click)="switchTab('notices')">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white;">📢</div>
-                  <span style="font-size: 10.5px; font-weight: 800; color: #6d28d9; background: rgba(139,92,246,0.12); padding: 3px 8px; border-radius: 10px;">{{ announcements.length }} NEW</span>
-                </div>
-                <div>
-                  <div class="action-card-title" style="font-size: 15px; font-weight: 800;">Hostel Notices</div>
-                  <div class="action-card-sub" style="color: #5b21b6;">Warden official broadcasts</div>
-                </div>
-              </div>
-
-              <!-- Action 4: My Tickets -->
-              <div class="action-tile-3d tile-amber" (click)="switchTab('my-complaints')">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;">📋</div>
-                  <span style="font-size: 10.5px; font-weight: 800; color: #b45309; background: rgba(245,158,11,0.15); padding: 3px 8px; border-radius: 10px;">{{ getActiveTicketsCount() }} ACTIVE</span>
-                </div>
-                <div>
-                  <div class="action-card-title" style="font-size: 15px; font-weight: 800;">My Tickets</div>
-                  <div class="action-card-sub" style="color: #78350f;">Track live repair progress</div>
+                <div class="stat-item resolved clickable" (click)="switchTab('my-complaints')">
+                  <span class="stat-count">{{ getResolvedCount() }}</span>
+                  <span class="stat-label">Resolved</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- 3. Futuristic Horizontal Notice Reel Stream -->
+          <!-- 1.5 Official Hostel Notices & Broadcasts Stream -->
           <div class="section-header" style="margin-top: 24px;">
             <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
               <div>
-                <h4 style="margin: 0; font-size: 16.5px; font-weight: 900; color: var(--text-primary);">📢 Official Notice Reel</h4>
-                <p class="section-subtitle" style="margin: 2px 0 0 0;">Live announcements from Hostel Administration</p>
+                <h4 style="margin: 0; font-size: 16px; font-weight: 800;">📢 Official Hostel Notices & Broadcasts</h4>
+                <p class="section-subtitle" style="margin: 2px 0 0 0;">Important announcements broadcasted by Wardens & Administration.</p>
               </div>
-              <button class="btn" (click)="switchTab('notices')" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; font-size: 11.5px; font-weight: 800; padding: 6px 12px; border-radius: 12px; border: 1px solid rgba(37, 99, 235, 0.25);">
-                View All ({{ announcements.length }}) →
+              <button class="btn" (click)="switchTab('notices')" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; font-size: 11.5px; font-weight: 700; padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(37, 99, 235, 0.2);">
+                View All Notices ({{ announcements.length }})
               </button>
             </div>
           </div>
@@ -264,23 +144,22 @@ import { API_CONFIG } from '../../config/api.config';
             <div class="skeleton skeleton-card"></div>
           </div>
 
-          <!-- Horizontal Carousel Reel of Notice Cards -->
-          <div *ngIf="!isLoadingAnnouncements && announcements.length > 0" class="notice-reel-container">
-            <div *ngFor="let notice of announcements.slice(0, 5)" class="notice-reel-card" (click)="openNoticeModal(notice)">
-              <div class="notice-card-header">
-                <span class="notice-tag">
-                  {{ notice.hostelBlock === 'All' ? '🌐 ALL HOSTELS' : '🏠 BLOCK ' + notice.hostelBlock }}
+          <div *ngIf="!isLoadingAnnouncements && announcements.length > 0" style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
+            <div *ngFor="let notice of announcements.slice(0, 3)" class="card animate-hover" style="border: 1px solid var(--border-color); padding: 16px; border-radius: 16px; background: var(--bg-card); cursor: pointer;" (click)="openNoticeModal(notice)">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span class="notice-block-tag" style="background: #eff6ff; color: #2563eb; font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 6px; text-transform: uppercase;">
+                  {{ notice.hostelBlock === 'All' ? '🌐 All Hostels' : '🏠 ' + notice.hostelBlock }}
                 </span>
-                <span class="notice-date">📅 {{ notice.createdAt | date:'d MMM' }}</span>
+                <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">
+                  📅 {{ notice.createdAt | date:'d MMM, h:mm a' }}
+                </span>
               </div>
-              <h5 class="notice-title">{{ notice.title }}</h5>
-              <p class="notice-preview">{{ notice.content }}</p>
-              <div *ngIf="notice.photoUrl" class="notice-photo-box">
-                <img [src]="getImageUrl(notice.photoUrl)" alt="Attachment" />
-              </div>
-              <div class="notice-card-footer">
-                <span>By: <strong>{{ notice.creator?.name || 'Warden' }}</strong></span>
-                <span class="read-more">Read Notice 🔍</span>
+              <h5 style="margin: 4px 0 6px 0; font-size: 15px; font-weight: 800; color: var(--text-primary);">{{ notice.title }}</h5>
+              <p style="margin: 0; font-size: 12.5px; color: var(--text-secondary); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                {{ notice.content }}
+              </p>
+              <div *ngIf="notice.photoUrl" style="margin-top: 10px;">
+                <img [src]="getImageUrl(notice.photoUrl)" style="width: 100%; max-height: 160px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border-color);" />
               </div>
             </div>
           </div>
@@ -293,6 +172,8 @@ import { API_CONFIG } from '../../config/api.config';
           <!-- 2. Dynamic Warden Section -->
           <div class="section-header" style="margin-top: 32px;">
             <h4>👨‍💼 Your Hostel Wardens</h4>
+            <p class="section-subtitle">Reach out to wardens assigned to your block for support and approvals.</p>
+          </div>
 
           <div *ngIf="isLoadingWardens" class="skeleton-list">
             <div class="skeleton skeleton-card"></div>
@@ -367,49 +248,24 @@ import { API_CONFIG } from '../../config/api.config';
             </div>
           </div>
 
-          <!-- 4. Futuristic App Info Showcase Section -->
-          <div style="margin-top: 32px; margin-bottom: 20px;">
-            <div style="background: linear-gradient(135deg, rgba(37,99,235,0.06) 0%, rgba(56,189,248,0.1) 100%); border-radius: 24px; padding: 22px 20px; border: 1.5px solid rgba(37,99,235,0.2); box-shadow: 0 12px 32px -8px rgba(37,99,235,0.1);">
-              
-              <!-- Overview Card -->
-              <div style="margin-bottom: 24px;">
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                  <span style="font-size: 10.5px; font-weight: 900; color: #2563eb; background: rgba(37,99,235,0.12); padding: 4px 10px; border-radius: 10px; letter-spacing: 0.8px; text-transform: uppercase;">⚡ SYSTEM OVERVIEW</span>
-                </div>
-                <h4 style="margin: 4px 0 8px 0; font-size: 20px; font-weight: 900; color: var(--text-primary);">What is HostelHub?</h4>
-                <p style="margin: 0; font-size: 13.5px; color: var(--text-secondary); line-height: 1.6;">
-                  {{ publicSettings.app_about || 'HostelHub is an all-in-one digital platform designed to streamline hostel management. It allows students to raise maintenance tickets instantly, monitors staff assignments, skips mess meals, tracks attendance, and updates students with official announcements.' }}
-                </p>
-                
-                <!-- 3 Capability Pills -->
-                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px;">
-                  <span style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 12px; font-size: 11.5px; font-weight: 800; color: var(--text-primary);">⚡ Instant Ticket Dispatch</span>
-                  <span style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 12px; font-size: 11.5px; font-weight: 800; color: var(--text-primary);">🍽️ Daily Mess Rating</span>
-                  <span style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 12px; font-size: 11.5px; font-weight: 800; color: var(--text-primary);">📢 Official Warden Feed</span>
-                </div>
+          <!-- 4. App Info/Description Section -->
+          <div class="card app-info-card" style="margin-top: 32px;">
+            <div class="app-info-grid">
+              <div class="app-info-about">
+                <div class="info-tag">Overview</div>
+                <h4>What is HostelHub?</h4>
+                <p>{{ publicSettings.app_about }}</p>
               </div>
-
-              <div style="height: 1px; background: var(--border-color); margin-bottom: 24px;"></div>
-
-              <!-- Process Flow Timeline -->
-              <div>
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                  <span style="font-size: 10.5px; font-weight: 900; color: #10b981; background: rgba(16,185,129,0.12); padding: 4px 10px; border-radius: 10px; letter-spacing: 0.8px; text-transform: uppercase;">🔄 WORKFLOW PIPELINE</span>
-                </div>
-                <h4 style="margin: 4px 0 16px 0; font-size: 20px; font-weight: 900; color: var(--text-primary);">How It Works</h4>
-
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
-                  <div *ngFor="let step of splitLines(publicSettings.app_how_it_works); let idx = index" style="background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: 18px; padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start;">
-                    <div style="width: 28px; height: 28px; border-radius: 10px; background: rgba(37,99,235,0.12); color: #2563eb; font-size: 12px; font-weight: 900; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                      0{{ idx + 1 }}
-                    </div>
-                    <p style="margin: 0; font-size: 12.5px; color: var(--text-primary); font-weight: 700; line-height: 1.4;">
-                      {{ step }}
-                    </p>
+              <div class="app-info-works">
+                <div class="info-tag">Process</div>
+                <h4>How It Works</h4>
+                <div class="work-steps">
+                  <div class="step-item" *ngFor="let step of splitLines(publicSettings.app_how_it_works)">
+                    <div class="step-bullet">✓</div>
+                    <p class="step-text">{{ step }}</p>
                   </div>
                 </div>
               </div>
-
             </div>
           </div>
 
@@ -1966,16 +1822,6 @@ import { API_CONFIG } from '../../config/api.config';
   `]
 })
 export class StudentDashboardComponent implements OnInit, OnDestroy {
-  isSidebarOpen = false;
-
-  toggleSidebar() {
-    this.isSidebarOpen = !this.isSidebarOpen;
-  }
-
-  closeSidebar() {
-    this.isSidebarOpen = false;
-  }
-
   getInitials(name: string): string {
     if (!name) return 'U';
     const parts = name.trim().split(' ');
@@ -1985,7 +1831,7 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     return name.substring(0, 2).toUpperCase();
   }
   user: User | null = null;
-  activeTab: any = 'home';
+  activeTab = 'home';
   complaints: any[] = [];
   announcements: any[] = [];
   notifications: any[] = [];
