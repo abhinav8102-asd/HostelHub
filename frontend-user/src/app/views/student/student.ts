@@ -962,6 +962,45 @@ import { API_CONFIG } from '../../config/api.config';
                 </button>
               </form>
             </div>
+
+            <!-- 4. My Recent Mess Feedback History -->
+            <div class="card mess-card" style="margin-top: 16px;">
+              <h5 style="margin: 0 0 4px 0; font-size: 15px; font-weight: 800; color: var(--text-primary);">💬 My Recent Feedback</h5>
+              <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">Your submitted meal ratings & reviews</p>
+
+              <div *ngIf="myMessFeedbacks.length > 0; else noMyFeedback" style="display: flex; flex-direction: column; gap: 10px;">
+                <div *ngFor="let f of myMessFeedbacks" style="padding: 12px 14px; border-radius: 14px; background: var(--bg-muted); border: 1px solid var(--border-color);">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="font-weight: 800; color: #f59e0b; font-size: 13px;">⭐ {{ f.rating }}/5</span>
+                      <span style="background: rgba(179, 16, 49, 0.1); color: #b31031; padding: 2px 8px; border-radius: 6px; font-size: 10.5px; font-weight: 800; text-transform: uppercase;">
+                        {{ f.mealType }}
+                      </span>
+                    </div>
+                    <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">
+                      📅 {{ (f.createdAt || f.date) | date:'MMM d, h:mm a' }}
+                    </span>
+                  </div>
+
+                  <p *ngIf="f.comment" style="font-style: italic; font-size: 13px; margin: 4px 0; color: var(--text-primary);">
+                    "{{ f.comment }}"
+                  </p>
+
+                  <div *ngIf="f.photoUrl" style="margin-top: 8px;">
+                    <img 
+                      [src]="getImageUrl(f.photoUrl)" 
+                      style="max-width: 100%; max-height: 180px; border-radius: 10px; object-fit: cover; border: 1px solid var(--border-color); cursor: pointer;" 
+                      (click)="openPhotoModal(getImageUrl(f.photoUrl))" 
+                      alt="Food photo" 
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <ng-template #noMyFeedback>
+                <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin: 8px 0;">You have not submitted any mess feedback yet.</p>
+              </ng-template>
+            </div>
           </div>
         </div>
 
@@ -2398,6 +2437,20 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  myMessFeedbacks: any[] = [];
+
+  loadMyMessFeedbacks(): void {
+    this.messService.getMyFeedback().subscribe({
+      next: (feedbacks) => {
+        this.myMessFeedbacks = feedbacks || [];
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Failed to load my mess feedback:', err);
+      }
+    });
+  }
+
   // Load mess data
   loadMessInfo(): void {
     this.isLoadingMess = true;
@@ -2425,6 +2478,8 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
         console.error('Failed to load skipped meals:', err);
       }
     });
+
+    this.loadMyMessFeedbacks();
   }
 
   // Get date strings for today & tomorrow
@@ -2688,6 +2743,7 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
         this.tempMessComment = '';
         this.tempMessRating = 5;
         this.clearMessPhoto();
+        this.loadMyMessFeedbacks();
         this.cdr.detectChanges();
         setTimeout(() => { this.messSuccess = ''; this.cdr.detectChanges(); }, 3000);
       },

@@ -15,6 +15,7 @@ router.put('/menu/:id', verifyToken, requireRole(['warden', 'admin']), messContr
 
 // Feedback routes
 router.post('/feedback', verifyToken, requireRole(['student']), upload.single('photo'), messController.submitFeedback);
+router.get('/feedback/my', verifyToken, requireRole(['student']), messController.getMyFeedback);
 router.get('/feedback/stats', verifyToken, requireRole(['warden', 'admin']), messController.getFeedbackStats);
 
 // Skip meal routes

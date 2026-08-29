@@ -287,6 +287,37 @@ exports.getFeedbackStats = async (req, res) => {
   }
 };
 
+// Get My Feedback (Student only)
+exports.getMyFeedback = async (req, res) => {
+  try {
+    const studentId = req.userId;
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+    const feedbacks = await MessFeedback.findAll({
+      where: {
+        studentId,
+        createdAt: {
+          [Op.gte]: sevenDaysAgo
+        }
+      },
+      order: [['createdAt', 'DESC']]
+    });
+
+    const formatted = feedbacks.map(f => {
+      const plain = f.get({ plain: true });
+      return {
+        ...plain,
+        photoUrl: plain.photoUrl || plain.photo_url || null
+      };
+    });
+
+    res.status(200).json(formatted);
+  } catch (error) {
+    console.error('Error fetching my mess feedback:', error);
+    res.status(500).json({ message: 'Error fetching my mess feedback.' });
+  }
+};
+
 // 5. Toggle Skip Meal (Student only)
 exports.toggleSkipMeal = async (req, res) => {
   try {

@@ -92,4 +92,10 @@ export class MessService {
       headers: this.authService.getAuthHeaders()
     });
   }
+
+  getMyFeedback(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/feedback/my`, {
+      headers: this.authService.getAuthHeaders()
+    });
+  }
 }
