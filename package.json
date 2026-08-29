@@ -5,6 +5,6 @@
   "scripts": {
     "postinstall": "cd backend && npm install",
     "build": "cd backend && npm install",
-    "start": "cd backend && node server.js"
+    "start": "cd backend && node --max-old-space-size=400 server.js"
   }
 }
