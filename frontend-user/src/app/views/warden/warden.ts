@@ -1025,21 +1025,107 @@ import { API_CONFIG } from '../../config/api.config';
                 </div>
               </div>
 
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-                <div>
-                  <label class="form-label" style="font-size: 12px; font-weight: 800; margin-bottom: 4px; display: block; color: var(--text-primary);">Hostel Block</label>
+              <!-- DYNAMIC ROLE FIELDS FOR STUDENT -->
+              <ng-container *ngIf="newUser.role === 'student'">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                  <div>
+                    <label class="form-label" style="font-size: 12px; font-weight: 800; margin-bottom: 4px; display: block; color: var(--text-primary);">Gender</label>
+                    <select class="form-input" [(ngModel)]="newUser.gender" name="gender" style="min-height: 44px; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; width: 100%; font-weight: 700; color: var(--text-primary); background: var(--bg-input); border: 1.5px solid var(--border-color);" required>
+                      <option value="male">👨 Male</option>
+                      <option value="female">👩 Female</option>
+                      <option value="other">🧑 Other</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="form-label" style="font-size: 12px; font-weight: 800; margin-bottom: 4px; display: block; color: var(--text-primary);">Batch</label>
+                    <input type="text" class="form-input" [(ngModel)]="newUser.batch" name="batch" placeholder="Batch 2025-2029" style="min-height: 44px; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; width: 100%; color: var(--text-primary); background: var(--bg-input); border: 1.5px solid var(--border-color);" required />
+                  </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                  <div>
+                    <label class="form-label" style="font-size: 12px; font-weight: 800; margin-bottom: 4px; display: block; color: var(--text-primary);">Hostel Block</label>
+                    <select class="form-input" [(ngModel)]="newUser.hostelBlock" name="hostelBlock" style="min-height: 44px; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; width: 100%; font-weight: 700; color: var(--text-primary); background: var(--bg-input); border: 1.5px solid var(--border-color);" required>
+                      <option value="Boys Hostel 1">Boys Hostel 1</option>
+                      <option value="Boys Hostel 2">Boys Hostel 2</option>
+                      <option value="Girls Hostel 1">Girls Hostel 1</option>
+                      <option value="Girls Hostel 2">Girls Hostel 2</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="form-label" style="font-size: 12px; font-weight: 800; margin-bottom: 4px; display: block; color: var(--text-primary);">Room Number</label>
+                    <input type="text" class="form-input" [(ngModel)]="newUser.roomNumber" name="roomNumber" placeholder="Room 204" style="min-height: 44px; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; width: 100%; color: var(--text-primary); background: var(--bg-input); border: 1.5px solid var(--border-color);" />
+                  </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                  <div>
+                    <label class="form-label" style="font-size: 12px; font-weight: 800; margin-bottom: 4px; display: block; color: var(--text-primary);">Roll Number</label>
+                    <input type="text" class="form-input" [(ngModel)]="newUser.rollNumber" name="rollNumber" placeholder="2025STU101" style="min-height: 44px; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; width: 100%; color: var(--text-primary); background: var(--bg-input); border: 1.5px solid var(--border-color);" />
+                  </div>
+                  <div>
+                    <label class="form-label" style="font-size: 12px; font-weight: 800; margin-bottom: 4px; display: block; color: var(--text-primary);">Phone Number</label>
+                    <input type="text" class="form-input" [(ngModel)]="newUser.phone" name="phone" placeholder="9876543210" style="min-height: 44px; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; width: 100%; color: var(--text-primary); background: var(--bg-input); border: 1.5px solid var(--border-color);" />
+                  </div>
+                </div>
+              </ng-container>
+
+              <!-- DYNAMIC ROLE FIELDS FOR MAINTENANCE STAFF -->
+              <ng-container *ngIf="newUser.role === 'staff'">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                  <div>
+                    <label class="form-label" style="font-size: 12px; font-weight: 800; margin-bottom: 4px; display: block; color: var(--text-primary);">Staff Specialization</label>
+                    <select class="form-input" [(ngModel)]="newUser.specialization" name="specialization" style="min-height: 44px; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; width: 100%; font-weight: 700; color: var(--text-primary); background: var(--bg-input); border: 1.5px solid var(--border-color);" required>
+                      <option value="Electrician">⚡ Electrician</option>
+                      <option value="Plumber">🚰 Plumber</option>
+                      <option value="Carpenter">🪚 Carpenter</option>
+                      <option value="Cleaner">🧹 Housekeeping / Cleaner</option>
+                      <option value="Security Guard">🛡️ Security Guard</option>
+                      <option value="Appliance Repair">🔧 AC & Appliance Repair</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="form-label" style="font-size: 12px; font-weight: 800; margin-bottom: 4px; display: block; color: var(--text-primary);">Phone Number</label>
+                    <input type="text" class="form-input" [(ngModel)]="newUser.phone" name="phone" placeholder="9876543210" style="min-height: 44px; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; width: 100%; color: var(--text-primary); background: var(--bg-input); border: 1.5px solid var(--border-color);" required />
+                  </div>
+                </div>
+
+                <div style="margin-bottom: 12px;">
+                  <label class="form-label" style="font-size: 12px; font-weight: 800; margin-bottom: 4px; display: block; color: var(--text-primary);">Assigned Hostel Block</label>
                   <select class="form-input" [(ngModel)]="newUser.hostelBlock" name="hostelBlock" style="min-height: 44px; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; width: 100%; font-weight: 700; color: var(--text-primary); background: var(--bg-input); border: 1.5px solid var(--border-color);" required>
+                    <option value="All Hostels">🌐 All Hostels</option>
                     <option value="Boys Hostel 1">Boys Hostel 1</option>
                     <option value="Boys Hostel 2">Boys Hostel 2</option>
                     <option value="Girls Hostel 1">Girls Hostel 1</option>
                     <option value="Girls Hostel 2">Girls Hostel 2</option>
                   </select>
                 </div>
-                <div>
-                  <label class="form-label" style="font-size: 12px; font-weight: 800; margin-bottom: 4px; display: block; color: var(--text-primary);">Room / Roll Number</label>
-                  <input type="text" class="form-input" [(ngModel)]="newUser.roomNumber" name="roomNumber" placeholder="Room 204" style="min-height: 44px; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; width: 100%; color: var(--text-primary); background: var(--bg-input); border: 1.5px solid var(--border-color);" />
+              </ng-container>
+
+              <!-- DYNAMIC ROLE FIELDS FOR ASSISTANT WARDEN -->
+              <ng-container *ngIf="newUser.role === 'warden'">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                  <div>
+                    <label class="form-label" style="font-size: 12px; font-weight: 800; margin-bottom: 4px; display: block; color: var(--text-primary);">Assigned Hostel Block</label>
+                    <select class="form-input" [(ngModel)]="newUser.hostelBlock" name="hostelBlock" style="min-height: 44px; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; width: 100%; font-weight: 700; color: var(--text-primary); background: var(--bg-input); border: 1.5px solid var(--border-color);" required>
+                      <option value="Boys Hostel 1">Boys Hostel 1</option>
+                      <option value="Boys Hostel 2">Boys Hostel 2</option>
+                      <option value="Girls Hostel 1">Girls Hostel 1</option>
+                      <option value="Girls Hostel 2">Girls Hostel 2</option>
+                      <option value="All Hostels">🌐 All Hostels</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="form-label" style="font-size: 12px; font-weight: 800; margin-bottom: 4px; display: block; color: var(--text-primary);">Phone Number</label>
+                    <input type="text" class="form-input" [(ngModel)]="newUser.phone" name="phone" placeholder="9876543210" style="min-height: 44px; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; width: 100%; color: var(--text-primary); background: var(--bg-input); border: 1.5px solid var(--border-color);" required />
+                  </div>
                 </div>
-              </div>
+
+                <div style="margin-bottom: 12px;">
+                  <label class="form-label" style="font-size: 12px; font-weight: 800; margin-bottom: 4px; display: block; color: var(--text-primary);">Designation / Bio</label>
+                  <input type="text" class="form-input" [(ngModel)]="newUser.bio" name="bio" placeholder="Hostel Warden" style="min-height: 44px; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; width: 100%; color: var(--text-primary); background: var(--bg-input); border: 1.5px solid var(--border-color);" />
+                </div>
+              </ng-container>
 
               <button type="submit" [disabled]="creatingUser" class="btn" style="width: 100%; height: 46px; background: linear-gradient(135deg, #8a0d24 0%, #b31031 100%); color: white; border: none; border-radius: 14px; font-weight: 800; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(179, 16, 49, 0.35); margin-top: 6px;">
                 <span>➕</span> {{ creatingUser ? 'Creating Account...' : 'Create Account Now' }}
@@ -2793,7 +2879,10 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
     roomNumber: '',
     rollNumber: '',
     phone: '',
-    gender: 'male'
+    gender: 'male',
+    batch: 'Batch 2025-2029',
+    specialization: 'Electrician',
+    bio: ''
   };
 
   bulkBatchData = {
@@ -2855,7 +2944,14 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
     this.userMgmtError = '';
     this.userMgmtSuccess = '';
 
-    this.http.post<any>('https://hostelhub-0cyi.onrender.com/api/users/create-staff-warden', this.newUser, this.getAuthHeadersHelper()).subscribe({
+    const payload = {
+      ...this.newUser,
+      bio: this.newUser.role === 'staff' 
+        ? (this.newUser.specialization || 'Maintenance Staff') 
+        : (this.newUser.bio || (this.newUser.role === 'warden' ? 'Hostel Warden' : 'Hostel Student'))
+    };
+
+    this.http.post<any>('https://hostelhub-0cyi.onrender.com/api/users/create-staff-warden', payload, this.getAuthHeadersHelper()).subscribe({
       next: (res) => {
         this.creatingUser = false;
         this.userMgmtSuccess = '✅ ' + (res.message || 'Account created successfully!');
@@ -2868,7 +2964,10 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
           roomNumber: '',
           rollNumber: '',
           phone: '',
-          gender: 'male'
+          gender: 'male',
+          batch: 'Batch 2025-2029',
+          specialization: 'Electrician',
+          bio: ''
         };
         this.loadAllUsers();
         this.cdr.detectChanges();
