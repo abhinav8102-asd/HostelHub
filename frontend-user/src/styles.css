@@ -892,24 +892,33 @@ body.dark-mode .badge-resolved {
   }
 }
 
-/* Badges for unread chat counts */
+.tab-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Badges for unread counts */
 .tab-badge {
   position: absolute;
-  top: -5px;
-  right: -8px;
-  background-color: #ef4444;
+  top: -6px;
+  right: -10px;
+  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
   color: white;
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 9.5px;
+  font-weight: 800;
   padding: 1px 5px;
   border-radius: 10px;
-  min-width: 14px;
-  height: 14px;
+  min-width: 16px;
+  height: 16px;
+  line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1.5px solid var(--bg-nav);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.5);
+  z-index: 10;
 }
 
 .channel-badge {

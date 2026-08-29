@@ -1060,7 +1060,10 @@ import { API_CONFIG } from '../../config/api.config';
           <span>Home</span>
         </button>
         <button type="button" class="tab-item" [class.active]="activeTab === 'notices'" (click)="switchTab('notices')">
-          <span class="tab-icon">📢</span>
+          <span class="tab-icon">
+            📢
+            <span class="tab-badge animate-scale" *ngIf="getUnreadNoticesCount() > 0">{{ getUnreadNoticesCount() }}</span>
+          </span>
           <span>Notices</span>
         </button>
         <button type="button" class="tab-item" [class.active]="activeTab === 'raise'" (click)="switchTab('raise')">
@@ -1072,7 +1075,10 @@ import { API_CONFIG } from '../../config/api.config';
           <span>Mess</span>
         </button>
         <button type="button" class="tab-item" [class.active]="activeTab === 'my-complaints'" (click)="switchTab('my-complaints')">
-          <span class="tab-icon">📋</span>
+          <span class="tab-icon">
+            📋
+            <span class="tab-badge animate-scale" *ngIf="getActiveTicketsCount() > 0">{{ getActiveTicketsCount() }}</span>
+          </span>
           <span>My Tickets</span>
         </button>
         <button type="button" class="tab-item" [class.active]="activeTab === 'profile'" (click)="switchTab('profile')">
@@ -2770,6 +2776,16 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  getUnreadNoticesCount(): number {
+    if (!this.announcements) return 0;
+    return this.announcements.length;
+  }
+
+  getActiveTicketsCount(): number {
+    if (!this.complaints) return 0;
+    return this.complaints.filter((c: any) => c.status === 'pending' || c.status === 'in_progress').length;
   }
 
   getImageUrl(url: string | null | undefined): string {

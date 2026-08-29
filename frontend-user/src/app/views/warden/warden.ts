@@ -1329,11 +1329,17 @@ import { API_CONFIG } from '../../config/api.config';
           <span>Home</span>
         </button>
         <button class="tab-item" [class.active]="activeTab === 'complaints'" (click)="activeTab = 'complaints'">
-          <span class="tab-icon">📋</span>
+          <span class="tab-icon">
+            📋
+            <span class="tab-badge animate-scale" *ngIf="getPendingComplaintsCount() > 0">{{ getPendingComplaintsCount() }}</span>
+          </span>
           <span>Complaints</span>
         </button>
         <button class="tab-item" [class.active]="activeTab === 'announcements'" (click)="onAnnouncementsTab()">
-          <span class="tab-icon">📢</span>
+          <span class="tab-icon">
+            📢
+            <span class="tab-badge animate-scale" *ngIf="announcements.length > 0">{{ announcements.length }}</span>
+          </span>
           <span>Notices</span>
         </button>
         <button class="tab-item" [class.active]="activeTab === 'mess'" (click)="activeTab = 'mess'; loadMessData()">
@@ -1341,7 +1347,10 @@ import { API_CONFIG } from '../../config/api.config';
           <span>Mess</span>
         </button>
         <button class="tab-item" [class.active]="activeTab === 'users'" (click)="activeTab = 'users'; loadAllUsers()">
-          <span class="tab-icon">👥</span>
+          <span class="tab-icon">
+            👥
+            <span class="tab-badge animate-scale" *ngIf="allUsersList.length > 0">{{ allUsersList.length }}</span>
+          </span>
           <span>Users</span>
         </button>
         <button class="tab-item" [class.active]="activeTab === 'approvals'" (click)="activeTab = 'approvals'; loadPendingApprovals()">
@@ -3416,6 +3425,11 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
         if (el) el.click();
       }
     }
+  }
+
+  getPendingComplaintsCount(): number {
+    if (!this.complaints) return 0;
+    return this.complaints.filter(c => c.status === 'pending' || c.status === 'in_progress').length;
   }
 
   getImageUrl(url: string | null | undefined): string {
