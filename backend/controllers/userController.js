@@ -77,6 +77,16 @@ exports.createWardenOrStaff = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
+    let finalRollNumber = (rollNumber && rollNumber.trim()) ? rollNumber.trim() : null;
+    if (!finalRollNumber && userRole !== 'student') {
+      finalRollNumber = `${userRole.toUpperCase()}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    }
+
+    let finalGender = (gender || 'male').toLowerCase().trim();
+    if (!['male', 'female'].includes(finalGender)) {
+      finalGender = 'male';
+    }
+
     const newUser = await User.create({
       name,
       email,
@@ -86,8 +96,8 @@ exports.createWardenOrStaff = async (req, res) => {
       bio: bio || (userRole === 'student' ? 'Hostel Student' : (userRole === 'warden' ? 'Hostel Warden' : 'Maintenance Staff')),
       hostelBlock: hostelBlock || 'Boys Hostel 1',
       roomNumber: roomNumber || '',
-      rollNumber: rollNumber || '',
-      gender: gender || 'male',
+      rollNumber: finalRollNumber,
+      gender: finalGender,
       batch: batch || (userRole === 'student' ? 'Batch 2025-2029' : 'Staff'),
       status: 'active'
     });
@@ -98,7 +108,10 @@ exports.createWardenOrStaff = async (req, res) => {
     });
   } catch (error) {
     console.error('Create User Error:', error);
-    res.status(500).json({ message: error?.message || 'Internal server error creating user.' });
+    const errMsg = error.name === 'SequelizeUniqueConstraintError' 
+      ? 'An account with this Roll Number or Email already exists!' 
+      : (error?.message || 'Internal server error creating user.');
+    res.status(400).json({ message: errMsg });
   }
 };
 
