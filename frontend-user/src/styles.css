@@ -215,53 +215,75 @@ body {
   z-index: 200;
 }
 
-/* ── TOP NAV (bottom-tabs class repositioned as top nav) ── */
+/* ── ULTRA-SLEEK MOBILE FLOATING CAPSULE NAVIGATION DOCK ── */
 .bottom-tabs {
-  order: 2 !important;
-  position: sticky !important;
-  top: 0 !important;
-  bottom: auto !important;
-  left: 0 !important;
-  width: 100% !important;
-  height: 58px !important;
-  background-color: var(--bg-nav) !important;
-  border-top: none !important;
-  border-bottom: 1px solid var(--border-color) !important;
+  position: fixed !important;
+  bottom: 12px !important;
+  top: auto !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: calc(100% - 24px) !important;
+  max-width: 480px !important;
+  height: 64px !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1.5px solid rgba(37, 99, 235, 0.25) !important;
+  border-radius: 32px !important;
   display: flex !important;
   align-items: center !important;
-  justify-content: flex-start !important;
-  gap: 4px !important;
-  padding: 0 16px !important;
-  z-index: 100 !important;
-  box-shadow: var(--shadow-sm) !important;
-  backdrop-filter: blur(12px);
-  transition: background-color 0.3s ease;
-  overflow-x: auto !important;
-  white-space: nowrap !important;
-  -webkit-overflow-scrolling: touch;
+  justify-content: space-around !important;
+  padding: 0 8px !important;
+  z-index: 9990 !important;
+  box-shadow: 0 16px 36px -6px rgba(37, 99, 235, 0.2), 0 4px 12px rgba(15, 23, 42, 0.08) !important;
+  overflow: visible !important;
 }
+
+body.dark-mode .bottom-tabs {
+  background: rgba(15, 23, 42, 0.95) !important;
+  border: 1.5px solid rgba(56, 189, 248, 0.3) !important;
+  box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.6) !important;
+}
+
 .bottom-tabs::-webkit-scrollbar {
   display: none !important;
 }
 
 .tab-item {
   display: flex !important;
-  flex-direction: row !important;
+  flex-direction: column !important;
   align-items: center !important;
-  gap: 7px !important;
+  justify-content: center !important;
+  gap: 2px !important;
   color: var(--text-muted) !important;
-  text-decoration: none;
-  font-size: 13px !important;
-  font-weight: 600 !important;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  background: none !important;
+  font-size: 9.5px !important;
+  font-weight: 800 !important;
+  padding: 5px 6px !important;
+  border-radius: 18px !important;
+  transition: all 0.2s ease !important;
+  background: transparent !important;
   border: none !important;
+  flex: 1 !important;
+  min-width: 0 !important;
   outline: none;
-  padding: 8px 16px !important;
-  border-radius: var(--radius-full) !important;
-  position: relative;
-  letter-spacing: 0.1px;
+  cursor: pointer;
+}
+
+.tab-item.active {
+  color: #2563eb !important;
+  background: rgba(37, 99, 235, 0.12) !important;
+}
+
+body.dark-mode .tab-item.active {
+  color: #38bdf8 !important;
+  background: rgba(56, 189, 248, 0.15) !important;
+}
+
+.tab-icon {
+  font-size: 19px !important;
+  line-height: 1 !important;
+  position: relative !important;
+  display: inline-block !important;
 }
 
 .tab-item:hover {

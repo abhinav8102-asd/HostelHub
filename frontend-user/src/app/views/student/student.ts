@@ -367,24 +367,49 @@ import { API_CONFIG } from '../../config/api.config';
             </div>
           </div>
 
-          <!-- 4. App Info/Description Section -->
-          <div class="card app-info-card" style="margin-top: 32px;">
-            <div class="app-info-grid">
-              <div class="app-info-about">
-                <div class="info-tag">Overview</div>
-                <h4>What is HostelHub?</h4>
-                <p>{{ publicSettings.app_about }}</p>
+          <!-- 4. Futuristic App Info Showcase Section -->
+          <div style="margin-top: 32px; margin-bottom: 20px;">
+            <div style="background: linear-gradient(135deg, rgba(37,99,235,0.06) 0%, rgba(56,189,248,0.1) 100%); border-radius: 24px; padding: 22px 20px; border: 1.5px solid rgba(37,99,235,0.2); box-shadow: 0 12px 32px -8px rgba(37,99,235,0.1);">
+              
+              <!-- Overview Card -->
+              <div style="margin-bottom: 24px;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                  <span style="font-size: 10.5px; font-weight: 900; color: #2563eb; background: rgba(37,99,235,0.12); padding: 4px 10px; border-radius: 10px; letter-spacing: 0.8px; text-transform: uppercase;">⚡ SYSTEM OVERVIEW</span>
+                </div>
+                <h4 style="margin: 4px 0 8px 0; font-size: 20px; font-weight: 900; color: var(--text-primary);">What is HostelHub?</h4>
+                <p style="margin: 0; font-size: 13.5px; color: var(--text-secondary); line-height: 1.6;">
+                  {{ publicSettings.app_about || 'HostelHub is an all-in-one digital platform designed to streamline hostel management. It allows students to raise maintenance tickets instantly, monitors staff assignments, skips mess meals, tracks attendance, and updates students with official announcements.' }}
+                </p>
+                
+                <!-- 3 Capability Pills -->
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px;">
+                  <span style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 12px; font-size: 11.5px; font-weight: 800; color: var(--text-primary);">⚡ Instant Ticket Dispatch</span>
+                  <span style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 12px; font-size: 11.5px; font-weight: 800; color: var(--text-primary);">🍽️ Daily Mess Rating</span>
+                  <span style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 12px; font-size: 11.5px; font-weight: 800; color: var(--text-primary);">📢 Official Warden Feed</span>
+                </div>
               </div>
-              <div class="app-info-works">
-                <div class="info-tag">Process</div>
-                <h4>How It Works</h4>
-                <div class="work-steps">
-                  <div class="step-item" *ngFor="let step of splitLines(publicSettings.app_how_it_works)">
-                    <div class="step-bullet">✓</div>
-                    <p class="step-text">{{ step }}</p>
+
+              <div style="height: 1px; background: var(--border-color); margin-bottom: 24px;"></div>
+
+              <!-- Process Flow Timeline -->
+              <div>
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                  <span style="font-size: 10.5px; font-weight: 900; color: #10b981; background: rgba(16,185,129,0.12); padding: 4px 10px; border-radius: 10px; letter-spacing: 0.8px; text-transform: uppercase;">🔄 WORKFLOW PIPELINE</span>
+                </div>
+                <h4 style="margin: 4px 0 16px 0; font-size: 20px; font-weight: 900; color: var(--text-primary);">How It Works</h4>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+                  <div *ngFor="let step of splitLines(publicSettings.app_how_it_works); let idx = index" style="background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: 18px; padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start;">
+                    <div style="width: 28px; height: 28px; border-radius: 10px; background: rgba(37,99,235,0.12); color: #2563eb; font-size: 12px; font-weight: 900; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                      0{{ idx + 1 }}
+                    </div>
+                    <p style="margin: 0; font-size: 12.5px; color: var(--text-primary); font-weight: 700; line-height: 1.4;">
+                      {{ step }}
+                    </p>
                   </div>
                 </div>
               </div>
+
             </div>
           </div>
 
