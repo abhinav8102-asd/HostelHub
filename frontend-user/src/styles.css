@@ -1608,5 +1608,151 @@ body.dark-mode .action-tile-3d {
 .step-text {
   font-size: 13px;
   color: var(--text-secondary);
-  line-height: 1.5;
+  line-height: 1.6;
+}
+
+/* ── FUTURISTIC 2026 CYBER COMMAND BAR & GLASS DASHBOARD SYSTEM ── */
+.cyber-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1.5px solid rgba(37, 99, 235, 0.18);
+  box-shadow: 0 8px 32px rgba(37, 99, 235, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+body.dark-mode .cyber-header-bar {
+  background: rgba(15, 23, 42, 0.85);
+  border-bottom: 1.5px solid rgba(59, 130, 246, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.cyber-user-pill {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.cyber-avatar-ring {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid #2563eb;
+  padding: 2px;
+  background: var(--bg-card);
+  box-shadow: 0 0 14px rgba(37, 99, 235, 0.3);
+}
+
+.cyber-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.cyber-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  background: #eff6ff;
+}
+
+.cyber-online-dot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #10b981;
+  border: 2px solid white;
+  box-shadow: 0 0 8px #10b981;
+  animation: livePulseDot 1.8s infinite;
+}
+
+.cyber-user-greeting {
+  display: flex;
+  flex-direction: column;
+}
+
+.cyber-user-name {
+  font-size: 15.5px;
+  font-weight: 900;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+}
+
+.cyber-block-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.cyber-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cyber-stat-chip {
+  background: linear-gradient(135deg, #1e3a8a, #2563eb);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  font-size: 11.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.cyber-stat-chip:active {
+  transform: scale(0.92);
+}
+
+.chip-num {
+  background: rgba(255, 255, 255, 0.25);
+  padding: 2px 7px;
+  border-radius: 12px;
+  font-size: 11px;
+}
+
+.cyber-icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+  color: var(--text-primary);
+}
+
+.cyber-icon-btn:active {
+  transform: scale(0.9);
+}
+
+.cyber-icon-btn.logout:hover {
+  background: #fee2e2;
+  color: #ef4444;
 }

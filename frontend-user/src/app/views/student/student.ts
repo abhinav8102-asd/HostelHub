@@ -68,25 +68,30 @@ import { API_CONFIG } from '../../config/api.config';
         </div>
       </div>
 
-      <!-- HEADER -->
-      <div class="header" *ngIf="activeTab !== 'chat'">
-        <div class="user-info" (click)="switchTab('my-profile')" style="cursor: pointer;" title="View Profile">
-          <div class="avatar-ring">
-            <span class="avatar" *ngIf="!user?.profilePicUrl">🎓</span>
-            <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" (error)="onAvatarError($event)" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
+      <!-- FUTURISTIC 2026 CYBER COMMAND BAR -->
+      <div class="cyber-header-bar" *ngIf="activeTab !== 'chat'">
+        <div class="cyber-user-pill" (click)="switchTab('my-profile')" title="View Profile">
+          <div class="cyber-avatar-ring">
+            <span class="cyber-avatar" *ngIf="!user?.profilePicUrl">🎓</span>
+            <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" (error)="onAvatarError($event)" class="cyber-avatar-img" />
+            <span class="cyber-online-dot"></span>
           </div>
-          <div>
-            <h3>{{ user?.name }}</h3>
-            <p class="user-meta">{{ user?.hostelBlock }} · Room {{ user?.roomNumber }}</p>
+          <div class="cyber-user-greeting">
+            <span class="cyber-user-name">{{ user?.name }}</span>
+            <span class="cyber-block-badge">🏢 {{ user?.hostelBlock || 'Hostel' }} · Room {{ user?.roomNumber }}</span>
           </div>
         </div>
-        <div class="header-actions">
-          <button class="theme-toggle-btn" (click)="toggleDarkMode()" [title]="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+
+        <div class="cyber-actions-right">
+          <div class="cyber-stat-chip clickable" (click)="switchTab('my-complaints')" title="View Tickets">
+            <span class="chip-num">{{ complaints.length }}</span>
+            <span class="chip-label">TICKETS</span>
+          </div>
+          <button class="cyber-icon-btn" (click)="toggleDarkMode()" [title]="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
             {{ isDarkMode ? '☀️' : '🌙' }}
           </button>
-          <button class="logout-btn" (click)="logout()">
-            <span>Logout</span>
-            <span>🚪</span>
+          <button class="cyber-icon-btn logout" (click)="logout()" title="Logout">
+            🚪
           </button>
         </div>
       </div>
@@ -97,49 +102,23 @@ import { API_CONFIG } from '../../config/api.config';
         <!-- TAB 0: HOME / COMMAND CENTER -->
         <div *ngIf="activeTab === 'home'" class="tab-panel animate-fade">
           
-          <!-- Live Status Pill Bar -->
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding: 0 2px;">
-            <div style="display: flex; align-items: center; gap: 8px; background: rgba(37, 99, 235, 0.1); padding: 5px 14px; border-radius: 20px; border: 1px solid rgba(37, 99, 235, 0.25);">
-              <span style="width: 9px; height: 9px; border-radius: 50%; background: #10b981; animation: livePulseDot 1.8s infinite; display: inline-block;"></span>
-              <span style="font-size: 11px; font-weight: 800; color: #2563eb; letter-spacing: 0.4px;">LIVE GRID · {{ user?.hostelBlock || 'HOSTEL' }}</span>
+          <!-- 1. Sleek Compact Glass Greeting Banner -->
+          <div style="background: linear-gradient(135deg, rgba(37,99,235,0.08) 0%, rgba(56,189,248,0.12) 100%); border-radius: 20px; padding: 16px 20px; border: 1.5px solid rgba(37,99,235,0.2); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 8px 24px rgba(37,99,235,0.06);">
+            <div>
+              <span style="font-size: 11px; font-weight: 800; color: #2563eb; letter-spacing: 0.6px; text-transform: uppercase; display: block; margin-bottom: 2px;">⚡ Student Command Center</span>
+              <h4 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--text-primary);">Hello, {{ user?.name }}! 👋</h4>
             </div>
-            <span style="font-size: 11.5px; font-weight: 700; color: var(--text-muted);">🎓 Student Portal</span>
-          </div>
-
-          <!-- 1. Cyber Mesh Animated 3D Hero Banner -->
-          <div class="card hero-banner-cyber">
-            <div class="profile-card-pattern"></div>
-            <div class="profile-card-content" style="position: relative; z-index: 2;">
-              <div class="profile-user-img-wrapper" style="width: 76px; height: 76px; border: 3.5px solid #38bdf8; box-shadow: 0 0 24px rgba(56, 189, 248, 0.5);">
-                <span class="profile-avatar-emoji" *ngIf="!user?.profilePicUrl" style="font-size: 38px;">🎓</span>
-                <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" class="profile-user-img" />
-              </div>
-              <div class="profile-user-details">
-                <div class="welcome-tag" style="color: #93c5fd; font-weight: 800; font-size: 12px; letter-spacing: 0.8px;">WELCOME BACK 👋</div>
-                <h4 class="profile-user-name" style="font-size: 26px; font-weight: 900; letter-spacing: -0.5px; margin: 2px 0 6px 0; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">{{ user?.name }}</h4>
-                <div class="profile-pills">
-                  <span class="profile-pill block-pill" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.35); font-weight: 700;">🏢 {{ user?.hostelBlock || 'N/A' }}</span>
-                  <span class="profile-pill room-pill" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.35); font-weight: 700;">🔑 Room {{ user?.roomNumber || 'N/A' }}</span>
-                  <span class="profile-pill batch-pill" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.35); font-weight: 700;">🎓 {{ user?.batch || 'Batch 2025' }}</span>
-                </div>
-              </div>
-              <div class="profile-quick-stats" style="gap: 10px;">
-                <div class="stat-item clickable" (click)="switchTab('my-complaints')" style="background: rgba(255,255,255,0.18); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.35); border-radius: 18px; padding: 12px 18px; transition: transform 0.2s ease;">
-                  <span class="stat-count" style="font-size: 22px; font-weight: 900; color: #ffffff;">{{ complaints.length }}</span>
-                  <span class="stat-label" style="font-size: 10px; color: #93c5fd; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Tickets</span>
-                </div>
-                <div class="stat-item resolved clickable" (click)="switchTab('my-complaints')" style="background: rgba(255,255,255,0.18); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.35); border-radius: 18px; padding: 12px 18px; transition: transform 0.2s ease;">
-                  <span class="stat-count" style="font-size: 22px; font-weight: 900; color: #34d399;">{{ getResolvedCount() }}</span>
-                  <span class="stat-label" style="font-size: 10px; color: #a7f3d0; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Resolved</span>
-                </div>
-              </div>
+            <div style="display: flex; gap: 8px;">
+              <span style="background: #eff6ff; color: #2563eb; border: 1px solid rgba(37,99,235,0.2); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 800;">
+                🎓 {{ user?.batch || 'Batch 2025' }}
+              </span>
             </div>
           </div>
 
           <!-- 2. Vibrant 3D Quick Action Grid Launchpad -->
-          <div style="margin-top: 28px; margin-bottom: 28px;">
+          <div style="margin-top: 10px; margin-bottom: 28px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-              <h4 style="margin: 0; font-size: 17px; font-weight: 800; color: var(--text-primary);">⚡ Quick Student Launchpad</h4>
+              <h4 style="margin: 0; font-size: 17px; font-weight: 900; color: var(--text-primary);">🚀 Quick Launchpad</h4>
               <span style="font-size: 11.5px; font-weight: 800; color: #2563eb;">1-Tap Access</span>
             </div>
 
