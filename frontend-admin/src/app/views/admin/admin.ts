@@ -51,14 +51,12 @@ import { ComplaintService } from '../../services/complaint.service';
           <button (click)="switchTab('stats')" [class.active]="activeTab === 'stats'">📊 Dashboard</button>
           <button (click)="switchTab('workflow')" [class.active]="activeTab === 'workflow'">🛠️ Work Flow</button>
           <button (click)="switchTab('performance')" [class.active]="activeTab === 'performance'">👨‍🔧 Staff Stats</button>
-          <button (click)="switchTab('attendance')" [class.active]="activeTab === 'attendance'">🕒 Attendance</button>
-          <button (click)="switchTab('feedback')" [class.active]="activeTab === 'feedback'">⭐ Reviews & Mess</button>
+          <button (click)="switchTab('feedback')" [class.active]="activeTab === 'feedback'">⭐ Reviews & Feedback</button>
           <button (click)="switchTab('notices')" [class.active]="activeTab === 'notices'">📢 Notices</button>
           <button (click)="switchTab('activity')" [class.active]="activeTab === 'activity'">📜 Activity Log</button>
-          <button (click)="switchTab('alerts')" [class.active]="activeTab === 'alerts'">🚨 Alerts Hub</button>
           <button (click)="switchTab('users')" [class.active]="activeTab === 'users'">👥 Students & Users</button>
           <button (click)="switchTab('tasks')" [class.active]="activeTab === 'tasks'">🗂️ Task Dispatcher</button>
-          <button (click)="switchTab('create')" [class.active]="activeTab === 'create'">➕ Create Staff</button>
+          <button (click)="switchTab('create')" [class.active]="activeTab === 'create'">➕ Create Account</button>
           <button (click)="switchTab('settings')" [class.active]="activeTab === 'settings'">⚙️ Settings</button>
           <button (click)="switchTab('my-profile')" [class.active]="activeTab === 'my-profile'">👤 Profile</button>
         </div>
@@ -66,18 +64,6 @@ import { ComplaintService } from '../../services/complaint.service';
         <!-- 1. DASHBOARD & REAL-TIME STATS -->
         <div *ngIf="activeTab === 'stats'" class="tab-panel animate-fade">
           <h4 class="page-title">📊 Executive Real-Time Dashboard</h4>
-
-          <!-- AI Insight Banner -->
-          <div class="ai-insight-banner">
-            <div style="display: flex; align-items: center; gap: 12px;">
-              <span style="font-size: 24px;">🤖</span>
-              <div>
-                <strong style="font-size: 13px; display: block; color: #a5b4fc;">AI Executive Insight</strong>
-                <span style="font-size: 12px; color: #f8fafc;">Real-time database analytics active. Click any metric box below for full detailed list.</span>
-              </div>
-            </div>
-            <span class="live-tag">● LIVE</span>
-          </div>
 
           <!-- Real-Time Metrics Table Card (Interactive Cards!) -->
           <div class="card shadow-card">
@@ -258,97 +244,76 @@ import { ComplaintService } from '../../services/complaint.service';
           </div>
         </div>
 
-        <!-- 4. REAL-TIME ATTENDANCE ANALYTICS -->
-        <div *ngIf="activeTab === 'attendance'" class="tab-panel animate-fade">
-          <h4 class="page-title">🕒 Student Attendance Analytics & Monthly Ledger</h4>
-
-          <div class="attendance-top-grid">
-            <div class="card attendance-card border-left-green">
-              <span class="card-sub-lbl">Student Today's Live Attendance</span>
-              <strong class="attendance-big-val green-text">{{ attendanceStats?.studentPercentage ?? 0 }}%</strong>
-              <span class="card-sub-lbl" style="margin-top: 4px;">{{ attendanceStats?.presentStudents ?? 0 }} Present / {{ attendanceStats?.absentStudents ?? 0 }} Absent (Total Active Students: {{ attendanceStats?.totalStudents ?? 0 }})</span>
-            </div>
-          </div>
-
-          <!-- Monthly Attendance History Ledger Card -->
-          <div class="card shadow-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
-              <div>
-                <h5 class="card-section-title" style="margin: 0;">📅 Student Monthly Attendance History Ledger</h5>
-                <span class="card-sub-lbl">View month-by-month present & absent day counts per student</span>
-              </div>
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <label class="form-label" style="margin: 0;">Select Month:</label>
-                <input type="month" class="form-input" style="width: auto;" [(ngModel)]="selectedAttendanceMonth" (change)="loadMonthlyAttendanceReport()" />
-              </div>
-            </div>
-
-            <div class="table-responsive">
-              <table class="custom-table">
-                <thead>
-                  <tr>
-                    <th>Student Name</th>
-                    <th>Room & Hostel Block</th>
-                    <th>Days Present</th>
-                    <th>Days Absent</th>
-                    <th>Outing Days</th>
-                    <th>Monthly Attendance %</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let item of monthlyAttendanceReport?.report">
-                    <td class="font-bold">{{ item.student?.name }}</td>
-                    <td>Room {{ item.student?.roomNumber || 'N/A' }} ({{ item.student?.hostelBlock || 'Block' }})</td>
-                    <td class="green-text font-bold">{{ item.presentDays }} days</td>
-                    <td class="red-text font-bold">{{ item.absentDays }} days</td>
-                    <td class="yellow-text">{{ item.outingDays }} days</td>
-                    <td>
-                      <span [class]="item.percentage >= 75 ? 'status-tag status-excellent' : 'status-tag status-attention'">
-                        {{ item.percentage }}%
-                      </span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div *ngIf="!monthlyAttendanceReport?.report || monthlyAttendanceReport?.report?.length === 0" class="empty-state">
-              <span class="empty-icon">📅</span>
-              <p>No student attendance history recorded for {{ selectedAttendanceMonth }}.</p>
-            </div>
-          </div>
-
-          <!-- Block-wise Attendance Card -->
-          <div class="card shadow-card" style="margin-top: 20px;">
-            <h5 class="card-section-title">Hostel Block Breakdown</h5>
-            <div *ngFor="let b of attendanceStats?.blockWise" class="block-attendance-item">
-              <div class="block-att-header">
-                <span class="font-bold">{{ b.block }}</span>
-                <span class="green-text font-bold">{{ b.percentage }}% Present</span>
-              </div>
-              <div class="progress-track-bg">
-                <div [style.width.%]="b.percentage" class="progress-track-fill green-fill"></div>
-              </div>
-              <div *ngIf="b.alert" class="alert-block-text">⚠️ {{ b.alert }}</div>
-            </div>
-            <div *ngIf="!attendanceStats?.blockWise || attendanceStats?.blockWise?.length === 0" class="empty-state">
-              <span class="empty-icon">🏢</span>
-              <p>No student hostel block attendance recorded today.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- 5. FEEDBACK & REVIEWS (COMPLAINTS + MESS FOOD REVIEWS) -->
+        <!-- 5. FEEDBACK & REVIEWS (MESS FOOD REVIEWS) -->
         <div *ngIf="activeTab === 'feedback'" class="tab-panel animate-fade">
-          <h4 class="page-title">⭐ Feedback & Reviews (System + Mess Reviews)</h4>
+          <h4 class="page-title">⭐ Student Mess Food Quality & Reviews</h4>
 
           <!-- Rating Breakdown Header -->
           <div class="card shadow-card" style="margin-bottom: 20px;">
-            <div class="feedback-score-row">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 14px;">
               <div>
-                <span class="card-sub-lbl" style="text-transform: uppercase;">Mess Food Quality Score</span>
-                <h2 class="rating-big-score">⭐ {{ messAnalytics?.summary?.avgRating ?? '0.0' }} <span style="font-size: 14px; opacity: 0.7;">/ 5.0</span></h2>
+                <span class="card-sub-lbl" style="text-transform: uppercase; font-weight: 700;">Mess Food Quality Overall Score</span>
+                <h2 class="rating-big-score" style="margin: 4px 0;">⭐ {{ messAnalytics?.summary?.avgRating ?? '0.0' }} <span style="font-size: 14px; opacity: 0.7;">/ 5.0</span></h2>
                 <span class="card-sub-lbl">Based on {{ messAnalytics?.summary?.totalReviews ?? 0 }} student reviews submitted</span>
+              </div>
+              <span class="clickable-hint">💡 Tap metric box below to filter meal type</span>
+            </div>
+
+            <!-- Meal Quality Filter Metric Cards -->
+            <div class="metrics-grid-auto" *ngIf="messAnalytics?.summary">
+              <div 
+                class="metric-box clickable-box" 
+                [style.border]="selectedMealFilter === 'all' ? '2px solid #b31031' : '1px solid var(--border-color)'"
+                [style.background]="selectedMealFilter === 'all' ? 'rgba(179, 16, 49, 0.08)' : 'var(--bg-card)'"
+                (click)="filterMealReviews('all')"
+              >
+                <span class="metric-lbl">All Reviews</span>
+                <strong class="metric-val purple-text">⭐ {{ messAnalytics.summary.avgRating || '0.0' }}</strong>
+                <span class="detail-link-text">{{ getFilteredMessReviews().length }} Reviews →</span>
+              </div>
+
+              <div 
+                class="metric-box clickable-box" 
+                [style.border]="selectedMealFilter === 'breakfast' ? '2px solid #b31031' : '1px solid var(--border-color)'"
+                [style.background]="selectedMealFilter === 'breakfast' ? 'rgba(179, 16, 49, 0.08)' : 'var(--bg-card)'"
+                (click)="filterMealReviews('breakfast')"
+              >
+                <span class="metric-lbl">Breakfast</span>
+                <strong class="metric-val green-text">🍳 {{ messAnalytics.summary.breakfastAvg || '0.0' }}</strong>
+                <span class="detail-link-text">Filter Breakfast →</span>
+              </div>
+
+              <div 
+                class="metric-box clickable-box" 
+                [style.border]="selectedMealFilter === 'lunch' ? '2px solid #b31031' : '1px solid var(--border-color)'"
+                [style.background]="selectedMealFilter === 'lunch' ? 'rgba(179, 16, 49, 0.08)' : 'var(--bg-card)'"
+                (click)="filterMealReviews('lunch')"
+              >
+                <span class="metric-lbl">Lunch</span>
+                <strong class="metric-val blue-text">🍛 {{ messAnalytics.summary.lunchAvg || '0.0' }}</strong>
+                <span class="detail-link-text">Filter Lunch →</span>
+              </div>
+
+              <div 
+                class="metric-box clickable-box" 
+                [style.border]="selectedMealFilter === 'snacks' ? '2px solid #b31031' : '1px solid var(--border-color)'"
+                [style.background]="selectedMealFilter === 'snacks' ? 'rgba(179, 16, 49, 0.08)' : 'var(--bg-card)'"
+                (click)="filterMealReviews('snacks')"
+              >
+                <span class="metric-lbl">Snacks</span>
+                <strong class="metric-val yellow-text">☕ {{ messAnalytics.summary.snacksAvg || '0.0' }}</strong>
+                <span class="detail-link-text">Filter Snacks →</span>
+              </div>
+
+              <div 
+                class="metric-box clickable-box" 
+                [style.border]="selectedMealFilter === 'dinner' ? '2px solid #b31031' : '1px solid var(--border-color)'"
+                [style.background]="selectedMealFilter === 'dinner' ? 'rgba(179, 16, 49, 0.08)' : 'var(--bg-card)'"
+                (click)="filterMealReviews('dinner')"
+              >
+                <span class="metric-lbl">Dinner</span>
+                <strong class="metric-val orange-text">🍽️ {{ messAnalytics.summary.dinnerAvg || '0.0' }}</strong>
+                <span class="detail-link-text">Filter Dinner →</span>
               </div>
             </div>
           </div>
@@ -356,11 +321,11 @@ import { ComplaintService } from '../../services/complaint.service';
           <!-- Student Reviews Stream -->
           <div class="card shadow-card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <h5 class="card-section-title" style="margin: 0;">All Student Mess Food Feedbacks & Ratings</h5>
-              <span class="ticket-badge" style="font-size: 11px;">Total: {{ messAnalytics?.reviews?.length || 0 }} Feedbacks</span>
+              <h5 class="card-section-title" style="margin: 0;">Student Mess Food Feedbacks & Ratings</h5>
+              <span class="ticket-badge" style="font-size: 11px;">Showing {{ getFilteredMessReviews().length }} Feedbacks</span>
             </div>
             <div style="max-height: 700px; overflow-y: auto; padding-right: 4px;">
-              <div *ngFor="let r of messAnalytics?.reviews" class="review-item-box" style="margin-bottom: 12px; padding: 14px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-color);">
+              <div *ngFor="let r of getFilteredMessReviews()" class="review-item-box" style="margin-bottom: 12px; padding: 14px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-color);">
                 <div class="review-item-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
                   <div>
                     <strong style="font-size: 14.5px; color: var(--text-primary);">{{ r.student?.name || 'Student' }}</strong>
@@ -368,12 +333,12 @@ import { ComplaintService } from '../../services/complaint.service';
                   </div>
                   <div style="display: flex; align-items: center; gap: 8px;">
                     <span class="status-tag status-moderate" style="font-size: 10px; text-transform: uppercase;">{{ r.mealType }}</span>
-                    <span class="rating-star" style="font-size: 14px; font-weight: 800; color: #f59e0b; background: rgba(245, 158, 11, 0.1); padding: 2px 8px; border-radius: 6px;">⭐ {{ r.foodQuality }}/5</span>
+                    <span class="rating-star" style="font-size: 14px; font-weight: 800; color: #f59e0b; background: rgba(245, 158, 11, 0.1); padding: 2px 8px; border-radius: 6px;">⭐ {{ r.rating || r.foodQuality }}/5</span>
                   </div>
                 </div>
-                <p class="review-comment" style="margin: 6px 0; font-size: 13px; color: var(--text-primary); font-style: italic; background: var(--bg-muted); padding: 8px 12px; border-radius: 8px;">"{{ r.comments || 'No comment provided.' }}"</p>
+                <p class="review-comment" style="margin: 6px 0; font-size: 13px; color: var(--text-primary); font-style: italic; background: var(--bg-muted); padding: 8px 12px; border-radius: 8px;">"{{ r.comment || r.comments || 'No comment provided.' }}"</p>
                 <div *ngIf="r.photoUrl" style="margin: 8px 0;">
-                  <img [src]="getImageUrl(r.photoUrl)" style="max-width: 100%; max-height: 180px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-color); cursor: pointer;" (click)="openPhotoModal(getImageUrl(r.photoUrl))" alt="Mess food feedback photo" />
+                  <img [src]="getImageUrl(r.photoUrl)" style="max-width: 100%; max-height: 200px; border-radius: 10px; object-fit: cover; border: 1px solid var(--border-color); cursor: pointer;" (click)="openPhotoModal(getImageUrl(r.photoUrl))" alt="Mess food feedback photo" />
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
                   <span class="card-sub-lbl" style="font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 4px;">
@@ -385,54 +350,20 @@ import { ComplaintService } from '../../services/complaint.service';
                 </div>
               </div>
             </div>
-            <div *ngIf="!messAnalytics?.reviews || messAnalytics?.reviews?.length === 0" class="empty-state">
+            <div *ngIf="getFilteredMessReviews().length === 0" class="empty-state">
               <span class="empty-icon">🍽️</span>
-              <p>No student mess reviews submitted yet. Student reviews will appear here live when submitted!</p>
+              <p>No student mess reviews match the selected meal filter.</p>
             </div>
           </div>
         </div>
 
-        <!-- NOTICES & BROADCASTS TAB -->
+        <!-- NOTICES & BROADCASTS TAB (READ ONLY) -->
         <div *ngIf="activeTab === 'notices'" class="tab-panel animate-fade">
           <h4 class="page-title">📢 Official Notices & Broadcasts</h4>
 
-          <!-- Create Notice Form -->
-          <div class="card shadow-card" style="margin-bottom: 20px;">
-            <h5 class="card-section-title">Broadcast New Official Notice</h5>
-            <div style="display: flex; flex-direction: column; gap: 12px;">
-              <div>
-                <label class="form-label">Notice Title</label>
-                <input type="text" class="form-input" [(ngModel)]="newNotice.title" placeholder="e.g. Water Supply Maintenance Schedule" />
-              </div>
-              <div>
-                <label class="form-label">Notice Content / Description</label>
-                <textarea class="form-input" rows="3" [(ngModel)]="newNotice.content" placeholder="Type official notice details here..."></textarea>
-              </div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                <div>
-                  <label class="form-label">Target Hostel Block</label>
-                  <select class="form-input" [(ngModel)]="newNotice.hostelBlock">
-                    <option value="All Hostels">All Hostel Blocks</option>
-                    <option value="Boys Hostel B-1">Boys Hostel B-1</option>
-                    <option value="Boys Hostel B-2">Boys Hostel B-2</option>
-                    <option value="Girls Hostel G-1">Girls Hostel G-1</option>
-                    <option value="Girls Hostel G-2">Girls Hostel G-2</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="form-label">Attachment Image (Optional)</label>
-                  <input type="file" accept="image/*" (change)="onNoticePhotoSelected($event)" style="font-size: 12px; width: 100%;" />
-                </div>
-              </div>
-              <button class="btn btn-primary" (click)="postNotice()" [disabled]="!newNotice.title || !newNotice.content">
-                📢 Broadcast Notice Now
-              </button>
-            </div>
-          </div>
-
-          <!-- All Active Notices Stream -->
+          <!-- All Active Notices Stream (Read Only View) -->
           <div class="card shadow-card">
-            <h5 class="card-section-title">All Broadcasted Notices</h5>
+            <h5 class="card-section-title">All Broadcasted Notices Feed</h5>
             <div *ngFor="let notice of announcementsList" class="card complaint-card-item" style="margin-bottom: 12px;">
               <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
@@ -443,7 +374,7 @@ import { ComplaintService } from '../../services/complaint.service';
                 <button class="btn btn-delete-user" (click)="deleteNotice(notice.id)" style="width: auto; padding: 4px 8px; font-size: 11px;">Delete 🗑️</button>
               </div>
               <p class="complaint-desc-text" style="margin-top: 8px;">{{ notice.content }}</p>
-              <img *ngIf="notice.photoUrl" [src]="getImageUrl(notice.photoUrl)" style="max-width: 100%; max-height: 250px; border-radius: 12px; margin-top: 10px; object-fit: cover; border: 1px solid var(--border-color);" />
+              <img *ngIf="notice.photoUrl" [src]="getImageUrl(notice.photoUrl)" (click)="openPhotoModal(getImageUrl(notice.photoUrl))" style="max-width: 100%; max-height: 250px; border-radius: 12px; margin-top: 10px; object-fit: cover; border: 1px solid var(--border-color); cursor: pointer;" alt="Notice Attachment" />
             </div>
 
             <div *ngIf="announcementsList.length === 0" class="empty-state">
@@ -453,34 +384,24 @@ import { ComplaintService } from '../../services/complaint.service';
           </div>
         </div>
 
-        <!-- 6. LIVE ACTIVITY FEED -->
+        <!-- 6. LIVE ACTIVITY AUDIT TRAIL FEED -->
         <div *ngIf="activeTab === 'activity'" class="tab-panel animate-fade">
-          <h4 class="page-title">📜 Live System Activity Feed</h4>
+          <h4 class="page-title">📜 Live System Activity & Audit Trail</h4>
 
           <div class="card shadow-card">
-            <div *ngFor="let log of activityLogs" class="activity-feed-row">
-              <span style="font-size: 18px;">⚡</span>
-              <div>
-                <span class="purple-text font-bold" style="font-size: 12px;">{{ log.actorName || 'System' }} ({{ log.actorRole | uppercase }})</span>
-                <p class="activity-desc">{{ log.description }}</p>
-                <span class="activity-time">{{ log.createdAt | date:'shortTime' }}</span>
+            <div *ngFor="let log of activityLogs" class="activity-feed-row" style="padding: 12px 14px; border-bottom: 1px solid var(--border-color); display: flex; gap: 12px; align-items: flex-start;">
+              <span style="font-size: 20px; background: var(--bg-muted); padding: 8px; border-radius: 10px;">⚡</span>
+              <div style="flex: 1;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span class="purple-text font-bold" style="font-size: 12.5px;">{{ log.actorName || 'System Action' }} ({{ (log.actorRole || 'System') | uppercase }})</span>
+                  <span class="activity-time" style="font-size: 11px; color: var(--text-muted);">{{ log.createdAt | date:'shortTime' }}</span>
+                </div>
+                <p class="activity-desc" style="margin: 4px 0 0 0; font-size: 13px; color: var(--text-primary); font-weight: 500;">{{ log.description }}</p>
               </div>
             </div>
-          </div>
-        </div>
-
-        <!-- 7. CRITICAL ALERTS HUB -->
-        <div *ngIf="activeTab === 'alerts'" class="tab-panel animate-fade">
-          <h4 class="page-title">🚨 Critical Alerts & Attention Hub</h4>
-
-          <div style="display: flex; flex-direction: column; gap: 12px;">
-            <div class="alert-card danger-alert">
-              <strong style="font-size: 14px;">⚠️ Unassigned Complaint Timeout Alert</strong>
-              <p style="margin: 4px 0 0 0; font-size: 12px;">{{ getMetrics().unassigned }} complaints pending assignment for > 2 hours.</p>
-            </div>
-            <div class="alert-card warning-alert">
-              <strong style="font-size: 14px;">⚡ High Absentees Alert</strong>
-              <p style="margin: 4px 0 0 0; font-size: 12px;">Boys Hostel B-1 reported 23% student absent rate today.</p>
+            <div *ngIf="!activityLogs || activityLogs.length === 0" class="empty-state">
+              <span class="empty-icon">📜</span>
+              <p>No recent activity logs recorded in database.</p>
             </div>
           </div>
         </div>
@@ -1182,6 +1103,19 @@ export class AdminDashboardComponent implements OnInit {
     } else if (this.createForm.role === 'staff' && this.createForm.bio === 'Hostel Warden') {
       this.createForm.bio = 'Electrician';
     }
+  }
+
+  selectedMealFilter: 'all' | 'breakfast' | 'lunch' | 'snacks' | 'dinner' = 'all';
+
+  filterMealReviews(meal: 'all' | 'breakfast' | 'lunch' | 'snacks' | 'dinner'): void {
+    this.selectedMealFilter = meal;
+    this.cdr.detectChanges();
+  }
+
+  getFilteredMessReviews(): any[] {
+    if (!this.messAnalytics || !this.messAnalytics.reviews) return [];
+    if (this.selectedMealFilter === 'all') return this.messAnalytics.reviews;
+    return this.messAnalytics.reviews.filter((r: any) => (r.mealType || '').toLowerCase() === this.selectedMealFilter.toLowerCase());
   }
 
   constructor(
