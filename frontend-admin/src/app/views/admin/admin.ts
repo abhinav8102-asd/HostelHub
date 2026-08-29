@@ -493,64 +493,126 @@ import { ComplaintService } from '../../services/complaint.service';
           </div>
         </div>
 
-        <!-- 10. CREATE STAFF / WARDEN -->
+        <!-- CREATE ACCOUNT TAB (STUDENT, WARDEN, STAFF) -->
         <div *ngIf="activeTab === 'create'" class="tab-panel animate-fade">
-          <h4 class="page-title">➕ Create Staff or Warden ID Account</h4>
-          <div class="card shadow-card" style="max-width: 500px;">
+          <h4 class="page-title">➕ Create User Account (Student, Warden, Staff)</h4>
+          <div class="card shadow-card" style="max-width: 580px;">
             <form (ngSubmit)="onCreateSubmit()">
-              <div class="form-group">
-                <label class="form-label">Full Name</label>
-                <input type="text" class="form-input" [(ngModel)]="createForm.name" name="name" required placeholder="e.g. Ramesh Sharma" />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Email Address</label>
-                <input type="email" class="form-input" [(ngModel)]="createForm.email" name="email" required placeholder="e.g. ramesh@hostelhub.com" />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Password</label>
-                <input type="password" class="form-input" [(ngModel)]="createForm.password" name="password" required placeholder="Set password" />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Phone Number (Optional)</label>
-                <input type="text" class="form-input" [(ngModel)]="createForm.phone" name="phone" placeholder="e.g. 9876543210" />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Role</label>
-                <select class="form-input" [(ngModel)]="createForm.role" (change)="onRoleChange()" name="role">
-                  <option value="staff">Maintenance Staff</option>
-                  <option value="warden">Warden</option>
+              
+              <!-- Role Selector -->
+              <div class="form-group" style="margin-bottom: 16px;">
+                <label class="form-label" style="font-weight: 700;">Account Type / Role *</label>
+                <select class="form-input" [(ngModel)]="createForm.role" (change)="onRoleChange()" name="role" style="height: 44px; font-weight: 700; background: var(--bg-muted);">
+                  <option value="student">🎓 Student Account</option>
+                  <option value="warden">🛡️ Warden Account</option>
+                  <option value="staff">🔧 Maintenance Staff Account</option>
                 </select>
               </div>
-              <div class="form-group">
-                <label class="form-label">Trade / Category</label>
-                <select class="form-input" [(ngModel)]="createForm.bio" name="bio">
-                  <option value="Electrician">Electrician</option>
-                  <option value="Plumber">Plumber</option>
-                  <option value="Carpenter">Carpenter</option>
-                  <option value="Painter">Painter</option>
-                  <option value="Mason">Mason</option>
-                  <option value="AC / AC Technician">AC / AC Technician</option>
-                  <option value="Appliance Technician">Appliance Technician</option>
-                  <option value="Generator / DG Operator">Generator / DG Operator</option>
-                  <option value="RO / Water Purifier Technician">RO / Water Purifier Technician</option>
-                  <option value="Lift Operator / Technician">Lift Operator / Technician</option>
-                  <option value="Wifi Operator / IT Technician">Wifi Operator / IT Technician</option>
-                  <option value="Cleaner / Housekeeping">Cleaner / Housekeeping</option>
-                  <option value="Security Guard">Security Guard</option>
-                  <option value="Hostel Warden">Hostel Warden</option>
-                </select>
+
+              <!-- General Credentials -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px;">
+                <div class="form-group">
+                  <label class="form-label">Full Name *</label>
+                  <input type="text" class="form-input" [(ngModel)]="createForm.name" name="name" required placeholder="e.g. Rahul Sharma" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Phone Number *</label>
+                  <input type="text" class="form-input" [(ngModel)]="createForm.phone" name="phone" placeholder="e.g. 9876543210" />
+                </div>
               </div>
-              <div class="form-group">
-                <label class="form-label">Assigned Hostel Area</label>
-                <select class="form-input" [(ngModel)]="createForm.hostelBlock" name="hostelBlock">
-                  <option value="All Hostels">All Hostels</option>
-                  <option value="Boys Hostel B-1">Boys Hostel B-1</option>
-                  <option value="Boys Hostel B-2">Boys Hostel B-2</option>
-                  <option value="Girls Hostel G-1">Girls Hostel G-1</option>
-                  <option value="Girls Hostel G-2">Girls Hostel G-2</option>
-                </select>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px;">
+                <div class="form-group">
+                  <label class="form-label">Email Address *</label>
+                  <input type="email" class="form-input" [(ngModel)]="createForm.email" name="email" required placeholder="e.g. rahul@hostelhub.com" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Password *</label>
+                  <input type="password" class="form-input" [(ngModel)]="createForm.password" name="password" required placeholder="Set password" />
+                </div>
               </div>
-              <button type="submit" class="btn btn-primary" style="margin-top: 10px;">🚀 Create Account Now</button>
+
+              <!-- STUDENT-SPECIFIC FIELDS -->
+              <div *ngIf="createForm.role === 'student'" style="background: rgba(99, 102, 241, 0.06); padding: 16px; border-radius: 12px; border: 1px solid rgba(99, 102, 241, 0.2); margin-bottom: 16px;">
+                <h5 style="margin: 0 0 12px 0; font-size: 13px; color: var(--purple-primary); font-weight: 800;">🎓 Student Details Form</h5>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px;">
+                  <div class="form-group">
+                    <label class="form-label">Roll Number *</label>
+                    <input type="text" class="form-input" [(ngModel)]="createForm.rollNumber" name="rollNumber" placeholder="e.g. 2025001" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Room Number *</label>
+                    <input type="text" class="form-input" [(ngModel)]="createForm.roomNumber" name="roomNumber" placeholder="e.g. 304" />
+                  </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px;">
+                  <div class="form-group">
+                    <label class="form-label">Hostel Block *</label>
+                    <select class="form-input" [(ngModel)]="createForm.hostelBlock" name="hostelBlock">
+                      <option value="Boys Hostel 1">Boys Hostel 1</option>
+                      <option value="Boys Hostel 2">Boys Hostel 2</option>
+                      <option value="Girls Hostel 1">Girls Hostel 1</option>
+                      <option value="Girls Hostel 2">Girls Hostel 2</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Gender *</label>
+                    <select class="form-input" [(ngModel)]="createForm.gender" name="gender">
+                      <option value="male">Male ♂</option>
+                      <option value="female">Female ♀</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Batch *</label>
+                  <input type="text" class="form-input" [(ngModel)]="createForm.batch" name="batch" placeholder="e.g. Batch 2025-2029" />
+                </div>
+              </div>
+
+              <!-- STAFF SPECIFIC FIELDS -->
+              <div *ngIf="createForm.role === 'staff'">
+                <div class="form-group" style="margin-bottom: 10px;">
+                  <label class="form-label">Trade / Category</label>
+                  <select class="form-input" [(ngModel)]="createForm.bio" name="bio">
+                    <option value="Electrician">Electrician</option>
+                    <option value="Plumber">Plumber</option>
+                    <option value="Carpenter">Carpenter</option>
+                    <option value="Painter">Painter</option>
+                    <option value="Mason">Mason</option>
+                    <option value="AC / AC Technician">AC / AC Technician</option>
+                    <option value="Cleaner / Housekeeping">Cleaner / Housekeeping</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 10px;">
+                  <label class="form-label">Assigned Hostel Area</label>
+                  <select class="form-input" [(ngModel)]="createForm.hostelBlock" name="hostelBlock">
+                    <option value="All Hostels">All Hostels</option>
+                    <option value="Boys Hostel 1">Boys Hostel 1</option>
+                    <option value="Boys Hostel 2">Boys Hostel 2</option>
+                    <option value="Girls Hostel 1">Girls Hostel 1</option>
+                    <option value="Girls Hostel 2">Girls Hostel 2</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- WARDEN SPECIFIC FIELDS -->
+              <div *ngIf="createForm.role === 'warden'">
+                <div class="form-group" style="margin-bottom: 10px;">
+                  <label class="form-label">Assigned Hostel Block</label>
+                  <select class="form-input" [(ngModel)]="createForm.hostelBlock" name="hostelBlock">
+                    <option value="All Hostels">All Hostels</option>
+                    <option value="Boys Hostel 1">Boys Hostel 1</option>
+                    <option value="Boys Hostel 2">Boys Hostel 2</option>
+                    <option value="Girls Hostel 1">Girls Hostel 1</option>
+                    <option value="Girls Hostel 2">Girls Hostel 2</option>
+                  </select>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary" style="margin-top: 14px; width: 100%; height: 44px; font-size: 14px; font-weight: 700;">🚀 Create {{ createForm.role | uppercase }} Account Now</button>
             </form>
           </div>
         </div>
@@ -1010,7 +1072,19 @@ export class AdminDashboardComponent implements OnInit {
   newTaskStaffId: number | null = null;
   newTaskPriority = 'medium';
 
-  createForm = { name: '', email: '', password: '', role: 'staff', phone: '', bio: 'Electrician', hostelBlock: 'All Hostels' };
+  createForm = {
+    name: '',
+    email: '',
+    password: '',
+    role: 'student',
+    phone: '',
+    bio: 'Hostel Student',
+    hostelBlock: 'Boys Hostel 1',
+    roomNumber: '',
+    rollNumber: '',
+    gender: 'male',
+    batch: 'Batch 2025-2029'
+  };
 
   // Interactive Modals State
   showMetricDetailsModal = false;
@@ -1107,9 +1181,14 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   onRoleChange(): void {
-    if (this.createForm.role === 'warden') {
+    if (this.createForm.role === 'student') {
+      this.createForm.bio = 'Hostel Student';
+      if (!this.createForm.hostelBlock || this.createForm.hostelBlock === 'All Hostels') {
+        this.createForm.hostelBlock = 'Boys Hostel 1';
+      }
+    } else if (this.createForm.role === 'warden') {
       this.createForm.bio = 'Hostel Warden';
-    } else if (this.createForm.role === 'staff' && this.createForm.bio === 'Hostel Warden') {
+    } else if (this.createForm.role === 'staff') {
       this.createForm.bio = 'Electrician';
     }
   }
@@ -1558,10 +1637,25 @@ export class AdminDashboardComponent implements OnInit {
       alert('Please fill out Name, Email, and Password.');
       return;
     }
+    if (this.createForm.role === 'student' && !this.createForm.rollNumber) {
+      this.createForm.rollNumber = 'STU-' + Math.floor(100000 + Math.random() * 900000);
+    }
     this.complaintService.createStaffAccount(this.createForm).subscribe({
       next: (res: any) => {
         alert(`✅ ${res.message || 'Account created successfully!'}`);
-        this.createForm = { name: '', email: '', password: '', role: 'staff', phone: '', bio: 'Electrician', hostelBlock: 'All Hostels' };
+        this.createForm = {
+          name: '',
+          email: '',
+          password: '',
+          role: 'student',
+          phone: '',
+          bio: 'Hostel Student',
+          hostelBlock: 'Boys Hostel 1',
+          roomNumber: '',
+          rollNumber: '',
+          gender: 'male',
+          batch: 'Batch 2025-2029'
+        };
         this.loadUsers();
       },
       error: (err: any) => alert(`❌ ${err.error?.message || err.message || 'Failed to create account.'}`)
