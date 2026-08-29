@@ -3,7 +3,7 @@ services:
     name: HostelHub
     env: node
     rootDir: backend
-    buildCommand: npm install
-    startCommand: node server.js
+    buildCommand: npm install --omit=dev
+    startCommand: node --max-old-space-size=384 server.js
     healthCheckPath: /health
     autoDeploy: true
