@@ -176,124 +176,118 @@ import { API_CONFIG } from '../../config/api.config';
         <!-- TAB 0: HOME / COMMAND CENTER -->
         <div *ngIf="activeTab === 'home'" class="tab-panel animate-fade">
           
-          <div class="hud-container">
-            <!-- 1. Sleek Compact Glass Greeting HUD Banner -->
-            <div class="hud-banner">
-              <div>
-                <span style="font-size: 11px; font-weight: 800; color: #2563eb; letter-spacing: 0.6px; text-transform: uppercase; display: block; margin-bottom: 2px;">⚡ LIVE SYSTEM GRID · HOSTEL {{ user?.hostelBlock || 'CAMPUS' }}</span>
-                <h4 style="margin: 0; font-size: 20px; font-weight: 900; color: var(--text-primary);">Welcome, {{ user?.name }} 👋</h4>
-                <p style="margin: 3px 0 0 0; font-size: 12px; color: var(--text-muted);">Room {{ user?.roomNumber }} · Batch {{ user?.batch || '2025' }}</p>
+          <!-- 1. Sleek Compact Glass Greeting Banner -->
+          <div style="background: linear-gradient(135deg, rgba(37,99,235,0.08) 0%, rgba(56,189,248,0.12) 100%); border-radius: 20px; padding: 16px 20px; border: 1.5px solid rgba(37,99,235,0.2); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 8px 24px rgba(37,99,235,0.06);">
+            <div>
+              <span style="font-size: 11px; font-weight: 800; color: #2563eb; letter-spacing: 0.6px; text-transform: uppercase; display: block; margin-bottom: 2px;">⚡ Student Command Center</span>
+              <h4 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--text-primary);">Hello, {{ user?.name }}! 👋</h4>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <span style="background: #eff6ff; color: #2563eb; border: 1px solid rgba(37,99,235,0.2); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 800;">
+                🎓 {{ user?.batch || 'Batch 2025' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- 2. Vibrant 3D Quick Action Grid Launchpad (Clean - No Flashing Animations) -->
+          <div style="margin-top: 10px; margin-bottom: 28px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <h4 style="margin: 0; font-size: 17px; font-weight: 900; color: var(--text-primary);">🚀 Quick Launchpad</h4>
+              <span style="font-size: 11.5px; font-weight: 800; color: #2563eb;">1-Tap Access</span>
+            </div>
+
+            <div class="action-grid-3d" style="gap: 14px;">
+              <!-- Action 1: Raise Complaint -->
+              <div class="action-tile-3d tile-blue" (click)="switchTab('raise')">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white;">🚀</div>
+                  <span style="font-size: 10.5px; font-weight: 800; color: #2563eb; background: rgba(37,99,235,0.12); padding: 3px 8px; border-radius: 10px;">URGENT</span>
+                </div>
+                <div>
+                  <div class="action-card-title" style="font-size: 15px; font-weight: 800;">Raise Issue</div>
+                  <div class="action-card-sub" style="color: #475569;">Submit ticket to staff</div>
+                </div>
               </div>
+
+              <!-- Action 2: Mess Review -->
+              <div class="action-tile-3d tile-green" (click)="switchTab('mess')">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #10b981, #059669); color: white;">⭐</div>
+                  <span style="font-size: 10.5px; font-weight: 800; color: #059669; background: rgba(16,185,129,0.12); padding: 3px 8px; border-radius: 10px;">DAILY</span>
+                </div>
+                <div>
+                  <div class="action-card-title" style="font-size: 15px; font-weight: 800;">Mess Review</div>
+                  <div class="action-card-sub" style="color: #047857;">Rate meal & upload photo</div>
+                </div>
+              </div>
+
+              <!-- Action 3: Notices & Broadcasts -->
+              <div class="action-tile-3d tile-purple" (click)="switchTab('notices')">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white;">📢</div>
+                  <span style="font-size: 10.5px; font-weight: 800; color: #6d28d9; background: rgba(139,92,246,0.12); padding: 3px 8px; border-radius: 10px;">{{ announcements.length }} NEW</span>
+                </div>
+                <div>
+                  <div class="action-card-title" style="font-size: 15px; font-weight: 800;">Hostel Notices</div>
+                  <div class="action-card-sub" style="color: #5b21b6;">Warden official broadcasts</div>
+                </div>
+              </div>
+
+              <!-- Action 4: My Tickets -->
+              <div class="action-tile-3d tile-amber" (click)="switchTab('my-complaints')">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;">📋</div>
+                  <span style="font-size: 10.5px; font-weight: 800; color: #b45309; background: rgba(245,158,11,0.15); padding: 3px 8px; border-radius: 10px;">{{ getActiveTicketsCount() }} ACTIVE</span>
+                </div>
+                <div>
+                  <div class="action-card-title" style="font-size: 15px; font-weight: 800;">My Tickets</div>
+                  <div class="action-card-sub" style="color: #78350f;">Track live repair progress</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Futuristic Horizontal Notice Reel Stream -->
+          <div class="section-header" style="margin-top: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
               <div>
-                <span style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; gap: 6px;">
-                  <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></span>
-                  ONLINE
+                <h4 style="margin: 0; font-size: 16.5px; font-weight: 900; color: var(--text-primary);">📢 Official Notice Reel</h4>
+                <p class="section-subtitle" style="margin: 2px 0 0 0;">Live announcements from Hostel Administration</p>
+              </div>
+              <button class="btn" (click)="switchTab('notices')" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; font-size: 11.5px; font-weight: 800; padding: 6px 12px; border-radius: 12px; border: 1px solid rgba(37, 99, 235, 0.25);">
+                View All ({{ announcements.length }}) →
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="isLoadingAnnouncements" class="skeleton-list">
+            <div class="skeleton skeleton-card"></div>
+          </div>
+
+          <!-- Horizontal Carousel Reel of Notice Cards -->
+          <div *ngIf="!isLoadingAnnouncements && announcements.length > 0" class="notice-reel-container">
+            <div *ngFor="let notice of announcements.slice(0, 5)" class="notice-reel-card" (click)="openNoticeModal(notice)">
+              <div class="notice-card-header">
+                <span class="notice-tag">
+                  {{ notice.hostelBlock === 'All' ? '🌐 ALL HOSTELS' : '🏠 BLOCK ' + notice.hostelBlock }}
                 </span>
+                <span class="notice-date">📅 {{ notice.createdAt | date:'d MMM' }}</span>
+              </div>
+              <h5 class="notice-title">{{ notice.title }}</h5>
+              <p class="notice-preview">{{ notice.content }}</p>
+              <div *ngIf="notice.photoUrl" class="notice-photo-box">
+                <img [src]="getImageUrl(notice.photoUrl)" alt="Attachment" />
+              </div>
+              <div class="notice-card-footer">
+                <span>By: <strong>{{ notice.creator?.name || 'Warden' }}</strong></span>
+                <span class="read-more">Read Notice 🔍</span>
               </div>
             </div>
+          </div>
 
-            <!-- 2. Instant Utility Triggers Launchpad -->
-            <div>
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <h5 style="margin: 0; font-size: 15px; font-weight: 900; color: var(--text-primary);">⚡ Instant Issue Dispatcher</h5>
-                <span style="font-size: 11px; color: #2563eb; font-weight: 800;">1-Tap Submit</span>
-              </div>
-
-              <div class="hud-quick-triggers">
-                <div class="hud-trigger-btn" (click)="switchTab('raise'); newComplaint.category = 'Water / Plumbing'">
-                  <div class="hud-trigger-icon" style="background: rgba(37, 99, 235, 0.12); color: #2563eb;">💧</div>
-                  <span class="hud-trigger-label">Plumbing</span>
-                  <span class="hud-trigger-sub">Water & Leak</span>
-                </div>
-
-                <div class="hud-trigger-btn" (click)="switchTab('raise'); newComplaint.category = 'Electricity / Power'">
-                  <div class="hud-trigger-icon" style="background: rgba(245, 158, 11, 0.12); color: #d97706;">⚡</div>
-                  <span class="hud-trigger-label">Electricity</span>
-                  <span class="hud-trigger-sub">Power & Fan</span>
-                </div>
-
-                <div class="hud-trigger-btn" (click)="switchTab('raise'); newComplaint.category = 'Internet / Wi-Fi'">
-                  <div class="hud-trigger-icon" style="background: rgba(139, 92, 246, 0.12); color: #7c3aed;">📶</div>
-                  <span class="hud-trigger-label">Wi-Fi / LAN</span>
-                  <span class="hud-trigger-sub">Network Issue</span>
-                </div>
-
-                <div class="hud-trigger-btn" (click)="switchTab('raise'); newComplaint.category = 'Cleaning / Sanitation'">
-                  <div class="hud-trigger-icon" style="background: rgba(16, 185, 129, 0.12); color: #059669;">🧹</div>
-                  <span class="hud-trigger-label">Sanitation</span>
-                  <span class="hud-trigger-sub">Room Clean</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- 3. Dual Hub: Active Tickets Status & Daily Mess Quick Rating -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
-              <!-- Left: Active Tickets Tracker -->
-              <div class="card" (click)="switchTab('my-complaints')" style="border-radius: 20px; padding: 18px; border: 1.5px solid var(--border-color); background: var(--bg-card); cursor: pointer; display: flex; flex-direction: column; justify-content: space-between;">
-                <div>
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <span style="font-size: 11px; font-weight: 800; color: #2563eb; text-transform: uppercase;">📋 MY TICKETS</span>
-                    <span style="font-size: 11px; font-weight: 800; background: rgba(37,99,235,0.1); color: #2563eb; padding: 2px 8px; border-radius: 8px;">{{ getActiveTicketsCount() }} Active</span>
-                  </div>
-                  <h4 style="margin: 0 0 4px 0; font-size: 16px; font-weight: 900; color: var(--text-primary);">Ticket Status</h4>
-                  <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Total Tickets Raised: {{ complaints.length }}</p>
-                </div>
-                <div style="margin-top: 14px; display: flex; justify-content: space-between; align-items: center;">
-                  <span style="font-size: 11.5px; font-weight: 800; color: #2563eb;">Track Live Progress →</span>
-                  <span style="font-size: 18px;">📋</span>
-                </div>
-              </div>
-
-              <!-- Right: Mess Review Direct Access -->
-              <div class="card" (click)="switchTab('mess')" style="border-radius: 20px; padding: 18px; border: 1.5px solid rgba(16, 185, 129, 0.3); background: linear-gradient(135deg, var(--bg-card) 0%, rgba(16, 185, 129, 0.05) 100%); cursor: pointer; display: flex; flex-direction: column; justify-content: space-between;">
-                <div>
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <span style="font-size: 11px; font-weight: 800; color: #059669; text-transform: uppercase;">⭐ MESS FEEDBACK</span>
-                    <span style="font-size: 11px; font-weight: 800; background: rgba(16, 185, 129, 0.12); color: #059669; padding: 2px 8px; border-radius: 8px;">DAILY</span>
-                  </div>
-                  <h4 style="margin: 0 0 4px 0; font-size: 16px; font-weight: 900; color: var(--text-primary);">Rate Meal</h4>
-                  <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Share food review & photo</p>
-                </div>
-                <div style="margin-top: 14px; display: flex; justify-content: space-between; align-items: center;">
-                  <span style="font-size: 11.5px; font-weight: 800; color: #059669;">Submit Review →</span>
-                  <span style="font-size: 18px;">🍴</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- 4. Official Warden Announcements Feed Stream -->
-            <div>
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                <h5 style="margin: 0; font-size: 15px; font-weight: 900; color: var(--text-primary);">📢 Official Warden Timeline</h5>
-                <button (click)="switchTab('notices')" style="background: none; border: none; font-size: 11.5px; font-weight: 800; color: #2563eb; cursor: pointer;">View All ({{ announcements.length }}) →</button>
-              </div>
-
-              <div *ngIf="isLoadingAnnouncements" class="skeleton-list">
-                <div class="skeleton skeleton-card"></div>
-              </div>
-
-              <div *ngIf="!isLoadingAnnouncements && announcements.length > 0" class="hud-timeline-feed">
-                <div *ngFor="let notice of announcements.slice(0, 3)" class="hud-timeline-item" (click)="openNoticeModal(notice)">
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <span style="background: #eff6ff; color: #2563eb; font-size: 10px; font-weight: 900; padding: 3px 8px; border-radius: 6px; text-transform: uppercase;">
-                      {{ notice.hostelBlock === 'All' ? '🌐 ALL HOSTELS' : '🏠 BLOCK ' + notice.hostelBlock }}
-                    </span>
-                    <span style="font-size: 10.5px; color: var(--text-muted); font-weight: 700;">
-                      {{ notice.createdAt | date:'d MMM, h:mm a' }}
-                    </span>
-                  </div>
-                  <h5 style="margin: 4px 0 4px 0; font-size: 14.5px; font-weight: 800; color: var(--text-primary);">{{ notice.title }}</h5>
-                  <p style="margin: 0; font-size: 12px; color: var(--text-secondary); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                    {{ notice.content }}
-                  </p>
-                </div>
-              </div>
-
-              <div *ngIf="!isLoadingAnnouncements && announcements.length === 0" class="empty-state" style="padding: 20px; text-align: center;">
-                <span style="font-size: 28px;">📢</span>
-                <p style="font-size: 13px; color: var(--text-muted); margin-top: 6px;">No active hostel notices posted yet.</p>
-              </div>
-            </div>
+          <div *ngIf="!isLoadingAnnouncements && announcements.length === 0" class="empty-state" style="padding: 20px; text-align: center;">
+            <span style="font-size: 28px;">📢</span>
+            <p style="font-size: 13px; color: var(--text-muted); margin-top: 6px;">No active hostel notices posted yet.</p>
           </div>
 
           <!-- 2. Dynamic Warden Section -->
