@@ -76,14 +76,15 @@ exports.getAnnouncements = async (req, res) => {
       order: [['createdAt', 'DESC']]
     });
 
-    if (req.userRole === 'student') {
+    if ((req.userRole || '').toLowerCase() === 'student') {
       // Find student block
       const student = await User.findByPk(req.userId);
-      if (student) {
+      if (student && student.hostelBlock) {
+        const studentBlock = student.hostelBlock.trim().toLowerCase();
         announcements = announcements.filter(a => {
           if (!a.hostelBlock || a.hostelBlock === 'All') return true;
-          const blocks = a.hostelBlock.split(',').map(b => b.trim());
-          return blocks.includes(student.hostelBlock);
+          const blocks = a.hostelBlock.split(',').map(b => b.trim().toLowerCase());
+          return blocks.some(b => b === studentBlock || studentBlock.includes(b) || b.includes(studentBlock));
         });
       }
     }

@@ -1051,7 +1051,7 @@ import { API_CONFIG } from '../../config/api.config';
             <div *ngFor="let notice of announcements" class="card" style="border: 1px solid var(--border-color); padding: 18px; border-radius: 18px; background: var(--bg-card); box-shadow: var(--shadow-sm);">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                 <span style="background: #fdf2f4; color: #b31031; font-size: 11px; font-weight: 800; padding: 4px 12px; border-radius: 8px; text-transform: uppercase; border: 1px solid rgba(179,16,49,0.2);">
-                  {{ notice.hostelBlock === 'All' ? '🌐 All Hostel Blocks' : '🏠 ' + notice.hostelBlock }}
+                  {{ notice.hostelBlock === 'All' ? '🌐 ALL HOSTEL BLOCKS' : '🏠 ' + notice.hostelBlock }}
                 </span>
                 <span style="font-size: 11.5px; color: var(--text-muted); font-weight: 600;">
                   📅 {{ notice.createdAt | date:'d MMM yyyy, h:mm a' }}
@@ -1067,24 +1067,21 @@ import { API_CONFIG } from '../../config/api.config';
               <div *ngIf="notice.photoUrl" style="margin-top: 10px; margin-bottom: 12px;">
                 <img 
                   [src]="getImageUrl(notice.photoUrl)" 
-                  style="max-width: 100%; max-height: 260px; object-fit: cover; border-radius: 12px; border: 1px solid var(--border-color); cursor: pointer;" 
+                  style="max-width: 100%; max-height: 280px; object-fit: cover; border-radius: 12px; border: 1px solid var(--border-color); cursor: pointer;" 
                   (click)="openPhotoModal(getImageUrl(notice.photoUrl))"
                   alt="Notice Attachment"
                 />
-                <div style="margin-top: 8px;">
-                  <button 
-                    type="button" 
-                    (click)="downloadImage(notice.photoUrl, 'Notice-Attachment.jpg')" 
-                    class="btn"
-                    style="background: var(--bg-muted); color: var(--text-primary); font-size: 11.5px; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border-color); cursor: pointer;"
-                  >
-                    📥 Download Attachment Image
-                  </button>
-                </div>
+                <button 
+                  type="button" 
+                  (click)="downloadImage(notice.photoUrl, 'Notice-Attachment.jpg')" 
+                  style="width: 100%; padding: 10px; border-radius: 12px; background: #fdf2f4; color: #b31031; border: 1px solid rgba(179, 16, 49, 0.2); font-size: 12.5px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; margin-top: 10px;"
+                >
+                  <span>📥</span> Download Attachment Image
+                </button>
               </div>
 
               <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--border-color); font-size: 11.5px; color: var(--text-muted);">
-                <span>Posted by: <strong>{{ notice.creator?.name || 'Hostel Administration' }}</strong></span>
+                <span>Posted by: <strong>{{ notice.creator?.name || 'Warden' }}</strong></span>
                 <span class="purple-text font-bold" style="cursor: pointer;" (click)="openNoticeModal(notice)">View Full Notice 🔍</span>
               </div>
             </div>

@@ -2711,6 +2711,15 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  getImageUrl(url: string | null | undefined): string {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+      return url;
+    }
+    const cleanPath = url.startsWith('/') ? url : '/' + url;
+    return 'https://hostelhub-0cyi.onrender.com' + cleanPath;
+  }
+
   // Load warden mess data
   loadMessData(): void {
     this.messError = '';
@@ -2788,13 +2797,6 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
     if (!this.rollCallDate) {
       this.rollCallDate = this.getTodayDateString();
     }
-    
-    this.isLoadingRollCall = true;
-    this.attendanceSuccess = '';
-    this.attendanceError = '';
-
-  // Load students and pre-fill attendance map with persistent absent roll-forward
-  loadDailyRollCall(): void {
     this.isLoadingRollCall = true;
     this.attendanceSuccess = '';
     this.attendanceError = '';
