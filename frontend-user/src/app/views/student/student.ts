@@ -54,7 +54,7 @@ import { API_CONFIG } from '../../config/api.config';
           </div>
           <div class="notice-modal-body">{{ selectedNotice.content }}</div>
           
-          <!-- Notice Photo Attachment with Download option -->
+          <!-- Notice Photo Attachment -->
           <div *ngIf="selectedNotice.photoUrl" style="margin-top: 14px; margin-bottom: 14px; text-align: center;">
             <img 
               [src]="getImageUrl(selectedNotice.photoUrl)" 
@@ -62,16 +62,6 @@ import { API_CONFIG } from '../../config/api.config';
               alt="Notice Attachment"
               (click)="openPhotoModal(getImageUrl(selectedNotice.photoUrl))"
             />
-            <div style="margin-top: 10px;">
-              <button 
-                type="button" 
-                (click)="downloadImage(selectedNotice.photoUrl, 'Notice-Attachment.jpg')" 
-                class="btn"
-                style="background: var(--neutral-100); color: var(--neutral-800); font-size: 12px; padding: 7px 14px; border-radius: 6px; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; border: 1px solid var(--neutral-200);"
-              >
-                📥 Download Image
-              </button>
-            </div>
           </div>
 
           <button class="btn btn-primary" style="width:100%;margin-top:4px" (click)="closeNoticeModal()">Close</button>
@@ -1009,13 +999,6 @@ import { API_CONFIG } from '../../config/api.config';
                   (click)="openPhotoModal(getImageUrl(notice.photoUrl))"
                   alt="Notice Attachment"
                 />
-                <button 
-                  type="button" 
-                  (click)="downloadImage(notice.photoUrl, 'Notice-Attachment.jpg')" 
-                  style="width: 100%; padding: 10px; border-radius: 12px; background: #fdf2f4; color: #b31031; border: 1px solid rgba(179, 16, 49, 0.2); font-size: 12.5px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; margin-top: 10px;"
-                >
-                  <span>📥</span> Download Attachment Image
-                </button>
               </div>
 
               <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--border-color); font-size: 11.5px; color: var(--text-muted);">
