@@ -115,11 +115,16 @@ const startServer = async () => {
 
         // Auto migration check for mess_feedbacks table photo_url column & meal_type column
         try {
-          await sequelize.query('ALTER TABLE mess_feedbacks ADD COLUMN IF NOT EXISTS photo_url VARCHAR(255);');
-          await sequelize.query('ALTER TABLE mess_feedbacks ALTER COLUMN meal_type TYPE VARCHAR(255);');
-          console.log('Migration check: mess_feedbacks columns ready.');
+          await sequelize.query('ALTER TABLE mess_feedbacks ADD COLUMN IF NOT EXISTS photo_url TEXT;');
+          await sequelize.query('ALTER TABLE mess_feedbacks ALTER COLUMN photo_url TYPE TEXT;');
+          console.log('Migration check: mess_feedbacks photo_url set to TEXT.');
         } catch (e) {
-          console.log('Note on mess_feedbacks migration check:', e.message);
+          try {
+            await sequelize.query('ALTER TABLE mess_feedbacks MODIFY COLUMN photo_url TEXT;');
+            console.log('Migration check: mess_feedbacks photo_url modified to TEXT.');
+          } catch (e2) {
+            console.log('Note on mess_feedbacks migration check:', e2.message);
+          }
         }
 
         // Run seed check in background

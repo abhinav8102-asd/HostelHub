@@ -1,4 +1,5 @@
 const fs = require('fs');
+const sequelize = require('../config/db');
 const { MessMenu, MessFeedback, MessSkip, User } = require('../models');
 const { Op } = require('sequelize');
 
