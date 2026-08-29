@@ -55,7 +55,6 @@ import { ComplaintService } from '../../services/complaint.service';
           <button (click)="switchTab('notices')" [class.active]="activeTab === 'notices'">📢 Notices</button>
           <button (click)="switchTab('activity')" [class.active]="activeTab === 'activity'">📜 Activity Log</button>
           <button (click)="switchTab('users')" [class.active]="activeTab === 'users'">👥 Students & Users</button>
-          <button (click)="switchTab('tasks')" [class.active]="activeTab === 'tasks'">🗂️ Task Dispatcher</button>
           <button (click)="switchTab('create')" [class.active]="activeTab === 'create'">➕ Create Account</button>
           <button (click)="switchTab('settings')" [class.active]="activeTab === 'settings'">⚙️ Settings</button>
           <button (click)="switchTab('my-profile')" [class.active]="activeTab === 'my-profile'">👤 Profile</button>
@@ -490,50 +489,6 @@ import { ComplaintService } from '../../services/complaint.service';
                 <button class="btn btn-secondary" (click)="openEditUserModal(u)" style="width: auto; padding: 6px 12px; font-size: 11px;">Edit ✏️</button>
                 <button class="btn btn-delete-user" (click)="deleteUser(u.id)" style="width: auto; padding: 6px 12px; font-size: 11px;">Delete</button>
               </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 9. TASK & WORK DISPATCHER -->
-        <div *ngIf="activeTab === 'tasks'" class="tab-panel animate-fade">
-          <h4 class="page-title">🗂️ Task & Work Dispatcher</h4>
-
-          <!-- Dispatch Task Card -->
-          <div class="card shadow-card" style="margin-bottom: 20px;">
-            <h5 class="card-section-title">Dispatch Custom Maintenance Task</h5>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-              <input type="text" class="form-input" [(ngModel)]="newTaskTitle" placeholder="Task Title (e.g. Clean Terrace Floor Block A)" />
-              <textarea class="form-input" [(ngModel)]="newTaskDesc" placeholder="Task details and instructions"></textarea>
-              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <select class="form-input" style="flex: 1;" [(ngModel)]="newTaskStaffId">
-                  <option [ngValue]="null">Select Staff Member</option>
-                  <option *ngFor="let s of staffList" [value]="s.id">{{ s.name }} ({{ s.bio || 'Maintenance' }})</option>
-                </select>
-                <select class="form-input" style="width: 140px;" [(ngModel)]="newTaskPriority">
-                  <option value="low">Low Priority</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High Priority</option>
-                  <option value="urgent">URGENT</option>
-                </select>
-              </div>
-              <button class="btn btn-primary" (click)="createStaffTask()">🚀 Dispatch Task to Staff</button>
-            </div>
-          </div>
-
-          <!-- All Dispatched Tasks Stream -->
-          <div class="card shadow-card">
-            <h5 class="card-section-title">All Dispatched Maintenance Tasks</h5>
-            <div *ngFor="let task of staffTasksList" class="task-item-row">
-              <div>
-                <strong style="font-size: 13px;">{{ task.title }}</strong>
-                <span class="card-sub-lbl" style="display: block;">Assigned to: <strong>{{ task.assignedStaff?.name || 'Staff' }}</strong> | Priority: <strong [class]="'priority-' + task.priority">{{ task.priority | uppercase }}</strong></span>
-                <p style="margin: 4px 0 0 0; font-size: 12px; color: var(--text-secondary);">{{ task.description }}</p>
-              </div>
-              <span [class]="'status-tag status-' + task.status">{{ task.status | uppercase }}</span>
-            </div>
-            <div *ngIf="staffTasksList.length === 0" class="empty-state">
-              <span class="empty-icon">🗂️</span>
-              <p>No custom maintenance tasks dispatched yet.</p>
             </div>
           </div>
         </div>
