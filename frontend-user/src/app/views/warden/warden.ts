@@ -947,47 +947,87 @@ import { API_CONFIG } from '../../config/api.config';
             Create Single or Bulk Student & Staff Accounts, manage activation status, and control user access.
           </p>
 
-          <div *ngIf="userMgmtSuccess" class="alert alert-success">{{ userMgmtSuccess }}</div>
-          <div *ngIf="userMgmtError" class="alert alert-danger">{{ userMgmtError }}</div>
+          <!-- Top Sub-Navigation Mode Pills -->
+          <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
+            <button 
+              type="button" 
+              (click)="userMgmtMode = 'single'; cdr.detectChanges()" 
+              [style.background]="userMgmtMode === 'single' ? 'linear-gradient(135deg, #8a0d24 0%, #b31031 100%)' : 'var(--bg-card)'"
+              [style.color]="userMgmtMode === 'single' ? 'white' : 'var(--text-primary)'"
+              style="padding: 10px 16px; border-radius: 12px; border: 1.5px solid var(--border-color); font-size: 12.5px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px;"
+            >
+              ➕ Single User
+            </button>
+            <button 
+              type="button" 
+              (click)="userMgmtMode = 'bulk'; cdr.detectChanges()" 
+              [style.background]="userMgmtMode === 'bulk' ? 'linear-gradient(135deg, #8a0d24 0%, #b31031 100%)' : 'var(--bg-card)'"
+              [style.color]="userMgmtMode === 'bulk' ? 'white' : 'var(--text-primary)'"
+              style="padding: 10px 16px; border-radius: 12px; border: 1.5px solid var(--border-color); font-size: 12.5px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px;"
+            >
+              📁 Bulk ID Import
+            </button>
+            <button 
+              type="button" 
+              (click)="userMgmtMode = 'batch_terminate'; cdr.detectChanges()" 
+              [style.background]="userMgmtMode === 'batch_terminate' ? 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)' : 'var(--bg-card)'"
+              [style.color]="userMgmtMode === 'batch_terminate' ? 'white' : 'var(--text-primary)'"
+              style="padding: 10px 16px; border-radius: 12px; border: 1.5px solid var(--border-color); font-size: 12.5px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px;"
+            >
+              🚨 Terminate Batch
+            </button>
+            <button 
+              type="button" 
+              (click)="userMgmtMode = 'directory'; loadAllUsers(); cdr.detectChanges()" 
+              [style.background]="userMgmtMode === 'directory' ? 'linear-gradient(135deg, #8a0d24 0%, #b31031 100%)' : 'var(--bg-card)'"
+              [style.color]="userMgmtMode === 'directory' ? 'white' : 'var(--text-primary)'"
+              style="padding: 10px 16px; border-radius: 12px; border: 1.5px solid var(--border-color); font-size: 12.5px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 6px;"
+            >
+              👥 All Users ({{ allUsersList.length }})
+            </button>
+          </div>
 
-          <!-- Section 1: Create Single Account Form -->
-          <div class="card" style="margin-bottom: 16px; padding: 18px; border-radius: 16px; border: 1px solid var(--border-color); background: var(--bg-card);">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-              <strong style="font-size: 15px; color: var(--text-primary);">➕ Create Single Account (Student / Staff)</strong>
-              <span style="font-size: 11px; background: rgba(179, 16, 49, 0.1); color: #b31031; font-weight: 700; padding: 2px 8px; border-radius: 6px;">Instant ID</span>
+          <div *ngIf="userMgmtSuccess" class="alert alert-success" style="padding: 12px 16px; font-weight: 700; border-radius: 12px; margin-bottom: 14px;">{{ userMgmtSuccess }}</div>
+          <div *ngIf="userMgmtError" class="alert alert-danger" style="padding: 12px 16px; font-weight: 700; border-radius: 12px; margin-bottom: 14px;">{{ userMgmtError }}</div>
+
+          <!-- MODE 1: Create Single Account Form -->
+          <div *ngIf="userMgmtMode === 'single'" class="card animate-fade" style="margin-bottom: 16px; padding: 20px; border-radius: 18px; border: 1px solid var(--border-color); background: var(--bg-card);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+              <strong style="font-size: 16px; color: var(--text-primary); font-weight: 800;">➕ Create Single Account (Student / Staff)</strong>
+              <span style="font-size: 11px; background: rgba(179, 16, 49, 0.12); color: #b31031; font-weight: 800; padding: 4px 10px; border-radius: 8px;">Instant ID</span>
             </div>
 
             <form (ngSubmit)="onCreateUserSubmit()">
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
                 <div>
-                  <label class="form-label" style="font-size: 11.5px; font-weight: 700;">Account Role</label>
-                  <select class="form-input" [(ngModel)]="newUser.role" name="role" style="height: 38px; border-radius: 10px; font-size: 12.5px; width: 100%; font-weight: 700;" required>
+                  <label class="form-label" style="font-size: 12px; font-weight: 800; margin-bottom: 4px; display: block; color: var(--text-primary);">Account Role</label>
+                  <select class="form-input" [(ngModel)]="newUser.role" name="role" style="min-height: 44px; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; width: 100%; font-weight: 700; color: var(--text-primary); background: var(--bg-input); border: 1.5px solid var(--border-color);" required>
                     <option value="student">👨‍🎓 Student</option>
                     <option value="staff">🔧 Maintenance Staff</option>
                     <option value="warden">👨‍💼 Assistant Warden</option>
                   </select>
                 </div>
                 <div>
-                  <label class="form-label" style="font-size: 11.5px; font-weight: 700;">Full Name</label>
-                  <input type="text" class="form-input" [(ngModel)]="newUser.name" name="name" placeholder="Full Name" style="height: 38px; border-radius: 10px; font-size: 12.5px; width: 100%;" required />
+                  <label class="form-label" style="font-size: 12px; font-weight: 800; margin-bottom: 4px; display: block; color: var(--text-primary);">Full Name</label>
+                  <input type="text" class="form-input" [(ngModel)]="newUser.name" name="name" placeholder="Rahul Kumar" style="min-height: 44px; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; width: 100%; color: var(--text-primary); background: var(--bg-input); border: 1.5px solid var(--border-color);" required />
                 </div>
               </div>
 
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
                 <div>
-                  <label class="form-label" style="font-size: 11.5px; font-weight: 700;">Email Address</label>
-                  <input type="email" class="form-input" [(ngModel)]="newUser.email" name="email" placeholder="user@gmail.com" style="height: 38px; border-radius: 10px; font-size: 12.5px; width: 100%;" required />
+                  <label class="form-label" style="font-size: 12px; font-weight: 800; margin-bottom: 4px; display: block; color: var(--text-primary);">Email Address</label>
+                  <input type="email" class="form-input" [(ngModel)]="newUser.email" name="email" placeholder="rahul@gmail.com" style="min-height: 44px; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; width: 100%; color: var(--text-primary); background: var(--bg-input); border: 1.5px solid var(--border-color);" required />
                 </div>
                 <div>
-                  <label class="form-label" style="font-size: 11.5px; font-weight: 700;">Login Password</label>
-                  <input type="password" class="form-input" [(ngModel)]="newUser.password" name="password" placeholder="Password" style="height: 38px; border-radius: 10px; font-size: 12.5px; width: 100%;" required />
+                  <label class="form-label" style="font-size: 12px; font-weight: 800; margin-bottom: 4px; display: block; color: var(--text-primary);">Login Password</label>
+                  <input type="password" class="form-input" [(ngModel)]="newUser.password" name="password" placeholder="Password (e.g. 123456)" style="min-height: 44px; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; width: 100%; color: var(--text-primary); background: var(--bg-input); border: 1.5px solid var(--border-color);" required />
                 </div>
               </div>
 
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
                 <div>
-                  <label class="form-label" style="font-size: 11.5px; font-weight: 700;">Hostel Block</label>
-                  <select class="form-input" [(ngModel)]="newUser.hostelBlock" name="hostelBlock" style="height: 38px; border-radius: 10px; font-size: 12.5px; width: 100%;" required>
+                  <label class="form-label" style="font-size: 12px; font-weight: 800; margin-bottom: 4px; display: block; color: var(--text-primary);">Hostel Block</label>
+                  <select class="form-input" [(ngModel)]="newUser.hostelBlock" name="hostelBlock" style="min-height: 44px; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; width: 100%; font-weight: 700; color: var(--text-primary); background: var(--bg-input); border: 1.5px solid var(--border-color);" required>
                     <option value="Boys Hostel 1">Boys Hostel 1</option>
                     <option value="Boys Hostel 2">Boys Hostel 2</option>
                     <option value="Girls Hostel 1">Girls Hostel 1</option>
@@ -995,51 +1035,120 @@ import { API_CONFIG } from '../../config/api.config';
                   </select>
                 </div>
                 <div>
-                  <label class="form-label" style="font-size: 11.5px; font-weight: 700;">Room / Phone</label>
-                  <input type="text" class="form-input" [(ngModel)]="newUser.roomNumber" name="roomNumber" placeholder="Room 101" style="height: 38px; border-radius: 10px; font-size: 12.5px; width: 100%;" />
+                  <label class="form-label" style="font-size: 12px; font-weight: 800; margin-bottom: 4px; display: block; color: var(--text-primary);">Room / Roll Number</label>
+                  <input type="text" class="form-input" [(ngModel)]="newUser.roomNumber" name="roomNumber" placeholder="Room 204" style="min-height: 44px; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; width: 100%; color: var(--text-primary); background: var(--bg-input); border: 1.5px solid var(--border-color);" />
                 </div>
               </div>
 
-              <button type="submit" [disabled]="creatingUser" class="btn" style="width: 100%; height: 42px; background: linear-gradient(135deg, #8a0d24 0%, #b31031 100%); color: white; border: none; border-radius: 12px; font-weight: 800; font-size: 13.5px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+              <button type="submit" [disabled]="creatingUser" class="btn" style="width: 100%; height: 46px; background: linear-gradient(135deg, #8a0d24 0%, #b31031 100%); color: white; border: none; border-radius: 14px; font-weight: 800; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(179, 16, 49, 0.35); margin-top: 6px;">
                 <span>➕</span> {{ creatingUser ? 'Creating Account...' : 'Create Account Now' }}
               </button>
             </form>
           </div>
 
-          <!-- Section 2: All Users & Activation/Deactivation Controls -->
-          <div class="card" style="padding: 18px; border-radius: 16px; border: 1px solid var(--border-color); background: var(--bg-card);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-              <strong style="font-size: 15px; color: var(--text-primary);">👥 User Directory & Activation Controls</strong>
-              <input type="text" class="form-input" [(ngModel)]="searchUserQuery" (input)="cdr.detectChanges()" placeholder="🔍 Search name, email..." style="height: 34px; padding: 0 10px; font-size: 12px; border-radius: 8px; width: 180px;" />
+          <!-- MODE 2: Bulk Account Import Form -->
+          <div *ngIf="userMgmtMode === 'bulk'" class="card animate-fade" style="margin-bottom: 16px; padding: 20px; border-radius: 18px; border: 1px solid var(--border-color); background: var(--bg-card);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+              <strong style="font-size: 16px; color: var(--text-primary); font-weight: 800;">📁 Bulk Account Import (CSV / Entries)</strong>
+              <span style="font-size: 11px; background: rgba(14, 165, 233, 0.12); color: #0284c7; font-weight: 800; padding: 4px 10px; border-radius: 8px;">Multi-Account Creation</span>
             </div>
 
-            <div *ngIf="isLoadingUsers" class="skeleton-list">
-              <div class="skeleton skeleton-card"></div>
+            <form (ngSubmit)="onBulkImportSubmit()">
+              <div style="margin-bottom: 12px;">
+                <label class="form-label" style="font-size: 12px; font-weight: 800; margin-bottom: 4px; display: block; color: var(--text-primary);">Batch Designation</label>
+                <input type="text" class="form-input" [(ngModel)]="bulkBatchData.batchName" name="batchName" placeholder="Batch 2025-2029" style="min-height: 44px; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; width: 100%; color: var(--text-primary); background: var(--bg-input); border: 1.5px solid var(--border-color);" required />
+              </div>
+
+              <div style="background: var(--bg-muted); border: 1px dashed var(--border-color); padding: 12px; border-radius: 12px; margin-bottom: 12px; font-size: 11.5px; color: var(--text-muted); line-height: 1.5;">
+                <strong style="color: var(--text-primary);">📋 Format Guide (1 Entry Per Line):</strong><br />
+                <code>Name, Email, Phone, RollNumber, RoomNumber, HostelBlock</code><br />
+                <em>Example:</em> <code>Rahul Kumar, rahul@gmail.com, 9876543210, STU101, 204, Boys Hostel 1</code>
+              </div>
+
+              <div style="margin-bottom: 14px;">
+                <label class="form-label" style="font-size: 12px; font-weight: 800; margin-bottom: 4px; display: block; color: var(--text-primary);">Paste CSV Data Lines</label>
+                <textarea class="form-input" [(ngModel)]="bulkBatchData.rawText" name="rawText" rows="6" placeholder="Rahul Kumar, rahul@gmail.com, 9876543210, STU101, 204, Boys Hostel 1&#10;Priya Sharma, priya@gmail.com, 9876543211, STU102, 105, Girls Hostel 1" style="width: 100%; padding: 12px; border-radius: 12px; font-size: 12.5px; font-family: monospace; color: var(--text-primary); background: var(--bg-input); border: 1.5px solid var(--border-color);" required></textarea>
+              </div>
+
+              <button type="submit" [disabled]="bulkImporting" class="btn" style="width: 100%; height: 46px; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: white; border: none; border-radius: 14px; font-weight: 800; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);">
+                <span>📁</span> {{ bulkImporting ? 'Processing Bulk Import...' : 'Import Bulk Accounts Now' }}
+              </button>
+            </form>
+          </div>
+
+          <!-- MODE 3: Terminate Entire Batch Form -->
+          <div *ngIf="userMgmtMode === 'batch_terminate'" class="card animate-fade" style="margin-bottom: 16px; padding: 20px; border-radius: 18px; border: 1px solid rgba(220, 38, 38, 0.3); background: var(--bg-card);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+              <strong style="font-size: 16px; color: #dc2626; font-weight: 800;">🚨 Terminate / Deactivate Entire Batch</strong>
+              <span style="font-size: 11px; background: #fee2e2; color: #b91c1c; font-weight: 800; padding: 4px 10px; border-radius: 8px;">Batch Action</span>
+            </div>
+
+            <div style="background: #fee2e2; border: 1px solid rgba(239, 68, 68, 0.3); padding: 14px; border-radius: 12px; margin-bottom: 14px; font-size: 12.5px; color: #991b1b; line-height: 1.5;">
+              ⚠️ <strong>Warning:</strong> Terminating a batch will automatically set all student accounts belonging to that batch to <strong>Inactive/Blocked</strong>. Students in that batch will be unable to log in.
+            </div>
+
+            <form (ngSubmit)="onTerminateBatchSubmit()">
+              <div style="margin-bottom: 14px;">
+                <label class="form-label" style="font-size: 12px; font-weight: 800; margin-bottom: 4px; display: block; color: var(--text-primary);">Target Batch Name</label>
+                <input type="text" class="form-input" [(ngModel)]="terminateBatchData.batchName" name="batchName" placeholder="Batch 2025-2029" style="min-height: 44px; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; width: 100%; color: var(--text-primary); background: var(--bg-input); border: 1.5px solid var(--border-color);" required />
+              </div>
+
+              <button type="submit" [disabled]="terminatingBatch" class="btn" style="width: 100%; height: 46px; background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); color: white; border: none; border-radius: 14px; font-weight: 800; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);">
+                <span>🚨</span> {{ terminatingBatch ? 'Deactivating Batch Accounts...' : 'Deactivate Entire Batch Now' }}
+              </button>
+            </form>
+          </div>
+
+          <!-- MODE 4 & ALWAYS ACCESSIBLE: All Users Directory & Activation Controls -->
+          <div class="card animate-fade" style="padding: 20px; border-radius: 18px; border: 1px solid var(--border-color); background: var(--bg-card);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+              <div>
+                <strong style="font-size: 16px; color: var(--text-primary); font-weight: 800;">👥 User Directory & Status Toggle</strong>
+                <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">
+                  Showing {{ filteredUsersList.length }} of {{ allUsersList.length }} account(s)
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 8px; align-items: center; width: 100%; max-width: 280px;">
+                <input 
+                  type="text" 
+                  class="form-input" 
+                  [(ngModel)]="searchUserQuery" 
+                  (input)="cdr.detectChanges()" 
+                  placeholder="🔍 Search name, email, room, roll..." 
+                  style="min-height: 40px; padding: 8px 12px; font-size: 12.5px; border-radius: 10px; width: 100%; color: var(--text-primary); background: var(--bg-input); border: 1.5px solid var(--border-color);" 
+                />
+              </div>
+            </div>
+
+            <div *ngIf="isLoadingUsers" class="skeleton-list" style="padding: 20px 0;">
+              <div class="skeleton skeleton-card" style="height: 60px; margin-bottom: 10px;"></div>
+              <div class="skeleton skeleton-card" style="height: 60px;"></div>
             </div>
 
             <div class="comments-list" *ngIf="!isLoadingUsers && filteredUsersList.length > 0; else noUsers">
-              <div *ngFor="let u of filteredUsersList" style="padding: 12px; border-radius: 12px; background: var(--bg-muted); border: 1px solid var(--border-color); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+              <div *ngFor="let u of filteredUsersList" style="padding: 14px; border-radius: 14px; background: var(--bg-muted); border: 1px solid var(--border-color); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
                 <div>
-                  <div style="display: flex; align-items: center; gap: 8px;">
-                    <strong style="font-size: 13.5px; color: var(--text-primary);">{{ u.name }}</strong>
-                    <span [style.background]="u.role === 'student' ? 'rgba(14,165,233,0.1)' : 'rgba(234,88,12,0.1)'" [style.color]="u.role === 'student' ? '#0284c7' : '#ea580c'" style="font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">
+                  <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <strong style="font-size: 14px; color: var(--text-primary); font-weight: 800;">{{ u.name }}</strong>
+                    <span [style.background]="u.role === 'student' ? 'rgba(14,165,233,0.12)' : 'rgba(234,88,12,0.12)'" [style.color]="u.role === 'student' ? '#0284c7' : '#ea580c'" style="font-size: 10.5px; font-weight: 800; padding: 2px 8px; border-radius: 6px; text-transform: uppercase;">
                       {{ u.role }}
                     </span>
-                    <span [style.background]="u.status === 'active' ? '#e6f4ea' : '#fee2e2'" [style.color]="u.status === 'active' ? '#166534' : '#b91c1c'" style="font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">
+                    <span [style.background]="u.status === 'active' ? '#e6f4ea' : '#fee2e2'" [style.color]="u.status === 'active' ? '#166534' : '#b91c1c'" style="font-size: 10.5px; font-weight: 800; padding: 2px 8px; border-radius: 6px; text-transform: uppercase;">
                       {{ u.status || 'active' }}
                     </span>
                   </div>
-                  <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">
-                    📧 {{ u.email }} · 🏠 {{ u.hostelBlock || 'Block' }}
+                  <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px; line-height: 1.4;">
+                    📧 {{ u.email }} · 🏠 {{ u.hostelBlock || 'Block' }} <span *ngIf="u.roomNumber">· Room {{ u.roomNumber }}</span> <span *ngIf="u.rollNumber">· Roll: {{ u.rollNumber }}</span>
                   </div>
                 </div>
 
-                <div style="display: flex; gap: 6px;" *ngIf="u.role !== 'admin'">
+                <div style="display: flex; gap: 6px; flex-shrink: 0;" *ngIf="u.role !== 'admin'">
                   <button 
                     *ngIf="u.status === 'active'"
                     type="button" 
                     (click)="toggleUserStatus(u, 'inactive')" 
-                    style="background: #fee2e2; color: #b91c1c; border: 1px solid rgba(239,68,68,0.3); font-size: 11px; font-weight: 800; padding: 6px 10px; border-radius: 8px; cursor: pointer;"
+                    style="background: #fee2e2; color: #b91c1c; border: 1px solid rgba(239,68,68,0.3); font-size: 11.5px; font-weight: 800; padding: 8px 12px; border-radius: 10px; cursor: pointer; box-shadow: var(--shadow-sm);"
                   >
                     Deactivate 🚫
                   </button>
@@ -1047,7 +1156,7 @@ import { API_CONFIG } from '../../config/api.config';
                     *ngIf="u.status !== 'active'"
                     type="button" 
                     (click)="toggleUserStatus(u, 'active')" 
-                    style="background: #e6f4ea; color: #166534; border: 1px solid rgba(34,197,94,0.3); font-size: 11px; font-weight: 800; padding: 6px 10px; border-radius: 8px; cursor: pointer;"
+                    style="background: #e6f4ea; color: #166534; border: 1px solid rgba(34,197,94,0.3); font-size: 11.5px; font-weight: 800; padding: 8px 12px; border-radius: 10px; cursor: pointer; box-shadow: var(--shadow-sm);"
                   >
                     Activate ✅
                   </button>
@@ -1056,7 +1165,10 @@ import { API_CONFIG } from '../../config/api.config';
             </div>
 
             <ng-template #noUsers>
-              <p style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 16px 0;">No accounts found matching search.</p>
+              <div style="text-align: center; padding: 30px 10px; color: var(--text-muted);">
+                <span style="font-size: 32px; display: block; margin-bottom: 8px;">📭</span>
+                <p style="font-size: 13px; margin: 0;">No accounts found matching search or directory is empty.</p>
+              </div>
             </ng-template>
           </div>
         </div>
@@ -2665,8 +2777,11 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
   isLoadingUsers = false;
   searchUserQuery = '';
   creatingUser = false;
+  bulkImporting = false;
+  terminatingBatch = false;
   userMgmtSuccess = '';
   userMgmtError = '';
+  userMgmtMode: 'single' | 'bulk' | 'batch_terminate' | 'directory' = 'single';
 
   newUser = {
     name: '',
@@ -2675,23 +2790,42 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
     role: 'student',
     hostelBlock: 'Boys Hostel 1',
     roomNumber: '',
+    rollNumber: '',
     phone: '',
     gender: 'male'
   };
 
+  bulkBatchData = {
+    batchName: 'Batch 2025-2029',
+    rawText: ''
+  };
+
+  terminateBatchData = {
+    batchName: 'Batch 2025-2029'
+  };
+
+  getAuthHeadersHelper(): { headers: { Authorization: string; 'Content-Type': string } } {
+    const token = this.authService.token || localStorage.getItem('hh_student_token') || localStorage.getItem('hh_token') || '';
+    return {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    };
+  }
+
   loadAllUsers(): void {
     this.isLoadingUsers = true;
-    this.http.get<any[]>('https://hostelhub-0cyi.onrender.com/api/users/all', {
-      headers: { Authorization: `Bearer ${localStorage.getItem('hh_token') || ''}` }
-    }).subscribe({
+    this.http.get<any[]>('https://hostelhub-0cyi.onrender.com/api/users/all', this.getAuthHeadersHelper()).subscribe({
       next: (users) => {
-        this.allUsersList = users;
+        this.allUsersList = users || [];
         this.isLoadingUsers = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Failed to load users list:', err);
         this.isLoadingUsers = false;
+        this.userMgmtError = '❌ ' + (err.error?.message || 'Failed to retrieve user directory.');
         this.cdr.detectChanges();
       }
     });
@@ -2704,7 +2838,9 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
       (u.name || '').toLowerCase().includes(q) ||
       (u.email || '').toLowerCase().includes(q) ||
       (u.role || '').toLowerCase().includes(q) ||
-      (u.hostelBlock || '').toLowerCase().includes(q)
+      (u.hostelBlock || '').toLowerCase().includes(q) ||
+      (u.roomNumber || '').toLowerCase().includes(q) ||
+      (u.rollNumber || '').toLowerCase().includes(q)
     );
   }
 
@@ -2718,9 +2854,7 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
     this.userMgmtError = '';
     this.userMgmtSuccess = '';
 
-    this.http.post<any>('https://hostelhub-0cyi.onrender.com/api/users/create-staff-warden', this.newUser, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('hh_token') || ''}` }
-    }).subscribe({
+    this.http.post<any>('https://hostelhub-0cyi.onrender.com/api/users/create-staff-warden', this.newUser, this.getAuthHeadersHelper()).subscribe({
       next: (res) => {
         this.creatingUser = false;
         this.userMgmtSuccess = '✅ ' + (res.message || 'Account created successfully!');
@@ -2731,16 +2865,104 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
           role: 'student',
           hostelBlock: 'Boys Hostel 1',
           roomNumber: '',
+          rollNumber: '',
           phone: '',
           gender: 'male'
         };
         this.loadAllUsers();
         this.cdr.detectChanges();
-        setTimeout(() => { this.userMgmtSuccess = ''; this.cdr.detectChanges(); }, 3500);
+        setTimeout(() => { this.userMgmtSuccess = ''; this.cdr.detectChanges(); }, 4000);
       },
       error: (err) => {
         this.creatingUser = false;
         this.userMgmtError = '❌ ' + (err.error?.message || 'Failed to create user account.');
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  onBulkImportSubmit(): void {
+    if (!this.bulkBatchData.rawText || !this.bulkBatchData.rawText.trim()) {
+      this.userMgmtError = 'Please paste CSV data or student entries.';
+      return;
+    }
+
+    this.bulkImporting = true;
+    this.userMgmtError = '';
+    this.userMgmtSuccess = '';
+
+    // Parse rawText lines (CSV: Name, Email, Phone, RollNumber, RoomNumber, HostelBlock)
+    const lines = this.bulkBatchData.rawText.trim().split('\n');
+    const students: any[] = [];
+
+    lines.forEach((line, idx) => {
+      const parts = line.split(',').map(p => p.trim());
+      if (parts.length >= 2 && parts[0] && parts[1]) {
+        students.push({
+          name: parts[0],
+          email: parts[1],
+          phone: parts[2] || '9876543210',
+          rollNumber: parts[3] || `STU${100 + idx}`,
+          roomNumber: parts[4] || '101',
+          hostelBlock: parts[5] || 'Boys Hostel 1',
+          gender: 'male'
+        });
+      }
+    });
+
+    if (students.length === 0) {
+      this.bulkImporting = false;
+      this.userMgmtError = 'No valid rows found. Format: Name, Email, Phone, RollNumber, RoomNumber, HostelBlock';
+      return;
+    }
+
+    const payload = {
+      batchName: this.bulkBatchData.batchName,
+      students
+    };
+
+    this.http.post<any>('https://hostelhub-0cyi.onrender.com/api/users/bulk-import', payload, this.getAuthHeadersHelper()).subscribe({
+      next: (res) => {
+        this.bulkImporting = false;
+        this.userMgmtSuccess = '✅ ' + (res.message || 'Bulk accounts imported successfully!');
+        this.bulkBatchData.rawText = '';
+        this.loadAllUsers();
+        this.cdr.detectChanges();
+        setTimeout(() => { this.userMgmtSuccess = ''; this.cdr.detectChanges(); }, 4000);
+      },
+      error: (err) => {
+        this.bulkImporting = false;
+        this.userMgmtError = '❌ ' + (err.error?.message || 'Failed bulk import.');
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  onTerminateBatchSubmit(): void {
+    if (!this.terminateBatchData.batchName || !this.terminateBatchData.batchName.trim()) {
+      this.userMgmtError = 'Batch Name is required.';
+      return;
+    }
+
+    if (!confirm(`Are you sure you want to DEACTIVATE/TERMINATE all students in batch "${this.terminateBatchData.batchName}"?`)) {
+      return;
+    }
+
+    this.terminatingBatch = true;
+    this.userMgmtError = '';
+    this.userMgmtSuccess = '';
+
+    this.http.post<any>('https://hostelhub-0cyi.onrender.com/api/users/terminate-batch', { batchName: this.terminateBatchData.batchName }, this.getAuthHeadersHelper()).subscribe({
+      next: (res) => {
+        this.terminatingBatch = false;
+        this.userMgmtSuccess = '✅ ' + (res.message || 'Batch terminated successfully!');
+        this.loadAllUsers();
+        this.cdr.detectChanges();
+        setTimeout(() => { this.userMgmtSuccess = ''; this.cdr.detectChanges(); }, 4000);
+      },
+      error: (err) => {
+        this.terminatingBatch = false;
+        this.userMgmtError = '❌ ' + (err.error?.message || 'Failed to terminate batch.');
         this.cdr.detectChanges();
       }
     });
@@ -2751,9 +2973,7 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
     this.userMgmtError = '';
     this.userMgmtSuccess = '';
 
-    this.http.put<any>(`https://hostelhub-0cyi.onrender.com/api/users/status/${userObj.id}`, { status: targetStatus }, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('hh_token') || ''}` }
-    }).subscribe({
+    this.http.put<any>(`https://hostelhub-0cyi.onrender.com/api/users/status/${userObj.id}`, { status: targetStatus }, this.getAuthHeadersHelper()).subscribe({
       next: (res) => {
         userObj.status = targetStatus;
         this.userMgmtSuccess = `✅ User "${userObj.name}" status updated to ${targetStatus}!`;
