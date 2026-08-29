@@ -259,6 +259,9 @@ exports.terminateUser = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found.' });
     }
+    if (req.userRole === 'warden' && user.role === 'admin') {
+      return res.status(403).json({ message: 'Wardens cannot terminate Super Admin accounts.' });
+    }
     user.status = 'blocked';
     await user.save();
     return res.json({ message: `User "${user.name}" (${user.role}) has been blocked/terminated successfully.` });

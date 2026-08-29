@@ -938,159 +938,126 @@ import { API_CONFIG } from '../../config/api.config';
           </div>
         </div>
 
-        <!-- TAB 6: DAILY ROLL CALL ATTENDANCE -->
-        <div *ngIf="activeTab === 'attendance'" class="tab-panel animate-fade">
-          <!-- Header Banner Widget -->
-          <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
-            <div style="width: 46px; height: 46px; border-radius: 50%; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">📅</div>
-            <div>
-              <h4 style="margin: 0 0 2px 0; font-size: 17px; font-weight: 800; color: var(--text-primary);">Daily Roll Call Attendance</h4>
-              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Mark and manage student attendance easily</p>
-            </div>
-          </div>
 
-          <div *ngIf="attendanceSuccess" class="alert alert-success">{{ attendanceSuccess }}</div>
-          <div *ngIf="attendanceError" class="alert alert-danger">{{ attendanceError }}</div>
 
-          <!-- Attendance Summary Metrics Cards Bar (All Hostels & Hostel-Wise Filterable) -->
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px;">
-            <!-- Total Students -->
-            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 12px; text-align: center; box-shadow: var(--shadow-sm);">
-              <div style="font-size: 20px; font-weight: 800; color: var(--text-primary);">{{ getAttendanceTotalStudentsCount() }}</div>
-              <div style="font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-top: 2px;">👥 Total Students</div>
-              <div style="font-size: 9px; color: #64748b; margin-top: 2px;">{{ filterHostelBlock || 'All Hostels' }}</div>
+        <!-- TAB 7: USER ACCOUNTS & CREATION (Single/Bulk + Activate/Deactivate) -->
+        <div *ngIf="activeTab === 'users'" class="tab-panel animate-fade">
+          <h4 class="page-title">👥 User Account Management</h4>
+          <p class="page-subtitle" style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+            Create Single or Bulk Student & Staff Accounts, manage activation status, and control user access.
+          </p>
+
+          <div *ngIf="userMgmtSuccess" class="alert alert-success">{{ userMgmtSuccess }}</div>
+          <div *ngIf="userMgmtError" class="alert alert-danger">{{ userMgmtError }}</div>
+
+          <!-- Section 1: Create Single Account Form -->
+          <div class="card" style="margin-bottom: 16px; padding: 18px; border-radius: 16px; border: 1px solid var(--border-color); background: var(--bg-card);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+              <strong style="font-size: 15px; color: var(--text-primary);">➕ Create Single Account (Student / Staff)</strong>
+              <span style="font-size: 11px; background: rgba(179, 16, 49, 0.1); color: #b31031; font-weight: 700; padding: 2px 8px; border-radius: 6px;">Instant ID</span>
             </div>
 
-            <!-- Present Count -->
-            <div style="background: #e6f4ea; border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 14px; padding: 12px; text-align: center;">
-              <div style="font-size: 20px; font-weight: 800; color: #166534;">{{ getAttendancePresentCount() }}</div>
-              <div style="font-size: 10.5px; font-weight: 800; color: #166534; margin-top: 2px;">✅ Present</div>
-              <div style="font-size: 9px; color: #15803d; margin-top: 2px;">{{ filterHostelBlock || 'All Hostels' }}</div>
-            </div>
-
-            <!-- Absent Count -->
-            <div style="background: #fee2e2; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 14px; padding: 12px; text-align: center;">
-              <div style="font-size: 20px; font-weight: 800; color: #b91c1c;">{{ getAttendanceAbsentCount() }}</div>
-              <div style="font-size: 10.5px; font-weight: 800; color: #b91c1c; margin-top: 2px;">❌ Absent</div>
-              <div style="font-size: 9px; color: #dc2626; margin-top: 2px;">{{ filterHostelBlock || 'All Hostels' }}</div>
-            </div>
-          </div>
-
-          <div class="mess-container">
-            <!-- Attendance Control Bar -->
-            <div class="card mess-card">
-              <h5>⚙️ Attendance Controls</h5>
-              
-              <div class="form-group" style="margin-top: 10px;">
-                <label class="form-label" for="attDate">Roll Call Date</label>
-                <input 
-                  type="date" 
-                  id="attDate" 
-                  name="attDate" 
-                  class="form-input" 
-                  [(ngModel)]="rollCallDate" 
-                  (change)="loadDailyRollCall()"
-                  required 
-                />
-              </div>
-
-              <!-- Search and Filter Row -->
-              <div style="display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap;">
-                <div style="flex: 1; min-width: 200px;">
-                  <input 
-                    type="text" 
-                    class="form-input" 
-                    placeholder="🔍 Search Student by Name or Room..." 
-                    [(ngModel)]="searchStudentQuery" 
-                  />
+            <form (ngSubmit)="onCreateUserSubmit()">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                <div>
+                  <label class="form-label" style="font-size: 11.5px; font-weight: 700;">Account Role</label>
+                  <select class="form-input" [(ngModel)]="newUser.role" name="role" style="height: 38px; border-radius: 10px; font-size: 12.5px; width: 100%; font-weight: 700;" required>
+                    <option value="student">👨‍🎓 Student</option>
+                    <option value="staff">🔧 Maintenance Staff</option>
+                    <option value="warden">👨‍💼 Assistant Warden</option>
+                  </select>
                 </div>
                 <div>
-                  <select class="form-input" [(ngModel)]="filterHostelBlock">
-                    <option value="">All Hostels</option>
+                  <label class="form-label" style="font-size: 11.5px; font-weight: 700;">Full Name</label>
+                  <input type="text" class="form-input" [(ngModel)]="newUser.name" name="name" placeholder="Full Name" style="height: 38px; border-radius: 10px; font-size: 12.5px; width: 100%;" required />
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                <div>
+                  <label class="form-label" style="font-size: 11.5px; font-weight: 700;">Email Address</label>
+                  <input type="email" class="form-input" [(ngModel)]="newUser.email" name="email" placeholder="user@gmail.com" style="height: 38px; border-radius: 10px; font-size: 12.5px; width: 100%;" required />
+                </div>
+                <div>
+                  <label class="form-label" style="font-size: 11.5px; font-weight: 700;">Login Password</label>
+                  <input type="password" class="form-input" [(ngModel)]="newUser.password" name="password" placeholder="Password" style="height: 38px; border-radius: 10px; font-size: 12.5px; width: 100%;" required />
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                <div>
+                  <label class="form-label" style="font-size: 11.5px; font-weight: 700;">Hostel Block</label>
+                  <select class="form-input" [(ngModel)]="newUser.hostelBlock" name="hostelBlock" style="height: 38px; border-radius: 10px; font-size: 12.5px; width: 100%;" required>
                     <option value="Boys Hostel 1">Boys Hostel 1</option>
                     <option value="Boys Hostel 2">Boys Hostel 2</option>
                     <option value="Girls Hostel 1">Girls Hostel 1</option>
                     <option value="Girls Hostel 2">Girls Hostel 2</option>
                   </select>
                 </div>
-              </div>
-
-              <!-- Bulk Action Row -->
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; border-top: 1px dashed var(--border-color); padding-top: 12px;">
-                <button type="button" class="btn btn-secondary" style="font-size: 11.5px; padding: 6px 12px;" (click)="markAllPresent()">
-                  ✅ Mark All Present
-                </button>
-                
-                <button type="button" class="btn btn-primary" [disabled]="savingAttendance || rollCallStudents.length === 0" (click)="saveDailyAttendance()">
-                  {{ savingAttendance ? 'Saving Attendance...' : '💾 Save Attendance Roll Call' }}
-                </button>
-              </div>
-            </div>
-
-            <!-- Student List Card -->
-            <div class="card mess-card" style="padding: 16px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                <h5>👨‍🎓 Students List</h5>
-                <span class="day-badge">{{ filteredStudents.length }} student(s)</span>
-              </div>
-
-              <div *ngIf="isLoadingRollCall" class="skeleton-list">
-                <div class="skeleton skeleton-card"></div>
-              </div>
-
-              <div class="comments-list" *ngIf="!isLoadingRollCall">
-                <div class="comment-item" *ngFor="let s of filteredStudents" style="flex-direction: column; gap: 8px; padding: 14px;">
-                  
-                  <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
-                    <div>
-                      <strong style="font-size: 14px; color: var(--text-primary);">{{ s.name }}</strong>
-                      <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">
-                        🏠 {{ s.hostelBlock }} · Room {{ s.roomNumber }}
-                      </div>
-                    </div>
-                    
-                    <!-- Roll Call Toggle Buttons -->
-                    <div style="display: flex; gap: 4px;">
-                      <button 
-                        type="button" 
-                        class="pill-btn" 
-                        [class.active]="attendanceMarkMap[s.id] === 'present'"
-                        (click)="attendanceMarkMap[s.id] = 'present'"
-                        style="padding: 4px 10px; font-size: 11px; border-radius: 4px;"
-                      >
-                        Present
-                      </button>
-                      <button 
-                        type="button" 
-                        class="pill-btn" 
-                        [class.active]="attendanceMarkMap[s.id] === 'absent'"
-                        (click)="attendanceMarkMap[s.id] = 'absent'"
-                        style="padding: 4px 10px; font-size: 11px; border-radius: 4px;"
-                      >
-                        Absent
-                      </button>
-                    </div>
-                  </div>
-
-                  <!-- Optional Remarks Box -->
-                  <div style="width: 100%;">
-                    <input 
-                      type="text" 
-                      class="form-input text-sm" 
-                      style="height: 28px; font-size: 11.5px; padding: 4px 8px;" 
-                      placeholder="Remarks (e.g. late entry, sick, went home)..."
-                      [(ngModel)]="attendanceRemarksMap[s.id]" 
-                    />
-                  </div>
-
+                <div>
+                  <label class="form-label" style="font-size: 11.5px; font-weight: 700;">Room / Phone</label>
+                  <input type="text" class="form-input" [(ngModel)]="newUser.roomNumber" name="roomNumber" placeholder="Room 101" style="height: 38px; border-radius: 10px; font-size: 12.5px; width: 100%;" />
                 </div>
               </div>
 
-              <div *ngIf="!isLoadingRollCall && filteredStudents.length === 0" class="empty-state">
-                <span class="empty-icon">📭</span>
-                <p>No active students match the query.</p>
+              <button type="submit" [disabled]="creatingUser" class="btn" style="width: 100%; height: 42px; background: linear-gradient(135deg, #8a0d24 0%, #b31031 100%); color: white; border: none; border-radius: 12px; font-weight: 800; font-size: 13.5px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <span>➕</span> {{ creatingUser ? 'Creating Account...' : 'Create Account Now' }}
+              </button>
+            </form>
+          </div>
+
+          <!-- Section 2: All Users & Activation/Deactivation Controls -->
+          <div class="card" style="padding: 18px; border-radius: 16px; border: 1px solid var(--border-color); background: var(--bg-card);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+              <strong style="font-size: 15px; color: var(--text-primary);">👥 User Directory & Activation Controls</strong>
+              <input type="text" class="form-input" [(ngModel)]="searchUserQuery" (input)="cdr.detectChanges()" placeholder="🔍 Search name, email..." style="height: 34px; padding: 0 10px; font-size: 12px; border-radius: 8px; width: 180px;" />
+            </div>
+
+            <div *ngIf="isLoadingUsers" class="skeleton-list">
+              <div class="skeleton skeleton-card"></div>
+            </div>
+
+            <div class="comments-list" *ngIf="!isLoadingUsers && filteredUsersList.length > 0; else noUsers">
+              <div *ngFor="let u of filteredUsersList" style="padding: 12px; border-radius: 12px; background: var(--bg-muted); border: 1px solid var(--border-color); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <strong style="font-size: 13.5px; color: var(--text-primary);">{{ u.name }}</strong>
+                    <span [style.background]="u.role === 'student' ? 'rgba(14,165,233,0.1)' : 'rgba(234,88,12,0.1)'" [style.color]="u.role === 'student' ? '#0284c7' : '#ea580c'" style="font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">
+                      {{ u.role }}
+                    </span>
+                    <span [style.background]="u.status === 'active' ? '#e6f4ea' : '#fee2e2'" [style.color]="u.status === 'active' ? '#166534' : '#b91c1c'" style="font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">
+                      {{ u.status || 'active' }}
+                    </span>
+                  </div>
+                  <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">
+                    📧 {{ u.email }} · 🏠 {{ u.hostelBlock || 'Block' }}
+                  </div>
+                </div>
+
+                <div style="display: flex; gap: 6px;" *ngIf="u.role !== 'admin'">
+                  <button 
+                    *ngIf="u.status === 'active'"
+                    type="button" 
+                    (click)="toggleUserStatus(u, 'inactive')" 
+                    style="background: #fee2e2; color: #b91c1c; border: 1px solid rgba(239,68,68,0.3); font-size: 11px; font-weight: 800; padding: 6px 10px; border-radius: 8px; cursor: pointer;"
+                  >
+                    Deactivate 🚫
+                  </button>
+                  <button 
+                    *ngIf="u.status !== 'active'"
+                    type="button" 
+                    (click)="toggleUserStatus(u, 'active')" 
+                    style="background: #e6f4ea; color: #166534; border: 1px solid rgba(34,197,94,0.3); font-size: 11px; font-weight: 800; padding: 6px 10px; border-radius: 8px; cursor: pointer;"
+                  >
+                    Activate ✅
+                  </button>
+                </div>
               </div>
             </div>
+
+            <ng-template #noUsers>
+              <p style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 16px 0;">No accounts found matching search.</p>
+            </ng-template>
           </div>
         </div>
 
@@ -1174,6 +1141,10 @@ import { API_CONFIG } from '../../config/api.config';
           <span class="tab-icon">🍴</span>
           <span>Mess</span>
         </button>
+        <button class="tab-item" [class.active]="activeTab === 'users'" (click)="activeTab = 'users'; loadAllUsers()">
+          <span class="tab-icon">👥</span>
+          <span>Users</span>
+        </button>
         <button class="tab-item" [class.active]="activeTab === 'approvals'" (click)="activeTab = 'approvals'; loadPendingApprovals()">
           <span class="tab-icon">
             🔍
@@ -1206,8 +1177,8 @@ import { API_CONFIG } from '../../config/api.config';
         </div>
       </div>
 
-      <!-- Original Clean Footer -->
-      <footer class="footer animate-fade" *ngIf="activeTab !== 'chat'">
+      <!-- Original Clean Footer (Home Tab Only) -->
+      <footer class="footer animate-fade" *ngIf="activeTab === 'home'">
         <div class="footer-content" style="text-align: center; padding: 18px 14px; border-top: 1px solid var(--border-color); margin-top: 24px; background: var(--bg-card); border-radius: 16px;">
           <p class="footer-title" style="margin: 0 0 6px 0; font-size: 13.5px; font-weight: 800; color: var(--text-primary);">{{ footerSettings?.footer_text || 'HostelHub - Modern Hostel Management' }}</p>
           <div class="footer-meta" style="display: flex; justify-content: center; align-items: center; gap: 14px; font-size: 12px; color: var(--text-muted); flex-wrap: wrap;">
@@ -2688,6 +2659,112 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
       this.profileError = '';
       this.profileSuccess = '';
     }
+  }
+
+  allUsersList: any[] = [];
+  isLoadingUsers = false;
+  searchUserQuery = '';
+  creatingUser = false;
+  userMgmtSuccess = '';
+  userMgmtError = '';
+
+  newUser = {
+    name: '',
+    email: '',
+    password: '',
+    role: 'student',
+    hostelBlock: 'Boys Hostel 1',
+    roomNumber: '',
+    phone: '',
+    gender: 'male'
+  };
+
+  loadAllUsers(): void {
+    this.isLoadingUsers = true;
+    this.http.get<any[]>('https://hostelhub-0cyi.onrender.com/api/users/all', {
+      headers: { Authorization: `Bearer ${localStorage.getItem('hh_token') || ''}` }
+    }).subscribe({
+      next: (users) => {
+        this.allUsersList = users;
+        this.isLoadingUsers = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Failed to load users list:', err);
+        this.isLoadingUsers = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  get filteredUsersList(): any[] {
+    const q = (this.searchUserQuery || '').toLowerCase().trim();
+    if (!q) return this.allUsersList;
+    return this.allUsersList.filter(u =>
+      (u.name || '').toLowerCase().includes(q) ||
+      (u.email || '').toLowerCase().includes(q) ||
+      (u.role || '').toLowerCase().includes(q) ||
+      (u.hostelBlock || '').toLowerCase().includes(q)
+    );
+  }
+
+  onCreateUserSubmit(): void {
+    if (!this.newUser.name || !this.newUser.email || !this.newUser.password) {
+      this.userMgmtError = 'Name, email, and password are required.';
+      return;
+    }
+
+    this.creatingUser = true;
+    this.userMgmtError = '';
+    this.userMgmtSuccess = '';
+
+    this.http.post<any>('https://hostelhub-0cyi.onrender.com/api/users/create-staff-warden', this.newUser, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('hh_token') || ''}` }
+    }).subscribe({
+      next: (res) => {
+        this.creatingUser = false;
+        this.userMgmtSuccess = '✅ ' + (res.message || 'Account created successfully!');
+        this.newUser = {
+          name: '',
+          email: '',
+          password: '',
+          role: 'student',
+          hostelBlock: 'Boys Hostel 1',
+          roomNumber: '',
+          phone: '',
+          gender: 'male'
+        };
+        this.loadAllUsers();
+        this.cdr.detectChanges();
+        setTimeout(() => { this.userMgmtSuccess = ''; this.cdr.detectChanges(); }, 3500);
+      },
+      error: (err) => {
+        this.creatingUser = false;
+        this.userMgmtError = '❌ ' + (err.error?.message || 'Failed to create user account.');
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  toggleUserStatus(userObj: any, targetStatus: 'active' | 'inactive'): void {
+    if (!userObj || !userObj.id) return;
+    this.userMgmtError = '';
+    this.userMgmtSuccess = '';
+
+    this.http.put<any>(`https://hostelhub-0cyi.onrender.com/api/users/status/${userObj.id}`, { status: targetStatus }, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('hh_token') || ''}` }
+    }).subscribe({
+      next: (res) => {
+        userObj.status = targetStatus;
+        this.userMgmtSuccess = `✅ User "${userObj.name}" status updated to ${targetStatus}!`;
+        this.cdr.detectChanges();
+        setTimeout(() => { this.userMgmtSuccess = ''; this.cdr.detectChanges(); }, 3000);
+      },
+      error: (err) => {
+        this.userMgmtError = '❌ ' + (err.error?.message || 'Failed to update user status.');
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   onProfilePicChange(event: any): void {

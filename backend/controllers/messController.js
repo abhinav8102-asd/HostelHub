@@ -148,8 +148,15 @@ exports.submitFeedback = async (req, res) => {
 // 4. Get Feedback Stats (Warden / Admin)
 exports.getFeedbackStats = async (req, res) => {
   try {
-    // Get all feedbacks with student details
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+    // Get all feedbacks from the last 7 days (1 week auto-expiry) with student details
     const feedbacks = await MessFeedback.findAll({
+      where: {
+        createdAt: {
+          [Op.gte]: sevenDaysAgo
+        }
+      },
       include: [
         {
           model: User,

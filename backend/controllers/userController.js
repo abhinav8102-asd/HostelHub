@@ -42,6 +42,10 @@ exports.updateUserStatus = async (req, res) => {
       return res.status(404).json({ message: 'User not found.' });
     }
 
+    if (req.userRole === 'warden' && user.role === 'admin') {
+      return res.status(403).json({ message: 'Wardens cannot modify Super Admin accounts.' });
+    }
+
     user.status = status;
     await user.save();
 
@@ -54,11 +58,15 @@ exports.updateUserStatus = async (req, res) => {
 
 exports.createWardenOrStaff = async (req, res) => {
   try {
-    const { name, email, password, role, phone, bio, hostelBlock, gender, batch } = req.body;
+    const { name, email, password, role, phone, bio, hostelBlock, roomNumber, rollNumber, gender, batch } = req.body;
 
-    const userRole = role || 'staff';
-    if (!['warden', 'staff', 'management'].includes(userRole)) {
-      return res.status(400).json({ message: 'Role must be warden, staff, or management.' });
+    const userRole = (role || 'staff').toLowerCase();
+    if (req.userRole === 'warden' && userRole === 'admin') {
+      return res.status(403).json({ message: 'Wardens cannot create Super Admin accounts.' });
+    }
+
+    if (!['student', 'warden', 'staff', 'management'].includes(userRole)) {
+      return res.status(400).json({ message: 'Role must be student, warden, staff, or management.' });
     }
 
     const existingUser = await User.findOne({ where: { email } });
@@ -75,10 +83,12 @@ exports.createWardenOrStaff = async (req, res) => {
       password: passwordHash,
       role: userRole,
       phone: phone || '0000000000',
-      bio: bio || (userRole === 'warden' ? 'Hostel Warden' : 'Maintenance Staff'),
-      hostelBlock: hostelBlock || 'All Hostels',
+      bio: bio || (userRole === 'student' ? 'Hostel Student' : (userRole === 'warden' ? 'Hostel Warden' : 'Maintenance Staff')),
+      hostelBlock: hostelBlock || 'Boys Hostel 1',
+      roomNumber: roomNumber || '',
+      rollNumber: rollNumber || '',
       gender: gender || 'male',
-      batch: batch || 'Staff',
+      batch: batch || (userRole === 'student' ? 'Batch 2025-2029' : 'Staff'),
       status: 'active'
     });
 

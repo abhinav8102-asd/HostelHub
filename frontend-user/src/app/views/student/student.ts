@@ -1108,8 +1108,8 @@ import { API_CONFIG } from '../../config/api.config';
         </div>
       </div>
 
-      <!-- Modern Ultra-Compact Sleek Footer -->
-      <footer class="footer animate-fade" *ngIf="activeTab !== 'chat'" style="margin-top: 20px; padding: 0 12px 16px 12px;">
+      <!-- Modern Ultra-Compact Sleek Footer (Home Tab Only) -->
+      <footer class="footer animate-fade" *ngIf="activeTab === 'home'" style="margin-top: 20px; padding: 0 12px 16px 12px;">
         <div class="footer-content" style="text-align: center; padding: 12px 16px; border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 14px; box-shadow: var(--shadow-sm); max-width: 480px; margin: 0 auto;">
           <h6 style="margin: 0 0 4px 0; font-size: 12.5px; font-weight: 800; color: var(--text-primary);">{{ footerSettings?.footer_text || 'HostelHub - Hostel Management Portal' }}</h6>
           <div style="display: flex; justify-content: center; align-items: center; gap: 12px; font-size: 11px; color: var(--text-muted); flex-wrap: wrap;">

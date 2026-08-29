@@ -6,18 +6,18 @@ const { verifyToken, requireRole } = require('../middleware/auth');
 const managementController = require('../controllers/managementController');
 
 router.get('/staff', verifyToken, requireRole(['warden', 'admin']), userController.getStaffList);
-router.get('/all', verifyToken, requireRole(['admin']), userController.getAllUsers);
-router.put('/status/:userId', verifyToken, requireRole(['admin']), userController.updateUserStatus);
-router.put('/edit/:userId', verifyToken, requireRole(['admin']), userController.updateUserDetails);
-router.post('/create-staff-warden', verifyToken, requireRole(['admin']), userController.createWardenOrStaff);
+router.get('/all', verifyToken, requireRole(['warden', 'admin']), userController.getAllUsers);
+router.put('/status/:userId', verifyToken, requireRole(['warden', 'admin']), userController.updateUserStatus);
+router.put('/edit/:userId', verifyToken, requireRole(['warden', 'admin']), userController.updateUserDetails);
+router.post('/create-staff-warden', verifyToken, requireRole(['warden', 'admin']), userController.createWardenOrStaff);
 router.get('/wardens', verifyToken, userController.getWardenList);
 router.delete('/delete/:userId', verifyToken, requireRole(['admin']), userController.deleteUser);
 
 // Executive Management & Admin endpoints mounted under /api/users
 router.get('/analytics', verifyToken, managementController.getManagementAnalytics);
-router.post('/bulk-import', verifyToken, requireRole(['admin']), managementController.bulkCreateBatchFromExcel);
-router.post('/terminate-user', verifyToken, requireRole(['admin']), managementController.terminateUser);
-router.post('/terminate-batch', verifyToken, requireRole(['admin']), managementController.terminateBatch);
+router.post('/bulk-import', verifyToken, requireRole(['warden', 'admin']), managementController.bulkCreateBatchFromExcel);
+router.post('/terminate-user', verifyToken, requireRole(['warden', 'admin']), managementController.terminateUser);
+router.post('/terminate-batch', verifyToken, requireRole(['warden', 'admin']), managementController.terminateBatch);
 router.get('/staff-performance', verifyToken, userController.getStaffPerformance);
 router.get('/attendance-stats', verifyToken, userController.getAttendanceStats);
 
