@@ -832,68 +832,6 @@ import { API_CONFIG } from '../../config/api.config';
               </div>
             </div>
           </form>
-
-          <div class="card" style="padding: 18px; margin-top: 20px; border-radius: 18px; border: 1px solid var(--border-color); background: var(--bg-card); box-shadow: var(--shadow-sm);">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
-              <span style="width: 28px; height: 28px; border-radius: 50%; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 13px;">📋</span>
-              <strong style="font-size: 15px; color: var(--text-primary);">My Attendance Records</strong>
-            </div>
-            
-            <div *ngIf="isLoadingAttendance" class="skeleton-list">
-              <div class="skeleton skeleton-card"></div>
-            </div>
-
-            <div *ngIf="!isLoadingAttendance && attendanceStats">
-              <!-- Attendance Stats Metrics Grid -->
-              <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px;">
-                <div style="background: var(--bg-muted); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; text-align: center;">
-                  <div style="font-size: 15px; font-weight: 800;" [style.color]="attendanceStats.percentage >= 75 ? '#166534' : '#b91c1c'">
-                    {{ attendanceStats.percentage }}%
-                  </div>
-                  <div style="font-size: 9px; color: var(--text-muted); margin-top: 2px;">Attendance</div>
-                </div>
-                <div style="background: var(--bg-muted); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; text-align: center;">
-                  <div style="font-size: 15px; font-weight: 800; color: var(--text-primary);">{{ attendanceStats.total }}</div>
-                  <div style="font-size: 9px; color: var(--text-muted); margin-top: 2px;">Total Days</div>
-                </div>
-                <div style="background: #e6f4ea; border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 12px; padding: 10px; text-align: center;">
-                  <div style="font-size: 15px; font-weight: 800; color: #166534;">{{ attendanceStats.present }}</div>
-                  <div style="font-size: 9px; color: #166534; margin-top: 2px;">Present</div>
-                </div>
-                <div style="background: #fee2e2; border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; padding: 10px; text-align: center;">
-                  <div style="font-size: 15px; font-weight: 800; color: #b91c1c;">{{ attendanceStats.absent }}</div>
-                  <div style="font-size: 9px; color: #b91c1c; margin-top: 2px;">Absent</div>
-                </div>
-              </div>
-
-              <!-- Attendance History List -->
-              <strong style="font-size: 13px; color: var(--text-primary); display: block; margin-bottom: 8px;">Recent Days Roll Call</strong>
-              <div class="comments-list" *ngIf="attendanceHistory.length > 0; else noAttendance" style="display: flex; flex-direction: column; gap: 8px;">
-                <div *ngFor="let att of attendanceHistory" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--bg-muted); border: 1px solid var(--border-color); border-radius: 10px;">
-                  <span style="font-size: 12.5px; font-weight: 700; color: var(--text-primary);">
-                    📅 {{ att.date | date:'EEEE, MMM d, y' }}
-                  </span>
-                  
-                  <span 
-                    [style.background]="att.status === 'present' ? '#e6f4ea' : '#fee2e2'"
-                    [style.color]="att.status === 'present' ? '#166534' : '#b91c1c'"
-                    style="font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 8px; text-transform: uppercase;"
-                  >
-                    {{ att.status }}
-                  </span>
-                </div>
-              </div>
-              <ng-template #noAttendance>
-                <p style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 12px 0;">No attendance records found yet.</p>
-              </ng-template>
-
-              <!-- Real-time Shield Note -->
-              <div style="margin-top: 14px; background: #f0f9ff; border: 1px solid rgba(14, 165, 233, 0.2); border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 16px; color: #0284c7;">🛡️</span>
-                <span style="font-size: 11px; color: #0369a1;">Attendance is marked daily by Warden and updated in real-time.</span>
-              </div>
-            </div>
-          </div>
         </div>
 
 
