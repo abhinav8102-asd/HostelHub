@@ -1928,6 +1928,7 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
       this.raiseSuccess = '';
     } else if (tab === 'notices') {
       this.loadAnnouncements();
+      this.markNoticesAsSeen();
     } else if (tab === 'home') {
       this.loadAnnouncements();
       this.loadComplaints();
@@ -1935,6 +1936,7 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
       this.loadMessInfo();
     } else if (tab === 'my-complaints') {
       this.loadComplaints();
+      this.markTicketsAsSeen();
     } else if (tab === 'profile') {
       this.clearAllNotifications();
     } else if (tab === 'my-profile') {
@@ -2778,14 +2780,41 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  lastSeenNoticesTime: string = localStorage.getItem('student_seen_notices_time') || '';
+  lastSeenTicketsTime: string = localStorage.getItem('student_seen_tickets_time') || '';
+
+  markNoticesAsSeen(): void {
+    this.lastSeenNoticesTime = new Date().toISOString();
+    localStorage.setItem('student_seen_notices_time', this.lastSeenNoticesTime);
+    this.cdr.detectChanges();
+  }
+
+  markTicketsAsSeen(): void {
+    this.lastSeenTicketsTime = new Date().toISOString();
+    localStorage.setItem('student_seen_tickets_time', this.lastSeenTicketsTime);
+    this.cdr.detectChanges();
+  }
+
   getUnreadNoticesCount(): number {
-    if (!this.announcements) return 0;
-    return this.announcements.length;
+    if (!this.announcements || this.announcements.length === 0) return 0;
+    if (!this.lastSeenNoticesTime) {
+      return this.announcements.length;
+    }
+    return this.announcements.filter(a => {
+      const itemTime = new Date(a.createdAt).getTime();
+      return itemTime > new Date(this.lastSeenNoticesTime).getTime();
+    }).length;
   }
 
   getActiveTicketsCount(): number {
-    if (!this.complaints) return 0;
-    return this.complaints.filter((c: any) => c.status === 'pending' || c.status === 'in_progress').length;
+    if (!this.complaints || this.complaints.length === 0) return 0;
+    if (!this.lastSeenTicketsTime) {
+      return this.complaints.filter((c: any) => c.status === 'pending' || c.status === 'in_progress').length;
+    }
+    return this.complaints.filter((c: any) => {
+      const itemTime = new Date(c.updatedAt || c.createdAt).getTime();
+      return itemTime > new Date(this.lastSeenTicketsTime).getTime() && (c.status === 'pending' || c.status === 'in_progress');
+    }).length;
   }
 
   getImageUrl(url: string | null | undefined): string {

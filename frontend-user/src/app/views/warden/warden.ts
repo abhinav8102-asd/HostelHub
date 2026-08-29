@@ -1328,17 +1328,17 @@ import { API_CONFIG } from '../../config/api.config';
           <span class="tab-icon">🏠</span>
           <span>Home</span>
         </button>
-        <button class="tab-item" [class.active]="activeTab === 'complaints'" (click)="activeTab = 'complaints'">
+        <button class="tab-item" [class.active]="activeTab === 'complaints'" (click)="activeTab = 'complaints'; markWardenComplaintsAsSeen()">
           <span class="tab-icon">
             📋
             <span class="tab-badge animate-scale" *ngIf="getPendingComplaintsCount() > 0">{{ getPendingComplaintsCount() }}</span>
           </span>
           <span>Complaints</span>
         </button>
-        <button class="tab-item" [class.active]="activeTab === 'announcements'" (click)="onAnnouncementsTab()">
+        <button class="tab-item" [class.active]="activeTab === 'announcements'" (click)="onAnnouncementsTab(); markWardenAnnouncementsAsSeen()">
           <span class="tab-icon">
             📢
-            <span class="tab-badge animate-scale" *ngIf="announcements.length > 0">{{ announcements.length }}</span>
+            <span class="tab-badge animate-scale" *ngIf="getUnreadAnnouncementsCount() > 0">{{ getUnreadAnnouncementsCount() }}</span>
           </span>
           <span>Notices</span>
         </button>
@@ -1347,10 +1347,7 @@ import { API_CONFIG } from '../../config/api.config';
           <span>Mess</span>
         </button>
         <button class="tab-item" [class.active]="activeTab === 'users'" (click)="activeTab = 'users'; loadAllUsers()">
-          <span class="tab-icon">
-            👥
-            <span class="tab-badge animate-scale" *ngIf="allUsersList.length > 0">{{ allUsersList.length }}</span>
-          </span>
+          <span class="tab-icon">👥</span>
           <span>Users</span>
         </button>
         <button class="tab-item" [class.active]="activeTab === 'approvals'" (click)="activeTab = 'approvals'; loadPendingApprovals()">
@@ -3427,9 +3424,41 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
     }
   }
 
+  lastSeenWardenComplaintsTime: string = localStorage.getItem('warden_seen_complaints_time') || '';
+  lastSeenWardenAnnouncementsTime: string = localStorage.getItem('warden_seen_announcements_time') || '';
+
+  markWardenComplaintsAsSeen(): void {
+    this.lastSeenWardenComplaintsTime = new Date().toISOString();
+    localStorage.setItem('warden_seen_complaints_time', this.lastSeenWardenComplaintsTime);
+    this.cdr.detectChanges();
+  }
+
+  markWardenAnnouncementsAsSeen(): void {
+    this.lastSeenWardenAnnouncementsTime = new Date().toISOString();
+    localStorage.setItem('warden_seen_announcements_time', this.lastSeenWardenAnnouncementsTime);
+    this.cdr.detectChanges();
+  }
+
   getPendingComplaintsCount(): number {
-    if (!this.complaints) return 0;
-    return this.complaints.filter(c => c.status === 'pending' || c.status === 'in_progress').length;
+    if (!this.complaints || this.complaints.length === 0) return 0;
+    if (!this.lastSeenWardenComplaintsTime) {
+      return this.complaints.filter(c => c.status === 'pending' || c.status === 'in_progress').length;
+    }
+    return this.complaints.filter(c => {
+      const itemTime = new Date(c.createdAt || c.updatedAt).getTime();
+      return itemTime > new Date(this.lastSeenWardenComplaintsTime).getTime() && (c.status === 'pending' || c.status === 'in_progress');
+    }).length;
+  }
+
+  getUnreadAnnouncementsCount(): number {
+    if (!this.announcements || this.announcements.length === 0) return 0;
+    if (!this.lastSeenWardenAnnouncementsTime) {
+      return this.announcements.length;
+    }
+    return this.announcements.filter(a => {
+      const itemTime = new Date(a.createdAt).getTime();
+      return itemTime > new Date(this.lastSeenWardenAnnouncementsTime).getTime();
+    }).length;
   }
 
   getImageUrl(url: string | null | undefined): string {
