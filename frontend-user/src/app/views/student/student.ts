@@ -2513,20 +2513,51 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
 
     // Show instant toast notification
     this.activeToast = {
-      message: '📥 Downloading image to Gallery...',
+      message: '📥 Preparing image for Gallery Save...',
       type: 'info',
       createdAt: new Date()
     };
     this.cdr.detectChanges();
 
-    const triggerDownload = (dataUrl: string) => {
+    const triggerNativeOrBlobDownload = async (blob: Blob) => {
       try {
+        const mimeType = blob.type || 'image/jpeg';
+        const file = new File([blob], fileName, { type: mimeType });
+
+        // Method A: Native Android Web Share Sheet (Provides direct 'Save to Gallery' / 'Photos' option)
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: 'Notice Attachment',
+            text: 'Save Notice Image to Gallery'
+          });
+          this.activeToast = {
+            message: '✅ Saved to Gallery!',
+            type: 'success',
+            createdAt: new Date()
+          };
+          this.cdr.detectChanges();
+          setTimeout(() => this.clearToast(), 4000);
+          return;
+        }
+      } catch (shareErr: any) {
+        if (shareErr.name === 'AbortError') {
+          this.clearToast();
+          return;
+        }
+        console.warn('Native share fallback to anchor link:', shareErr);
+      }
+
+      // Method B: Blob Object URL Anchor Download
+      try {
+        const blobUrl = URL.createObjectURL(blob);
         const link = document.createElement('a');
-        link.href = dataUrl;
+        link.href = blobUrl;
         link.download = fileName;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
 
         this.activeToast = {
           message: '✅ Image downloaded to Gallery!',
@@ -2535,73 +2566,70 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
         };
         this.cdr.detectChanges();
         setTimeout(() => this.clearToast(), 4000);
-      } catch (err) {
-        console.error('Download link trigger failed:', err);
-        window.open(dataUrl, '_blank');
-        this.activeToast = {
-          message: '✅ Image opened / downloaded!',
-          type: 'success',
-          createdAt: new Date()
-        };
-        this.cdr.detectChanges();
-        setTimeout(() => this.clearToast(), 4000);
-      }
-    };
-
-    // 1. Base64 URL direct trigger
-    if (fullUrl.startsWith('data:image')) {
-      triggerDownload(fullUrl);
-      return;
-    }
-
-    // 2. Canvas conversion (Reliable across Android WebView)
-    const img = new Image();
-    img.crossOrigin = 'Anonymous';
-    img.onload = () => {
-      try {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.naturalWidth || img.width;
-        canvas.height = img.naturalHeight || img.height;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(img, 0, 0);
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
-          triggerDownload(dataUrl);
-          return;
-        }
-      } catch (canvasErr) {
-        console.warn('Canvas conversion failed, fallback to fetch:', canvasErr);
-      }
-      this.fetchBlobDownload(fullUrl, fileName, triggerDownload);
-    };
-
-    img.onerror = () => {
-      this.fetchBlobDownload(fullUrl, fileName, triggerDownload);
-    };
-
-    img.src = fullUrl;
-  }
-
-  private fetchBlobDownload(fullUrl: string, fileName: string, callback: (dataUrl: string) => void): void {
-    fetch(fullUrl, { mode: 'cors' })
-      .then(res => res.blob())
-      .then(blob => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          callback(reader.result as string);
-        };
-        reader.readAsDataURL(blob);
-      })
-      .catch(err => {
-        console.warn('Fetch blob download fallback failed:', err);
+      } catch (linkErr) {
+        console.error('Anchor download failed:', linkErr);
         window.open(fullUrl, '_blank');
         this.activeToast = {
-          message: '✅ Image opened in browser for download!',
+          message: '✅ Image opened for download!',
           type: 'success',
           createdAt: new Date()
         };
         this.cdr.detectChanges();
         setTimeout(() => this.clearToast(), 4000);
+      }
+    };
+
+    const dataURItoBlob = (dataURI: string): Blob => {
+      const parts = dataURI.split(',');
+      const mime = parts[0].split(':')[1].split(';')[0];
+      const byteString = atob(parts[1]);
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      return new Blob([ab], { type: mime });
+    };
+
+    // 1. Base64 URL direct blob conversion
+    if (fullUrl.startsWith('data:image')) {
+      try {
+        const blob = dataURItoBlob(fullUrl);
+        triggerNativeOrBlobDownload(blob);
+        return;
+      } catch (base64Err) {
+        console.warn('Base64 blob conversion failed:', base64Err);
+      }
+    }
+
+    // 2. HTTP fetch blob
+    fetch(fullUrl, { mode: 'cors' })
+      .then(res => res.blob())
+      .then(blob => triggerNativeOrBlobDownload(blob))
+      .catch(err => {
+        console.warn('Fetch image blob failed, attempting canvas conversion:', err);
+        const img = new Image();
+        img.crossOrigin = 'Anonymous';
+        img.onload = () => {
+          try {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.naturalWidth || img.width;
+            canvas.height = img.naturalHeight || img.height;
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+              ctx.drawImage(img, 0, 0);
+              canvas.toBlob(blob => {
+                if (blob) triggerNativeOrBlobDownload(blob);
+              }, 'image/jpeg', 0.95);
+              return;
+            }
+          } catch (canvasErr) {
+            console.error('Canvas blob failed:', canvasErr);
+          }
+          window.open(fullUrl, '_blank');
+        };
+        img.onerror = () => window.open(fullUrl, '_blank');
+        img.src = fullUrl;
       });
   }
 
