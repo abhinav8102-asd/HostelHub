@@ -215,34 +215,33 @@ body {
   z-index: 200;
 }
 
-/* ── ULTRA-SLEEK MOBILE FLOATING CAPSULE NAVIGATION DOCK ── */
+/* ── CLEAN NATIVE MOBILE BOTTOM NAVIGATION BAR ── */
 .bottom-tabs {
   position: fixed !important;
-  bottom: 12px !important;
+  bottom: 0 !important;
   top: auto !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  width: calc(100% - 24px) !important;
-  max-width: 480px !important;
-  height: 64px !important;
-  background: rgba(255, 255, 255, 0.95) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
-  border: 1.5px solid rgba(37, 99, 235, 0.25) !important;
-  border-radius: 32px !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  transform: none !important;
+  height: 62px !important;
+  background: var(--bg-card) !important;
+  border-top: 1px solid var(--border-color) !important;
+  border-bottom: none !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-around !important;
-  padding: 0 8px !important;
+  padding: 0 4px !important;
   z-index: 9990 !important;
-  box-shadow: 0 16px 36px -6px rgba(37, 99, 235, 0.2), 0 4px 12px rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08) !important;
   overflow: visible !important;
 }
 
 body.dark-mode .bottom-tabs {
-  background: rgba(15, 23, 42, 0.95) !important;
-  border: 1.5px solid rgba(56, 189, 248, 0.3) !important;
-  box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.6) !important;
+  background: #0f172a !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4) !important;
 }
 
 .bottom-tabs::-webkit-scrollbar {
@@ -254,12 +253,12 @@ body.dark-mode .bottom-tabs {
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 2px !important;
+  gap: 3px !important;
   color: var(--text-muted) !important;
-  font-size: 9.5px !important;
-  font-weight: 800 !important;
-  padding: 5px 6px !important;
-  border-radius: 18px !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  padding: 6px 0 !important;
+  border-radius: 12px !important;
   transition: all 0.2s ease !important;
   background: transparent !important;
   border: none !important;
@@ -271,16 +270,17 @@ body.dark-mode .bottom-tabs {
 
 .tab-item.active {
   color: #2563eb !important;
-  background: rgba(37, 99, 235, 0.12) !important;
+  font-weight: 900 !important;
+  background: rgba(37, 99, 235, 0.08) !important;
 }
 
 body.dark-mode .tab-item.active {
   color: #38bdf8 !important;
-  background: rgba(56, 189, 248, 0.15) !important;
+  background: rgba(56, 189, 248, 0.12) !important;
 }
 
 .tab-icon {
-  font-size: 19px !important;
+  font-size: 20px !important;
   line-height: 1 !important;
   position: relative !important;
   display: inline-block !important;
