@@ -106,7 +106,18 @@ exports.getStudentStats = async (req, res) => {
       else if (a.status === 'outing') summary.outing++;
     });
 
-    // Percentage of attendance (present / (total - outings) or simply present / total, let's do present / total for standard percentage)
+    summary.percentage = summary.total > 0 ? Math.round((summary.present / summary.total) * 100) : 100;
+
+    res.status(200).json({
+      summary,
+      history: attendances
+    });
+  } catch (error) {
+    console.error('Error fetching student attendance stats:', error);
+    res.status(500).json({ message: 'Error fetching attendance stats.' });
+  }
+};
+
 // 5. Get Monthly Attendance Report for all Students (Admin / Warden)
 exports.getMonthlyAttendanceReport = async (req, res) => {
   try {
