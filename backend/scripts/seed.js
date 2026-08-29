@@ -88,11 +88,13 @@ const seedDB = async () => {
     }
 
     console.log('Seeding process complete.');
-    process.exit(0);
   } catch (error) {
     console.error('⚠️ Seeding warning (non-fatal):', error.message);
-    process.exit(0); // Exit 0 so npm start always continues to launch node server.js
   }
 };
 
-seedDB();
+module.exports = seedDB;
+
+if (require.main === module) {
+  seedDB().then(() => process.exit(0));
+}
