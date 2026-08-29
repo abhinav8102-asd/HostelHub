@@ -5,25 +5,27 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
 
-/* ── LIGHT MODE (Default) — Crimson Gradient Theme ── */
+/* ── LIGHT MODE (Default) — Engineering Royal Blue & Pearl White Theme ── */
 :root {
-  /* Crimson-to-Black Brand Colors */
-  --primary: #b31031;
-  --primary-dark: #8a0d24;
-  --primary-deeper: #690518;
-  --primary-light: #fde8ec;
-  --primary-glow: rgba(179, 16, 49, 0.25);
-  --secondary: #ff4b6e;
+  /* Royal Blue & Electric Cyan Palette */
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --primary-deeper: #1e3a8a;
+  --primary-light: #eff6ff;
+  --primary-glow: rgba(37, 99, 235, 0.25);
+  --secondary: #38bdf8;
+  --accent-cyan: #06b6d4;
   --success: #10b981;
   --success-light: #d1fae5;
   --warning: #f59e0b;
   --danger: #ef4444;
   --danger-light: #fee2e2;
 
-  /* Crimson header gradient */
-  --gradient-brand: linear-gradient(180deg, #b31031 0%, #1a0208 100%);
-  --gradient-btn: linear-gradient(135deg, #b31031 0%, #690518 100%);
-  --gradient-card: linear-gradient(135deg, #b31031 0%, #8a0d24 100%);
+  /* Engineering Blue Header & Button Gradients */
+  --gradient-brand: linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #1d4ed8 100%);
+  --gradient-btn: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  --gradient-card: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+  --gradient-cyan: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
 
   /* Neutral palette */
   --neutral-900: #0f172a;
@@ -38,31 +40,31 @@
   --neutral-50: #f8fafc;
   --white: #ffffff;
 
-  /* Surface colours (light) */
-  --bg-body: #f8f0f2;
+  /* Surface colours (light) — Ice Blue Body + Crisp Pearl Cards */
+  --bg-body: #f0f7ff;
   --bg-card: #ffffff;
-  --bg-header: linear-gradient(180deg, #b31031 0%, #1a0208 100%);
+  --bg-header: linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #1d4ed8 100%);
   --bg-nav: #ffffff;
   --bg-input: #ffffff;
-  --bg-muted: #fdf3f5;
+  --bg-muted: #f0f7ff;
 
   /* Text colours (light) */
-  --text-primary: #1a0208;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
   --text-on-primary: #ffffff;
 
   /* Border */
   --border-color: rgba(226, 232, 240, 0.9);
   --border-focus: var(--primary);
 
-  /* Shadows — crimson tinted */
-  --shadow-sm: 0 1px 3px rgba(179, 16, 49, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
-  --shadow-md: 0 4px 12px rgba(179, 16, 49, 0.10), 0 2px 6px rgba(15, 23, 42, 0.04);
-  --shadow-lg: 0 10px 28px rgba(179, 16, 49, 0.14), 0 4px 8px rgba(15, 23, 42, 0.05);
-  --shadow-xl: 0 20px 40px rgba(179, 16, 49, 0.18), 0 8px 16px rgba(15, 23, 42, 0.06);
+  /* Shadows — 3D Blue Tinted Elevation */
+  --shadow-sm: 0 2px 6px rgba(37, 99, 235, 0.05), 0 1px 3px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 8px 20px -4px rgba(37, 99, 235, 0.12), 0 3px 8px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 16px 32px -8px rgba(37, 99, 235, 0.18), 0 6px 16px rgba(15, 23, 42, 0.05);
+  --shadow-xl: 0 24px 48px -12px rgba(37, 99, 235, 0.24), 0 10px 24px rgba(15, 23, 42, 0.06);
   --shadow-glow: 0 0 0 4px var(--primary-glow);
-  --shadow-brand: 0 8px 24px rgba(179, 16, 49, 0.35);
+  --shadow-brand: 0 10px 28px rgba(37, 99, 235, 0.35);
 
   /* Typography */
   --font-sans: 'Inter', 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -83,27 +85,24 @@
   --transition-spring: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ── DARK MODE — Charcoal Base + Crimson Accent ── */
+/* ── DARK MODE — Midnight Blue Base + Royal Blue Accent ── */
 body.dark-mode {
-  /* Crimson stays as accent only */
-  --primary: #e8405a;
-  --primary-dark: #b31031;
-  --primary-deeper: #8a0d24;
-  --primary-light: rgba(179, 16, 49, 0.15);
-  --primary-glow: rgba(232, 64, 90, 0.25);
-  --secondary: #ff6b85;
+  --primary: #3b82f6;
+  --primary-dark: #2563eb;
+  --primary-deeper: #1d4ed8;
+  --primary-light: rgba(37, 99, 235, 0.18);
+  --primary-glow: rgba(59, 130, 246, 0.3);
+  --secondary: #60a5fa;
 
-  /* Gradients — header crimson, buttons crimson */
-  --gradient-brand: linear-gradient(180deg, #b31031 0%, #1a0208 100%);
-  --gradient-btn: linear-gradient(135deg, #b31031 0%, #690518 100%);
-  --gradient-card: linear-gradient(135deg, #b31031 0%, #8a0d24 100%);
+  --gradient-brand: linear-gradient(135deg, #0a0f1d 0%, #1e3a8a 100%);
+  --gradient-btn: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  --gradient-card: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
 
   --success: #34d399;
   --success-light: rgba(52, 211, 153, 0.12);
   --danger: #f87171;
   --danger-light: rgba(248, 113, 113, 0.12);
 
-  /* Neutral palette — proper dark charcoal */
   --neutral-900: #f8fafc;
   --neutral-800: #e2e8f0;
   --neutral-700: #cbd5e1;
@@ -116,27 +115,27 @@ body.dark-mode {
   --neutral-50: #0a1120;
   --white: #1e293b;
 
-  /* Surface colours — clean dark gray, NOT dark red */
-  --bg-body: #0a0f1a;
-  --bg-card: #111827;
-  --bg-header: linear-gradient(180deg, #b31031 0%, #1a0208 100%);
-  --bg-nav: #111827;
-  --bg-input: #1a2438;
-  --bg-muted: #0f172a;
+  --bg-body: #0a0f1d;
+  --bg-card: #151d30;
+  --bg-header: linear-gradient(135deg, #0a0f1d 0%, #1e3a8a 100%);
+  --bg-nav: #151d30;
+  --bg-input: #0f172a;
+  --bg-muted: #1e293b;
 
-  /* Text — clean white/gray, NOT pinkish */
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
   --text-on-primary: #ffffff;
 
-  /* Borders & Shadows — neutral dark */
-  --border-color: rgba(30, 41, 59, 0.9);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.25);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.25);
-  --shadow-lg: 0 10px 28px rgba(0, 0, 0, 0.55), 0 4px 8px rgba(0, 0, 0, 0.3);
-  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.65), 0 8px 16px rgba(0, 0, 0, 0.35);
-  --shadow-brand: 0 8px 24px rgba(179, 16, 49, 0.4);
+  --border-color: rgba(51, 65, 85, 0.7);
+  --border-focus: var(--primary);
+
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 24px 48px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 0 4px var(--primary-glow);
+  --shadow-brand: 0 10px 28px rgba(37, 99, 235, 0.4);
 }
 
 /* ── RESET ── */

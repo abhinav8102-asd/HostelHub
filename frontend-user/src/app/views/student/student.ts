@@ -134,7 +134,7 @@ import { API_CONFIG } from '../../config/api.config';
                 <h4 style="margin: 0; font-size: 16px; font-weight: 800;">📢 Official Hostel Notices & Broadcasts</h4>
                 <p class="section-subtitle" style="margin: 2px 0 0 0;">Important announcements broadcasted by Wardens & Administration.</p>
               </div>
-              <button class="btn" (click)="switchTab('notices')" style="background: rgba(179, 16, 49, 0.1); color: #b31031; font-size: 11.5px; font-weight: 700; padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(179, 16, 49, 0.2);">
+              <button class="btn" (click)="switchTab('notices')" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; font-size: 11.5px; font-weight: 700; padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(37, 99, 235, 0.2);">
                 View All Notices ({{ announcements.length }})
               </button>
             </div>
@@ -147,7 +147,7 @@ import { API_CONFIG } from '../../config/api.config';
           <div *ngIf="!isLoadingAnnouncements && announcements.length > 0" style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
             <div *ngFor="let notice of announcements.slice(0, 3)" class="card animate-hover" style="border: 1px solid var(--border-color); padding: 16px; border-radius: 16px; background: var(--bg-card); cursor: pointer;" (click)="openNoticeModal(notice)">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <span class="notice-block-tag" style="background: #fdf2f4; color: #b31031; font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 6px; text-transform: uppercase;">
+                <span class="notice-block-tag" style="background: #eff6ff; color: #2563eb; font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 6px; text-transform: uppercase;">
                   {{ notice.hostelBlock === 'All' ? '🌐 All Hostels' : '🏠 ' + notice.hostelBlock }}
                 </span>
                 <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">
@@ -585,7 +585,7 @@ import { API_CONFIG } from '../../config/api.config';
         <div *ngIf="activeTab === 'my-profile'" class="tab-panel animate-fade">
           <!-- Header Banner Widget -->
           <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
-            <div style="width: 46px; height: 46px; border-radius: 50%; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">👤</div>
+            <div style="width: 46px; height: 46px; border-radius: 50%; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">👤</div>
             <div>
               <h4 style="margin: 0 0 2px 0; font-size: 17px; font-weight: 800; color: var(--text-primary);">Edit Profile</h4>
               <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Update your profile information</p>
@@ -598,13 +598,13 @@ import { API_CONFIG } from '../../config/api.config';
 
             <!-- Profile Photo Card Box -->
             <div class="card" style="padding: 24px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--bg-card); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; box-shadow: var(--shadow-sm);">
-              <div style="position: relative; width: 104px; height: 104px; border-radius: 50%; border: 3px solid #b31031; padding: 3px; background: var(--bg-card);">
+              <div style="position: relative; width: 104px; height: 104px; border-radius: 50%; border: 3px solid #2563eb; padding: 3px; background: var(--bg-card);">
                 <div style="width: 100%; height: 100%; border-radius: 50%; overflow: hidden; background: #f1f5f9; display: flex; align-items: center; justify-content: center;">
                   <img *ngIf="profilePreviewUrl" [src]="profilePreviewUrl" (error)="profilePreviewUrl = null" style="width: 100%; height: 100%; object-fit: cover;" />
                   <span *ngIf="!profilePreviewUrl" style="font-size: 44px; color: #94a3b8;">🎓</span>
                 </div>
                 <!-- Camera Badge Icon -->
-                <button type="button" (click)="selectPhoto('profile')" style="position: absolute; bottom: 2px; right: 2px; width: 30px; height: 30px; border-radius: 50%; background: #b31031; color: white; border: 2px solid white; display: flex; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+                <button type="button" (click)="selectPhoto('profile')" style="position: absolute; bottom: 2px; right: 2px; width: 30px; height: 30px; border-radius: 50%; background: #2563eb; color: white; border: 2px solid white; display: flex; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
                   📷
                 </button>
               </div>
@@ -615,7 +615,7 @@ import { API_CONFIG } from '../../config/api.config';
               </div>
 
               <input type="file" (change)="onProfilePicChange($event)" accept="image/*" class="file-input" id="profilePicFile" style="display: none;"/>
-              <button type="button" (click)="selectPhoto('profile')" class="btn" style="width: 100%; max-width: 320px; height: 42px; background: #fdf2f4; color: #b31031; border: 1px solid rgba(179, 16, 49, 0.2); border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+              <button type="button" (click)="selectPhoto('profile')" class="btn" style="width: 100%; max-width: 320px; height: 42px; background: #eff6ff; color: #2563eb; border: 1px solid rgba(37, 99, 235, 0.2); border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
                 <span>📷</span> Change Photo
               </button>
             </div>
@@ -800,15 +800,15 @@ import { API_CONFIG } from '../../config/api.config';
               </div>
             </div>
 
-            <!-- Save Changes Crimson Button -->
-            <button type="submit" class="btn" style="width: 100%; height: 46px; background: linear-gradient(135deg, #8a0d24 0%, #b31031 100%); color: white; border: none; border-radius: 14px; font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: 0 4px 14px rgba(138, 13, 36, 0.35);" [disabled]="!profileForm.form.valid || updatingProfile">
+            <!-- Save Changes Blue Button -->
+            <button type="submit" class="btn" style="width: 100%; height: 46px; background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%); color: white; border: none; border-radius: 14px; font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);" [disabled]="!profileForm.form.valid || updatingProfile">
               <span>💾</span> {{ updatingProfile ? 'Updating...' : 'Save Changes' }}
             </button>
 
             <!-- Bottom Need Help Box -->
             <div class="card" style="padding: 16px; border-radius: 16px; border: 1px solid var(--border-color); background: var(--bg-card); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
               <div>
-                <strong style="font-size: 13px; color: #b31031; display: block; margin-bottom: 2px;">Need Help?</strong>
+                <strong style="font-size: 13px; color: #2563eb; display: block; margin-bottom: 2px;">Need Help?</strong>
                 <span style="font-size: 11.5px; color: var(--text-muted);">We are here to assist you.</span>
               </div>
 
@@ -939,7 +939,7 @@ import { API_CONFIG } from '../../config/api.config';
 
                   <!-- Dual Photo Source Buttons: Camera & Gallery -->
                   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
-                    <button type="button" (click)="selectMessPhoto('camera')" class="btn" style="background: rgba(179, 16, 49, 0.08); color: #b31031; border: 1px dashed rgba(179, 16, 49, 0.3); padding: 9px; border-radius: 10px; font-size: 11.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer;">
+                    <button type="button" (click)="selectMessPhoto('camera')" class="btn" style="background: rgba(37, 99, 235, 0.08); color: #2563eb; border: 1px dashed rgba(37, 99, 235, 0.3); padding: 9px; border-radius: 10px; font-size: 11.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer;">
                       <span>📷 Real-time Camera</span>
                     </button>
                     <button type="button" (click)="selectMessPhoto('gallery')" class="btn" style="background: var(--bg-muted); color: var(--text-primary); border: 1px dashed var(--border-color); padding: 9px; border-radius: 10px; font-size: 11.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer;">
@@ -973,7 +973,7 @@ import { API_CONFIG } from '../../config/api.config';
                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                     <div style="display: flex; align-items: center; gap: 8px;">
                       <span style="font-weight: 800; color: #f59e0b; font-size: 13px;">⭐ {{ f.rating }}/5</span>
-                      <span style="background: rgba(179, 16, 49, 0.1); color: #b31031; padding: 2px 8px; border-radius: 6px; font-size: 10.5px; font-weight: 800; text-transform: uppercase;">
+                      <span style="background: rgba(37, 99, 235, 0.1); color: #2563eb; padding: 2px 8px; border-radius: 6px; font-size: 10.5px; font-weight: 800; text-transform: uppercase;">
                         {{ f.mealType }}
                       </span>
                     </div>
@@ -1017,7 +1017,7 @@ import { API_CONFIG } from '../../config/api.config';
           <div *ngIf="!isLoadingAnnouncements && announcements.length > 0" style="display: flex; flex-direction: column; gap: 14px;">
             <div *ngFor="let notice of announcements" class="card" style="border: 1px solid var(--border-color); padding: 18px; border-radius: 18px; background: var(--bg-card); box-shadow: var(--shadow-sm);">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <span style="background: #fdf2f4; color: #b31031; font-size: 11px; font-weight: 800; padding: 4px 12px; border-radius: 8px; text-transform: uppercase; border: 1px solid rgba(179,16,49,0.2);">
+                <span style="background: #eff6ff; color: #2563eb; font-size: 11px; font-weight: 800; padding: 4px 12px; border-radius: 8px; text-transform: uppercase; border: 1px solid rgba(37, 99, 235, 0.2);">
                   {{ notice.hostelBlock === 'All' ? '🌐 ALL HOSTEL BLOCKS' : '🏠 ' + notice.hostelBlock }}
                 </span>
                 <span style="font-size: 11.5px; color: var(--text-muted); font-weight: 600;">
@@ -1106,7 +1106,7 @@ import { API_CONFIG } from '../../config/api.config';
             <button type="button" (click)="cancelExitModal($event)" style="flex: 1; padding: 12px; border-radius: 14px; border: 1px solid var(--border-color); background: var(--bg-muted); color: var(--text-primary); font-size: 13.5px; font-weight: 700; cursor: pointer;">
               No, Cancel
             </button>
-            <button type="button" (click)="confirmExitApp()" style="flex: 1; padding: 12px; border-radius: 14px; border: none; background: linear-gradient(135deg, #8a0d24 0%, #b31031 100%); color: white; font-size: 13.5px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(179, 16, 49, 0.35);">
+            <button type="button" (click)="confirmExitApp()" style="flex: 1; padding: 12px; border-radius: 14px; border: none; background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%); color: white; font-size: 13.5px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);">
               Yes, Exit
             </button>
           </div>
