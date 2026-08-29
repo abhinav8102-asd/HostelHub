@@ -1756,3 +1756,309 @@ body.dark-mode .cyber-header-bar {
   background: #fee2e2;
   color: #ef4444;
 }
+
+/* ── FUTURISTIC SIDEBAR GLASS DRAWER ── */
+.sidebar-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 9999;
+  display: flex;
+}
+
+.sidebar-drawer {
+  width: 310px;
+  max-width: 85vw;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(24px);
+  border-right: 1.5px solid rgba(37, 99, 235, 0.25);
+  box-shadow: 12px 0 40px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px 20px;
+  animation: slideRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body.dark-mode .sidebar-drawer {
+  background: rgba(15, 23, 42, 0.95);
+  border-right: 1.5px solid rgba(59, 130, 246, 0.25);
+}
+
+@keyframes slideRight {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sidebar-avatar-ring {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2.5px solid #2563eb;
+  padding: 2px;
+  box-shadow: 0 0 16px rgba(37, 99, 235, 0.35);
+}
+
+.sidebar-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.sidebar-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #eff6ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.sidebar-user-name {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--text-primary);
+  margin: 0 0 2px 0;
+}
+
+.sidebar-user-role {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  display: block;
+}
+
+.sidebar-user-block {
+  font-size: 11px;
+  font-weight: 800;
+  color: #2563eb;
+}
+
+.sidebar-close-btn {
+  background: rgba(15, 23, 42, 0.08);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.sidebar-nav-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 20px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  text-align: left;
+}
+
+.sidebar-nav-item:hover, .sidebar-nav-item.active {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0%, rgba(56, 189, 248, 0.15) 100%);
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  color: #2563eb;
+  transform: translateX(4px);
+}
+
+.sidebar-nav-icon {
+  font-size: 20px;
+}
+
+.sidebar-badge {
+  margin-left: auto;
+  background: #2563eb;
+  color: white;
+  font-size: 10.5px;
+  font-weight: 900;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.sidebar-footer-box {
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+.sidebar-logout-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #ef4444;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.hamburger-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(37, 99, 235, 0.25);
+  background: rgba(37, 99, 235, 0.08);
+  color: #2563eb;
+  font-size: 20px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.hamburger-btn:active {
+  transform: scale(0.9);
+}
+
+/* ── FUTURISTIC HORIZONTAL NOTICE REEL CAROUSEL ── */
+.notice-reel-container {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding: 8px 4px 16px 4px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.notice-reel-container::-webkit-scrollbar {
+  height: 5px;
+}
+.notice-reel-container::-webkit-scrollbar-thumb {
+  background: rgba(37, 99, 235, 0.3);
+  border-radius: 10px;
+}
+
+.notice-reel-card {
+  flex: 0 0 280px;
+  scroll-snap-align: start;
+  border-radius: 20px;
+  padding: 16px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  box-shadow: 0 10px 24px -6px rgba(37, 99, 235, 0.1);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.notice-reel-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(37, 99, 235, 0.4);
+  box-shadow: 0 16px 32px -8px rgba(37, 99, 235, 0.25);
+}
+
+.notice-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.notice-tag {
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 3px 8px;
+  border-radius: 8px;
+  text-transform: uppercase;
+}
+
+.notice-date {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.notice-title {
+  margin: 4px 0 6px 0;
+  font-size: 14.5px;
+  font-weight: 900;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.notice-preview {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.notice-photo-box {
+  margin-top: 10px;
+  border-radius: 12px;
+  overflow: hidden;
+  max-height: 110px;
+}
+
+.notice-photo-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.notice-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-color);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.read-more {
+  color: #2563eb;
+  font-weight: 800;
+}

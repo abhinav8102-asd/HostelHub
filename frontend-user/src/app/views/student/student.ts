@@ -68,17 +68,94 @@ import { API_CONFIG } from '../../config/api.config';
         </div>
       </div>
 
+      <!-- FUTURISTIC GLASS SIDEBAR DRAWER OVERLAY -->
+      <div class="sidebar-backdrop animate-fade" *ngIf="isSidebarOpen" (click)="closeSidebar()">
+        <div class="sidebar-drawer" (click)="$event.stopPropagation()">
+          <!-- Sidebar Header -->
+          <div class="sidebar-header">
+            <div class="sidebar-user-info">
+              <div class="sidebar-avatar-ring">
+                <span class="sidebar-avatar" *ngIf="!user?.profilePicUrl">🎓</span>
+                <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" class="sidebar-avatar-img" />
+              </div>
+              <div>
+                <h4 class="sidebar-user-name">{{ user?.name }}</h4>
+                <span class="sidebar-user-role">🎓 Student · Room {{ user?.roomNumber }}</span>
+                <span class="sidebar-user-block">🏢 {{ user?.hostelBlock || 'Hostel' }}</span>
+              </div>
+            </div>
+            <button type="button" class="sidebar-close-btn" (click)="closeSidebar()">✕</button>
+          </div>
+
+          <!-- Navigation Links List -->
+          <div class="sidebar-nav-menu">
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'home'" (click)="switchTab('home'); closeSidebar()">
+              <span class="sidebar-nav-icon">🏠</span>
+              <span>Home Dashboard</span>
+            </button>
+
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'notices'" (click)="switchTab('notices'); closeSidebar()">
+              <span class="sidebar-nav-icon">📢</span>
+              <span>Official Notices</span>
+              <span class="sidebar-badge" *ngIf="getUnreadNoticesCount() > 0">{{ getUnreadNoticesCount() }}</span>
+            </button>
+
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'raise'" (click)="switchTab('raise'); closeSidebar()">
+              <span class="sidebar-nav-icon">🚀</span>
+              <span>Raise Complaint</span>
+            </button>
+
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'mess'" (click)="switchTab('mess'); closeSidebar()">
+              <span class="sidebar-nav-icon">🍴</span>
+              <span>Mess Food Reviews</span>
+            </button>
+
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'my-complaints'" (click)="switchTab('my-complaints'); closeSidebar()">
+              <span class="sidebar-nav-icon">📋</span>
+              <span>My Tickets Tracker</span>
+              <span class="sidebar-badge" *ngIf="getActiveTicketsCount() > 0">{{ getActiveTicketsCount() }}</span>
+            </button>
+
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'profile'" (click)="switchTab('profile'); closeSidebar()">
+              <span class="sidebar-nav-icon">🔔</span>
+              <span>Notifications & Alerts</span>
+              <span class="sidebar-badge" *ngIf="getUnreadNotificationsCount() > 0">{{ getUnreadNotificationsCount() }}</span>
+            </button>
+
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'my-profile'" (click)="switchTab('my-profile'); closeSidebar()">
+              <span class="sidebar-nav-icon">👤</span>
+              <span>Account Profile</span>
+            </button>
+          </div>
+
+          <!-- Sidebar Footer Logout Button -->
+          <div class="sidebar-footer-box">
+            <button type="button" class="sidebar-logout-btn" (click)="logout()">
+              <span>🚪 Logout Account</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- FUTURISTIC 2026 CYBER COMMAND BAR -->
       <div class="cyber-header-bar" *ngIf="activeTab !== 'chat'">
-        <div class="cyber-user-pill" (click)="switchTab('my-profile')" title="View Profile">
-          <div class="cyber-avatar-ring">
-            <span class="cyber-avatar" *ngIf="!user?.profilePicUrl">🎓</span>
-            <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" (error)="onAvatarError($event)" class="cyber-avatar-img" />
-            <span class="cyber-online-dot"></span>
-          </div>
-          <div class="cyber-user-greeting">
-            <span class="cyber-user-name">{{ user?.name }}</span>
-            <span class="cyber-block-badge">🏢 {{ user?.hostelBlock || 'Hostel' }} · Room {{ user?.roomNumber }}</span>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <!-- ☰ Hamburger Drawer Toggle Button -->
+          <button type="button" class="hamburger-btn" (click)="toggleSidebar()" title="Open Navigation Menu">
+            <span>☰</span>
+          </button>
+
+          <!-- User Pill -->
+          <div class="cyber-user-pill" (click)="switchTab('my-profile')" title="View Profile">
+            <div class="cyber-avatar-ring">
+              <span class="cyber-avatar" *ngIf="!user?.profilePicUrl">🎓</span>
+              <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" (error)="onAvatarError($event)" class="cyber-avatar-img" />
+              <span class="cyber-online-dot"></span>
+            </div>
+            <div class="cyber-user-greeting">
+              <span class="cyber-user-name">{{ user?.name }}</span>
+              <span class="cyber-block-badge">🏢 {{ user?.hostelBlock || 'Hostel' }} · Room {{ user?.roomNumber }}</span>
+            </div>
           </div>
         </div>
 
@@ -89,9 +166,6 @@ import { API_CONFIG } from '../../config/api.config';
           </div>
           <button class="cyber-icon-btn" (click)="toggleDarkMode()" [title]="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
             {{ isDarkMode ? '☀️' : '🌙' }}
-          </button>
-          <button class="cyber-icon-btn logout" (click)="logout()" title="Logout">
-            🚪
           </button>
         </div>
       </div>
@@ -173,15 +247,15 @@ import { API_CONFIG } from '../../config/api.config';
             </div>
           </div>
 
-          <!-- 1.5 Official Hostel Notices & Broadcasts Stream -->
+          <!-- 3. Futuristic Horizontal Notice Reel Stream -->
           <div class="section-header" style="margin-top: 24px;">
             <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
               <div>
-                <h4 style="margin: 0; font-size: 16px; font-weight: 800;">📢 Official Hostel Notices & Broadcasts</h4>
-                <p class="section-subtitle" style="margin: 2px 0 0 0;">Important announcements broadcasted by Wardens & Administration.</p>
+                <h4 style="margin: 0; font-size: 16.5px; font-weight: 900; color: var(--text-primary);">📢 Official Notice Reel</h4>
+                <p class="section-subtitle" style="margin: 2px 0 0 0;">Live announcements from Hostel Administration</p>
               </div>
-              <button class="btn" (click)="switchTab('notices')" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; font-size: 11.5px; font-weight: 700; padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(37, 99, 235, 0.2);">
-                View All Notices ({{ announcements.length }})
+              <button class="btn" (click)="switchTab('notices')" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; font-size: 11.5px; font-weight: 800; padding: 6px 12px; border-radius: 12px; border: 1px solid rgba(37, 99, 235, 0.25);">
+                View All ({{ announcements.length }}) →
               </button>
             </div>
           </div>
@@ -190,22 +264,23 @@ import { API_CONFIG } from '../../config/api.config';
             <div class="skeleton skeleton-card"></div>
           </div>
 
-          <div *ngIf="!isLoadingAnnouncements && announcements.length > 0" style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
-            <div *ngFor="let notice of announcements.slice(0, 3)" class="card animate-hover" style="border: 1px solid var(--border-color); padding: 16px; border-radius: 16px; background: var(--bg-card); cursor: pointer;" (click)="openNoticeModal(notice)">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <span class="notice-block-tag" style="background: #eff6ff; color: #2563eb; font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 6px; text-transform: uppercase;">
-                  {{ notice.hostelBlock === 'All' ? '🌐 All Hostels' : '🏠 ' + notice.hostelBlock }}
+          <!-- Horizontal Carousel Reel of Notice Cards -->
+          <div *ngIf="!isLoadingAnnouncements && announcements.length > 0" class="notice-reel-container">
+            <div *ngFor="let notice of announcements.slice(0, 5)" class="notice-reel-card" (click)="openNoticeModal(notice)">
+              <div class="notice-card-header">
+                <span class="notice-tag">
+                  {{ notice.hostelBlock === 'All' ? '🌐 ALL HOSTELS' : '🏠 BLOCK ' + notice.hostelBlock }}
                 </span>
-                <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">
-                  📅 {{ notice.createdAt | date:'d MMM, h:mm a' }}
-                </span>
+                <span class="notice-date">📅 {{ notice.createdAt | date:'d MMM' }}</span>
               </div>
-              <h5 style="margin: 4px 0 6px 0; font-size: 15px; font-weight: 800; color: var(--text-primary);">{{ notice.title }}</h5>
-              <p style="margin: 0; font-size: 12.5px; color: var(--text-secondary); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                {{ notice.content }}
-              </p>
-              <div *ngIf="notice.photoUrl" style="margin-top: 10px;">
-                <img [src]="getImageUrl(notice.photoUrl)" style="width: 100%; max-height: 160px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border-color);" />
+              <h5 class="notice-title">{{ notice.title }}</h5>
+              <p class="notice-preview">{{ notice.content }}</p>
+              <div *ngIf="notice.photoUrl" class="notice-photo-box">
+                <img [src]="getImageUrl(notice.photoUrl)" alt="Attachment" />
+              </div>
+              <div class="notice-card-footer">
+                <span>By: <strong>{{ notice.creator?.name || 'Warden' }}</strong></span>
+                <span class="read-more">Read Notice 🔍</span>
               </div>
             </div>
           </div>
@@ -1868,6 +1943,16 @@ import { API_CONFIG } from '../../config/api.config';
   `]
 })
 export class StudentDashboardComponent implements OnInit, OnDestroy {
+  isSidebarOpen = false;
+
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
+
+  closeSidebar() {
+    this.isSidebarOpen = false;
+  }
+
   getInitials(name: string): string {
     if (!name) return 'U';
     const parts = name.trim().split(' ');
