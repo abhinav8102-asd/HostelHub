@@ -41,25 +41,110 @@ import { API_CONFIG } from '../../config/api.config';
         </div>
       </div>
 
-      <!-- Header -->
-      <div class="header">
-        <div class="user-info" (click)="switchTab('profile')" style="cursor: pointer;" title="View Profile">
-          <div class="avatar-ring">
-            <span class="avatar" *ngIf="!user?.profilePicUrl">👨‍💼</span>
-            <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" (error)="onAvatarError($event)" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
+      <!-- FUTURISTIC SIDEBAR GLASS DRAWER OVERLAY -->
+      <div class="sidebar-backdrop" *ngIf="isSidebarOpen" (click)="closeSidebar()">
+        <div class="sidebar-drawer" (click)="$event.stopPropagation()">
+          <div class="sidebar-header">
+            <div class="sidebar-user-info">
+              <div class="sidebar-avatar-ring">
+                <span class="avatar" *ngIf="!user?.profilePicUrl" style="font-size: 24px;">👨‍💼</span>
+                <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" (error)="onAvatarError($event)" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
+              </div>
+              <div>
+                <h4 class="sidebar-user-name">{{ user?.name || 'Warden' }}</h4>
+                <span class="sidebar-user-role">🛡️ Official Warden</span>
+                <span class="sidebar-user-block">🏢 {{ user?.hostelBlock || 'All Blocks' }}</span>
+              </div>
+            </div>
+            <button type="button" class="sidebar-close-btn" (click)="closeSidebar()">✕</button>
           </div>
-          <div>
-            <h3>Warden Portal</h3>
-            <p class="user-meta">Managing {{ user?.hostelBlock || 'All Blocks' }}</p>
+
+          <!-- Navigation Links List -->
+          <div class="sidebar-nav-menu">
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'home'" (click)="switchTab('home'); closeSidebar()">
+              <div class="sidebar-nav-icon-wrapper">🏠</div>
+              <span>Home Command</span>
+              <span class="sidebar-arrow">›</span>
+            </button>
+
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'complaints'" (click)="switchTab('complaints'); closeSidebar()">
+              <div class="sidebar-nav-icon-wrapper">📋</div>
+              <span>Complaints & Tickets</span>
+              <span class="sidebar-badge" *ngIf="getPendingCount() > 0">{{ getPendingCount() }}</span>
+              <span class="sidebar-arrow" *ngIf="getPendingCount() === 0">›</span>
+            </button>
+
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'announcements'" (click)="switchTab('announcements'); closeSidebar()">
+              <div class="sidebar-nav-icon-wrapper">📢</div>
+              <span>Official Broadcasts</span>
+              <span class="sidebar-arrow">›</span>
+            </button>
+
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'mess'" (click)="switchTab('mess'); closeSidebar()">
+              <div class="sidebar-nav-icon-wrapper">🍽️</div>
+              <span>Mess & Meal Management</span>
+              <span class="sidebar-arrow">›</span>
+            </button>
+
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'users'" (click)="switchTab('users'); closeSidebar()">
+              <div class="sidebar-nav-icon-wrapper">👥</div>
+              <span>Hostel Students</span>
+              <span class="sidebar-arrow">›</span>
+            </button>
+
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'approvals'" (click)="switchTab('approvals'); closeSidebar()">
+              <div class="sidebar-nav-icon-wrapper">⚡</div>
+              <span>Staff & Approvals</span>
+              <span class="sidebar-arrow">›</span>
+            </button>
+
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'my-profile'" (click)="switchTab('my-profile'); closeSidebar()">
+              <div class="sidebar-nav-icon-wrapper">👤</div>
+              <span>My Profile</span>
+              <span class="sidebar-arrow">›</span>
+            </button>
+          </div>
+
+          <!-- Sidebar Footer Logout Button -->
+          <div class="sidebar-footer-box">
+            <button type="button" class="sidebar-logout-btn" (click)="logout()">
+              <span>🚪 Logout Account</span>
+            </button>
           </div>
         </div>
-        <div class="header-actions">
-          <button class="theme-toggle-btn" (click)="toggleDarkMode()" [title]="isDarkMode ? 'Light Mode' : 'Dark Mode'">
-            {{ isDarkMode ? '☀️' : '🌙' }}
+      </div>
+
+      <!-- CYBER COMMAND TOP HEADER BAR -->
+      <div class="cyber-top-bar">
+        <!-- Left Group: Hamburger + Avatar + Warden Info -->
+        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+          <button type="button" (click)="toggleSidebar()" title="Open Navigation Menu" class="hamburger-btn">
+            <span>☰</span>
           </button>
-          <button class="logout-btn" (click)="logout()">
-            <span>Logout</span>
-            <span>🚪</span>
+
+          <div (click)="switchTab('my-profile')" style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex: 1; min-width: 0;">
+            <div style="position: relative; width: 40px; height: 40px; flex-shrink: 0;">
+              <div style="width: 100%; height: 100%; border-radius: 50%; border: 2.5px solid #2563eb; padding: 2px; display: flex; align-items: center; justify-content: center; background: var(--bg-card); box-shadow: 0 0 14px rgba(37, 99, 235, 0.25);">
+                <span class="avatar" *ngIf="!user?.profilePicUrl" style="font-size: 18px;">👨‍💼</span>
+                <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" (error)="onAvatarError($event)" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
+              </div>
+              <div class="online-pulse-dot"></div>
+            </div>
+            <div style="flex: 1; min-width: 0; overflow: hidden;">
+              <h4 style="margin: 0; font-family: var(--font-display); font-size: 15px; font-weight: 900; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;">
+                {{ user?.name || 'Warden' }}
+              </h4>
+              <p style="margin: 2px 0 0 0; font-size: 11px; font-weight: 800; color: #2563eb; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;">
+                🏢 {{ user?.hostelBlock || 'All Blocks' }} Warden
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Group: Theme Toggle -->
+        <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+          <button (click)="toggleDarkMode()" [title]="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'" style="width: 38px; height: 38px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--text-primary); flex-shrink: 0;">
+            {{ isDarkMode ? '☀️' : '🌙' }}
           </button>
         </div>
       </div>
@@ -69,96 +154,234 @@ import { API_CONFIG } from '../../config/api.config';
         
         <!-- TAB -1: WARDEN HOME DASHBOARD -->
         <div *ngIf="activeTab === 'home'" class="tab-panel animate-fade">
-          <!-- Warden Profile Card (Top Widget) -->
-          <div class="card student-profile-card" style="margin-bottom: 20px; background: linear-gradient(135deg, #b31031 0%, #8a0d24 50%, #4a0412 100%) !important; border-radius: 18px !important; border: 1px solid rgba(255, 255, 255, 0.2) !important; box-shadow: 0 10px 28px rgba(179, 16, 49, 0.35) !important;">
-            <div class="profile-card-pattern"></div>
-            <div class="profile-card-content" style="display: flex; align-items: center; gap: 16px;">
-              <div class="profile-user-img-wrapper" style="width: 70px; height: 70px; border-radius: 50%; overflow: hidden; background: rgba(255,255,255,0.15); border: 2.5px solid #ffffff; box-shadow: var(--shadow-sm); flex-shrink: 0;">
-                <span class="profile-avatar-emoji" *ngIf="!user?.profilePicUrl" style="font-size: 36px; line-height: 70px; text-align: center; display: block; color: white;">👨‍💼</span>
-                <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" style="width: 100%; height: 100%; object-fit: cover;" />
+          
+          <!-- Section 1: WORLD-CLASS 3D ANIMATED LAUNCHPAD GRID -->
+          <div style="margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <h3 style="font-family: var(--font-display); font-size: 16px; font-weight: 900; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 8px;">
+                <span>🚀 Warden Launchpad</span>
+              </h3>
+              <span style="font-size: 11px; font-weight: 800; color: #2563eb; background: rgba(37, 99, 235, 0.08); padding: 4px 10px; border-radius: 20px;">
+                1-Tap Command
+              </span>
+            </div>
+
+            <div class="action-grid-3d">
+              <!-- Tile 1: Pending Approvals -->
+              <div class="action-tile-3d tile-blue" (click)="switchTab('approvals'); loadPendingApprovals()">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #ffffff;">
+                    🔍
+                  </div>
+                  <span style="background: rgba(37, 99, 235, 0.12); color: #2563eb; font-size: 10px; font-weight: 900; padding: 4px 8px; border-radius: 12px; text-transform: uppercase;">
+                    APPROVALS
+                  </span>
+                </div>
+                <div>
+                  <h4 class="action-card-title">{{ pendingApprovals.length }} Pending</h4>
+                  <p class="action-card-sub" style="color: var(--text-muted);">Student registration requests</p>
+                </div>
               </div>
-              <div class="profile-user-details" style="color: #ffffff; flex-grow: 1;">
-                <div class="welcome-tag" style="font-size: 12px; opacity: 0.85; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Warden Dashboard,</div>
-                <h4 class="profile-user-name" style="margin: 2px 0 6px 0; font-size: 20px; font-weight: 800; color: #ffffff;">{{ user?.name }}</h4>
-                <div class="profile-pills" style="display: flex; gap: 6px; flex-wrap: wrap;">
-                  <span class="profile-pill block-pill" style="font-size: 11px; background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 12px; font-weight: 700; color: #ffffff;">🏠 {{ user?.hostelBlock || 'All Hostels' }}</span>
-                  <span class="profile-pill role-pill" style="font-size: 11px; background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 12px; font-weight: 700; color: #ffffff;">🛡️ Warden</span>
+
+              <!-- Tile 2: Total Complaint Tickets -->
+              <div class="action-tile-3d tile-amber" (click)="switchTab('complaints')">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #ffffff;">
+                    📋
+                  </div>
+                  <span style="background: rgba(245, 158, 11, 0.15); color: #d97706; font-size: 10px; font-weight: 900; padding: 4px 8px; border-radius: 12px; text-transform: uppercase;">
+                    TICKETS
+                  </span>
+                </div>
+                <div>
+                  <h4 class="action-card-title">{{ complaints.length }} Tickets</h4>
+                  <p class="action-card-sub" style="color: var(--text-muted);">Active hostel maintenance</p>
+                </div>
+              </div>
+
+              <!-- Tile 3: Post Notice -->
+              <div class="action-tile-3d tile-purple" (click)="switchTab('announcements')">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: #ffffff;">
+                    📢
+                  </div>
+                  <span style="background: rgba(139, 92, 246, 0.15); color: #7c3aed; font-size: 10px; font-weight: 900; padding: 4px 8px; border-radius: 12px; text-transform: uppercase;">
+                    BROADCAST
+                  </span>
+                </div>
+                <div>
+                  <h4 class="action-card-title">Post Broadcast</h4>
+                  <p class="action-card-sub" style="color: var(--text-muted);">{{ announcements.length }} active notices sent</p>
+                </div>
+              </div>
+
+              <!-- Tile 4: Mess & Meal Management -->
+              <div class="action-tile-3d tile-green" (click)="switchTab('mess'); loadMessData()">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff;">
+                    🍽️
+                  </div>
+                  <span style="background: rgba(16, 185, 129, 0.15); color: #059669; font-size: 10px; font-weight: 900; padding: 4px 8px; border-radius: 12px; text-transform: uppercase;">
+                    MESS LIVE
+                  </span>
+                </div>
+                <div>
+                  <h4 class="action-card-title">Mess Skip Stats</h4>
+                  <p class="action-card-sub" style="color: var(--text-muted);">Live meal waste analytics</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Quick Metrics Summary Cards -->
-          <div class="metrics-summary-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px;">
-            <div class="metric-card card clickable" style="padding: 16px; display: flex; flex-direction: column; gap: 4px; background: var(--bg-card); cursor: pointer;" (click)="activeTab = 'approvals'; loadPendingApprovals()">
-              <span style="font-size: 22px;">🔍</span>
-              <span style="font-size: 18px; font-weight: 700; color: var(--text-primary);">{{ pendingApprovals.length }}</span>
-              <span style="font-size: 11.5px; color: var(--text-muted); font-weight: 600;">Pending Approvals</span>
-            </div>
-            
-            <div class="metric-card card clickable" style="padding: 16px; display: flex; flex-direction: column; gap: 4px; background: var(--bg-card); cursor: pointer;" (click)="activeTab = 'complaints'">
-              <span style="font-size: 22px;">📋</span>
-              <span style="font-size: 18px; font-weight: 700; color: var(--text-primary);">{{ getPendingCount() }}</span>
-              <span style="font-size: 11.5px; color: var(--text-muted); font-weight: 600;">New Complaints</span>
-            </div>
-
-            <div class="metric-card card clickable" style="padding: 16px; display: flex; flex-direction: column; gap: 4px; background: var(--bg-card); cursor: pointer;" (click)="onAnnouncementsTab()">
-              <span style="font-size: 22px;">📢</span>
-              <span style="font-size: 18px; font-weight: 700; color: var(--text-primary);">{{ announcements.length }}</span>
-              <span style="font-size: 11.5px; color: var(--text-muted); font-weight: 600;">Active Notices</span>
-            </div>
-
-            <div class="metric-card card clickable" style="padding: 16px; display: flex; flex-direction: column; gap: 4px; background: var(--bg-card); cursor: pointer;" (click)="activeTab = 'mess'; loadMessData()">
-              <span style="font-size: 22px;">⭐</span>
-              <span style="font-size: 18px; font-weight: 700; color: var(--text-primary);">{{ feedbackStats?.overallAvg || 'N/A' }}</span>
-              <span style="font-size: 11.5px; color: var(--text-muted); font-weight: 600;">Mess Rating</span>
-            </div>
-          </div>
-
-          <!-- Quick Notice Publisher Panel -->
-          <div class="card" style="padding: 18px; margin-bottom: 20px; border-radius: var(--radius-md); background: var(--bg-card);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <h5 style="margin: 0; font-size: 16px; font-weight: 700; color: var(--text-primary);">📢 Quick Announcements</h5>
-              <button class="btn btn-primary" style="font-size: 12px; padding: 6px 12px; cursor: pointer; border-radius: 6px;" (click)="onAnnouncementsTab()">
-                ➕ Write Notice
+          <!-- Section 2: OFFICIAL BROADCAST STREAM REEL -->
+          <div style="margin-bottom: 24px;" *ngIf="announcements.length > 0">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 2px;">
+              <h3 style="font-family: var(--font-display); font-size: 16px; font-weight: 900; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 8px;">
+                <span>📢 Official Notice Reel</span>
+              </h3>
+              <button (click)="switchTab('announcements')" style="background: transparent; border: none; color: #2563eb; font-size: 12px; font-weight: 800; cursor: pointer;">
+                View All ({{ announcements.length }}) →
               </button>
             </div>
-            <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.4; margin: 0 0 12px 0;">
-              Announce water cut, mess scheduling changes, or other notices directly to target hostel blocks instantly.
-            </p>
-            <div style="background: var(--bg-body); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px;">
-              <span style="font-size: 11.5px; text-transform: uppercase; font-weight: 700; color: var(--primary); display: block; margin-bottom: 6px;">Last notice sent:</span>
-              <strong style="font-size: 13.5px; color: var(--text-primary); display: block;" *ngIf="announcements.length > 0">{{ announcements[0].title }}</strong>
-              <span style="font-size: 12.5px; color: var(--text-muted); display: block; margin-top: 4px; line-height: 1.35;" *ngIf="announcements.length > 0">{{ announcements[0].content | slice:0:80 }}...</span>
-              <span style="font-size: 13px; color: var(--text-muted);" *ngIf="announcements.length === 0">No announcements sent yet.</span>
+
+            <div class="notice-reel-wrapper">
+              <div class="notice-reel-track">
+                <div class="notice-reel-card" *ngFor="let notice of announcements" (click)="switchTab('announcements')">
+                  <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                      <span style="background: rgba(37, 99, 235, 0.1); color: #2563eb; font-size: 10px; font-weight: 900; padding: 3px 8px; border-radius: 8px;">
+                        🌐 {{ notice.hostelBlock || 'ALL HOSTELS' }}
+                      </span>
+                      <span style="font-size: 10.5px; font-weight: 700; color: var(--text-muted);">
+                        📅 {{ notice.createdAt | date:'d MMM' }}
+                      </span>
+                    </div>
+                    <h4 style="margin: 0 0 6px 0; font-family: var(--font-display); font-size: 14.5px; font-weight: 800; color: var(--text-primary); line-height: 1.3;">
+                      {{ notice.title }}
+                    </h4>
+                    <p style="margin: 0; font-size: 12px; color: var(--text-secondary); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                      {{ notice.content }}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          
-          <!-- Integrated Analytics Graph Widgets -->
-          <div class="card" style="padding: 18px; margin-bottom: 20px; background: var(--bg-card);">
-            <h5 style="margin-top: 0; margin-bottom: 12px; font-size: 15px; font-weight: 700; color: var(--text-primary);">📊 Maintenance Resolution Analytics</h5>
-            <div class="analytics-graphs" style="display: flex; flex-direction: column; gap: 14px;">
-              <div class="graph-bar-item">
-                <div style="display: flex; justify-content: space-between; font-size: 12.5px; margin-bottom: 4px; color: var(--text-muted);">
-                  <span>Resolved Issues</span>
-                  <strong style="color: #059669;">{{ getResolvedCount() }} / {{ complaints.length }}</strong>
+
+          <!-- Section 3: WARDEN COMMAND OVERVIEW & SYSTEM PIPELINE GLASS CARD -->
+          <div class="overview-glass-card" style="margin-bottom: 24px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+              <span style="background: rgba(37, 99, 235, 0.12); color: #2563eb; font-size: 11px; font-weight: 900; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.4px;">
+                ⚡ Warden Command System
+              </span>
+              <span style="font-size: 11px; font-weight: 800; color: var(--text-muted);">v2.4 Live Pipeline</span>
+            </div>
+
+            <h3 style="font-family: var(--font-display); font-size: 18px; font-weight: 900; color: var(--text-primary); margin: 0 0 10px 0; line-height: 1.3;">
+              Automated Hostel Management & Maintenance Engine 🏢
+            </h3>
+            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin: 0 0 18px 0;">
+              HostelHub empowers wardens to manage student complaints, dispatch electricians & plumbers, publish official hostel broadcasts, and track daily mess meal skip analytics seamlessly.
+            </p>
+
+            <!-- 4-Step Resolution Pipeline Grid -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px;">
+              <div class="overview-step-pill">
+                <div style="width: 32px; height: 32px; border-radius: 10px; background: rgba(37, 99, 235, 0.12); color: #2563eb; font-weight: 900; font-size: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  01
                 </div>
-                <div style="width: 100%; height: 8px; background: var(--bg-body); border-radius: 4px; overflow: hidden;">
-                  <div [style.width.%]="complaints.length > 0 ? (getResolvedCount() / complaints.length * 100) : 0" style="height: 100%; background: #059669; border-radius: 4px;"></div>
+                <div>
+                  <h5 style="margin: 0; font-size: 12.5px; font-weight: 800; color: var(--text-primary);">Receive Ticket</h5>
+                  <p style="margin: 2px 0 0 0; font-size: 10.5px; color: var(--text-muted);">Real-time student alerts</p>
                 </div>
               </div>
 
-              <div class="graph-bar-item">
-                <div style="display: flex; justify-content: space-between; font-size: 12.5px; margin-bottom: 4px; color: var(--text-muted);">
-                  <span>Awaiting Assignment (New)</span>
-                  <strong style="color: #ef4444;">{{ getPendingCount() }} / {{ complaints.length }}</strong>
+              <div class="overview-step-pill">
+                <div style="width: 32px; height: 32px; border-radius: 10px; background: rgba(16, 185, 129, 0.12); color: #10b981; font-weight: 900; font-size: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  02
                 </div>
-                <div style="width: 100%; height: 8px; background: var(--bg-body); border-radius: 4px; overflow: hidden;">
-                  <div [style.width.%]="complaints.length > 0 ? (getPendingCount() / complaints.length * 100) : 0" style="height: 100%; background: #ef4444; border-radius: 4px;"></div>
+                <div>
+                  <h5 style="margin: 0; font-size: 12.5px; font-weight: 800; color: var(--text-primary);">Staff Dispatch</h5>
+                  <p style="margin: 2px 0 0 0; font-size: 10.5px; color: var(--text-muted);">Assign plumber/electrician</p>
+                </div>
+              </div>
+
+              <div class="overview-step-pill">
+                <div style="width: 32px; height: 32px; border-radius: 10px; background: rgba(245, 158, 11, 0.12); color: #d97706; font-weight: 900; font-size: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  03
+                </div>
+                <div>
+                  <h5 style="margin: 0; font-size: 12.5px; font-weight: 800; color: var(--text-primary);">Track Repair</h5>
+                  <p style="margin: 2px 0 0 0; font-size: 10.5px; color: var(--text-muted);">Live work progress</p>
+                </div>
+              </div>
+
+              <div class="overview-step-pill">
+                <div style="width: 32px; height: 32px; border-radius: 10px; background: rgba(139, 92, 246, 0.12); color: #7c3aed; font-weight: 900; font-size: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  04
+                </div>
+                <div>
+                  <h5 style="margin: 0; font-size: 12.5px; font-weight: 800; color: var(--text-primary);">Broadcast & Approve</h5>
+                  <p style="margin: 2px 0 0 0; font-size: 10.5px; color: var(--text-muted);">Official student notices</p>
                 </div>
               </div>
             </div>
+
+            <!-- Feature Tags Pill Row -->
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+              <span class="overview-feature-pill">🛡️ Role Isolation</span>
+              <span class="overview-feature-pill">⚡ Instant Socket Alerts</span>
+              <span class="overview-feature-pill">📊 Mess Analytics</span>
+              <span class="overview-feature-pill">📱 Mobile APK Native</span>
+            </div>
           </div>
+
+          <!-- Section 4: SOLO CREATOR & ARCHITECT SPOTLIGHT CARD -->
+          <div class="solo-dev-card" style="margin-bottom: 24px;">
+            <div style="position: relative; display: inline-block; margin-bottom: 12px;">
+              <div style="width: 68px; height: 68px; border-radius: 50%; border: 3px solid #2563eb; padding: 3px; margin: 0 auto; background: var(--bg-card); box-shadow: 0 0 20px rgba(37, 99, 235, 0.3);">
+                <div style="width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); color: white; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 900;">
+                  👨‍💻
+                </div>
+              </div>
+              <span style="position: absolute; bottom: 0; right: -4px; background: #10b981; color: white; font-size: 9px; font-weight: 900; padding: 2px 6px; border-radius: 10px; border: 1.5px solid var(--bg-card);">
+                SOLO ARCHITECT
+              </span>
+            </div>
+
+            <h3 style="margin: 0; font-family: var(--font-display); font-size: 19px; font-weight: 900; color: var(--text-primary);">
+              Abhinav Kumar
+            </h3>
+            <p style="margin: 3px 0 12px 0; font-size: 12.5px; font-weight: 800; color: #2563eb;">
+              Full-Stack Developer & Software Architect 🚀
+            </p>
+            <p style="margin: 0 0 16px 0; font-size: 12px; color: var(--text-secondary); line-height: 1.5; max-width: 480px; margin-left: auto; margin-right: auto;">
+              Designed and built the entire HostelHub ecosystem single-handedly — from Angular frontends, Node.js REST APIs, Socket.IO live notifications, PostgreSQL databases, to native Capacitor Android Mobile builds.
+            </p>
+
+            <div style="display: flex; justify-content: center; align-items: center; gap: 10px;">
+              <a href="https://github.com/abhinav8102-asd" target="_blank" class="social-icon-btn-dev" title="GitHub Repository">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+              </a>
+              <a href="mailto:abhinavkumar.dev@gmail.com" class="social-icon-btn-dev" title="Send Email">
+                ✉️
+              </a>
+            </div>
+          </div>
+
+          <!-- Section 5: APP FOOTER GLASS CARD -->
+          <div class="app-footer-card">
+            <h4 style="margin: 0 0 6px 0; font-family: var(--font-display); font-size: 14px; font-weight: 800; color: var(--text-primary);">
+              Hostel Maintenance & Administration Portal
+            </h4>
+            <p style="margin: 0 0 10px 0; font-size: 12px; color: var(--text-secondary);">
+              📩 support&#64;hostelhub.com · 📞 +91 98765 43210
+            </p>
+            <p style="margin: 0; font-size: 11px; font-weight: 700; color: var(--text-muted);">
+              Developed by HostelHub Engineering Team 🏢 · © 2026 HostelHub. All rights reserved.
+            </p>
+          </div>
+
         </div>
 
         <!-- TAB 0: COMPLAINTS LIST -->
@@ -1322,42 +1545,42 @@ import { API_CONFIG } from '../../config/api.config';
 
       </div>
 
-      <!-- Bottom Fixed Tab Navigation Bar -->
+      <!-- Bottom Navigation Dock (displayed as floating glass top-nav by global CSS) -->
       <div class="bottom-tabs">
-        <button class="tab-item" [class.active]="activeTab === 'home'" (click)="activeTab = 'home'">
+        <button type="button" class="tab-item" [class.active]="activeTab === 'home'" (click)="switchTab('home')">
           <span class="tab-icon">🏠</span>
           <span>Home</span>
         </button>
-        <button class="tab-item" [class.active]="activeTab === 'complaints'" (click)="activeTab = 'complaints'; markWardenComplaintsAsSeen()">
+        <button type="button" class="tab-item" [class.active]="activeTab === 'complaints'" (click)="switchTab('complaints'); markWardenComplaintsAsSeen()">
           <span class="tab-icon">
             📋
             <span class="tab-badge animate-scale" *ngIf="getPendingComplaintsCount() > 0">{{ getPendingComplaintsCount() }}</span>
           </span>
-          <span>Complaints</span>
+          <span>Tickets</span>
         </button>
-        <button class="tab-item" [class.active]="activeTab === 'announcements'" (click)="onAnnouncementsTab(); markWardenAnnouncementsAsSeen()">
+        <button type="button" class="tab-item" [class.active]="activeTab === 'announcements'" (click)="onAnnouncementsTab(); markWardenAnnouncementsAsSeen()">
           <span class="tab-icon">
             📢
             <span class="tab-badge animate-scale" *ngIf="getUnreadAnnouncementsCount() > 0">{{ getUnreadAnnouncementsCount() }}</span>
           </span>
           <span>Notices</span>
         </button>
-        <button class="tab-item" [class.active]="activeTab === 'mess'" (click)="activeTab = 'mess'; loadMessData()">
-          <span class="tab-icon">🍴</span>
+        <button type="button" class="tab-item" [class.active]="activeTab === 'mess'" (click)="switchTab('mess'); loadMessData()">
+          <span class="tab-icon">🍽️</span>
           <span>Mess</span>
         </button>
-        <button class="tab-item" [class.active]="activeTab === 'users'" (click)="activeTab = 'users'; loadAllUsers()">
+        <button type="button" class="tab-item" [class.active]="activeTab === 'users'" (click)="switchTab('users'); loadAllUsers()">
           <span class="tab-icon">👥</span>
           <span>Users</span>
         </button>
-        <button class="tab-item" [class.active]="activeTab === 'approvals'" (click)="activeTab = 'approvals'; loadPendingApprovals()">
+        <button type="button" class="tab-item" [class.active]="activeTab === 'approvals'" (click)="switchTab('approvals'); loadPendingApprovals()">
           <span class="tab-icon">
-            🔍
+            ⚡
             <span class="tab-badge animate-scale" *ngIf="pendingApprovals.length > 0" style="background:#ef4444;">{{ pendingApprovals.length }}</span>
           </span>
           <span>Approvals</span>
         </button>
-        <button class="tab-item" [class.active]="activeTab === 'my-profile'" (click)="activeTab = 'my-profile'; initProfileEdit()">
+        <button type="button" class="tab-item" [class.active]="activeTab === 'my-profile'" (click)="switchTab('my-profile'); initProfileEdit()">
           <span class="tab-icon">👤</span>
           <span>Profile</span>
         </button>
@@ -2286,6 +2509,18 @@ import { API_CONFIG } from '../../config/api.config';
   `]
 })
 export class WardenDashboardComponent implements OnInit, OnDestroy {
+  isSidebarOpen = false;
+
+  toggleSidebar(): void {
+    this.isSidebarOpen = !this.isSidebarOpen;
+    this.cdr.detectChanges();
+  }
+
+  closeSidebar(): void {
+    this.isSidebarOpen = false;
+    this.cdr.detectChanges();
+  }
+
   getInitials(name: string): string {
     if (!name) return 'U';
     const parts = name.trim().split(' ');
