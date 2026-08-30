@@ -163,15 +163,8 @@ import { API_CONFIG } from '../../config/api.config';
           </div>
         </div>
 
-        <!-- Right Group: Tickets Pill & Theme Toggle -->
+        <!-- Right Group: Theme Toggle -->
         <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
-          <button (click)="switchTab('my-complaints')" title="View Active Tickets" style="background: #2563eb; color: #ffffff; border: none; padding: 6px 12px; border-radius: 20px; font-size: 11.5px; font-weight: 800; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); cursor: pointer; flex-shrink: 0;">
-            <span style="background: rgba(255, 255, 255, 0.25); color: #ffffff; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10.5px; font-weight: 900;">
-              {{ getActiveTicketsCount() }}
-            </span>
-            <span style="color: #ffffff; font-weight: 900; letter-spacing: 0.4px;">TICKETS</span>
-          </button>
-
           <button (click)="toggleDarkMode()" [title]="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'" style="width: 36px; height: 36px; border-radius: 11px; border: 1.5px solid var(--border-color); background: var(--bg-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--text-primary); flex-shrink: 0;">
             {{ isDarkMode ? '☀️' : '🌙' }}
           </button>

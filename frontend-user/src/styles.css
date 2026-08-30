@@ -315,29 +315,6 @@ body.dark-mode .tab-item.active {
   transform: scale(1.15);
 }
 
-/* Standout Floating Action Button (FAB) for Center Raise Ticket Tab */
-.tab-item-raise {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
-  color: #ffffff !important;
-  border-radius: 16px !important;
-  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4) !important;
-  padding: 6px 10px !important;
-}
-
-.tab-item-raise span {
-  color: #ffffff !important;
-}
-
-.tab-item-raise.active {
-  background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%) !important;
-  box-shadow: 0 8px 22px rgba(37, 99, 235, 0.5) !important;
-  transform: translateY(-3px) scale(1.05) !important;
-}
-
-.tab-item-raise.active span {
-  color: #ffffff !important;
-}
-
 /* ── TAB CONTENT ── */
 .tab-content-area {
   order: 3 !important;
