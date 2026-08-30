@@ -299,43 +299,68 @@ import { API_CONFIG } from '../../config/api.config';
             <p style="font-size: 13px; color: var(--text-muted); margin-top: 6px;">No active hostel notices posted yet.</p>
           </div>
 
-          <!-- 2. Dynamic Warden Section -->
+          <!-- 2. Dynamic Auto-Adjusting Hostel Wardens Section -->
           <div class="section-header" style="margin-top: 32px;">
-            <h4>👨‍💼 Your Hostel Wardens</h4>
-            <p class="section-subtitle">Reach out to wardens assigned to your block for support and approvals.</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+              <div>
+                <h4 style="margin: 0; font-size: 17px; font-weight: 900; color: var(--text-primary);">👨‍💼 Your Hostel Wardens</h4>
+                <p class="section-subtitle" style="margin: 2px 0 0 0; color: var(--text-muted);">Reach out to wardens assigned to your block for support and approvals.</p>
+              </div>
+              <span *ngIf="wardens.length > 0" style="background: rgba(37,99,235,0.1); color: #2563eb; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 12px;">
+                {{ wardens.length }} {{ wardens.length === 1 ? 'Warden Active' : 'Wardens Active' }}
+              </span>
+            </div>
           </div>
 
           <div *ngIf="isLoadingWardens" class="skeleton-list">
             <div class="skeleton skeleton-card"></div>
-            <div class="skeleton skeleton-card"></div>
           </div>
 
-          <div class="warden-grid" *ngIf="!isLoadingWardens && wardens.length > 0">
-            <div class="card warden-card animate-hover" *ngFor="let warden of wardens">
-              <div class="warden-header">
-                <div class="warden-avatar-wrapper">
-                  <span class="warden-default-avatar" *ngIf="!warden.profilePicUrl">👨‍💼</span>
-                  <img *ngIf="warden.profilePicUrl" [src]="getImageUrl(warden.profilePicUrl)" class="warden-img" />
+          <!-- Dynamic Responsive Grid (Auto-adjusts for 1 or multiple wardens) -->
+          <div *ngIf="!isLoadingWardens && wardens.length > 0" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 14px;">
+            <div *ngFor="let warden of wardens" style="background: linear-gradient(135deg, rgba(239, 246, 255, 0.95) 0%, rgba(219, 234, 254, 0.7) 100%); border: 1.5px solid rgba(37, 99, 235, 0.25); border-radius: 26px; padding: 22px 20px; box-shadow: 0 10px 28px -4px rgba(37, 99, 235, 0.1); backdrop-filter: blur(16px); display: flex; flex-direction: column; justify-content: space-between; transition: all 0.25s ease;">
+              
+              <div>
+                <!-- Top Row: Avatar & Details -->
+                <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 14px;">
+                  <div style="position: relative; width: 62px; height: 62px; flex-shrink: 0;">
+                    <div style="width: 100%; height: 100%; border-radius: 20px; border: 2px solid #2563eb; padding: 2px; background: var(--bg-card); overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(37,99,235,0.2);">
+                      <span *ngIf="!warden.profilePicUrl" style="font-size: 28px;">👨‍💼</span>
+                      <img *ngIf="warden.profilePicUrl" [src]="getImageUrl(warden.profilePicUrl)" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;" alt="Warden Photo" />
+                    </div>
+                  </div>
+                  <div>
+                    <h5 style="margin: 0 0 4px 0; font-family: var(--font-display); font-size: 17px; font-weight: 900; color: var(--text-primary);">
+                      {{ warden.name }}
+                    </h5>
+                    <span style="background: #2563eb; color: white; font-size: 10.5px; font-weight: 800; padding: 3px 10px; border-radius: 10px; display: inline-block;">
+                      🏢 Block {{ warden.hostelBlock || 'All' }} Warden
+                    </span>
+                  </div>
                 </div>
-                <div class="warden-name-block">
-                  <h5 class="warden-name">{{ warden.name }}</h5>
-                  <span class="warden-tag">Block {{ warden.hostelBlock || 'All' }} Warden</span>
-                </div>
+
+                <!-- Bio -->
+                <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; margin: 0 0 16px 0;">
+                  {{ warden.bio || 'Available for hostel administration, mess regulations, and student support.' }}
+                </p>
               </div>
-              <p class="warden-bio">{{ warden.bio || 'Available for hostel administration, mess regulations, and student support.' }}</p>
-              <div class="warden-contact-list">
-                <a [href]="'tel:' + warden.phone" class="warden-contact-link phone">
-                  <span>📞 {{ warden.phone }}</span>
+
+              <!-- Quick Action Contact Buttons (1-Tap Call & Email) -->
+              <div style="display: flex; gap: 10px; margin-top: 12px; padding-top: 14px; border-top: 1px solid rgba(37, 99, 235, 0.15);">
+                <a *ngIf="warden.phone" [href]="'tel:' + warden.phone" style="flex: 1; background: var(--bg-card); color: #2563eb; border: 1.5px solid rgba(37, 99, 235, 0.3); padding: 9px 12px; border-radius: 14px; font-size: 12px; font-weight: 800; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                  <span>📞 Call</span>
                 </a>
-                <a [href]="'mailto:' + warden.email" class="warden-contact-link email">
-                  <span>✉️ {{ warden.email }}</span>
+                <a *ngIf="warden.email" [href]="'mailto:' + warden.email" style="flex: 1; background: var(--bg-card); color: #2563eb; border: 1.5px solid rgba(37, 99, 235, 0.3); padding: 9px 12px; border-radius: 14px; font-size: 12px; font-weight: 800; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                  <span>✉️ Email</span>
                 </a>
               </div>
+
             </div>
           </div>
-          <div *ngIf="!isLoadingWardens && wardens.length === 0" class="empty-state">
-            <span class="empty-icon">👥</span>
-            <p>No wardens registered in the system yet.</p>
+
+          <div *ngIf="!isLoadingWardens && wardens.length === 0" class="empty-state" style="padding: 20px; text-align: center;">
+            <span style="font-size: 28px;">👥</span>
+            <p style="font-size: 13px; color: var(--text-muted); margin-top: 6px;">No wardens registered in the system yet.</p>
           </div>
 
           <!-- 3. Dynamic Solo Developer & Architect Section -->
