@@ -89,41 +89,48 @@ import { API_CONFIG } from '../../config/api.config';
           <!-- Navigation Links List -->
           <div class="sidebar-nav-menu">
             <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'home'" (click)="switchTab('home'); closeSidebar()">
-              <span class="sidebar-nav-icon">🏠</span>
+              <div class="sidebar-nav-icon-wrapper">🏠</div>
               <span>Home Dashboard</span>
+              <span class="sidebar-arrow">›</span>
             </button>
 
             <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'notices'" (click)="switchTab('notices'); closeSidebar()">
-              <span class="sidebar-nav-icon">📢</span>
+              <div class="sidebar-nav-icon-wrapper">📢</div>
               <span>Official Notices</span>
               <span class="sidebar-badge" *ngIf="getUnreadNoticesCount() > 0">{{ getUnreadNoticesCount() }}</span>
+              <span class="sidebar-arrow" *ngIf="getUnreadNoticesCount() === 0">›</span>
             </button>
 
             <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'raise'" (click)="switchTab('raise'); closeSidebar()">
-              <span class="sidebar-nav-icon">🚀</span>
+              <div class="sidebar-nav-icon-wrapper">🚀</div>
               <span>Raise Complaint</span>
+              <span class="sidebar-arrow">›</span>
             </button>
 
             <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'mess'" (click)="switchTab('mess'); closeSidebar()">
-              <span class="sidebar-nav-icon">🍴</span>
+              <div class="sidebar-nav-icon-wrapper">🍴</div>
               <span>Mess Food Reviews</span>
+              <span class="sidebar-arrow">›</span>
             </button>
 
             <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'my-complaints'" (click)="switchTab('my-complaints'); closeSidebar()">
-              <span class="sidebar-nav-icon">📋</span>
+              <div class="sidebar-nav-icon-wrapper">📋</div>
               <span>My Tickets Tracker</span>
               <span class="sidebar-badge" *ngIf="getActiveTicketsCount() > 0">{{ getActiveTicketsCount() }}</span>
+              <span class="sidebar-arrow" *ngIf="getActiveTicketsCount() === 0">›</span>
             </button>
 
             <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'profile'" (click)="switchTab('profile'); closeSidebar()">
-              <span class="sidebar-nav-icon">🔔</span>
+              <div class="sidebar-nav-icon-wrapper">🔔</div>
               <span>Notifications & Alerts</span>
               <span class="sidebar-badge" *ngIf="getUnreadNotificationsCount() > 0">{{ getUnreadNotificationsCount() }}</span>
+              <span class="sidebar-arrow" *ngIf="getUnreadNotificationsCount() === 0">›</span>
             </button>
 
             <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'my-profile'" (click)="switchTab('my-profile'); closeSidebar()">
-              <span class="sidebar-nav-icon">👤</span>
+              <div class="sidebar-nav-icon-wrapper">👤</div>
               <span>Account Profile</span>
+              <span class="sidebar-arrow">›</span>
             </button>
           </div>
 
