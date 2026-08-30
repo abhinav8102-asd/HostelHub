@@ -338,41 +338,56 @@ import { API_CONFIG } from '../../config/api.config';
             <p>No wardens registered in the system yet.</p>
           </div>
 
-          <!-- 3. Dynamic Developer Team Section -->
+          <!-- 3. Dynamic Solo Developer & Architect Section -->
           <div class="section-header" style="margin-top: 32px;">
-            <h4>🚀 Meet the Developer Team</h4>
-            <p class="section-subtitle">The creative minds behind the design, architecture, and maintenance of HostelHub.</p>
+            <h4>👨‍💻 Creator & Solo Developer</h4>
+            <p class="section-subtitle">The architect and engineer behind the complete design, system backend, and native mobile apps of HostelHub.</p>
           </div>
 
           <div *ngIf="isLoadingPublicSettings" class="skeleton-list">
             <div class="skeleton skeleton-card"></div>
           </div>
 
-          <div class="developer-grid" *ngIf="!isLoadingPublicSettings && publicSettings.developer_team?.length > 0">
-            <div class="card developer-card animate-hover" *ngFor="let dev of publicSettings.developer_team">
-              <div class="dev-avatar-wrapper">
-                <img [src]="getImageUrl(dev.pic)" class="dev-img" />
-                <div class="dev-role-badge">{{ dev.role }}</div>
+          <div *ngIf="!isLoadingPublicSettings" style="margin-top: 14px;">
+            <div class="solo-dev-card" style="background: linear-gradient(135deg, rgba(239, 246, 255, 0.95) 0%, rgba(219, 234, 254, 0.7) 100%); border: 1.5px solid rgba(37, 99, 235, 0.3); border-radius: 28px; padding: 28px 20px; text-align: center; position: relative; overflow: hidden; box-shadow: 0 12px 32px -4px rgba(37, 99, 235, 0.15); backdrop-filter: blur(16px);">
+              
+              <!-- Avatar Circle with Glowing Border -->
+              <div style="position: relative; width: 90px; height: 90px; margin: 0 auto 16px auto;">
+                <div style="width: 100%; height: 100%; border-radius: 50%; border: 3px solid #2563eb; padding: 3px; background: var(--bg-card); box-shadow: 0 0 20px rgba(37, 99, 235, 0.3);">
+                  <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" alt="Abhinav Kumar" />
+                </div>
+                <span class="online-pulse-dot" style="width: 14px; height: 14px; border-width: 2.5px; bottom: 2px; right: 2px;"></span>
               </div>
-              <h5 class="dev-name">{{ dev.name }}</h5>
-              <p class="dev-desc">{{ dev.description }}</p>
 
-              <!-- Dynamic Clickable Social Links -->
-              <div class="dev-social-links" style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 14px;">
-                <a *ngIf="dev.github" [href]="dev.github" target="_blank" rel="noopener" class="social-icon-btn" title="GitHub Profile" (click)="$event.stopPropagation()">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+              <!-- Role Tag -->
+              <div style="display: inline-block; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; font-size: 11px; font-weight: 900; padding: 5px 14px; border-radius: 20px; letter-spacing: 0.5px; text-transform: uppercase; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); margin-bottom: 12px;">
+                🚀 CREATOR & LEAD FULL-STACK DEVELOPER
+              </div>
+
+              <!-- Name & Description -->
+              <h4 style="font-family: var(--font-display); font-size: 22px; font-weight: 900; color: var(--text-primary); margin: 0 0 6px 0;">
+                Abhinav Kumar
+              </h4>
+              <p style="font-size: 13px; font-weight: 600; color: var(--text-secondary); max-width: 480px; margin: 0 auto 20px auto; line-height: 1.5;">
+                Sole Architect & Lead Developer of HostelHub. Expert in Full-Stack Engineering, Angular, Node.js, Express, Sequelize, & Capacitor Native Apps.
+              </p>
+
+              <!-- Social Links Row -->
+              <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
+                <a href="https://github.com/abhinav8102-asd" target="_blank" rel="noopener" style="width: 40px; height: 40px; border-radius: 12px; background: var(--bg-card); border: 1.5px solid rgba(37, 99, 235, 0.25); color: #2563eb; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: all 0.2s ease;" title="GitHub Profile">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
                 </a>
-                <a *ngIf="dev.linkedin" [href]="dev.linkedin" target="_blank" rel="noopener" class="social-icon-btn" title="LinkedIn Profile" (click)="$event.stopPropagation()">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                <a href="https://linkedin.com" target="_blank" rel="noopener" style="width: 40px; height: 40px; border-radius: 12px; background: var(--bg-card); border: 1.5px solid rgba(37, 99, 235, 0.25); color: #2563eb; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: all 0.2s ease;" title="LinkedIn Profile">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
                 </a>
-                <a *ngIf="dev.instagram || true" [href]="dev.instagram || 'https://instagram.com'" target="_blank" rel="noopener" class="social-icon-btn" title="Instagram Profile" (click)="$event.stopPropagation()">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                <a href="https://instagram.com" target="_blank" rel="noopener" style="width: 40px; height: 40px; border-radius: 12px; background: var(--bg-card); border: 1.5px solid rgba(37, 99, 235, 0.25); color: #2563eb; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: all 0.2s ease;" title="Instagram Profile">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
                 </a>
-                <a *ngIf="dev.twitter" [href]="dev.twitter" target="_blank" rel="noopener" class="social-icon-btn" title="Twitter Profile" (click)="$event.stopPropagation()">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+                <a href="https://twitter.com" target="_blank" rel="noopener" style="width: 40px; height: 40px; border-radius: 12px; background: var(--bg-card); border: 1.5px solid rgba(37, 99, 235, 0.25); color: #2563eb; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: all 0.2s ease;" title="Twitter Profile">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
                 </a>
-                <a *ngIf="dev.email" [href]="dev.email.startsWith('mailto:') ? dev.email : 'mailto:' + dev.email" target="_blank" rel="noopener" class="social-icon-btn" title="Email" (click)="$event.stopPropagation()">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                <a href="mailto:abhinav@hostelhub.com" target="_blank" rel="noopener" style="width: 40px; height: 40px; border-radius: 12px; background: var(--bg-card); border: 1.5px solid rgba(37, 99, 235, 0.25); color: #2563eb; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: all 0.2s ease;" title="Email">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                 </a>
               </div>
             </div>

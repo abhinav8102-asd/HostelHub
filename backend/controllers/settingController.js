@@ -59,24 +59,13 @@ exports.getPublicSettings = async (req, res) => {
         { 
           name: 'Abhinav Kumar', 
           role: 'Lead Full-Stack Developer', 
-          description: 'Expert in Node.js, Express, Sequelize, and Angular architecture.', 
+          description: 'Sole Architect & Lead Developer of HostelHub. Expert in Full-Stack Engineering, Angular, Node.js, Express, Sequelize, & Capacitor Native Apps.', 
           pic: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
           github: 'https://github.com/abhinav8102-asd',
           linkedin: 'https://linkedin.com',
           instagram: 'https://instagram.com',
           twitter: 'https://twitter.com',
           email: 'mailto:abhinav@hostelhub.com'
-        },
-        { 
-          name: 'Saransh Singh', 
-          role: 'UI/UX Designer', 
-          description: 'Specializes in crafting premium dark/light mode interfaces and custom transitions.', 
-          pic: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
-          github: 'https://github.com',
-          linkedin: 'https://linkedin.com',
-          instagram: 'https://instagram.com',
-          twitter: 'https://twitter.com',
-          email: 'mailto:saransh@hostelhub.com'
         }
       ])
     };
