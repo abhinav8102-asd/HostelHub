@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { AuthService, User } from '../../services/auth.service';
 import { ComplaintService } from '../../services/complaint.service';
@@ -34,16 +35,22 @@ import { API_CONFIG } from '../../config/api.config';
         </div>
       </div>
 
-      <!-- Header -->
+      <!-- Header Bar -->
       <div class="header">
         <div class="user-info">
-          <div class="avatar-ring">
+          <div class="avatar-ring" style="position: relative;">
             <span class="avatar" *ngIf="!user?.profilePicUrl">🔧</span>
             <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" (error)="onImgError($event)"/>
+            <span class="online-pulse-dot" style="width: 12px; height: 12px; right: 0; bottom: 0; position: absolute;"></span>
           </div>
           <div>
-            <h3>Staff Portal</h3>
-            <p class="user-meta">{{ user?.name }} • Specialist</p>
+            <h3 style="margin: 0; display: flex; align-items: center; gap: 6px;">
+              <span>Staff Portal</span>
+              <span style="font-size: 10px; font-weight: 800; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; padding: 2px 8px; border-radius: 10px; text-transform: uppercase;">LIVE</span>
+            </h3>
+            <p class="user-meta" style="margin: 2px 0 0 0;">
+              {{ user?.name || 'Staff Member' }} • {{ getStaffSpecialty() | titlecase }}
+            </p>
           </div>
         </div>
         <div class="header-actions">
@@ -57,14 +64,20 @@ import { API_CONFIG } from '../../config/api.config';
         </div>
       </div>
 
-      <!-- Navigation Tabs (styled as top navbar) -->
+      <!-- Floating Glass Navigation Dock -->
       <div class="bottom-tabs">
         <button class="tab-item" [class.active]="activeTab === 'tasks'" (click)="activeTab = 'tasks'">
-          <span class="tab-icon">🛠️</span>
+          <span class="tab-icon">
+            🛠️
+            <span class="tab-badge animate-scale" *ngIf="getAssignedCount() > 0">{{ getAssignedCount() }}</span>
+          </span>
           <span class="tab-text">My Tasks</span>
         </button>
         <button class="tab-item" [class.active]="activeTab === 'alerts'" (click)="onAlertsTab()">
-          <span class="tab-icon">🔔</span>
+          <span class="tab-icon">
+            🔔
+            <span class="tab-badge animate-scale" *ngIf="getUnreadNotifCount() > 0" style="background: #8b5cf6;">{{ getUnreadNotifCount() }}</span>
+          </span>
           <span class="tab-text">Alert History</span>
         </button>
         <button class="tab-item" [class.active]="activeTab === 'my-profile'" (click)="activeTab = 'my-profile'; initProfileEdit()">
@@ -78,177 +91,236 @@ import { API_CONFIG } from '../../config/api.config';
         
         <!-- TAB 1: ASSIGNED TASKS -->
         <div *ngIf="activeTab === 'tasks'" class="animate-fade">
-          <!-- Header Banner Widget -->
-          <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
-            <div style="width: 46px; height: 46px; border-radius: 50%; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">🛠️</div>
+          <!-- Cyber Glass Header Banner -->
+          <div class="cyber-tab-header">
+            <div class="cyber-header-badge" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white;">🛠️</div>
             <div>
-              <h4 style="margin: 0 0 2px 0; font-size: 17px; font-weight: 800; color: var(--text-primary);">My Assigned Tasks</h4>
-              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">View, track and update your assigned maintenance jobs</p>
+              <h4 style="margin: 0 0 2px 0; font-family: var(--font-display); font-size: 17.5px; font-weight: 900; color: var(--text-primary);">My Maintenance Tasks</h4>
+              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">View room locations, call students, start work & upload proof</p>
             </div>
           </div>
 
           <!-- Filter Pills -->
-          <div class="filter-pills">
+          <div class="filter-pills" style="margin-bottom: 16px;">
             <button class="pill-btn" [class.active]="filterStatus === 'all'" (click)="filterStatus = 'all'">
               All ({{ tasks.length }})
             </button>
-            <button class="pill-btn" [class.active]="filterStatus === 'assigned'" (click)="filterStatus = 'assigned'">
+            <button class="pill-btn" [class.active]="filterStatus === 'assigned'" (click)="filterStatus = 'assigned'" style="border-color: rgba(37,99,235,0.4);">
               New ({{ getAssignedCount() }})
             </button>
-            <button class="pill-btn" [class.active]="filterStatus === 'in_progress'" (click)="filterStatus = 'in_progress'">
+            <button class="pill-btn" [class.active]="filterStatus === 'in_progress'" (click)="filterStatus = 'in_progress'" style="border-color: rgba(245,158,11,0.4);">
               Active ({{ getInProgressCount() }})
             </button>
-            <button class="pill-btn" [class.active]="filterStatus === 'resolved'" (click)="filterStatus = 'resolved'">
+            <button class="pill-btn" [class.active]="filterStatus === 'resolved'" (click)="filterStatus = 'resolved'" style="border-color: rgba(16,185,129,0.4);">
               Done ({{ getResolvedCount() }})
             </button>
           </div>
 
           <div class="complaints-list" *ngIf="filteredTasks.length > 0; else noTasks">
-            <div class="card task-card" *ngFor="let task of filteredTasks" [class.expanded]="expandedTaskId === task.id">
+            <div class="card task-card" *ngFor="let task of filteredTasks" [class.expanded]="expandedTaskId === task.id" style="border-radius: 20px; transition: all 0.25s ease;">
               
-              <div class="task-summary" (click)="toggleExpand(task.id)">
-                <div class="task-header">
-                  <span class="badge" [class]="'badge-' + task.status">{{ task.status.replace('_', ' ') }}</span>
-                  <span class="task-room">Room {{ task.student?.roomNumber }} ({{ task.student?.hostelBlock }})</span>
+              <div class="task-summary" (click)="toggleExpand(task.id)" style="cursor: pointer;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                  <span class="badge" [class]="'badge-' + task.status" style="font-size: 11px; font-weight: 900; padding: 5px 12px; border-radius: 12px; text-transform: uppercase;">
+                    {{ task.status === 'assigned' ? '🆕 NEW ASSIGNED' : task.status === 'in_progress' ? '⏳ IN PROGRESS' : '✅ COMPLETED' }}
+                  </span>
+                  <span style="font-size: 12px; font-weight: 800; color: #2563eb; background: rgba(37, 99, 235, 0.08); padding: 4px 10px; border-radius: 12px;">
+                    🏠 Room {{ task.student?.roomNumber || 'N/A' }} ({{ task.student?.hostelBlock || 'Block A' }})
+                  </span>
                 </div>
-                <h4 class="task-title">{{ task.title }}</h4>
-                <div class="task-category-tag">
-                  <span class="cat-tag-icon">{{ getCategoryIcon(task.category) }}</span>
-                  <span>{{ task.category | titlecase }}</span>
+
+                <h4 style="margin: 0 0 6px 0; font-family: var(--font-display); font-size: 16px; font-weight: 800; color: var(--text-primary);">
+                  {{ task.title }}
+                </h4>
+
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                  <span style="background: var(--bg-muted); border: 1px solid var(--border-color); color: var(--text-secondary); font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 8px; display: inline-flex; align-items: center; gap: 4px;">
+                    <span>{{ getCategoryIcon(task.category) }}</span>
+                    <span>{{ task.category | titlecase }}</span>
+                  </span>
+
+                  <span *ngIf="task.priority" style="font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px;" [style.color]="task.priority === 'urgent' ? '#ef4444' : '#d97706'" [style.background]="task.priority === 'urgent' ? 'rgba(239,68,68,0.1)' : 'rgba(245,158,11,0.1)'">
+                    {{ task.priority === 'urgent' ? '🚨 URGENT' : '⚠️ HIGH PRIORITY' }}
+                  </span>
                 </div>
-                <p class="task-desc-short" *ngIf="expandedTaskId !== task.id">
-                  {{ task.description | slice:0:60 }}{{ task.description.length > 60 ? '...' : '' }}
+
+                <p class="task-desc-short" *ngIf="expandedTaskId !== task.id" style="margin: 0; font-size: 12.5px; color: var(--text-muted); line-height: 1.4;">
+                  {{ task.description | slice:0:65 }}{{ task.description.length > 65 ? '...' : '' }}
                 </p>
-                <div class="tap-hint" *ngIf="expandedTaskId !== task.id">Tap to view details & updates 👇</div>
+
+                <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border-color); display: flex; justify-content: space-between; align-items: center;" *ngIf="expandedTaskId !== task.id">
+                  <span style="font-size: 11.5px; font-weight: 700; color: #2563eb;">Tap for Student Info & Actions</span>
+                  <span style="font-size: 12px; color: #2563eb;">👇</span>
+                </div>
               </div>
 
               <!-- Expanded Details Area -->
-              <div class="task-details animate-fade" *ngIf="expandedTaskId === task.id">
-                <p class="task-desc-full"><strong>Job Description:</strong><br/>{{ task.description }}</p>
+              <div class="task-details animate-fade" *ngIf="expandedTaskId === task.id" style="margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border-color);">
+                <p style="font-size: 13px; color: var(--text-primary); line-height: 1.5; margin: 0 0 16px 0; background: var(--bg-muted); padding: 12px; border-radius: 12px; border: 1px solid var(--border-color);">
+                  <strong style="color: #2563eb; display: block; margin-bottom: 4px; font-size: 11.5px; text-transform: uppercase;">Job Problem Details:</strong>
+                  {{ task.description }}
+                </p>
 
-                <!-- Student info -->
-                <div class="student-info-section">
-                  <div class="info-label">👤 Student Contact Info</div>
-                  <p class="student-name">Name: <strong>{{ task.student?.name }}</strong></p>
-                  <p class="student-room">Room No: {{ task.student?.roomNumber }} ({{ task.student?.hostelBlock }})</p>
-                  <a [href]="'tel:' + task.student?.phone" class="btn btn-call-student">
-                    📞 Call Student ({{ task.student?.phone }})
-                  </a>
+                <!-- Student Contact Section -->
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px; margin-bottom: 16px;">
+                  <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">👤 Student Contact & Location</div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                    <div>
+                      <strong style="font-size: 14px; color: var(--text-primary); display: block;">{{ task.student?.name || 'Student' }}</strong>
+                      <span style="font-size: 12px; color: var(--text-muted);">Room No: <strong>{{ task.student?.roomNumber || 'N/A' }}</strong> • {{ task.student?.hostelBlock || 'Block A' }}</span>
+                    </div>
+
+                    <!-- Direct Call Button -->
+                    <a [href]="'tel:' + (task.student?.phone || '')" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; font-size: 12.5px; font-weight: 800; padding: 8px 14px; border-radius: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+                      <span>📞 Call Student</span>
+                    </a>
+                  </div>
                 </div>
 
                 <!-- Problem photo attached by student -->
-                <div class="photo-view" *ngIf="task.photoUrl">
-                  <p class="section-label">📸 Issue Attachment:</p>
-                  <div class="image-container" (click)="openPhotoModal(getImageUrl(task.photoUrl))">
-                    <img [src]="getImageUrl(task.photoUrl)" class="comp-img" alt="Student issue photo" (error)="onImgError($event)"/>
-                    <div class="image-overlay">🔍 Tap to Zoom</div>
+                <div class="photo-view" *ngIf="task.photoUrl" style="margin-bottom: 16px;">
+                  <p style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">📸 Student Issue Image Attachment:</p>
+                  <div class="image-container" (click)="openPhotoModal(getImageUrl(task.photoUrl))" style="width: 100%; height: 160px; border-radius: 12px; overflow: hidden; position: relative; cursor: pointer; border: 1px solid var(--border-color);">
+                    <img [src]="getImageUrl(task.photoUrl)" style="width: 100%; height: 100%; object-fit: cover;" alt="Student issue photo" (error)="onImgError($event)"/>
+                    <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.7); color: white; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 8px;">🔍 Tap to Zoom</div>
                   </div>
                 </div>
 
                 <!-- Actions based on status -->
-                <div class="task-actions" *ngIf="task.status === 'assigned'">
-                  <button class="btn btn-primary btn-start-job" (click)="updateStatus(task.id, 'in_progress')">
-                    🚀 Start This Job
+                <div *ngIf="task.status === 'assigned'" style="margin-top: 14px;">
+                  <button type="button" class="btn" style="width: 100%; height: 46px; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; border: none; border-radius: 14px; font-size: 14px; font-weight: 900; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);" (click)="updateStatus(task.id, 'in_progress')">
+                    🚀 Start Work Now (Mark In Progress)
                   </button>
                 </div>
 
-                <div class="task-actions" *ngIf="task.status === 'in_progress'">
-                  <div class="resolution-form">
-                    <label class="form-label">Upload Work Proof (Required):</label>
-                    
-                    <div class="upload-area" *ngIf="!imagePreviewUrls[task.id]">
-                      <input type="file" (change)="onFileChange($event, task.id)" accept="image/*" class="file-input" [id]="'proof_' + task.id" />
-                      <label [for]="'proof_' + task.id" class="file-input-label" (click)="selectPhoto('proof', task.id); $event.preventDefault()">
-                        <span class="upload-icon">📸</span>
-                        <span class="upload-text">Select Completion Image</span>
-                      </label>
+                <div *ngIf="task.status === 'in_progress'" style="margin-top: 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px;">
+                  <label style="font-size: 12px; font-weight: 800; color: var(--text-primary); display: block; margin-bottom: 8px;">
+                    📸 Upload Work Proof Photo (Required to complete job):
+                  </label>
+                  
+                  <div *ngIf="!imagePreviewUrls[task.id]" style="margin-bottom: 12px;">
+                    <input type="file" (change)="onFileChange($event, task.id)" accept="image/*" class="file-input" [id]="'proof_' + task.id" style="display: none;" />
+                    <div (click)="selectPhoto('proof', task.id)" style="background: #fdf2f4; border: 1.5px dashed rgba(179, 16, 49, 0.3); border-radius: 14px; padding: 16px; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
+                      <span style="font-size: 28px;">📷</span>
+                      <strong style="font-size: 13px; color: #b31031;">Take / Select Proof Photo</strong>
+                      <span style="font-size: 11px; color: var(--text-muted);">Snap repair completion photo</span>
                     </div>
-
-                    <div class="preview-area animate-fade" *ngIf="imagePreviewUrls[task.id]">
-                      <img [src]="imagePreviewUrls[task.id]" alt="Preview proof" class="preview-thumbnail"/>
-                      <div class="preview-info">
-                        <span class="preview-name">{{ selectedFiles[task.id]?.name }}</span>
-                        <button type="button" class="btn-remove-file" (click)="removeSelectedFile(task.id)">Remove ❌</button>
-                      </div>
-                    </div>
-
-                    <button class="btn btn-success btn-submit-resolved" [disabled]="!selectedFiles[task.id]" (click)="resolveTask(task.id)">
-                      ✅ Mark Completed
-                    </button>
                   </div>
+
+                  <div *ngIf="imagePreviewUrls[task.id]" style="margin-bottom: 12px; display: flex; align-items: center; gap: 12px; background: var(--bg-muted); padding: 10px; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <img [src]="imagePreviewUrls[task.id]" style="width: 54px; height: 54px; border-radius: 8px; object-fit: cover;" alt="Preview proof"/>
+                    <div style="flex: 1; min-width: 0;">
+                      <span style="font-size: 12px; font-weight: 700; color: var(--text-primary); display: block; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
+                        {{ selectedFiles[task.id]?.name || 'Proof Photo' }}
+                      </span>
+                      <span style="font-size: 10.5px; color: #10b981; font-weight: 700;">✓ Ready to submit</span>
+                    </div>
+                    <button type="button" (click)="removeSelectedFile(task.id)" style="background: none; border: none; color: #ef4444; font-size: 13px; cursor: pointer; font-weight: 700;">✕ Remove</button>
+                  </div>
+
+                  <button type="button" class="btn" [disabled]="!selectedFiles[task.id]" (click)="resolveTask(task.id)" style="width: 100%; height: 46px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 14px; font-size: 14px; font-weight: 900; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);">
+                    ✅ Mark Job Completed & Done
+                  </button>
                 </div>
 
                 <!-- If resolved, show proof uploaded -->
-                <div class="resolved-proof-section" *ngIf="task.status === 'resolved'">
-                  <p class="text-success">🎉 Job Completed Successfully!</p>
-                  <div class="photo-view" *ngIf="task.completionPhotoUrl">
-                    <p class="section-label">✅ Uploaded Work Proof:</p>
-                    <div class="image-container" (click)="openPhotoModal(getImageUrl(task.completionPhotoUrl))">
-                      <img [src]="getImageUrl(task.completionPhotoUrl)" class="comp-img" alt="Work completion proof" (error)="onImgError($event)"/>
-                      <div class="image-overlay">🔍 Tap to Zoom</div>
+                <div *ngIf="task.status === 'resolved'" style="margin-top: 14px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 14px; padding: 14px;">
+                  <p style="margin: 0 0 10px 0; font-size: 13.5px; font-weight: 800; color: #059669; display: flex; align-items: center; gap: 6px;">
+                    <span>🎉</span> Job Completed & Resolved!
+                  </p>
+                  <div *ngIf="task.completionPhotoUrl">
+                    <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 6px;">WORK COMPLETION PROOF:</span>
+                    <div (click)="openPhotoModal(getImageUrl(task.completionPhotoUrl))" style="width: 100%; height: 140px; border-radius: 10px; overflow: hidden; position: relative; cursor: pointer;">
+                      <img [src]="getImageUrl(task.completionPhotoUrl)" style="width: 100%; height: 100%; object-fit: cover;" alt="Work completion proof" (error)="onImgError($event)"/>
+                      <div style="position: absolute; bottom: 6px; right: 6px; background: rgba(0,0,0,0.7); color: white; font-size: 10.5px; font-weight: 700; padding: 3px 8px; border-radius: 6px;">🔍 Tap to Zoom</div>
                     </div>
                   </div>
                 </div>
 
-                <button class="btn btn-secondary btn-collapse" (click)="toggleExpand(null)">Collapse Task 👆</button>
+                <button type="button" class="btn btn-secondary" style="width: 100%; margin-top: 14px; padding: 10px; border-radius: 12px; font-size: 12.5px; font-weight: 700; cursor: pointer;" (click)="toggleExpand(null)">
+                  Collapse Task 👆
+                </button>
               </div>
 
             </div>
           </div>
 
           <ng-template #noTasks>
-            <div class="empty-state">
-              <span class="empty-icon">🏖️</span>
-              <p>No jobs assigned to you matching this status. Enjoy your day!</p>
+            <div class="empty-state" style="text-align: center; padding: 48px 20px;">
+              <span style="font-size: 52px; display: block; margin-bottom: 12px;">🎉</span>
+              <h4 style="margin: 0 0 6px 0; color: var(--text-primary);">All Clear!</h4>
+              <p style="margin: 0; color: var(--text-muted); font-size: 13px;">No maintenance jobs matching this status. Enjoy your day!</p>
             </div>
           </ng-template>
         </div>
 
         <!-- TAB 2: ALERTS LOG -->
         <div *ngIf="activeTab === 'alerts'" class="animate-fade">
-          <!-- Header Banner Widget -->
-          <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
-            <div style="width: 46px; height: 46px; border-radius: 50%; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">🔔</div>
+          <!-- Cyber Header Banner -->
+          <div class="cyber-tab-header">
+            <div class="cyber-header-badge" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: white;">🔔</div>
             <div>
-              <h4 style="margin: 0 0 2px 0; font-size: 17px; font-weight: 800; color: var(--text-primary);">Alert History</h4>
-              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Real-time activity logs and notification history</p>
+              <h4 style="margin: 0 0 2px 0; font-family: var(--font-display); font-size: 17.5px; font-weight: 900; color: var(--text-primary);">Work Alerts & Broadcast Log</h4>
+              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Real-time notification alerts, task assignments and system logs</p>
             </div>
           </div>
 
-          <div class="notif-header-row" style="margin-bottom: 12px;">
-            <h5 style="margin: 0; font-size: 14px; font-weight: 700; color: var(--text-primary);">Notifications</h5>
-            <button class="clear-notif-btn" *ngIf="notifications.length > 0" (click)="clearAllNotifications()">
-              Mark all as read Checkbox
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <h5 style="margin: 0; font-size: 14px; font-weight: 800; color: var(--text-primary);">Notifications Log</h5>
+            <button class="clear-notif-btn" *ngIf="notifications.length > 0" (click)="clearAllNotifications()" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; font-size: 11.5px; font-weight: 800; padding: 6px 12px; border-radius: 12px; border: 1px solid rgba(37, 99, 235, 0.2); cursor: pointer;">
+              ✓ Mark all as read
             </button>
           </div>
           
           <div class="notifications-list" *ngIf="notifications.length > 0; else noNotifications">
-            <div class="card notif-card clickable-notice" [class.unread]="!notif.isRead" *ngFor="let notif of notifications" (click)="onNotificationClick(notif)">
-              <div class="notif-meta">
-                <span class="notif-badge-icon">{{ getNotifIcon(notif.type) }}</span>
-                <span class="notif-time">{{ notif.createdAt | date:'shortTime' }}</span>
+            <div class="card notif-card clickable-notice" [class.unread]="!notif.isRead" *ngFor="let notif of notifications" (click)="onNotificationClick(notif)" style="border-radius: 16px; padding: 14px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-size: 18px;">{{ getNotifIcon(notif.type) }}</span>
+                <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">{{ notif.createdAt | date:'d MMM, h:mm a' }}</span>
               </div>
-              <p class="notif-msg">{{ notif.message }}</p>
-              <div class="notice-tap-hint">Tap to view details 🔎</div>
+              <p style="margin: 0 0 8px 0; font-size: 13px; color: var(--text-primary); line-height: 1.4; font-weight: 600;">{{ notif.message }}</p>
+              <div style="font-size: 11px; color: #2563eb; text-align: right; font-weight: 800;">Tap to view details 🔎</div>
             </div>
           </div>
           <ng-template #noNotifications>
-            <div class="empty-state">
-              <span class="empty-icon">🔔</span>
-              <p>No notifications on your log yet.</p>
+            <div class="empty-state" style="text-align: center; padding: 48px 20px;">
+              <span style="font-size: 48px; display: block; margin-bottom: 12px;">🔕</span>
+              <h4 style="margin: 0 0 6px 0; color: var(--text-primary);">No Alerts</h4>
+              <p style="margin: 0; color: var(--text-muted); font-size: 13px;">No notification alerts on your log yet.</p>
             </div>
           </ng-template>
         </div>
 
-        <!-- TAB 3: EDIT PROFILE -->
+        <!-- TAB 3: EDIT PROFILE & DUTY STATUS -->
         <div *ngIf="activeTab === 'my-profile'" class="animate-fade">
-          <!-- Header Banner Widget -->
-          <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
-            <div style="width: 46px; height: 46px; border-radius: 50%; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">👤</div>
+          <!-- Cyber Header Banner -->
+          <div class="cyber-tab-header">
+            <div class="cyber-header-badge" style="background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); color: white;">👤</div>
             <div>
-              <h4 style="margin: 0 0 2px 0; font-size: 17px; font-weight: 800; color: var(--text-primary);">Edit Profile</h4>
-              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Update your profile information</p>
+              <h4 style="margin: 0 0 2px 0; font-family: var(--font-display); font-size: 17.5px; font-weight: 900; color: var(--text-primary);">Staff Profile & Availability</h4>
+              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Update profile avatar, availability status & contact info</p>
             </div>
+          </div>
+
+          <!-- Duty Availability Toggle Box -->
+          <div class="card" style="padding: 18px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--bg-card); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px;" [style.border-color]="isOnDuty ? 'rgba(16, 185, 129, 0.4)' : 'rgba(239, 68, 68, 0.4)'">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px;" [style.background]="isOnDuty ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)'" [style.color]="isOnDuty ? '#10b981' : '#ef4444'">
+                {{ isOnDuty ? '🟢' : '🔴' }}
+              </div>
+              <div>
+                <strong style="font-size: 14px; color: var(--text-primary); display: block;">
+                  {{ isOnDuty ? 'ON DUTY — Available for Jobs' : 'OFF DUTY — On Leave / Unavailable' }}
+                </strong>
+                <span style="font-size: 11.5px; color: var(--text-muted);">
+                  {{ isOnDuty ? 'Warden can assign new maintenance tickets to you' : 'New ticket assignments are paused while off-duty' }}
+                </span>
+              </div>
+            </div>
+
+            <button type="button" (click)="toggleDutyStatus()" style="padding: 8px 16px; border-radius: 20px; border: none; font-size: 12px; font-weight: 900; cursor: pointer; transition: all 0.2s ease; white-space: nowrap;" [style.background]="isOnDuty ? '#10b981' : '#ef4444'" style="color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+              {{ isOnDuty ? 'Set Off-Duty' : 'Set On-Duty' }}
+            </button>
           </div>
 
           <form (ngSubmit)="onProfileSubmit()" #profileForm="ngForm" style="display: flex; flex-direction: column; gap: 16px;">
@@ -319,7 +391,7 @@ import { API_CONFIG } from '../../config/api.config';
               <div>
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
                   <span style="width: 32px; height: 32px; border-radius: 8px; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 15px;">📄</span>
-                  <label class="form-label" style="margin: 0; font-size: 12.5px; font-weight: 700; color: var(--text-primary);">Bio</label>
+                  <label class="form-label" style="margin: 0; font-size: 12.5px; font-weight: 700; color: var(--text-primary);">Specialty / Duty Bio</label>
                 </div>
                 <div style="position: relative;">
                   <textarea 
@@ -328,7 +400,7 @@ import { API_CONFIG } from '../../config/api.config';
                     class="form-input" 
                     rows="3" 
                     style="border-radius: 12px; font-size: 13px; background: var(--bg-muted); border: 1px solid var(--border-color); padding: 10px 14px; width: 100%;"
-                    placeholder="Tell us about yourself..."
+                    placeholder="Describe your maintenance specialty (e.g. Electrician, Plumber)..."
                     [(ngModel)]="editUser.bio"
                   ></textarea>
                   <span style="position: absolute; right: 12px; bottom: 8px; font-size: 10px; color: var(--text-muted);">{{ editUser.bio ? editUser.bio.length : 0 }}/150</span>
@@ -349,29 +421,78 @@ import { API_CONFIG } from '../../config/api.config';
               </div>
 
               <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <a href="mailto:support@hostelhub.com" style="background: var(--bg-muted); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 11.5px; font-weight: 600; padding: 6px 12px; border-radius: 20px; text-decoration: none; display: flex; align-items: center; gap: 6px;">
-                  <span>✉️</span> support@hostelhub.com
+                <a [href]="'mailto:' + (footerSettings?.footer_email || 'support@hostelhub.com')" style="background: var(--bg-muted); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 11.5px; font-weight: 600; padding: 6px 12px; border-radius: 20px; text-decoration: none; display: flex; align-items: center; gap: 6px;">
+                  <span>✉️</span> {{ footerSettings?.footer_email || 'support@hostelhub.com' }}
                 </a>
-                <a href="tel:+919876543210" style="background: var(--bg-muted); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 11.5px; font-weight: 600; padding: 6px 12px; border-radius: 20px; text-decoration: none; display: flex; align-items: center; gap: 6px;">
-                  <span>📞</span> +91 98765 43210
+                <a [href]="'tel:' + (footerSettings?.footer_phone || '+919876543210')" style="background: var(--bg-muted); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 11.5px; font-weight: 600; padding: 6px 12px; border-radius: 20px; text-decoration: none; display: flex; align-items: center; gap: 6px;">
+                  <span>📞</span> {{ footerSettings?.footer_phone || '+91 98765 43210' }}
                 </a>
               </div>
             </div>
           </form>
+
+          <!-- Dynamic Solo Developer Card -->
+          <div style="margin-top: 24px;" *ngIf="publicSettings?.developer_team?.length">
+            <div style="margin-bottom: 12px;">
+              <h4 style="font-family: var(--font-display); font-size: 15px; font-weight: 900; color: var(--text-primary); margin: 0 0 2px 0;">
+                👨‍💻 Creator & Solo Developer
+              </h4>
+              <p style="margin: 0; font-size: 11.5px; color: var(--text-muted);">The architect and engineer behind HostelHub.</p>
+            </div>
+
+            <div class="solo-dev-card" style="padding: 24px 18px; border-radius: 24px;">
+              <div style="position: relative; display: inline-block; margin-bottom: 12px;">
+                <div style="width: 72px; height: 72px; border-radius: 50%; border: 3px solid #2563eb; padding: 3px; margin: 0 auto; background: var(--bg-card); overflow: hidden;">
+                  <img [src]="getImageUrl(publicSettings.developer_team[0].pic || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80')" 
+                       style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" 
+                       [alt]="publicSettings.developer_team[0].name || 'Abhinav Kumar'" 
+                       (error)="onImgError($event)" />
+                </div>
+                <div class="online-pulse-dot" style="width: 12px; height: 12px; right: 2px; bottom: 2px;"></div>
+              </div>
+
+              <h4 style="margin: 0 0 4px 0; font-family: var(--font-display); font-size: 20px; font-weight: 900; color: var(--text-primary);">
+                {{ publicSettings.developer_team[0].name || 'Abhinav Kumar' }}
+              </h4>
+
+              <span style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #ffffff; font-size: 10.5px; font-weight: 900; padding: 4px 14px; border-radius: 20px; letter-spacing: 0.5px; display: inline-block; margin-bottom: 12px;">
+                🚀 {{ (publicSettings.developer_team[0].role || 'CREATOR & LEAD FULL-STACK DEVELOPER') | uppercase }}
+              </span>
+
+              <p style="margin: 0 0 16px 0; font-size: 12px; color: var(--text-secondary); line-height: 1.5; max-width: 440px; margin-left: auto; margin-right: auto;">
+                {{ publicSettings.developer_team[0].description || 'Sole Architect & Lead Developer of HostelHub.' }}
+              </p>
+
+              <div style="display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <a [href]="publicSettings.developer_team[0].github || 'https://github.com/abhinav8102-asd'" target="_blank" class="social-icon-btn-dev" title="GitHub">
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                </a>
+                <a [href]="publicSettings.developer_team[0].linkedin || 'https://linkedin.com'" target="_blank" class="social-icon-btn-dev" title="LinkedIn">
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.762-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                </a>
+                <a [href]="publicSettings.developer_team[0].email || 'mailto:support@hostelhub.com'" class="social-icon-btn-dev" title="Email">
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M0 3v18h24v-18h-24zm21.518 2l-9.518 6.013-9.518-6.013h19.036zm-19.518 14v-11.774l10 6.32 10-6.32v11.774h-20z"/></svg>
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
 
       </div>
 
-      <!-- Clean 3-Line Footer -->
-      <footer class="footer animate-fade" *ngIf="footerSettings">
-        <div class="footer-content">
-          <p class="footer-title">{{ footerSettings.footer_text }}</p>
-          <div class="footer-meta">
-            <span *ngIf="footerSettings.footer_email">📧 {{ footerSettings.footer_email }}</span>
-            <span *ngIf="footerSettings.footer_phone">📞 {{ footerSettings.footer_phone }}</span>
-          </div>
-          <p class="footer-copyright">{{ footerSettings.footer_copyright }}</p>
+      <!-- Single App Footer Glass Card -->
+      <footer class="app-footer-card animate-fade" style="margin: 24px 16px 24px 16px; padding: 22px 18px; border-radius: 24px;">
+        <h4 style="margin: 0 0 8px 0; font-family: var(--font-display); font-size: 15px; font-weight: 900; color: var(--text-primary); text-align: center;">
+          {{ footerSettings?.footer_text || 'Hostel Maintenance & Support Portal' }}
+        </h4>
+        <div style="display: flex; justify-content: center; align-items: center; gap: 14px; font-size: 12px; color: var(--text-muted); flex-wrap: wrap; margin-bottom: 10px;">
+          <span>📧 {{ footerSettings?.footer_email || 'support@hostelhub.com' }}</span>
+          <span>·</span>
+          <span>📞 {{ footerSettings?.footer_phone || '+91 98765 43210' }}</span>
         </div>
+        <p style="margin: 0; font-size: 11px; font-weight: 700; color: var(--text-muted); line-height: 1.5; text-align: center;">
+          Developed by HostelHub Engineering Team 💻 · {{ footerSettings?.footer_copyright || '© 2026 HostelHub. All rights reserved.' }}
+        </p>
       </footer>
     </div>
   `,
@@ -448,349 +569,114 @@ import { API_CONFIG } from '../../config/api.config';
       transform: translateY(-1px);
     }
 
-    /* Scrollable Layout */
-    .tab-content-area {
-      flex: 1;
-      padding: 16px;
-      padding-bottom: 80px;
-      overflow-y: auto;
-      background-color: var(--bg-body);
+    /* Floating Glass Navigation Dock */
+    .bottom-tabs {
+      background: var(--bg-glass);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 12px;
+      position: sticky;
+      top: 73px;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
     }
-    .page-title {
-      font-size: 18px;
+
+    .tab-item {
+      background: none;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 6px 16px;
+      border-radius: var(--radius-md);
+      transition: all var(--transition-normal);
+      position: relative;
+    }
+
+    .tab-item.active {
+      color: var(--primary);
+      background: var(--primary-light);
       font-weight: 700;
-      color: var(--neutral-900);
-      margin-bottom: 16px;
-      letter-spacing: -0.3px;
     }
 
-    /* Animations */
-    .animate-fade {
-      animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
+    .tab-icon {
+      font-size: 18px;
+      position: relative;
     }
 
-    /* Filter pills */
+    .tab-badge {
+      position: absolute;
+      top: -4px;
+      right: -8px;
+      background: var(--primary);
+      color: white;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 5px;
+      border-radius: 10px;
+      line-height: 1;
+    }
+
+    .tab-text {
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .tab-content-area {
+      padding: 20px 16px;
+      flex: 1;
+    }
+
     .filter-pills {
       display: flex;
       gap: 8px;
-      margin-bottom: 14px;
+      overflow-x: auto;
+      padding-bottom: 4px;
     }
+
     .pill-btn {
-      background-color: var(--white);
-      border: 1px solid var(--neutral-200);
-      padding: 6px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 700;
+      padding: 7px 14px;
       border-radius: 20px;
       cursor: pointer;
-      transition: var(--transition-fast);
-      color: var(--neutral-600);
+      white-space: nowrap;
+      transition: all var(--transition-normal);
     }
+
     .pill-btn.active {
-      background-color: var(--primary);
-      color: var(--white);
+      background: var(--primary);
+      color: white;
       border-color: var(--primary);
       box-shadow: var(--shadow-sm);
     }
 
-    /* Task Card list */
-    .task-card {
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      cursor: pointer;
-      overflow: hidden;
-      padding: 0;
-    }
-    .task-summary {
-      padding: 16px;
-    }
-    .task-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-    .task-room {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--neutral-500);
-    }
-    .task-title {
-      font-size: 14.5px;
-      font-weight: 700;
-      color: var(--neutral-900);
-      margin-bottom: 4px;
-    }
-    .task-category-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 11px;
-      background-color: var(--neutral-100);
-      padding: 2px 8px;
-      border-radius: 12px;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: var(--neutral-600);
-    }
-    .task-desc-short {
-      font-size: 12.5px;
-      color: var(--neutral-500);
-      line-height: 1.4;
-    }
-    .tap-hint {
-      font-size: 10px;
-      color: var(--primary);
-      font-weight: 700;
-      text-align: right;
-      margin-top: 8px;
-    }
-
-    /* Expanded Content area */
-    .task-details {
-      padding: 0 16px 16px 16px;
-      border-top: 1px solid var(--neutral-100);
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .task-desc-full {
-      font-size: 13px;
-      color: var(--neutral-700);
-      line-height: 1.45;
-      padding-top: 12px;
-    }
-
-    /* Student details */
-    .student-info-section {
-      background-color: var(--bg-muted);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      padding: 12px;
-    }
-    .info-label {
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--neutral-500);
-      text-transform: uppercase;
-      margin-bottom: 4px;
-    }
-    .student-name {
-      font-size: 13px;
-      color: var(--neutral-800);
-    }
-    .student-room {
-      font-size: 11.5px;
-      color: var(--neutral-500);
-      margin-bottom: 8px;
-    }
-    .btn-call-student {
-      background-color: var(--white);
-      border: 1.5px solid var(--primary);
-      color: var(--primary);
-      padding: 6px 12px;
-      font-size: 11.5px;
-      font-weight: 700;
-      border-radius: var(--radius-sm);
-      display: inline-flex;
-      width: auto;
-      text-decoration: none;
-      transition: var(--transition-fast);
-      box-shadow: var(--shadow-sm);
-    }
-    .btn-call-student:hover {
-      background-color: var(--primary);
-      color: var(--white);
-    }
-
-    /* Original Photo Attachment */
-    .section-label {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: var(--neutral-500);
-      margin-bottom: 4px;
-    }
-    .image-container {
-      position: relative;
-      border-radius: var(--radius-md);
-      overflow: hidden;
-      cursor: zoom-in;
-    }
-    .comp-img {
-      width: 100%;
-      max-height: 160px;
-      object-fit: cover;
-      display: block;
-      border: 1px solid var(--neutral-200);
-      border-radius: var(--radius-md);
-      transition: transform 0.25s ease;
-    }
-    .image-container:hover .comp-img {
-      transform: scale(1.02);
-    }
-    .image-overlay {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      background: rgba(15, 23, 42, 0.6);
-      color: var(--white);
-      text-align: center;
-      font-size: 10px;
-      font-weight: 700;
-      padding: 4px 0;
-      backdrop-filter: blur(2px);
-    }
-
-    /* Task Actions */
-    .task-actions {
-      margin-top: 4px;
-      border-top: 1.5px dashed var(--neutral-200);
-      padding-top: 12px;
-    }
-    .btn-start-job {
-      box-shadow: 0 4px 6px rgba(179, 16, 49, 0.15);
-    }
-    .btn-submit-resolved {
-      margin-top: 12px;
-      box-shadow: 0 4px 6px rgba(16, 185, 129, 0.15);
-    }
-
-    /* Resolution Proof Uploads styling */
-    .resolution-form {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .upload-area {
-      position: relative;
-      width: 100%;
-    }
-    .file-input { display: none; }
-    .file-input-label {
-      border: 1.5px dashed var(--neutral-400);
-      border-radius: var(--radius-md);
-      background-color: var(--neutral-100);
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: pointer;
-      transition: var(--transition-fast);
-    }
-    .upload-icon {
-      font-size: 24px;
-      margin-bottom: 2px;
-    }
-    .upload-text {
-      font-size: 12.5px;
-      font-weight: 700;
-      color: var(--neutral-700);
-    }
-
-    /* Preview area for resolution */
-    .preview-area {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px;
-      background: var(--white);
-      border: 1.5px solid var(--neutral-200);
-      border-radius: var(--radius-md);
-    }
-    .preview-thumbnail {
-      width: 60px;
-      height: 60px;
-      border-radius: var(--radius-sm);
-      object-fit: cover;
-      border: 1px solid var(--neutral-200);
-    }
-    .preview-info {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .preview-name {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--neutral-800);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 180px;
-    }
-    .btn-remove-file {
-      background: none;
-      border: none;
-      color: var(--danger);
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      text-align: left;
-      width: fit-content;
-      padding: 2px 0;
-    }
-
-    .btn-success {
-      background-color: var(--success);
-      color: var(--white);
-    }
-    .btn-success:active {
-      transform: scale(0.97);
-    }
-    .text-success {
-      font-size: 13.5px;
-      font-weight: 700;
-      color: var(--success);
-    }
-    .resolved-proof-section {
-      background-color: #f0fdf4;
-      border: 1px solid #bbf7d0;
-      border-radius: var(--radius-md);
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .btn-collapse {
-      margin-top: 4px;
-    }
-
-    .empty-state {
-      text-align: center;
-      color: var(--neutral-400);
-      padding: 40px 20px;
-      font-size: 14px;
-    }
-    .empty-icon {
-      font-size: 32px;
-      display: block;
-      margin-bottom: 8px;
-    }
-
-    /* Live Toast Notification */
+    /* Toast Alert Notification */
     .toast-alert {
       position: fixed;
-      top: 12px;
+      top: 20px;
       left: 50%;
       transform: translateX(-50%);
-      width: calc(100% - 32px);
-      max-width: 500px;
-      background-color: #0f172a;
-      color: var(--white);
-      border-radius: var(--radius-lg);
-      padding: 14px 18px;
-      box-shadow: var(--shadow-xl);
-      z-index: 2000;
-      animation: slideDown 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(37, 99, 235, 0.4);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      color: white;
+      padding: 12px 18px;
+      border-radius: 16px;
+      z-index: 9999;
+      backdrop-filter: blur(12px);
+      max-width: 90%;
       cursor: pointer;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .toast-content {
       display: flex;
@@ -798,23 +684,19 @@ import { API_CONFIG } from '../../config/api.config';
       gap: 12px;
     }
     .toast-bell {
-      font-size: 24px;
+      font-size: 22px;
     }
     .toast-text strong {
       font-size: 11px;
-      color: var(--primary-light);
+      color: #60a5fa;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
     .toast-text p {
       font-size: 12px;
       color: #e2e8f0;
-      margin-top: 2px;
+      margin: 2px 0 0 0;
       line-height: 1.35;
-    }
-    @keyframes slideDown {
-      from { transform: translateY(-30px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
     }
 
     /* Zoom Photo Modal styles */
@@ -863,11 +745,13 @@ import { API_CONFIG } from '../../config/api.config';
       from { opacity: 0; }
       to { opacity: 1; }
     }
+    @keyframes slideDown {
+      from { transform: translate(-50%, -30px); opacity: 0; }
+      to { transform: translate(-50%, 0); opacity: 1; }
+    }
 
-    /* Clickable Notices & Notifications Alert styles */
     .clickable-notice {
       cursor: pointer;
-      position: relative;
       transition: var(--transition-normal);
     }
     .clickable-notice:hover {
@@ -875,89 +759,9 @@ import { API_CONFIG } from '../../config/api.config';
       box-shadow: var(--shadow-md);
       border-color: var(--primary);
     }
-    .notice-tap-hint {
-      font-size: 10px;
-      color: var(--primary);
-      text-align: right;
-      margin-top: 8px;
-      font-weight: 600;
-    }
-    .notif-header-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-    .clear-notif-btn {
-      background: none;
-      border: none;
-      color: var(--primary);
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      padding: 4px 8px;
-      border-radius: 4px;
-      transition: var(--transition-fast);
-    }
-    .clear-notif-btn:hover {
-      background-color: var(--primary-light);
-    }
-    .notif-card {
-      border-left: 4px solid var(--neutral-400);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.01);
-      padding: 12px 16px;
-      margin-bottom: 12px;
-    }
     .notif-card.unread {
-      border-left-color: var(--primary);
+      border-left: 4px solid var(--primary);
       background-color: var(--primary-light);
-      box-shadow: 0 2px 6px rgba(179, 16, 49, 0.05);
-    }
-    .notif-meta {
-      display: flex;
-      justify-content: space-between;
-      font-size: 10px;
-      color: var(--neutral-400);
-      margin-bottom: 4px;
-      font-weight: 600;
-    }
-    .notif-badge-icon {
-      font-size: 14px;
-    }
-    /* Footer Styling */
-    .footer {
-      order: 4;
-      background-color: var(--bg-card);
-      border-top: 1px solid var(--border-color);
-      padding: 20px 20px 24px;
-      margin-top: auto;
-      text-align: center;
-      width: 100%;
-      box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
-    }
-    .footer-content {
-      max-width: 900px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .footer-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-    .footer-meta {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      font-size: 11.5px;
-      color: var(--text-muted);
-    }
-    .footer-copyright {
-      font-size: 10.5px;
-      color: var(--text-muted);
-      margin-top: 4px;
     }
   `]
 })
@@ -971,6 +775,7 @@ export class StaffDashboardComponent implements OnInit, OnDestroy {
   expandedTaskId: number | null = null;
   zoomPhotoUrl: string | null = null;
   activeTab = 'tasks';
+  isOnDuty = true;
   
   editUser = { name: '', phone: '', bio: '' };
   profilePreviewUrl: string | null = null;
@@ -979,8 +784,9 @@ export class StaffDashboardComponent implements OnInit, OnDestroy {
   profileError = '';
   profileSuccess = '';
   notifications: any[] = [];
-  footerSettings = {
-    footer_text: 'HostelHub Management System • Staff & Maintenance Portal',
+  publicSettings: any = null;
+  footerSettings: any = {
+    footer_text: 'HostelHub Management System • Staff Portal',
     footer_email: 'support@hostelhub.com',
     footer_phone: '+91 98765 43210',
     footer_copyright: '© 2026 HostelHub Inc. All rights reserved.'
@@ -994,6 +800,7 @@ export class StaffDashboardComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private complaintService: ComplaintService,
     private socketService: SocketService,
+    private http: HttpClient,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
@@ -1004,6 +811,8 @@ export class StaffDashboardComponent implements OnInit, OnDestroy {
     if (saved === 'true') { this.isDarkMode = true; document.body.classList.add('dark-mode'); }
     this.loadTasks();
     this.loadNotifications();
+    this.loadPublicSettings();
+    this.loadFooterSettings();
 
     this.notifSub = this.socketService.notification$.subscribe(notif => {
       if (notif) {
@@ -1013,6 +822,11 @@ export class StaffDashboardComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
         setTimeout(() => this.clearToast(), 3000);
       }
+    });
+
+    this.socketService.onEvent('settings_updated', () => {
+      this.loadPublicSettings();
+      this.loadFooterSettings();
     });
   }
 
@@ -1029,15 +843,34 @@ export class StaffDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  loadPublicSettings(): void {
+    this.http.get<any>(`${API_CONFIG.baseUrl}/api/settings/public`).subscribe({
+      next: (res) => { this.publicSettings = res; this.cdr.detectChanges(); },
+      error: (err) => console.error(err)
+    });
+  }
+
+  loadFooterSettings(): void {
+    this.http.get<any>(`${API_CONFIG.baseUrl}/api/settings/footer`).subscribe({
+      next: (res) => { if (res) { this.footerSettings = res; this.cdr.detectChanges(); } },
+      error: (err) => console.error(err)
+    });
+  }
+
+  toggleDutyStatus(): void {
+    this.isOnDuty = !this.isOnDuty;
+    this.showLocalToast(this.isOnDuty ? '🟢 You are now ON DUTY (Available for jobs)' : '🔴 You are now OFF DUTY (Assignments paused)');
+  }
+
   onFileChange(event: any, taskId: number): void {
     if (event.target.files.length > 0) {
       const file = event.target.files[0];
       this.selectedFiles[taskId] = file;
 
-      // Generate preview
       const reader = new FileReader();
       reader.onload = () => {
         this.imagePreviewUrls[taskId] = reader.result as string;
+        this.cdr.detectChanges();
       };
       reader.readAsDataURL(file);
     }
@@ -1094,19 +927,15 @@ export class StaffDashboardComponent implements OnInit, OnDestroy {
     return this.tasks.filter(t => t.status === 'resolved').length;
   }
 
+  getUnreadNotifCount(): number {
+    return this.notifications.filter(n => !n.isRead).length;
+  }
+
   getFilteredTasks(): any[] {
-    if (this.filterStatus === 'all') {
-      return this.tasks;
-    }
-    if (this.filterStatus === 'assigned') {
-      return this.tasks.filter(t => t.status === 'assigned');
-    }
-    if (this.filterStatus === 'in_progress') {
-      return this.tasks.filter(t => t.status === 'in_progress');
-    }
-    if (this.filterStatus === 'resolved') {
-      return this.tasks.filter(t => t.status === 'resolved');
-    }
+    if (this.filterStatus === 'all') return this.tasks;
+    if (this.filterStatus === 'assigned') return this.tasks.filter(t => t.status === 'assigned');
+    if (this.filterStatus === 'in_progress') return this.tasks.filter(t => t.status === 'in_progress');
+    if (this.filterStatus === 'resolved') return this.tasks.filter(t => t.status === 'resolved');
     return this.tasks;
   }
 
@@ -1130,8 +959,12 @@ export class StaffDashboardComponent implements OnInit, OnDestroy {
     this.zoomPhotoUrl = null;
   }
 
+  getStaffSpecialty(): string {
+    return (this.user as any)?.specialization || this.user?.role || 'Maintenance Specialist';
+  }
+
   getCategoryIcon(cat: string): string {
-    switch (cat) {
+    switch (cat?.toLowerCase()) {
       case 'electrical': return '⚡';
       case 'plumbing': return '🚰';
       case 'carpentry': return '🪚';
@@ -1233,6 +1066,7 @@ export class StaffDashboardComponent implements OnInit, OnDestroy {
       const reader = new FileReader();
       reader.onload = () => {
         this.profilePreviewUrl = reader.result as string;
+        this.cdr.detectChanges();
       };
       reader.readAsDataURL(file);
     }
@@ -1321,4 +1155,3 @@ export class StaffDashboardComponent implements OnInit, OnDestroy {
     }
   }
 }
-
