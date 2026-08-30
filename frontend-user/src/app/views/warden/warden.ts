@@ -227,7 +227,13 @@ import { API_CONFIG } from '../../config/api.config';
                 </div>
                 <div>
                   <h4 class="action-card-title">Mess Rating & Reviews</h4>
-                  <p class="action-card-sub" style="color: var(--text-muted);">{{ feedbackStats?.overallAvg || 'N/A' }} ★ Student mess fe          <!-- Section 2: OFFICIAL BROADCAST STREAM REEL -->
+                  <p class="action-card-sub" style="color: var(--text-muted);">{{ feedbackStats?.overallAvg || 'N/A' }} ★ Student mess feedback</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: OFFICIAL BROADCAST STREAM REEL -->
           <div style="margin-bottom: 24px;" *ngIf="announcements.length > 0">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 0 2px;">
               <div>
