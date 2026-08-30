@@ -1307,7 +1307,7 @@ import { API_CONFIG } from '../../config/api.config';
           </span>
           <span>Notices</span>
         </button>
-        <button type="button" class="tab-item" [class.active]="activeTab === 'raise'" (click)="switchTab('raise')">
+        <button type="button" class="tab-item tab-item-raise" [class.active]="activeTab === 'raise'" (click)="switchTab('raise')">
           <span class="tab-icon">➕</span>
           <span>Raise</span>
         </button>

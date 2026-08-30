@@ -215,7 +215,7 @@ body {
   z-index: 200;
 }
 
-/* ── TOP NAV (bottom-tabs class repositioned as top nav) ── */
+/* ── WORLD-CLASS GLASS FLOATING DOCK NAVIGATION (bottom-tabs) ── */
 .bottom-tabs {
   order: 2 !important;
   position: sticky !important;
@@ -223,22 +223,29 @@ body {
   bottom: auto !important;
   left: 0 !important;
   width: 100% !important;
-  height: 58px !important;
-  background-color: var(--bg-nav) !important;
+  min-height: 60px !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
   border-top: none !important;
-  border-bottom: 1px solid var(--border-color) !important;
+  border-bottom: 1.5px solid rgba(37, 99, 235, 0.15) !important;
   display: flex !important;
   align-items: center !important;
-  justify-content: flex-start !important;
+  justify-content: space-around !important;
   gap: 4px !important;
-  padding: 0 16px !important;
+  padding: 6px 10px !important;
   z-index: 100 !important;
-  box-shadow: var(--shadow-sm) !important;
-  backdrop-filter: blur(12px);
-  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.08) !important;
+  transition: all 0.3s ease !important;
   overflow-x: auto !important;
   white-space: nowrap !important;
   -webkit-overflow-scrolling: touch;
+}
+
+body.dark-mode .bottom-tabs {
+  background: rgba(15, 23, 42, 0.92) !important;
+  border-bottom-color: rgba(59, 130, 246, 0.25) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
 }
 
 .bottom-tabs::-webkit-scrollbar {
@@ -247,38 +254,88 @@ body {
 
 .tab-item {
   display: flex !important;
-  flex-direction: row !important;
+  flex-direction: column !important;
   align-items: center !important;
-  gap: 7px !important;
+  justify-content: center !important;
+  gap: 3px !important;
   color: var(--text-muted) !important;
   text-decoration: none;
-  font-size: 13px !important;
-  font-weight: 600 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
   cursor: pointer;
-  transition: all var(--transition-fast);
-  background: none !important;
-  border: none !important;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
   outline: none;
-  padding: 8px 16px !important;
-  border-radius: var(--radius-full) !important;
+  padding: 6px 8px !important;
+  border-radius: 14px !important;
   position: relative;
-  letter-spacing: 0.1px;
+  letter-spacing: 0.2px;
+  flex: 1;
+  min-width: 48px;
 }
 
 .tab-item:hover {
-  color: var(--primary) !important;
-  background-color: var(--primary-light) !important;
+  color: #2563eb !important;
+  background: rgba(37, 99, 235, 0.06) !important;
+}
+
+body.dark-mode .tab-item:hover {
+  color: #60a5fa !important;
+  background: rgba(59, 130, 246, 0.12) !important;
 }
 
 .tab-item.active {
-  color: var(--primary) !important;
-  background-color: var(--primary-light) !important;
-  font-weight: 700 !important;
+  color: #2563eb !important;
+  background: linear-gradient(135deg, rgba(239, 246, 255, 0.95) 0%, rgba(219, 234, 254, 0.7) 100%) !important;
+  border: 1px solid rgba(37, 99, 235, 0.25) !important;
+  font-weight: 900 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12) !important;
+}
+
+body.dark-mode .tab-item.active {
+  color: #60a5fa !important;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.9) 100%) !important;
+  border: 1px solid rgba(59, 130, 246, 0.35) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
 }
 
 .tab-icon {
-  font-size: 17px !important;
+  font-size: 18px !important;
   margin-bottom: 0 !important;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s ease;
+}
+
+.tab-item.active .tab-icon {
+  transform: scale(1.15);
+}
+
+/* Standout Floating Action Button (FAB) for Center Raise Ticket Tab */
+.tab-item-raise {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  color: #ffffff !important;
+  border-radius: 16px !important;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4) !important;
+  padding: 6px 10px !important;
+}
+
+.tab-item-raise span {
+  color: #ffffff !important;
+}
+
+.tab-item-raise.active {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%) !important;
+  box-shadow: 0 8px 22px rgba(37, 99, 235, 0.5) !important;
+  transform: translateY(-3px) scale(1.05) !important;
+}
+
+.tab-item-raise.active span {
+  color: #ffffff !important;
 }
 
 /* ── TAB CONTENT ── */
