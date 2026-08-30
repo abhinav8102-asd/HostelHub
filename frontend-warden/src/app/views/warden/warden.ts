@@ -37,25 +37,110 @@ import { AttendanceService } from '../../services/attendance.service';
         </div>
       </div>
 
-      <!-- Header -->
-      <div class="header">
-        <div class="user-info">
-          <div class="avatar-ring">
-            <span class="avatar" *ngIf="!user?.profilePicUrl">👨‍💼</span>
-            <img *ngIf="user?.profilePicUrl" [src]="'https://hostelhub-0cyi.onrender.com' + user.profilePicUrl" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
+      <!-- FUTURISTIC SIDEBAR GLASS DRAWER OVERLAY -->
+      <div class="sidebar-backdrop" *ngIf="isSidebarOpen" (click)="closeSidebar()">
+        <div class="sidebar-drawer" (click)="$event.stopPropagation()">
+          <div class="sidebar-header">
+            <div class="sidebar-user-info">
+              <div class="sidebar-avatar-ring">
+                <span class="avatar" *ngIf="!user?.profilePicUrl" style="font-size: 24px;">👨‍💼</span>
+                <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" (error)="onAvatarError($event)" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
+              </div>
+              <div>
+                <h4 class="sidebar-user-name">{{ user?.name || 'Warden' }}</h4>
+                <span class="sidebar-user-role">🛡️ Official Warden</span>
+                <span class="sidebar-user-block">🏢 {{ user?.hostelBlock || 'All Blocks' }}</span>
+              </div>
+            </div>
+            <button type="button" class="sidebar-close-btn" (click)="closeSidebar()">✕</button>
           </div>
-          <div>
-            <h3>Warden Portal</h3>
-            <p class="user-meta">Managing {{ user?.hostelBlock || 'All Blocks' }}</p>
+
+          <!-- Navigation Links List -->
+          <div class="sidebar-nav-menu">
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'home'" (click)="switchTab('home'); closeSidebar()">
+              <div class="sidebar-nav-icon-wrapper">🏠</div>
+              <span>Home Command</span>
+              <span class="sidebar-arrow">›</span>
+            </button>
+
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'complaints'" (click)="switchTab('complaints'); closeSidebar()">
+              <div class="sidebar-nav-icon-wrapper">📋</div>
+              <span>Complaints & Tickets</span>
+              <span class="sidebar-badge" *ngIf="getPendingCount() > 0">{{ getPendingCount() }}</span>
+              <span class="sidebar-arrow" *ngIf="getPendingCount() === 0">›</span>
+            </button>
+
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'announcements'" (click)="switchTab('announcements'); closeSidebar()">
+              <div class="sidebar-nav-icon-wrapper">📢</div>
+              <span>Official Broadcasts</span>
+              <span class="sidebar-arrow">›</span>
+            </button>
+
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'mess'" (click)="switchTab('mess'); closeSidebar()">
+              <div class="sidebar-nav-icon-wrapper">🍽️</div>
+              <span>Mess & Meal Management</span>
+              <span class="sidebar-arrow">›</span>
+            </button>
+
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'users'" (click)="switchTab('users'); closeSidebar()">
+              <div class="sidebar-nav-icon-wrapper">👥</div>
+              <span>Hostel Students</span>
+              <span class="sidebar-arrow">›</span>
+            </button>
+
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'approvals'" (click)="switchTab('approvals'); closeSidebar()">
+              <div class="sidebar-nav-icon-wrapper">⚡</div>
+              <span>Staff & Approvals</span>
+              <span class="sidebar-arrow">›</span>
+            </button>
+
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'profile'" (click)="switchTab('profile'); closeSidebar()">
+              <div class="sidebar-nav-icon-wrapper">👤</div>
+              <span>My Profile</span>
+              <span class="sidebar-arrow">›</span>
+            </button>
+          </div>
+
+          <!-- Sidebar Footer Logout Button -->
+          <div class="sidebar-footer-box">
+            <button type="button" class="sidebar-logout-btn" (click)="logout()">
+              <span>🚪 Logout Account</span>
+            </button>
           </div>
         </div>
-        <div class="header-actions">
-          <button class="theme-toggle-btn" (click)="toggleDarkMode()" [title]="isDarkMode ? 'Light Mode' : 'Dark Mode'">
-            {{ isDarkMode ? '☀️' : '🌙' }}
+      </div>
+
+      <!-- CYBER COMMAND TOP HEADER BAR -->
+      <div class="cyber-top-bar">
+        <!-- Left Group: Hamburger + Avatar + Warden Info -->
+        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+          <button type="button" (click)="toggleSidebar()" title="Open Navigation Menu" class="hamburger-btn">
+            <span>☰</span>
           </button>
-          <button class="logout-btn" (click)="logout()">
-            <span>Logout</span>
-            <span>🚪</span>
+
+          <div (click)="switchTab('profile')" style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex: 1; min-width: 0;">
+            <div style="position: relative; width: 40px; height: 40px; flex-shrink: 0;">
+              <div style="width: 100%; height: 100%; border-radius: 50%; border: 2.5px solid #2563eb; padding: 2px; display: flex; align-items: center; justify-content: center; background: var(--bg-card); box-shadow: 0 0 14px rgba(37, 99, 235, 0.25);">
+                <span class="avatar" *ngIf="!user?.profilePicUrl" style="font-size: 18px;">👨‍💼</span>
+                <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" (error)="onAvatarError($event)" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
+              </div>
+              <div class="online-pulse-dot"></div>
+            </div>
+            <div style="flex: 1; min-width: 0; overflow: hidden;">
+              <h4 style="margin: 0; font-family: var(--font-display); font-size: 15px; font-weight: 900; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;">
+                {{ user?.name || 'Warden' }}
+              </h4>
+              <p style="margin: 2px 0 0 0; font-size: 11px; font-weight: 800; color: #2563eb; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;">
+                🏢 {{ user?.hostelBlock || 'All Blocks' }} Warden
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Group: Theme Toggle -->
+        <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+          <button (click)="toggleDarkMode()" [title]="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'" style="width: 38px; height: 38px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--text-primary); flex-shrink: 0;">
+            {{ isDarkMode ? '☀️' : '🌙' }}
           </button>
         </div>
       </div>
@@ -66,116 +151,231 @@ import { AttendanceService } from '../../services/attendance.service';
         <!-- TAB 0: HOME DASHBOARD -->
         <div *ngIf="activeTab === 'home'" class="tab-panel animate-fade">
           
-          <!-- Animated Hero Welcome Card with Floating Elements & Shimmer -->
-          <div class="warden-hero-card">
-            <div class="hero-bg-glow"></div>
-            <div class="hero-content">
-              <span class="hero-badge animate-pulse-glow">⚡ Warden Command Center</span>
-              <h2 class="hero-title">Welcome back, <span class="typing-text">{{ user?.name || 'Warden' }}</span> 👋</h2>
-              <p class="hero-subtitle">Managing <strong>{{ user?.hostelBlock || 'All Hostel Blocks' }}</strong> · Real-time operational overview</p>
-              
-              <div class="hero-quick-actions">
-                <button class="hero-btn primary-glow" (click)="activeTab = 'announcements'">
-                  <span>📢 Post Notice</span>
-                </button>
-                <button class="hero-btn glass-btn" (click)="activeTab = 'complaints'; filterStatus = 'pending'">
-                  <span>🔔 New Complaints ({{ getPendingCount() }})</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Moving Live Marquee Ticker -->
-          <div class="live-marquee-container" *ngIf="announcements.length > 0">
-            <div class="marquee-tag">📢 LIVE NOTICE</div>
-            <div class="marquee-track">
-              <div class="marquee-content">
-                <span>{{ announcements[0]?.title }}: "{{ announcements[0]?.content | slice:0:90 }}"</span>
-                <span class="marquee-dot">•</span>
-                <span>Tap "Notices" tab to view all announcements & attachments</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- 2x2 Animated Grid Stats Cards with Floating Animation -->
-          <div class="dashboard-grid-2x2">
-            <div class="grid-card float-card-1" (click)="activeTab = 'complaints'; filterStatus = 'pending'">
-              <div class="card-icon-wrapper red-glow">🔍</div>
-              <div class="card-info">
-                <h3 class="card-value counter-anim">{{ getPendingCount() }}</h3>
-                <p class="card-label">Pending Approvals</p>
-              </div>
-              <div class="card-arrow">→</div>
+          <!-- Section 1: WORLD-CLASS 3D ANIMATED LAUNCHPAD GRID -->
+          <div style="margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <h3 style="font-family: var(--font-display); font-size: 16px; font-weight: 900; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 8px;">
+                <span>🚀 Warden Launchpad</span>
+              </h3>
+              <span style="font-size: 11px; font-weight: 800; color: #2563eb; background: rgba(37, 99, 235, 0.08); padding: 4px 10px; border-radius: 20px;">
+                1-Tap Command
+              </span>
             </div>
 
-            <div class="grid-card float-card-2" (click)="activeTab = 'complaints'; filterStatus = 'all'">
-              <div class="card-icon-wrapper orange-glow">📋</div>
-              <div class="card-info">
-                <h3 class="card-value counter-anim">{{ complaints.length }}</h3>
-                <p class="card-label">Total Tickets</p>
-              </div>
-              <div class="card-arrow">→</div>
-            </div>
-
-            <div class="grid-card float-card-3" (click)="activeTab = 'announcements'">
-              <div class="card-icon-wrapper purple-glow">📣</div>
-              <div class="card-info">
-                <h3 class="card-value counter-anim">{{ announcements.length }}</h3>
-                <p class="card-label">Active Notices</p>
-              </div>
-              <div class="card-arrow">→</div>
-            </div>
-
-            <div class="grid-card float-card-4" (click)="activeTab = 'mess'">
-              <div class="card-icon-wrapper green-glow">🍽️</div>
-              <div class="card-info">
-                <h3 class="card-value counter-anim">Live</h3>
-                <p class="card-label">Mess Skip Stats</p>
-              </div>
-              <div class="card-arrow">→</div>
-            </div>
-          </div>
-
-          <!-- Quick Action Section Banner -->
-          <div class="quick-announcement-banner">
-            <div class="banner-text">
-              <h4>📢 Quick Announcement</h4>
-              <p>Announce water cut, mess scheduling changes, or urgent notices instantly to students.</p>
-            </div>
-            <button class="btn-post-quick" (click)="activeTab = 'announcements'">
-              <span>+ Write Notice</span>
-            </button>
-          </div>
-
-          <!-- Live Resolution Analytics Preview -->
-          <div class="home-analytics-preview">
-            <div class="preview-header">
-              <h5>📊 Resolution Overview</h5>
-              <button class="link-btn" (click)="activeTab = 'analytics'">Full Analytics →</button>
-            </div>
-            <div class="analytics-mini-bars">
-              <div class="mini-bar-item">
-                <div class="bar-top">
-                  <span>Pending</span>
-                  <strong>{{ getPendingCount() }}</strong>
+            <div class="action-grid-3d">
+              <!-- Tile 1: Pending Approvals -->
+              <div class="action-tile-3d tile-blue" (click)="switchTab('approvals')">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #ffffff;">
+                    🔍
+                  </div>
+                  <span style="background: rgba(37, 99, 235, 0.12); color: #2563eb; font-size: 10px; font-weight: 900; padding: 4px 8px; border-radius: 12px; text-transform: uppercase;">
+                    APPROVALS
+                  </span>
                 </div>
-                <div class="bar-track"><div class="bar-fill red" [style.width.%]="complaints.length ? (getPendingCount() / complaints.length * 100) : 0"></div></div>
-              </div>
-              <div class="mini-bar-item">
-                <div class="bar-top">
-                  <span>In Progress</span>
-                  <strong>{{ getAssignedCount() }}</strong>
+                <div>
+                  <h4 class="action-card-title">{{ getPendingCount() }} Pending</h4>
+                  <p class="action-card-sub" style="color: var(--text-muted);">Registration & Staff requests</p>
                 </div>
-                <div class="bar-track"><div class="bar-fill orange" [style.width.%]="complaints.length ? (getAssignedCount() / complaints.length * 100) : 0"></div></div>
               </div>
-              <div class="mini-bar-item">
-                <div class="bar-top">
-                  <span>Resolved</span>
-                  <strong>{{ getResolvedCount() }}</strong>
+
+              <!-- Tile 2: Total Complaint Tickets -->
+              <div class="action-tile-3d tile-amber" (click)="switchTab('complaints')">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #ffffff;">
+                    📋
+                  </div>
+                  <span style="background: rgba(245, 158, 11, 0.15); color: #d97706; font-size: 10px; font-weight: 900; padding: 4px 8px; border-radius: 12px; text-transform: uppercase;">
+                    TICKETS
+                  </span>
                 </div>
-                <div class="bar-track"><div class="bar-fill green" [style.width.%]="complaints.length ? (getResolvedCount() / complaints.length * 100) : 0"></div></div>
+                <div>
+                  <h4 class="action-card-title">{{ complaints.length }} Tickets</h4>
+                  <p class="action-card-sub" style="color: var(--text-muted);">Active hostel maintenance</p>
+                </div>
+              </div>
+
+              <!-- Tile 3: Post Notice -->
+              <div class="action-tile-3d tile-purple" (click)="switchTab('announcements')">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: #ffffff;">
+                    📢
+                  </div>
+                  <span style="background: rgba(139, 92, 246, 0.15); color: #7c3aed; font-size: 10px; font-weight: 900; padding: 4px 8px; border-radius: 12px; text-transform: uppercase;">
+                    BROADCAST
+                  </span>
+                </div>
+                <div>
+                  <h4 class="action-card-title">Post Broadcast</h4>
+                  <p class="action-card-sub" style="color: var(--text-muted);">{{ announcements.length }} active notices sent</p>
+                </div>
+              </div>
+
+              <!-- Tile 4: Mess & Meal Management -->
+              <div class="action-tile-3d tile-green" (click)="switchTab('mess')">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff;">
+                    🍽️
+                  </div>
+                  <span style="background: rgba(16, 185, 129, 0.15); color: #059669; font-size: 10px; font-weight: 900; padding: 4px 8px; border-radius: 12px; text-transform: uppercase;">
+                    MESS LIVE
+                  </span>
+                </div>
+                <div>
+                  <h4 class="action-card-title">Mess Skip Stats</h4>
+                  <p class="action-card-sub" style="color: var(--text-muted);">Live meal waste analytics</p>
+                </div>
               </div>
             </div>
+          </div>
+
+          <!-- Section 2: OFFICIAL BROADCAST STREAM REEL -->
+          <div style="margin-bottom: 24px;" *ngIf="announcements.length > 0">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 2px;">
+              <h3 style="font-family: var(--font-display); font-size: 16px; font-weight: 900; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 8px;">
+                <span>📢 Official Notice Reel</span>
+              </h3>
+              <button (click)="switchTab('announcements')" style="background: transparent; border: none; color: #2563eb; font-size: 12px; font-weight: 800; cursor: pointer;">
+                View All ({{ announcements.length }}) →
+              </button>
+            </div>
+
+            <div class="notice-reel-wrapper">
+              <div class="notice-reel-track">
+                <div class="notice-reel-card" *ngFor="let notice of announcements" (click)="switchTab('announcements')">
+                  <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                      <span style="background: rgba(37, 99, 235, 0.1); color: #2563eb; font-size: 10px; font-weight: 900; padding: 3px 8px; border-radius: 8px;">
+                        🌐 {{ notice.hostelBlock || 'ALL HOSTELS' }}
+                      </span>
+                      <span style="font-size: 10.5px; font-weight: 700; color: var(--text-muted);">
+                        📅 {{ notice.createdAt | date:'d MMM' }}
+                      </span>
+                    </div>
+                    <h4 style="margin: 0 0 6px 0; font-family: var(--font-display); font-size: 14.5px; font-weight: 800; color: var(--text-primary); line-height: 1.3;">
+                      {{ notice.title }}
+                    </h4>
+                    <p style="margin: 0; font-size: 12px; color: var(--text-secondary); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                      {{ notice.content }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: WARDEN COMMAND OVERVIEW & SYSTEM PIPELINE GLASS CARD -->
+          <div class="overview-glass-card" style="margin-bottom: 24px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+              <span style="background: rgba(37, 99, 235, 0.12); color: #2563eb; font-size: 11px; font-weight: 900; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.4px;">
+                ⚡ Warden Command System
+              </span>
+              <span style="font-size: 11px; font-weight: 800; color: var(--text-muted);">v2.4 Live Pipeline</span>
+            </div>
+
+            <h3 style="font-family: var(--font-display); font-size: 18px; font-weight: 900; color: var(--text-primary); margin: 0 0 10px 0; line-height: 1.3;">
+              Automated Hostel Management & Maintenance Engine 🏢
+            </h3>
+            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin: 0 0 18px 0;">
+              HostelHub empowers wardens to manage student complaints, dispatch electricians & plumbers, publish official hostel broadcasts, and track daily mess meal skip analytics seamlessly.
+            </p>
+
+            <!-- 4-Step Resolution Pipeline Grid -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px;">
+              <div class="overview-step-pill">
+                <div style="width: 32px; height: 32px; border-radius: 10px; background: rgba(37, 99, 235, 0.12); color: #2563eb; font-weight: 900; font-size: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  01
+                </div>
+                <div>
+                  <h5 style="margin: 0; font-size: 12.5px; font-weight: 800; color: var(--text-primary);">Receive Ticket</h5>
+                  <p style="margin: 2px 0 0 0; font-size: 10.5px; color: var(--text-muted);">Real-time student alerts</p>
+                </div>
+              </div>
+
+              <div class="overview-step-pill">
+                <div style="width: 32px; height: 32px; border-radius: 10px; background: rgba(16, 185, 129, 0.12); color: #10b981; font-weight: 900; font-size: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  02
+                </div>
+                <div>
+                  <h5 style="margin: 0; font-size: 12.5px; font-weight: 800; color: var(--text-primary);">Staff Dispatch</h5>
+                  <p style="margin: 2px 0 0 0; font-size: 10.5px; color: var(--text-muted);">Assign plumber/electrician</p>
+                </div>
+              </div>
+
+              <div class="overview-step-pill">
+                <div style="width: 32px; height: 32px; border-radius: 10px; background: rgba(245, 158, 11, 0.12); color: #d97706; font-weight: 900; font-size: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  03
+                </div>
+                <div>
+                  <h5 style="margin: 0; font-size: 12.5px; font-weight: 800; color: var(--text-primary);">Track Repair</h5>
+                  <p style="margin: 2px 0 0 0; font-size: 10.5px; color: var(--text-muted);">Live work progress</p>
+                </div>
+              </div>
+
+              <div class="overview-step-pill">
+                <div style="width: 32px; height: 32px; border-radius: 10px; background: rgba(139, 92, 246, 0.12); color: #7c3aed; font-weight: 900; font-size: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  04
+                </div>
+                <div>
+                  <h5 style="margin: 0; font-size: 12.5px; font-weight: 800; color: var(--text-primary);">Broadcast & Approve</h5>
+                  <p style="margin: 2px 0 0 0; font-size: 10.5px; color: var(--text-muted);">Official student notices</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Feature Tags Pill Row -->
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+              <span class="overview-feature-pill">🛡️ Role Isolation</span>
+              <span class="overview-feature-pill">⚡ Instant Socket Alerts</span>
+              <span class="overview-feature-pill">📊 Mess Analytics</span>
+              <span class="overview-feature-pill">📱 Mobile APK Native</span>
+            </div>
+          </div>
+
+          <!-- Section 4: SOLO CREATOR & ARCHITECT SPOTLIGHT CARD -->
+          <div class="solo-dev-card" style="margin-bottom: 24px;">
+            <div style="position: relative; display: inline-block; margin-bottom: 12px;">
+              <div style="width: 68px; height: 68px; border-radius: 50%; border: 3px solid #2563eb; padding: 3px; margin: 0 auto; background: var(--bg-card); box-shadow: 0 0 20px rgba(37, 99, 235, 0.3);">
+                <div style="width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); color: white; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 900;">
+                  👨‍💻
+                </div>
+              </div>
+              <span style="position: absolute; bottom: 0; right: -4px; background: #10b981; color: white; font-size: 9px; font-weight: 900; padding: 2px 6px; border-radius: 10px; border: 1.5px solid var(--bg-card);">
+                SOLO ARCHITECT
+              </span>
+            </div>
+
+            <h3 style="margin: 0; font-family: var(--font-display); font-size: 19px; font-weight: 900; color: var(--text-primary);">
+              Abhinav Kumar
+            </h3>
+            <p style="margin: 3px 0 12px 0; font-size: 12.5px; font-weight: 800; color: #2563eb;">
+              Full-Stack Developer & Software Architect 🚀
+            </p>
+            <p style="margin: 0 0 16px 0; font-size: 12px; color: var(--text-secondary); line-height: 1.5; max-width: 480px; margin-left: auto; margin-right: auto;">
+              Designed and built the entire HostelHub ecosystem single-handedly — from Angular frontends, Node.js REST APIs, Socket.IO live notifications, PostgreSQL databases, to native Capacitor Android Mobile builds.
+            </p>
+
+            <div style="display: flex; justify-content: center; align-items: center; gap: 10px;">
+              <a href="https://github.com/abhinav8102-asd" target="_blank" class="social-icon-btn-dev" title="GitHub Repository">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+              </a>
+              <a href="mailto:abhinavkumar.dev@gmail.com" class="social-icon-btn-dev" title="Send Email">
+                ✉️
+              </a>
+            </div>
+          </div>
+
+          <!-- Section 5: APP FOOTER GLASS CARD -->
+          <div class="app-footer-card">
+            <h4 style="margin: 0 0 6px 0; font-family: var(--font-display); font-size: 14px; font-weight: 800; color: var(--text-primary);">
+              Hostel Maintenance & Administration Portal
+            </h4>
+            <p style="margin: 0 0 10px 0; font-size: 12px; color: var(--text-secondary);">
+              📩 support&#64;hostelhub.com · 📞 +91 98765 43210
+            </p>
+            <p style="margin: 0; font-size: 11px; font-weight: 700; color: var(--text-muted);">
+              Developed by HostelHub Engineering Team 🏢 · © 2026 HostelHub. All rights reserved.
+            </p>
           </div>
 
         </div>
@@ -911,103 +1111,40 @@ import { AttendanceService } from '../../services/attendance.service';
 
       </div>
 
-      <!-- Bottom Nav -->
+      <!-- Bottom Navigation Dock (displayed as floating glass top-nav by global CSS) -->
       <div class="bottom-tabs">
-        <button class="tab-item" [class.active]="activeTab === 'home'" (click)="activeTab = 'home'">
+        <button type="button" class="tab-item" [class.active]="activeTab === 'home'" (click)="switchTab('home')">
           <span class="tab-icon">🏠</span>
           <span>Home</span>
         </button>
-        <button class="tab-item" [class.active]="activeTab === 'complaints'" (click)="activeTab = 'complaints'">
-          <span class="tab-icon">📋</span>
-          <span>Complaints</span>
+        <button type="button" class="tab-item" [class.active]="activeTab === 'complaints'" (click)="switchTab('complaints')">
+          <span class="tab-icon">
+            📋
+            <span class="tab-badge animate-scale" *ngIf="getPendingCount() > 0">{{ getPendingCount() }}</span>
+          </span>
+          <span>Tickets</span>
         </button>
-        <button class="tab-item" [class.active]="activeTab === 'announcements'" (click)="onAnnouncementsTab()">
+        <button type="button" class="tab-item" [class.active]="activeTab === 'announcements'" (click)="onAnnouncementsTab()">
           <span class="tab-icon">📢</span>
           <span>Notices</span>
         </button>
-        <button class="tab-item" [class.active]="activeTab === 'mess'" (click)="activeTab = 'mess'; loadMessData()">
-          <span class="tab-icon">🍴</span>
+        <button type="button" class="tab-item" [class.active]="activeTab === 'mess'" (click)="switchTab('mess'); loadMessData()">
+          <span class="tab-icon">🍽️</span>
           <span>Mess</span>
         </button>
-        <button class="tab-item" [class.active]="activeTab === 'attendance'" (click)="activeTab = 'attendance'; loadDailyRollCall()">
-          <span class="tab-icon">📅</span>
-          <span>Attendance</span>
+        <button type="button" class="tab-item" [class.active]="activeTab === 'users'" (click)="switchTab('users')">
+          <span class="tab-icon">👥</span>
+          <span>Students</span>
         </button>
-
-        <button class="tab-item" [class.active]="activeTab === 'analytics'" (click)="activeTab = 'analytics'">
-          <span class="tab-icon">📊</span>
-          <span>Analytics</span>
+        <button type="button" class="tab-item" [class.active]="activeTab === 'approvals'" (click)="switchTab('approvals')">
+          <span class="tab-icon">⚡</span>
+          <span>Approvals</span>
         </button>
-        <button class="tab-item" [class.active]="activeTab === 'my-profile'" (click)="activeTab = 'my-profile'; initProfileEdit()">
+        <button type="button" class="tab-item" [class.active]="activeTab === 'profile'" (click)="switchTab('profile'); initProfileEdit()">
           <span class="tab-icon">👤</span>
           <span>Profile</span>
         </button>
       </div><!-- /bottom-tabs -->
-
-
-      <!-- Enhanced Rich Footer -->
-      <footer class="footer animate-fade">
-        <div class="footer-container">
-          <!-- Top Section: Brand & Tagline -->
-          <div class="footer-brand-section">
-            <div class="footer-brand-logo">
-              <span class="brand-icon">🏰</span>
-              <span class="brand-name">HostelHub</span>
-              <span class="brand-badge">PRO v2.4</span>
-            </div>
-            <p class="footer-tagline">
-              {{ footerSettings?.footer_text || 'Smart Hostel Administration & Resident Maintenance Ecosystem' }}
-            </p>
-          </div>
-
-          <!-- Quick Navigation Link Pills -->
-          <div class="footer-quick-nav">
-            <span class="nav-pill" (click)="activeTab = 'home'">🏠 Home</span>
-            <span class="nav-pill" (click)="activeTab = 'complaints'">📋 Tickets</span>
-            <span class="nav-pill" (click)="activeTab = 'announcements'">📢 Notices</span>
-            <span class="nav-pill" (click)="activeTab = 'mess'">🍴 Mess Admin</span>
-            <span class="nav-pill" (click)="activeTab = 'attendance'">📅 Roll Call</span>
-
-            <span class="nav-pill" (click)="activeTab = 'analytics'">📊 Analytics</span>
-          </div>
-
-          <!-- Middle Section: Contact & Emergency Info Cards -->
-          <div class="footer-info-cards">
-            <div class="footer-card">
-              <span class="f-card-icon">📧</span>
-              <div>
-                <span class="f-card-label">Support Email</span>
-                <span class="f-card-val">{{ footerSettings?.footer_email || 'support@hostelhub.com' }}</span>
-              </div>
-            </div>
-            <div class="footer-card">
-              <span class="f-card-icon">📞</span>
-              <div>
-                <span class="f-card-label">Warden Helpline</span>
-                <span class="f-card-val">{{ footerSettings?.footer_phone || '+91 98765 43210' }}</span>
-              </div>
-            </div>
-            <div class="footer-card emergency-card">
-              <span class="f-card-icon">🚨</span>
-              <div>
-                <span class="f-card-label">24/7 Security Guard Desk</span>
-                <span class="f-card-val">+91 91234 56789</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Bottom Section: System Meta & Copyright -->
-          <div class="footer-bottom">
-            <div class="system-status">
-              <span class="status-dot"></span>
-              <span>HostelHub Cloud Server Online</span>
-            </div>
-            <p class="footer-copyright">
-              {{ footerSettings?.footer_copyright || '© 2026 HostelHub Management. All rights reserved.' }} · Encrypted & Secure Portal 🔒
-            </p>
-          </div>
-        </div>
-      </footer>
     </div><!-- /dashboard-container -->
 
   `,
@@ -2265,6 +2402,28 @@ import { AttendanceService } from '../../services/attendance.service';
 export class WardenDashboardComponent implements OnInit, OnDestroy {
   user: User | null = null;
   activeTab: string = 'home';
+  isSidebarOpen = false;
+
+  toggleSidebar(): void {
+    this.isSidebarOpen = !this.isSidebarOpen;
+    this.cdr.detectChanges();
+  }
+
+  closeSidebar(): void {
+    this.isSidebarOpen = false;
+    this.cdr.detectChanges();
+  }
+
+  switchTab(tab: string): void {
+    this.activeTab = tab;
+    this.cdr.detectChanges();
+  }
+
+  onAvatarError(event: any): void {
+    if (event && event.target) {
+      event.target.style.display = 'none';
+    }
+  }
   
   editUser = { name: '', phone: '', bio: '' };
   profilePreviewUrl: string | null = null;
