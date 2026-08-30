@@ -426,11 +426,6 @@ import { AttendanceService } from '../../services/attendance.service';
             </p>
           </div>
 
-        </div>ar(--text-muted);">
-              Developed by HostelHub Engineering Team 🏢 · © 2026 HostelHub. All rights reserved.
-            </p>
-          </div>
-
         </div>
 
         <!-- TAB 1: COMPLAINTS LIST -->
