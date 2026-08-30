@@ -268,11 +268,10 @@ import { API_CONFIG } from '../../config/api.config';
             <div class="skeleton skeleton-card"></div>
           </div>
 
-          <!-- Auto-Scrolling Side-by-Side Notice Reel Track -->
+          <!-- Side-by-Side Notice Reel Track (Clean Touch Swipe - No Auto Animation) -->
           <div *ngIf="!isLoadingAnnouncements && announcements.length > 0" class="notice-reel-wrapper">
             <div class="notice-reel-track">
-              <!-- Render notices list duplicated for seamless looping animation -->
-              <div *ngFor="let notice of announcements.concat(announcements)" class="notice-reel-card" (click)="openNoticeModal(notice)">
+              <div *ngFor="let notice of announcements" class="notice-reel-card" (click)="openNoticeModal(notice)">
                 <div>
                   <div class="notice-card-header">
                     <span class="notice-tag">
@@ -2060,7 +2059,7 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private messService: MessService,
     private attendanceService: AttendanceService
-  ) {}
+  ) { }
 
   switchTab(tab: string): void {
     this.activeTab = tab;
@@ -2086,7 +2085,7 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     }
     try {
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    } catch (e) {}
+    } catch (e) { }
     this.cdr.detectChanges();
   }
 
@@ -2531,7 +2530,7 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     if (!u) return;
 
     // Critical fields check: ONLY Gender or Academic Batch require Warden re-approval
-    const isCriticalChanged = 
+    const isCriticalChanged =
       (this.editUser.gender && this.editUser.gender !== u.gender) ||
       (this.editUser.batch && this.editUser.batch !== u.batch);
 
@@ -2876,7 +2875,7 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     this.messSuccess = '';
     this.messError = '';
     const date = this.getTodayDateString();
-    
+
     const formData = new FormData();
     formData.append('mealType', this.selectedMessMeal);
     formData.append('date', date);
