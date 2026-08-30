@@ -2131,3 +2131,22 @@ body.dark-mode .contact-btn-warden {
   border-color: rgba(59, 130, 246, 0.3) !important;
   color: #60a5fa !important;
 }
+
+/* ── APP FOOTER CARD GLASS ── */
+.app-footer-card {
+  margin-top: 28px;
+  margin-bottom: 12px;
+  padding: 18px 20px;
+  border-radius: 22px;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(239, 246, 255, 0.95) 0%, rgba(219, 234, 254, 0.7) 100%);
+  border: 1.5px solid rgba(37, 99, 235, 0.25);
+  box-shadow: 0 8px 24px -4px rgba(37, 99, 235, 0.1);
+  backdrop-filter: blur(16px);
+}
+
+body.dark-mode .app-footer-card {
+  background: linear-gradient(135deg, rgba(21, 29, 48, 0.95) 0%, rgba(15, 23, 42, 0.9) 100%);
+  border: 1.5px solid rgba(59, 130, 246, 0.3);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.4);
+}

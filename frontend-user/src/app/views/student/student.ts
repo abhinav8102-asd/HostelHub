@@ -492,6 +492,20 @@ import { API_CONFIG } from '../../config/api.config';
 
           </div>
 
+          <!-- 5. Sleek Redesigned Royal Blue Footer Card (Dark & Light Mode Ready) -->
+          <footer class="app-footer-card animate-fade">
+            <h6 style="margin: 0 0 6px 0; font-family: var(--font-display); font-size: 13.5px; font-weight: 900; color: var(--text-primary);">
+              {{ footerSettings?.footer_text || 'HostelHub — Hostel Maintenance & Support Portal' }}
+            </h6>
+            <div style="display: flex; justify-content: center; align-items: center; gap: 12px; font-size: 11.5px; font-weight: 700; color: var(--text-secondary); flex-wrap: wrap;">
+              <span>📧 {{ footerSettings?.footer_email || 'support@hostelhub.com' }}</span>
+              <span>·</span>
+              <span>📞 {{ footerSettings?.footer_phone || '+91 98765 43210' }}</span>
+            </div>
+            <div style="margin-top: 8px; font-size: 11px; font-weight: 600; color: var(--text-muted);">
+              Developed by <strong>HostelHub Engineering Team 💻</strong> · {{ footerSettings?.footer_copyright || '© 2026 HostelHub Inc. All rights reserved.' }}
+            </div>
+          </footer>
 
         </div>
 
@@ -1358,21 +1372,6 @@ import { API_CONFIG } from '../../config/api.config';
           </div>
         </div>
       </div>
-
-      <!-- Modern Ultra-Compact Sleek Footer (Home Tab Only) -->
-      <footer class="footer animate-fade" *ngIf="activeTab === 'home'" style="margin-top: 20px; padding: 0 12px 16px 12px;">
-        <div class="footer-content" style="text-align: center; padding: 12px 16px; border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 14px; box-shadow: var(--shadow-sm); max-width: 480px; margin: 0 auto;">
-          <h6 style="margin: 0 0 4px 0; font-size: 12.5px; font-weight: 800; color: var(--text-primary);">{{ footerSettings?.footer_text || 'HostelHub - Hostel Management Portal' }}</h6>
-          <div style="display: flex; justify-content: center; align-items: center; gap: 12px; font-size: 11px; color: var(--text-muted); flex-wrap: wrap;">
-            <span>📧 {{ footerSettings?.footer_email || 'support@hostelhub.com' }}</span>
-            <span>·</span>
-            <span>📞 {{ footerSettings?.footer_phone || '+91 98765 43210' }}</span>
-          </div>
-          <div style="margin-top: 4px; font-size: 10px; color: var(--text-muted); opacity: 0.85;">
-            Developed by HostelHub Engineering Team 💻 · {{ footerSettings?.footer_copyright || '© 2026 HostelHub Inc.' }}
-          </div>
-        </div>
-      </footer>
     </div>
   `,
   styles: [`
@@ -1435,7 +1434,7 @@ import { API_CONFIG } from '../../config/api.config';
     /* Content area */
     .tab-content-area {
       flex: 1;
-      padding: 24px 20px 80px;
+      padding: 16px 16px 65px;
       max-width: 760px;
       width: 100%;
       margin: 0 auto;
