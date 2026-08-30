@@ -378,25 +378,78 @@ import { API_CONFIG } from '../../config/api.config';
             </div>
           </div>
 
-          <!-- 4. App Info/Description Section -->
-          <div class="card app-info-card" style="margin-top: 32px;">
-            <div class="app-info-grid">
-              <div class="app-info-about">
-                <div class="info-tag">Overview</div>
-                <h4>What is HostelHub?</h4>
-                <p>{{ publicSettings.app_about }}</p>
+          <!-- 4. System Overview & Workflow Pipeline Card (Exact Match to User Screenshot) -->
+          <div class="overview-glass-card" style="margin-top: 32px; background: linear-gradient(135deg, rgba(239, 246, 255, 0.85) 0%, rgba(219, 234, 254, 0.6) 100%); border: 1.5px solid rgba(37, 99, 235, 0.2); border-radius: 28px; padding: 24px 20px; box-shadow: 0 10px 30px rgba(37, 99, 235, 0.06); backdrop-filter: blur(16px);">
+            
+            <!-- Top Section: What is HostelHub? -->
+            <div style="margin-bottom: 24px;">
+              <span style="background: rgba(37, 99, 235, 0.12); color: #2563eb; font-size: 10.5px; font-weight: 800; padding: 4px 12px; border-radius: 12px; letter-spacing: 0.5px; text-transform: uppercase;">
+                ⚡ SYSTEM OVERVIEW
+              </span>
+              <h3 style="font-family: var(--font-display); font-size: 20px; font-weight: 900; color: var(--text-primary); margin: 10px 0 8px 0;">
+                What is HostelHub?
+              </h3>
+              <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin: 0 0 16px 0;">
+                {{ publicSettings.app_about || 'HostelHub is an all-in-one digital platform designed to streamline hostel management. It allows students to raise maintenance tickets instantly, monitors staff assignments, skips mess meals, tracks attendance, and updates students with official announcements.' }}
+              </p>
+              
+              <!-- Feature Pills Row -->
+              <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <span style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); font-size: 11.5px; font-weight: 800; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                  ⚡ Instant Ticket Dispatch
+                </span>
+                <span style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); font-size: 11.5px; font-weight: 800; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                  🍽️ Daily Mess Rating
+                </span>
+                <span style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); font-size: 11.5px; font-weight: 800; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                  📢 Official Warden Feed
+                </span>
               </div>
-              <div class="app-info-works">
-                <div class="info-tag">Process</div>
-                <h4>How It Works</h4>
-                <div class="work-steps">
-                  <div class="step-item" *ngFor="let step of splitLines(publicSettings.app_how_it_works)">
-                    <div class="step-bullet">✓</div>
-                    <p class="step-text">{{ step }}</p>
-                  </div>
+            </div>
+
+            <div style="height: 1px; background: var(--border-color); margin: 20px 0; opacity: 0.6;"></div>
+
+            <!-- Bottom Section: How It Works -->
+            <div>
+              <span style="background: rgba(16, 185, 129, 0.12); color: #059669; font-size: 10.5px; font-weight: 800; padding: 4px 12px; border-radius: 12px; letter-spacing: 0.5px; text-transform: uppercase;">
+                🔄 WORKFLOW PIPELINE
+              </span>
+              <h3 style="font-family: var(--font-display); font-size: 20px; font-weight: 900; color: var(--text-primary); margin: 10px 0 16px 0;">
+                How It Works
+              </h3>
+
+              <!-- 4 Step Pill Cards -->
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="background: var(--bg-card); border-radius: 18px; padding: 14px 16px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+                  <span style="background: #eff6ff; color: #2563eb; font-size: 12.5px; font-weight: 900; width: 34px; height: 34px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">01</span>
+                  <p style="margin: 0; font-size: 12.5px; font-weight: 700; color: var(--text-primary); line-height: 1.4;">
+                    1. Raise a Ticket: Submit electrical, plumbing, carpentry, or cleaning issues with photos.
+                  </p>
+                </div>
+
+                <div style="background: var(--bg-card); border-radius: 18px; padding: 14px 16px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+                  <span style="background: #eff6ff; color: #2563eb; font-size: 12.5px; font-weight: 900; width: 34px; height: 34px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">02</span>
+                  <p style="margin: 0; font-size: 12.5px; font-weight: 700; color: var(--text-primary); line-height: 1.4;">
+                    2. Automated Routing: Wardens assign staff based on category.
+                  </p>
+                </div>
+
+                <div style="background: var(--bg-card); border-radius: 18px; padding: 14px 16px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+                  <span style="background: #eff6ff; color: #2563eb; font-size: 12.5px; font-weight: 900; width: 34px; height: 34px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">03</span>
+                  <p style="margin: 0; font-size: 12.5px; font-weight: 700; color: var(--text-primary); line-height: 1.4;">
+                    3. Track Resolution: View status changes and review work completion proof.
+                  </p>
+                </div>
+
+                <div style="background: var(--bg-card); border-radius: 18px; padding: 14px 16px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+                  <span style="background: #eff6ff; color: #2563eb; font-size: 12.5px; font-weight: 900; width: 34px; height: 34px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">04</span>
+                  <p style="margin: 0; font-size: 12.5px; font-weight: 700; color: var(--text-primary); line-height: 1.4;">
+                    4. Connect: Join batch group chats and stay updated.
+                  </p>
                 </div>
               </div>
             </div>
+
           </div>
 
 
