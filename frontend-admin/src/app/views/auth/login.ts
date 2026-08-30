@@ -13,7 +13,7 @@ import { AuthService } from '../../services/auth.service';
       <!-- Top Branding Section -->
       <div class="brand-header">
         <div class="logo-card">
-          <img src="assets/logo.png" alt="HostelHub Logo" class="brand-logo-img" (error)="onImgError($event)" />
+          <img src="assets/logo.png" alt="HostelHub Logo" class="brand-logo-img" />
         </div>
         <h2 class="welcome-text">Admin Portal 👑</h2>
         <p class="welcome-subtext">Sign in to manage hostel complaints & system operations</p>
@@ -369,12 +369,6 @@ export class LoginComponent implements OnInit {
   togglePassword(): void {
     this.showPassword = !this.showPassword;
     this.cdr.detectChanges();
-  }
-
-  onImgError(event: any): void {
-    if (event && event.target) {
-      event.target.src = 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=120&q=80';
-    }
   }
 
   onSubmit(): void {
