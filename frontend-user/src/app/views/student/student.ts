@@ -2176,6 +2176,7 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     } else if (tab === 'profile') {
       this.clearAllNotifications();
     } else if (tab === 'my-profile') {
+      this.loadUserProfile();
       this.initProfileEdit();
       this.loadAttendanceStats();
     }
@@ -2190,6 +2191,7 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.user = this.authService.currentUserValue;
+    this.loadUserProfile();
     this.loadAnnouncements();
     this.loadComplaints();
     this.loadNotifications();
@@ -2588,7 +2590,7 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
   showCriticalUpdateModal: boolean = false;
 
   initProfileEdit(): void {
-    const u = this.authService.currentUserValue;
+    const u = this.user || this.authService.currentUserValue;
     if (u) {
       this.editUser = {
         name: u.name || '',
@@ -2606,6 +2608,19 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
       this.profileError = '';
       this.profileSuccess = '';
     }
+  }
+
+  loadUserProfile(): void {
+    this.authService.getProfile().subscribe({
+      next: (user) => {
+        if (user) {
+          this.user = user;
+          this.initProfileEdit();
+          this.cdr.detectChanges();
+        }
+      },
+      error: (err) => console.error('Failed to load user profile:', err)
+    });
   }
 
   onProfilePicChange(event: any): void {

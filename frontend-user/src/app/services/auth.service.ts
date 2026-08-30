@@ -158,6 +158,20 @@ export class AuthService {
     );
   }
 
+  getProfile(): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/profile`, {
+      headers: this.getAuthHeaders()
+    }).pipe(
+      tap(user => {
+        if (user) {
+          localStorage.setItem(USER_KEY, JSON.stringify(user));
+          this.currentUserSubject.next(user);
+          Preferences.set({ key: USER_KEY, value: JSON.stringify(user) });
+        }
+      })
+    );
+  }
+
   isLoggedIn(): boolean {
     return !!this.token;
   }

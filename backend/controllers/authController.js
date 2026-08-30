@@ -122,6 +122,10 @@ exports.login = async (req, res) => {
         phone: user.phone,
         roomNumber: user.roomNumber,
         hostelBlock: user.hostelBlock,
+        gender: user.gender,
+        batch: user.batch,
+        rollNumber: user.rollNumber,
+        status: user.status,
         bio: user.bio,
         profilePicUrl: user.profilePicUrl
       }
