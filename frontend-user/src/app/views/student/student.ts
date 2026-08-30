@@ -138,37 +138,40 @@ import { API_CONFIG } from '../../config/api.config';
 
       <!-- CYBER COMMAND TOP HEADER BAR -->
       <div class="cyber-top-bar" *ngIf="activeTab !== 'chat'">
-        <!-- Left: Hamburger Button -->
-        <button type="button" class="hamburger-btn" (click)="toggleSidebar()" title="Open Navigation Menu">
-          <span>☰</span>
-        </button>
+        <!-- Left Group: Hamburger + Avatar + Student Info -->
+        <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; padding-right: 6px;">
+          <button type="button" class="hamburger-btn" (click)="toggleSidebar()" title="Open Navigation Menu">
+            <span>☰</span>
+          </button>
 
-        <!-- Center/Left: User Profile & Online Indicator -->
-        <div (click)="switchTab('my-profile')" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-          <div style="position: relative; width: 44px; height: 44px;">
-            <div style="width: 100%; height: 100%; border-radius: 50%; border: 2px solid #2563eb; padding: 2px; display: flex; align-items: center; justify-content: center;">
-              <span class="avatar" *ngIf="!user?.profilePicUrl" style="font-size: 20px;">🎓</span>
-              <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" (error)="onAvatarError($event)" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
+          <div (click)="switchTab('my-profile')" style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex: 1; min-width: 0;">
+            <div style="position: relative; width: 40px; height: 40px; flex-shrink: 0;">
+              <div style="width: 100%; height: 100%; border-radius: 50%; border: 2px solid #2563eb; padding: 2px; display: flex; align-items: center; justify-content: center; background: var(--bg-card);">
+                <span class="avatar" *ngIf="!user?.profilePicUrl" style="font-size: 18px;">🎓</span>
+                <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" (error)="onAvatarError($event)" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
+              </div>
+              <div class="online-pulse-dot"></div>
             </div>
-            <div class="online-pulse-dot"></div>
-          </div>
-          <div>
-            <h4 style="margin: 0; font-size: 15px; font-weight: 800; color: var(--text-primary);">{{ user?.name }}</h4>
-            <p style="margin: 2px 0 0 0; font-size: 11px; font-weight: 700; color: #2563eb;">
-              🏢 {{ user?.hostelBlock }} · Room {{ user?.roomNumber }}
-            </p>
+            <div style="flex: 1; min-width: 0; overflow: hidden;">
+              <h4 style="margin: 0; font-size: 14.5px; font-weight: 900; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;">
+                {{ user?.name }}
+              </h4>
+              <p style="margin: 2px 0 0 0; font-size: 11px; font-weight: 700; color: #2563eb; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;">
+                🏢 {{ user?.hostelBlock }} · Rm {{ user?.roomNumber }}
+              </p>
+            </div>
           </div>
         </div>
 
-        <!-- Right: Tickets Pill & Theme Toggle -->
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <button (click)="switchTab('my-complaints')" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; border: none; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 800; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(37,99,235,0.3); cursor: pointer;">
-            <span style="background: rgba(255,255,255,0.25); color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900;">
+        <!-- Right Group: Tickets Pill & Theme Toggle -->
+        <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+          <button (click)="switchTab('my-complaints')" class="header-tickets-btn" title="View Active Tickets">
+            <span class="tickets-badge-count">
               {{ getActiveTicketsCount() }}
             </span>
-            <span>TICKETS</span>
+            <span class="tickets-badge-text">TICKETS</span>
           </button>
-          <button class="theme-toggle-btn" (click)="toggleDarkMode()" style="width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--border-color); background: var(--bg-card); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+          <button class="theme-toggle-btn" (click)="toggleDarkMode()" [title]="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'" style="width: 38px; height: 38px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--text-primary); flex-shrink: 0;">
             {{ isDarkMode ? '☀️' : '🌙' }}
           </button>
         </div>
