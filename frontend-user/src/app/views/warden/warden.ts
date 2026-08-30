@@ -215,19 +215,19 @@ import { API_CONFIG } from '../../config/api.config';
                 </div>
               </div>
 
-              <!-- Tile 4: Mess & Meal Management -->
+              <!-- Tile 4: Mess & Meal Feedback Reviews -->
               <div class="action-tile-3d tile-green" (click)="switchTab('mess'); loadMessData()">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                   <div class="action-badge-floating" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff;">
-                    🍽️
+                    ⭐
                   </div>
                   <span style="background: rgba(16, 185, 129, 0.15); color: #059669; font-size: 10px; font-weight: 900; padding: 4px 8px; border-radius: 12px; text-transform: uppercase;">
-                    MESS LIVE
+                    MESS REVIEW
                   </span>
                 </div>
                 <div>
-                  <h4 class="action-card-title">Mess Skip Stats</h4>
-                  <p class="action-card-sub" style="color: var(--text-muted);">Live meal waste analytics</p>
+                  <h4 class="action-card-title">Mess Rating & Reviews</h4>
+                  <p class="action-card-sub" style="color: var(--text-muted);">{{ feedbackStats?.overallAvg || 'N/A' }} ★ Student mess feedback</p>
                 </div>
               </div>
             </div>
@@ -247,21 +247,34 @@ import { API_CONFIG } from '../../config/api.config';
             <div class="notice-reel-wrapper">
               <div class="notice-reel-track">
                 <div class="notice-reel-card" *ngFor="let notice of announcements" (click)="switchTab('announcements')">
-                  <div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                      <span style="background: rgba(37, 99, 235, 0.1); color: #2563eb; font-size: 10px; font-weight: 900; padding: 3px 8px; border-radius: 8px;">
-                        🌐 {{ notice.hostelBlock || 'ALL HOSTELS' }}
-                      </span>
-                      <span style="font-size: 10.5px; font-weight: 700; color: var(--text-muted);">
-                        📅 {{ notice.createdAt | date:'d MMM' }}
-                      </span>
+                  <div style="display: flex; flex-direction: column; height: 100%; justify-content: space-between;">
+                    <div>
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="background: rgba(37, 99, 235, 0.1); color: #2563eb; font-size: 10px; font-weight: 900; padding: 3px 8px; border-radius: 8px;">
+                          🌐 {{ notice.hostelBlock || 'ALL HOSTELS' }}
+                        </span>
+                        <span style="font-size: 10.5px; font-weight: 700; color: var(--text-muted);">
+                          📅 {{ notice.createdAt | date:'d MMM' }}
+                        </span>
+                      </div>
+
+                      <!-- Notice Photo Image (if present) -->
+                      <div *ngIf="notice.photoUrl || notice.photo_url || notice.imageUrl" style="width: 100%; height: 110px; border-radius: 12px; overflow: hidden; margin-bottom: 8px; border: 1.5px solid var(--border-color); background: var(--bg-muted);" (click)="$event.stopPropagation(); zoomPhotoUrl = getImageUrl(notice.photoUrl || notice.photo_url || notice.imageUrl)">
+                        <img [src]="getImageUrl(notice.photoUrl || notice.photo_url || notice.imageUrl)" style="width: 100%; height: 100%; object-fit: cover;" (error)="onImgError($event)" />
+                      </div>
+
+                      <h4 style="margin: 0 0 6px 0; font-family: var(--font-display); font-size: 14.5px; font-weight: 800; color: var(--text-primary); line-height: 1.3;">
+                        {{ notice.title }}
+                      </h4>
+                      <p style="margin: 0; font-size: 12px; color: var(--text-secondary); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                        {{ notice.content }}
+                      </p>
                     </div>
-                    <h4 style="margin: 0 0 6px 0; font-family: var(--font-display); font-size: 14.5px; font-weight: 800; color: var(--text-primary); line-height: 1.3;">
-                      {{ notice.title }}
-                    </h4>
-                    <p style="margin: 0; font-size: 12px; color: var(--text-secondary); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                      {{ notice.content }}
-                    </p>
+
+                    <div style="margin-top: 10px; pt: 6px; border-top: 1px dashed var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                      <span style="font-size: 10.5px; font-weight: 700; color: #2563eb;">Tap to view detail</span>
+                      <span style="font-size: 12px; color: #2563eb;">→</span>
+                    </div>
                   </div>
                 </div>
               </div>
