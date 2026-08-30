@@ -352,7 +352,7 @@ import { AttendanceService } from '../../services/attendance.service';
           </div>
 
           <!-- Section 4: SOLO CREATOR & ARCHITECT SPOTLIGHT SECTION -->
-          <div style="margin-bottom: 24px;">
+          <div style="margin-bottom: 24px;" *ngIf="publicSettings?.developer_team?.length">
             <!-- Header Outside Card -->
             <div style="margin-bottom: 14px;">
               <h3 style="font-family: var(--font-display); font-size: 16px; font-weight: 900; color: var(--text-primary); margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
@@ -367,43 +367,44 @@ import { AttendanceService } from '../../services/attendance.service';
             <!-- Developer Glass Card (Matching Screenshot 2) -->
             <div class="solo-dev-card" style="margin-bottom: 0; padding: 28px 20px; border-radius: 28px;">
               <div style="position: relative; display: inline-block; margin-bottom: 14px;">
-                <div style="width: 76px; height: 76px; border-radius: 50%; border: 3px solid #2563eb; padding: 3px; margin: 0 auto; background: var(--bg-card); box-shadow: 0 0 24px rgba(37, 99, 235, 0.35);">
-                  <div style="width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); color: white; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 900;">
-                    👨‍💻
-                  </div>
+                <div style="width: 76px; height: 76px; border-radius: 50%; border: 3px solid #2563eb; padding: 3px; margin: 0 auto; background: var(--bg-card); box-shadow: 0 0 24px rgba(37, 99, 235, 0.35); overflow: hidden;">
+                  <img [src]="getImageUrl(publicSettings.developer_team[0].pic || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80')" 
+                       style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" 
+                       [alt]="publicSettings.developer_team[0].name || 'Abhinav Kumar'" 
+                       (error)="onAvatarError($event)" />
                 </div>
                 <div class="online-pulse-dot" style="width: 14px; height: 14px; right: 2px; bottom: 2px;"></div>
               </div>
 
               <div style="margin-bottom: 14px;">
                 <span style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #ffffff; font-size: 11px; font-weight: 900; padding: 6px 16px; border-radius: 20px; letter-spacing: 0.5px; display: inline-block; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);">
-                  🚀 CREATOR & LEAD FULL-STACK DEVELOPER
+                  🚀 {{ (publicSettings.developer_team[0].role || 'CREATOR & LEAD FULL-STACK DEVELOPER') | uppercase }}
                 </span>
               </div>
 
               <h3 style="margin: 0 0 6px 0; font-family: var(--font-display); font-size: 22px; font-weight: 900; color: var(--text-primary);">
-                Abhinav Kumar
+                {{ publicSettings.developer_team[0].name || 'Abhinav Kumar' }}
               </h3>
 
               <p style="margin: 0 0 18px 0; font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; max-width: 480px; margin-left: auto; margin-right: auto;">
-                Sole Architect & Lead Developer of HostelHub. Expert in Full-Stack Engineering, Angular, Node.js, Express, Sequelize, & Capacitor Native Apps.
+                {{ publicSettings.developer_team[0].description || 'Sole Architect & Lead Developer of HostelHub. Expert in Full-Stack Engineering, Angular, Node.js, Express, Sequelize, & Capacitor Native Apps.' }}
               </p>
 
               <!-- 5 Social Media Buttons -->
               <div style="display: flex; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap;">
-                <a href="https://github.com/abhinav8102-asd" target="_blank" class="social-icon-btn-dev" title="GitHub Repository">
+                <a [href]="publicSettings.developer_team[0].github || 'https://github.com/abhinav8102-asd'" target="_blank" class="social-icon-btn-dev" title="GitHub Repository">
                   <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
                 </a>
-                <a href="https://linkedin.com" target="_blank" class="social-icon-btn-dev" title="LinkedIn Profile">
+                <a [href]="publicSettings.developer_team[0].linkedin || 'https://linkedin.com'" target="_blank" class="social-icon-btn-dev" title="LinkedIn Profile">
                   <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.762-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
                 </a>
-                <a href="https://instagram.com" target="_blank" class="social-icon-btn-dev" title="Instagram Profile">
+                <a [href]="publicSettings.developer_team[0].instagram || 'https://instagram.com'" target="_blank" class="social-icon-btn-dev" title="Instagram Profile">
                   <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
                 </a>
-                <a href="https://twitter.com" target="_blank" class="social-icon-btn-dev" title="Twitter Profile">
+                <a [href]="publicSettings.developer_team[0].twitter || 'https://twitter.com'" target="_blank" class="social-icon-btn-dev" title="Twitter Profile">
                   <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
                 </a>
-                <a href="mailto:abhinavkumar.dev@gmail.com" class="social-icon-btn-dev" title="Send Email">
+                <a [href]="publicSettings.developer_team[0].email || 'mailto:support@hostelhub.com'" class="social-icon-btn-dev" title="Send Email">
                   <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M0 3v18h24v-18h-24zm21.518 2l-9.518 6.013-9.518-6.013h19.036zm-19.518 14v-11.774l10 6.32 10-6.32v11.774h-20z"/></svg>
                 </a>
               </div>
@@ -413,15 +414,15 @@ import { AttendanceService } from '../../services/attendance.service';
           <!-- Section 5: SINGLE APP FOOTER GLASS CARD (Matching Screenshot 3) -->
           <div class="app-footer-card" style="margin-top: 24px; margin-bottom: 24px; padding: 22px 18px; border-radius: 24px;">
             <h4 style="margin: 0 0 8px 0; font-family: var(--font-display); font-size: 15px; font-weight: 900; color: var(--text-primary);">
-              Hostel Maintenance & Support Portal
+              {{ footerSettings?.footer_text || 'Hostel Maintenance & Support Portal' }}
             </h4>
             <div style="display: flex; justify-content: center; align-items: center; gap: 14px; font-size: 12px; color: var(--text-muted); flex-wrap: wrap; margin-bottom: 10px;">
-              <span>📧 support&#64;hostelhub.com</span>
+              <span>📧 {{ footerSettings?.footer_email || 'support@hostelhub.com' }}</span>
               <span>·</span>
-              <span>📞 +91 98765 43210</span>
+              <span>📞 {{ footerSettings?.footer_phone || '+91 98765 43210' }}</span>
             </div>
             <p style="margin: 0; font-size: 11px; font-weight: 700; color: var(--text-muted); line-height: 1.5;">
-              Developed by HostelHub Engineering Team 💻 · © 2026 HostelHub. All rights reserved.
+              Developed by HostelHub Engineering Team 💻 · {{ footerSettings?.footer_copyright || '© 2026 HostelHub. All rights reserved.' }}
             </p>
           </div>
 
@@ -2557,6 +2558,7 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
     this.loadStaffList();
     this.loadStaffWorkload();
     this.loadFooterSettings();
+    this.loadPublicSettings();
 
     this.notifSub = this.socketService.notification$.subscribe(notif => {
       if (notif) {
@@ -2565,6 +2567,12 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
         this.loadStaffWorkload();
         setTimeout(() => this.clearToast(), 3000);
       }
+    });
+
+    // Listen for real-time settings updates from Admin Panel
+    this.socketService.onEvent('settings_updated', () => {
+      this.loadFooterSettings();
+      this.loadPublicSettings();
     });
 
     // Listen for real-time announcement deletion
@@ -2617,10 +2625,29 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  publicSettings: any = null;
+  isLoadingPublicSettings = false;
+
   loadFooterSettings(): void {
     this.complaintService.getFooterSettings().subscribe({
       next: (res) => { this.footerSettings = res; this.cdr.detectChanges(); },
       error: (err) => console.error(err)
+    });
+  }
+
+  loadPublicSettings(): void {
+    this.isLoadingPublicSettings = true;
+    this.complaintService.getPublicSettings().subscribe({
+      next: (res: any) => {
+        this.publicSettings = res;
+        this.isLoadingPublicSettings = false;
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        console.error('Failed to load public settings:', err);
+        this.isLoadingPublicSettings = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 

@@ -38,6 +38,10 @@ exports.updateFooterSettings = async (req, res) => {
       }
     }
 
+    if (req.io) {
+      req.io.emit('settings_updated', { type: 'footer' });
+    }
+
     res.status(200).json({ message: 'Footer settings updated successfully.' });
   } catch (error) {
     console.error('Update Footer Settings Error:', error);
@@ -97,6 +101,7 @@ exports.getPublicSettings = async (req, res) => {
           pic: dev.pic || (idx === 0 ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80' : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80'),
           github: dev.github || (idx === 0 ? 'https://github.com/abhinav8102-asd' : 'https://github.com'),
           linkedin: dev.linkedin || 'https://linkedin.com',
+          instagram: dev.instagram || 'https://instagram.com',
           twitter: dev.twitter || 'https://twitter.com',
           email: dev.email || (idx === 0 ? 'mailto:abhinav@hostelhub.com' : 'mailto:saransh@hostelhub.com')
         }));
@@ -130,6 +135,10 @@ exports.updatePublicSettings = async (req, res) => {
       if (value !== undefined) {
         await Setting.upsert({ key, value });
       }
+    }
+
+    if (req.io) {
+      req.io.emit('settings_updated', { type: 'public' });
     }
 
     res.status(200).json({ message: 'Public settings updated successfully.' });
