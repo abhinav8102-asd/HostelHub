@@ -435,11 +435,11 @@ import { API_CONFIG } from '../../config/api.config';
         <!-- TAB 0: COMPLAINTS LIST -->
         <div *ngIf="activeTab === 'complaints'" class="tab-panel animate-fade">
           <!-- Complaints Header Card -->
-          <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
-            <div style="width: 46px; height: 46px; border-radius: 50%; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">📋</div>
+          <div class="cyber-tab-header">
+            <div class="cyber-header-badge" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white;">📋</div>
             <div>
-              <h4 style="margin: 0 0 2px 0; font-size: 17px; font-weight: 800; color: var(--text-primary);">Student Complaint Tickets</h4>
-              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">View, assign and manage all student complaints</p>
+              <h4 style="margin: 0 0 2px 0; font-family: var(--font-display); font-size: 17.5px; font-weight: 900; color: var(--text-primary);">Student Maintenance Tickets</h4>
+              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">View, assign service staff, and resolve student complaints in real-time</p>
             </div>
           </div>
 
@@ -670,14 +670,13 @@ import { API_CONFIG } from '../../config/api.config';
         <div *ngIf="activeTab === 'announcements'" class="tab-panel animate-fade">
           
           <!-- Post Notice Header Banner Card -->
-          <div class="card" style="padding: 20px; margin-bottom: 20px; border-radius: 18px; border: 1px solid var(--border-color); background: var(--bg-card);">
-            <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
-              <div style="width: 48px; height: 48px; border-radius: 50%; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">📢</div>
-              <div>
-                <h4 style="margin: 0 0 2px 0; font-size: 17px; font-weight: 800; color: var(--text-primary);">Post Notice / Announcement</h4>
-                <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Send important updates to hostel(s) instantly.</p>
-              </div>
+          <div class="cyber-tab-header" style="margin-bottom: 20px;">
+            <div class="cyber-header-badge" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: white;">📢</div>
+            <div>
+              <h4 style="margin: 0 0 2px 0; font-family: var(--font-display); font-size: 17.5px; font-weight: 900; color: var(--text-primary);">Post Notice / Announcement</h4>
+              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Publish official broadcasts to student mobile applications instantly</p>
             </div>
+          </div>
 
             <form (ngSubmit)="onNoticeSubmit()" #noticeForm="ngForm">
               <div *ngIf="noticeError" class="alert alert-danger">{{ noticeError }}</div>
@@ -867,11 +866,11 @@ import { API_CONFIG } from '../../config/api.config';
         <!-- TAB 4: EDIT PROFILE -->
         <div *ngIf="activeTab === 'my-profile'" class="tab-panel animate-fade">
           <!-- Header Banner Widget -->
-          <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
-            <div style="width: 46px; height: 46px; border-radius: 50%; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">👤</div>
+          <div class="cyber-tab-header">
+            <div class="cyber-header-badge" style="background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); color: white;">👤</div>
             <div>
-              <h4 style="margin: 0 0 2px 0; font-size: 17px; font-weight: 800; color: var(--text-primary);">Edit Profile</h4>
-              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Update your profile information</p>
+              <h4 style="margin: 0 0 2px 0; font-family: var(--font-display); font-size: 17.5px; font-weight: 900; color: var(--text-primary);">Warden Profile & Preferences</h4>
+              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Update profile avatar, hostel block assignment & security settings</p>
             </div>
           </div>
 
@@ -987,11 +986,11 @@ import { API_CONFIG } from '../../config/api.config';
         <!-- TAB 5: WARDEN MESS MANAGEMENT -->
         <div *ngIf="activeTab === 'mess'" class="tab-panel animate-fade">
           <!-- Mess Admin Header Card -->
-          <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
-            <div style="width: 46px; height: 46px; border-radius: 50%; background: #fdf2f4; color: #b31031; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;">🍴</div>
+          <div class="cyber-tab-header">
+            <div class="cyber-header-badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;">🍽️</div>
             <div>
-              <h4 style="margin: 0 0 2px 0; font-size: 17px; font-weight: 800; color: var(--text-primary);">Mess Admin Portal</h4>
-              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Manage weekly mess menu for all hostel blocks</p>
+              <h4 style="margin: 0 0 2px 0; font-family: var(--font-display); font-size: 17.5px; font-weight: 900; color: var(--text-primary);">Mess & Meal Management Engine</h4>
+              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Manage weekly meal menu, track student meal skips & mess reviews</p>
             </div>
           </div>
 
@@ -1214,10 +1213,13 @@ import { API_CONFIG } from '../../config/api.config';
 
         <!-- TAB 7: USER ACCOUNTS & CREATION (Single/Bulk + Activate/Deactivate) -->
         <div *ngIf="activeTab === 'users'" class="tab-panel animate-fade">
-          <h4 class="page-title">👥 User Account Management</h4>
-          <p class="page-subtitle" style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
-            Create Single or Bulk Student & Staff Accounts, manage activation status, and control user access.
-          </p>
+          <div class="cyber-tab-header">
+            <div class="cyber-header-badge" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: white;">👥</div>
+            <div>
+              <h4 style="margin: 0 0 2px 0; font-family: var(--font-display); font-size: 17.5px; font-weight: 900; color: var(--text-primary);">User Account Directory</h4>
+              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Create single/bulk accounts, manage status, and grant user access</p>
+            </div>
+          </div>
 
           <!-- Top Sub-Navigation Mode Pills -->
           <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
@@ -1535,10 +1537,13 @@ import { API_CONFIG } from '../../config/api.config';
 
         <!-- TAB 8: REGISTRATION APPROVALS -->
         <div *ngIf="activeTab === 'approvals'" class="tab-panel animate-fade">
-          <h4 class="page-title">🔍 Pending Student Registrations</h4>
-          <p class="page-subtitle" style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
-            Verify and approve student registrations for {{ user?.hostelBlock || 'your hostel' }}.
-          </p>
+          <div class="cyber-tab-header">
+            <div class="cyber-header-badge" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white;">⚡</div>
+            <div>
+              <h4 style="margin: 0 0 2px 0; font-family: var(--font-display); font-size: 17.5px; font-weight: 900; color: var(--text-primary);">Pending Registration Approvals</h4>
+              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Verify and approve student registrations for {{ user?.hostelBlock || 'your hostel' }}</p>
+            </div>
+          </div>
 
           <div *ngIf="pendingApprovals.length > 0; else noPending">
             <div class="card" *ngFor="let student of pendingApprovals" style="margin-bottom: 14px; padding: 16px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); display: flex; flex-direction: column; gap: 12px; position: relative;">
@@ -1590,8 +1595,6 @@ import { API_CONFIG } from '../../config/api.config';
             </div>
           </ng-template>
         </div>
-
-      </div>
 
       <!-- Bottom Navigation Dock (displayed as floating glass top-nav by global CSS) -->
       <div class="bottom-tabs">

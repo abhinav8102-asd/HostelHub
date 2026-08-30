@@ -435,7 +435,13 @@ import { AttendanceService } from '../../services/attendance.service';
 
         <!-- TAB 1: COMPLAINTS LIST -->
         <div *ngIf="activeTab === 'complaints'" class="tab-panel animate-fade">
-          <h4 class="page-title">📋 Student Complaint Tickets</h4>
+          <div class="cyber-tab-header">
+            <div class="cyber-header-badge" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white;">📋</div>
+            <div>
+              <h4 style="margin: 0 0 2px 0; font-family: var(--font-display); font-size: 17.5px; font-weight: 900; color: var(--text-primary);">Student Maintenance Tickets</h4>
+              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">View, assign service staff, and resolve student complaints in real-time</p>
+            </div>
+          </div>
 
           <!-- New Unassigned Complaints Alert Section Banner -->
           <div *ngIf="getPendingCount() > 0 && filterStatus !== 'pending'" style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 12px; padding: 14px 18px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
@@ -632,7 +638,13 @@ import { AttendanceService } from '../../services/attendance.service';
 
         <!-- TAB 1: CREATE ANNOUNCEMENT -->
         <div *ngIf="activeTab === 'announcements'" class="tab-panel animate-fade">
-          <h4 class="page-title">📣 Post Notice / Announcement</h4>
+          <div class="cyber-tab-header" style="margin-bottom: 20px;">
+            <div class="cyber-header-badge" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: white;">📢</div>
+            <div>
+              <h4 style="margin: 0 0 2px 0; font-family: var(--font-display); font-size: 17.5px; font-weight: 900; color: var(--text-primary);">Post Notice / Announcement</h4>
+              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Publish official broadcasts to student mobile applications instantly</p>
+            </div>
+          </div>
           
           <div class="form-container">
             <form (ngSubmit)="onNoticeSubmit()" #noticeForm="ngForm">
@@ -786,7 +798,13 @@ import { AttendanceService } from '../../services/attendance.service';
 
         <!-- TAB 4: EDIT PROFILE -->
         <div *ngIf="activeTab === 'my-profile'" class="tab-panel animate-fade">
-          <h4 class="page-title">👤 Edit Profile</h4>
+          <div class="cyber-tab-header">
+            <div class="cyber-header-badge" style="background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); color: white;">👤</div>
+            <div>
+              <h4 style="margin: 0 0 2px 0; font-family: var(--font-display); font-size: 17.5px; font-weight: 900; color: var(--text-primary);">Warden Profile & Preferences</h4>
+              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Update profile avatar, hostel block assignment & security settings</p>
+            </div>
+          </div>
           
           <div class="form-container">
             <form (ngSubmit)="onProfileSubmit()" #profileForm="ngForm">
@@ -852,7 +870,13 @@ import { AttendanceService } from '../../services/attendance.service';
 
         <!-- TAB 5: WARDEN MESS MANAGEMENT -->
         <div *ngIf="activeTab === 'mess'" class="tab-panel animate-fade">
-          <h4 class="page-title">🍴 Mess Admin Portal</h4>
+          <div class="cyber-tab-header">
+            <div class="cyber-header-badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;">🍽️</div>
+            <div>
+              <h4 style="margin: 0 0 2px 0; font-family: var(--font-display); font-size: 17.5px; font-weight: 900; color: var(--text-primary);">Mess & Meal Management Engine</h4>
+              <p style="margin: 0; font-size: 12px; color: var(--text-muted);">Manage weekly meal menu, track student meal skips & mess reviews</p>
+            </div>
+          </div>
 
           <div *ngIf="messSuccess" class="alert alert-success">{{ messSuccess }}</div>
           <div *ngIf="messError" class="alert alert-danger">{{ messError }}</div>
