@@ -251,14 +251,14 @@ import { API_CONFIG } from '../../config/api.config';
             </div>
           </div>
 
-          <!-- 3. Official Notice Reel Horizontal Carousel Stream -->
+          <!-- 1.5 World-Class Auto-Scrolling Official Notice Reel Stream -->
           <div class="section-header" style="margin-top: 24px;">
             <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
               <div>
-                <h4 style="margin: 0; font-size: 16.5px; font-weight: 900; color: var(--text-primary);">📢 Official Notice Reel</h4>
-                <p class="section-subtitle" style="margin: 2px 0 0 0;">Live announcements from Hostel Administration</p>
+                <h4 style="margin: 0; font-size: 17px; font-weight: 900; color: var(--text-primary);">📢 Official Notice Reel</h4>
+                <p class="section-subtitle" style="margin: 2px 0 0 0; color: var(--text-muted);">Live announcements from Hostel Administration</p>
               </div>
-              <button class="btn" (click)="switchTab('notices')" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; font-size: 11.5px; font-weight: 800; padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(37, 99, 235, 0.25); cursor: pointer;">
+              <button (click)="switchTab('notices')" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; font-size: 11.5px; font-weight: 800; padding: 6px 14px; border-radius: 14px; border: 1px solid rgba(37, 99, 235, 0.25); cursor: pointer;">
                 View All ({{ announcements.length }}) →
               </button>
             </div>
@@ -268,36 +268,30 @@ import { API_CONFIG } from '../../config/api.config';
             <div class="skeleton skeleton-card"></div>
           </div>
 
-          <!-- Horizontal Carousel Reel of Notice Cards -->
-          <div *ngIf="!isLoadingAnnouncements && announcements.length > 0" class="notice-reel-wrapper" (mouseenter)="stopNoticeAutoScroll()" (mouseleave)="startNoticeAutoScroll()">
-            <div class="notice-reel-track" id="notice-reel-track">
-              <div *ngFor="let notice of announcements.slice(0, 6); let idx = index" class="notice-reel-card" (click)="openNoticeModal(notice)">
-                <div class="notice-card-header">
-                  <span class="notice-tag">
-                    {{ notice.hostelBlock === 'All' ? '🌐 ALL HOSTELS' : '🏠 BLOCK ' + notice.hostelBlock }}
-                  </span>
-                  <span class="notice-date">📅 {{ notice.createdAt | date:'d MMM' }}</span>
+          <!-- Auto-Scrolling Side-by-Side Notice Reel Track -->
+          <div *ngIf="!isLoadingAnnouncements && announcements.length > 0" class="notice-reel-wrapper">
+            <div class="notice-reel-track">
+              <!-- Render notices list duplicated for seamless looping animation -->
+              <div *ngFor="let notice of announcements.concat(announcements)" class="notice-reel-card" (click)="openNoticeModal(notice)">
+                <div>
+                  <div class="notice-card-header">
+                    <span class="notice-tag">
+                      {{ notice.hostelBlock === 'All' ? '🌐 ALL HOSTELS' : '🏠 BLOCK ' + notice.hostelBlock }}
+                    </span>
+                    <span class="notice-date">📅 {{ notice.createdAt | date:'d MMM' }}</span>
+                  </div>
+                  <h5 class="notice-title">{{ notice.title }}</h5>
+                  <p class="notice-preview">{{ notice.content }}</p>
+                  <div *ngIf="notice.photoUrl" class="notice-photo-box">
+                    <img [src]="getImageUrl(notice.photoUrl)" alt="Notice Attachment" />
+                  </div>
                 </div>
-                <h5 class="notice-title">{{ notice.title }}</h5>
-                <p class="notice-preview">{{ notice.content }}</p>
-                <div *ngIf="notice.photoUrl" class="notice-photo-box">
-                  <img [src]="getImageUrl(notice.photoUrl)" alt="Attachment" />
-                </div>
+
                 <div class="notice-card-footer">
                   <span>By: <strong>{{ notice.creator?.name || 'Warden' }}</strong></span>
                   <span class="read-more">Read Notice 🔍</span>
                 </div>
               </div>
-            </div>
-
-            <!-- Carousel Active Indicators -->
-            <div class="notice-reel-indicators">
-              <div 
-                *ngFor="let notice of announcements.slice(0, 6); let idx = index" 
-                class="notice-indicator-dot" 
-                [class.active]="noticeCarouselIndex === idx"
-                (click)="scrollToNoticeIndex(idx)"
-              ></div>
             </div>
           </div>
 
@@ -1960,8 +1954,6 @@ import { API_CONFIG } from '../../config/api.config';
 })
 export class StudentDashboardComponent implements OnInit, OnDestroy {
   isSidebarOpen = false;
-  noticeCarouselIndex = 0;
-  private noticeTimer: any = null;
 
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
@@ -1969,34 +1961,6 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
 
   closeSidebar() {
     this.isSidebarOpen = false;
-  }
-
-  startNoticeAutoScroll(): void {
-    if (this.noticeTimer) clearInterval(this.noticeTimer);
-    this.noticeTimer = setInterval(() => {
-      if (this.announcements && this.announcements.length > 0) {
-        const total = Math.min(this.announcements.length, 6);
-        this.noticeCarouselIndex = (this.noticeCarouselIndex + 1) % total;
-        this.scrollToNoticeIndex(this.noticeCarouselIndex);
-      }
-    }, 3500);
-  }
-
-  scrollToNoticeIndex(index: number): void {
-    this.noticeCarouselIndex = index;
-    const el = document.getElementById('notice-reel-track');
-    if (el) {
-      const cardWidth = 291;
-      el.scrollTo({ left: index * cardWidth, behavior: 'smooth' });
-    }
-    this.cdr.detectChanges();
-  }
-
-  stopNoticeAutoScroll(): void {
-    if (this.noticeTimer) {
-      clearInterval(this.noticeTimer);
-      this.noticeTimer = null;
-    }
   }
 
   getInitials(name: string): string {
@@ -2138,7 +2102,6 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     this.loadWardens();
     this.loadPublicSettings();
     this.setupBackButtonListener();
-    this.startNoticeAutoScroll();
 
     // Restore dark mode preference
     const saved = localStorage.getItem('hh_dark_mode');
@@ -2146,6 +2109,7 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
       this.isDarkMode = true;
       document.body.classList.add('dark-mode');
     }
+
 
     // Subscribe to live socket notifications
     this.notifSub = this.socketService.notification$.subscribe(notif => {
@@ -2205,7 +2169,6 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.stopNoticeAutoScroll();
     if (this.notifSub) { this.notifSub.unsubscribe(); }
     if (this.backButtonPluginSub && typeof this.backButtonPluginSub.remove === 'function') {
       this.backButtonPluginSub.remove();
