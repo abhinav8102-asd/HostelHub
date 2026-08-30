@@ -166,7 +166,7 @@ import { AuthService } from '../../services/auth.service';
   `,
   styles: [`
     .auth-page {
-      background: linear-gradient(180deg, #70091b 0%, #4a0412 60%, #31020b 100%);
+      background: linear-gradient(180deg, #1e3a8a 0%, #0f172a 60%, #090d16 100%);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -248,7 +248,8 @@ import { AuthService } from '../../services/auth.service';
       width: 38px;
       height: 38px;
       border-radius: 50%;
-      background: #fdf2f4;
+      background: #eff6ff;
+      color: #2563eb;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -271,8 +272,9 @@ import { AuthService } from '../../services/auth.service';
       box-sizing: border-box;
     }
     .form-input-box:focus {
-      border-color: #b31031;
+      border-color: #2563eb;
       background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
     }
 
     .select-input {
@@ -309,15 +311,15 @@ import { AuthService } from '../../services/auth.service';
     }
 
     .security-box {
-      background: #fdf2f4;
-      border: 1px solid rgba(179, 16, 49, 0.15);
+      background: #eff6ff;
+      border: 1px solid rgba(37, 99, 235, 0.2);
       border-radius: 12px;
       padding: 8px 12px;
       display: flex;
       align-items: center;
       gap: 8px;
       font-size: 11px;
-      color: #b31031;
+      color: #2563eb;
       font-weight: 600;
       margin: 10px 0 16px 0;
     }
@@ -325,7 +327,7 @@ import { AuthService } from '../../services/auth.service';
 
     .btn-crimson {
       width: 100%;
-      background: linear-gradient(135deg, #8a0d24 0%, #b31031 100%);
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
       color: #ffffff;
       border: none;
       height: 44px;
@@ -333,7 +335,7 @@ import { AuthService } from '../../services/auth.service';
       font-weight: 800;
       border-radius: 12px;
       cursor: pointer;
-      box-shadow: 0 4px 14px rgba(138, 13, 36, 0.4);
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -352,7 +354,7 @@ import { AuthService } from '../../services/auth.service';
       margin-bottom: 16px;
     }
     .login-gold-link {
-      color: #fbbf24;
+      color: #60a5fa;
       text-decoration: none;
       font-weight: 800;
     }
@@ -373,8 +375,8 @@ import { AuthService } from '../../services/auth.service';
       width: 26px;
       height: 26px;
       border-radius: 50%;
-      background: rgba(251, 191, 36, 0.2);
-      color: #fbbf24;
+      background: rgba(37, 99, 235, 0.25);
+      color: #60a5fa;
       margin: 0 auto 4px auto;
       display: flex;
       align-items: center;
