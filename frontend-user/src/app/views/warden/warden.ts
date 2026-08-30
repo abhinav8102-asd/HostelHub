@@ -774,7 +774,6 @@ import { API_CONFIG } from '../../config/api.config';
                 <span *ngIf="!postingNotice && !justPosted">🚀 Post Announcement</span>
               </button>
             </form>
-          </div>
 
           <!-- Previously Posted Notices -->
           <div class="announcements-history" *ngIf="announcements.length > 0">
@@ -1595,6 +1594,7 @@ import { API_CONFIG } from '../../config/api.config';
             </div>
           </ng-template>
         </div>
+      </div><!-- /tab-content-area -->
 
       <!-- Bottom Navigation Dock (displayed as floating glass top-nav by global CSS) -->
       <div class="bottom-tabs">

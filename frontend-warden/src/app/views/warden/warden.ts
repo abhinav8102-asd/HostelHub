@@ -2487,7 +2487,11 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
   }
 
   switchTab(tab: string): void {
+    if (tab === 'profile') tab = 'my-profile';
     this.activeTab = tab;
+    if (tab === 'my-profile') {
+      this.initProfileEdit();
+    }
     this.cdr.detectChanges();
   }
 
