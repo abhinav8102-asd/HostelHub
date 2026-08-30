@@ -318,7 +318,7 @@ import { API_CONFIG } from '../../config/api.config';
 
           <!-- Dynamic Responsive Grid (Auto-adjusts for 1 or multiple wardens) -->
           <div *ngIf="!isLoadingWardens && wardens.length > 0" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 14px;">
-            <div *ngFor="let warden of wardens" style="background: linear-gradient(135deg, rgba(239, 246, 255, 0.95) 0%, rgba(219, 234, 254, 0.7) 100%); border: 1.5px solid rgba(37, 99, 235, 0.25); border-radius: 26px; padding: 22px 20px; box-shadow: 0 10px 28px -4px rgba(37, 99, 235, 0.1); backdrop-filter: blur(16px); display: flex; flex-direction: column; justify-content: space-between; transition: all 0.25s ease;">
+            <div *ngFor="let warden of wardens" class="warden-glass-card">
               
               <div>
                 <!-- Top Row: Avatar & Details -->
@@ -347,10 +347,10 @@ import { API_CONFIG } from '../../config/api.config';
 
               <!-- Quick Action Contact Buttons (1-Tap Call & Email) -->
               <div style="display: flex; gap: 10px; margin-top: 12px; padding-top: 14px; border-top: 1px solid rgba(37, 99, 235, 0.15);">
-                <a *ngIf="warden.phone" [href]="'tel:' + warden.phone" style="flex: 1; background: var(--bg-card); color: #2563eb; border: 1.5px solid rgba(37, 99, 235, 0.3); padding: 9px 12px; border-radius: 14px; font-size: 12px; font-weight: 800; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                <a *ngIf="warden.phone" [href]="'tel:' + warden.phone" class="contact-btn-warden" style="flex: 1; padding: 9px 12px; border-radius: 14px; font-size: 12px; font-weight: 800; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px;">
                   <span>📞 Call</span>
                 </a>
-                <a *ngIf="warden.email" [href]="'mailto:' + warden.email" style="flex: 1; background: var(--bg-card); color: #2563eb; border: 1.5px solid rgba(37, 99, 235, 0.3); padding: 9px 12px; border-radius: 14px; font-size: 12px; font-weight: 800; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                <a *ngIf="warden.email" [href]="'mailto:' + warden.email" class="contact-btn-warden" style="flex: 1; padding: 9px 12px; border-radius: 14px; font-size: 12px; font-weight: 800; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px;">
                   <span>✉️ Email</span>
                 </a>
               </div>
@@ -374,7 +374,7 @@ import { API_CONFIG } from '../../config/api.config';
           </div>
 
           <div *ngIf="!isLoadingPublicSettings" style="margin-top: 14px;">
-            <div class="solo-dev-card" style="background: linear-gradient(135deg, rgba(239, 246, 255, 0.95) 0%, rgba(219, 234, 254, 0.7) 100%); border: 1.5px solid rgba(37, 99, 235, 0.3); border-radius: 28px; padding: 28px 20px; text-align: center; position: relative; overflow: hidden; box-shadow: 0 12px 32px -4px rgba(37, 99, 235, 0.15); backdrop-filter: blur(16px);">
+            <div class="solo-dev-card">
               
               <!-- Avatar Circle with Glowing Border -->
               <div style="position: relative; width: 90px; height: 90px; margin: 0 auto 16px auto;">
@@ -399,19 +399,19 @@ import { API_CONFIG } from '../../config/api.config';
 
               <!-- Social Links Row -->
               <div style="display: flex; align-items: center; justify-content: center; gap: 12px;">
-                <a href="https://github.com/abhinav8102-asd" target="_blank" rel="noopener" style="width: 40px; height: 40px; border-radius: 12px; background: var(--bg-card); border: 1.5px solid rgba(37, 99, 235, 0.25); color: #2563eb; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: all 0.2s ease;" title="GitHub Profile">
+                <a href="https://github.com/abhinav8102-asd" target="_blank" rel="noopener" class="social-icon-btn-dev" title="GitHub Profile">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
                 </a>
-                <a href="https://linkedin.com" target="_blank" rel="noopener" style="width: 40px; height: 40px; border-radius: 12px; background: var(--bg-card); border: 1.5px solid rgba(37, 99, 235, 0.25); color: #2563eb; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: all 0.2s ease;" title="LinkedIn Profile">
+                <a href="https://linkedin.com" target="_blank" rel="noopener" class="social-icon-btn-dev" title="LinkedIn Profile">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
                 </a>
-                <a href="https://instagram.com" target="_blank" rel="noopener" style="width: 40px; height: 40px; border-radius: 12px; background: var(--bg-card); border: 1.5px solid rgba(37, 99, 235, 0.25); color: #2563eb; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: all 0.2s ease;" title="Instagram Profile">
+                <a href="https://instagram.com" target="_blank" rel="noopener" class="social-icon-btn-dev" title="Instagram Profile">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
                 </a>
-                <a href="https://twitter.com" target="_blank" rel="noopener" style="width: 40px; height: 40px; border-radius: 12px; background: var(--bg-card); border: 1.5px solid rgba(37, 99, 235, 0.25); color: #2563eb; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: all 0.2s ease;" title="Twitter Profile">
+                <a href="https://twitter.com" target="_blank" rel="noopener" class="social-icon-btn-dev" title="Twitter Profile">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
                 </a>
-                <a href="mailto:abhinav@hostelhub.com" target="_blank" rel="noopener" style="width: 40px; height: 40px; border-radius: 12px; background: var(--bg-card); border: 1.5px solid rgba(37, 99, 235, 0.25); color: #2563eb; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: all 0.2s ease;" title="Email">
+                <a href="mailto:abhinav@hostelhub.com" target="_blank" rel="noopener" class="social-icon-btn-dev" title="Email">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                 </a>
               </div>
@@ -419,7 +419,7 @@ import { API_CONFIG } from '../../config/api.config';
           </div>
 
           <!-- 4. System Overview & Workflow Pipeline Card (Exact Match to User Screenshot) -->
-          <div class="overview-glass-card" style="margin-top: 32px; background: linear-gradient(135deg, rgba(239, 246, 255, 0.85) 0%, rgba(219, 234, 254, 0.6) 100%); border: 1.5px solid rgba(37, 99, 235, 0.2); border-radius: 28px; padding: 24px 20px; box-shadow: 0 10px 30px rgba(37, 99, 235, 0.06); backdrop-filter: blur(16px);">
+          <div class="overview-glass-card" style="margin-top: 32px;">
             
             <!-- Top Section: What is HostelHub? -->
             <div style="margin-bottom: 24px;">
@@ -435,13 +435,13 @@ import { API_CONFIG } from '../../config/api.config';
               
               <!-- Feature Pills Row -->
               <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                <span style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); font-size: 11.5px; font-weight: 800; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                <span class="overview-feature-pill">
                   ⚡ Instant Ticket Dispatch
                 </span>
-                <span style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); font-size: 11.5px; font-weight: 800; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                <span class="overview-feature-pill">
                   🍽️ Daily Mess Rating
                 </span>
-                <span style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); font-size: 11.5px; font-weight: 800; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                <span class="overview-feature-pill">
                   📢 Official Warden Feed
                 </span>
               </div>
@@ -460,29 +460,29 @@ import { API_CONFIG } from '../../config/api.config';
 
               <!-- 4 Step Pill Cards -->
               <div style="display: flex; flex-direction: column; gap: 12px;">
-                <div style="background: var(--bg-card); border-radius: 18px; padding: 14px 16px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
-                  <span style="background: #eff6ff; color: #2563eb; font-size: 12.5px; font-weight: 900; width: 34px; height: 34px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">01</span>
+                <div class="overview-step-pill">
+                  <span style="background: rgba(37,99,235,0.12); color: #2563eb; font-size: 12.5px; font-weight: 900; width: 34px; height: 34px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">01</span>
                   <p style="margin: 0; font-size: 12.5px; font-weight: 700; color: var(--text-primary); line-height: 1.4;">
                     1. Raise a Ticket: Submit electrical, plumbing, carpentry, or cleaning issues with photos.
                   </p>
                 </div>
 
-                <div style="background: var(--bg-card); border-radius: 18px; padding: 14px 16px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
-                  <span style="background: #eff6ff; color: #2563eb; font-size: 12.5px; font-weight: 900; width: 34px; height: 34px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">02</span>
+                <div class="overview-step-pill">
+                  <span style="background: rgba(37,99,235,0.12); color: #2563eb; font-size: 12.5px; font-weight: 900; width: 34px; height: 34px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">02</span>
                   <p style="margin: 0; font-size: 12.5px; font-weight: 700; color: var(--text-primary); line-height: 1.4;">
                     2. Automated Routing: Wardens assign staff based on category.
                   </p>
                 </div>
 
-                <div style="background: var(--bg-card); border-radius: 18px; padding: 14px 16px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
-                  <span style="background: #eff6ff; color: #2563eb; font-size: 12.5px; font-weight: 900; width: 34px; height: 34px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">03</span>
+                <div class="overview-step-pill">
+                  <span style="background: rgba(37,99,235,0.12); color: #2563eb; font-size: 12.5px; font-weight: 900; width: 34px; height: 34px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">03</span>
                   <p style="margin: 0; font-size: 12.5px; font-weight: 700; color: var(--text-primary); line-height: 1.4;">
                     3. Track Resolution: View status changes and review work completion proof.
                   </p>
                 </div>
 
-                <div style="background: var(--bg-card); border-radius: 18px; padding: 14px 16px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
-                  <span style="background: #eff6ff; color: #2563eb; font-size: 12.5px; font-weight: 900; width: 34px; height: 34px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">04</span>
+                <div class="overview-step-pill">
+                  <span style="background: rgba(37,99,235,0.12); color: #2563eb; font-size: 12.5px; font-weight: 900; width: 34px; height: 34px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">04</span>
                   <p style="margin: 0; font-size: 12.5px; font-weight: 700; color: var(--text-primary); line-height: 1.4;">
                     4. Connect: Join batch group chats and stay updated.
                   </p>

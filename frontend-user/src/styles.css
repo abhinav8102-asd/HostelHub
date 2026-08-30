@@ -2009,3 +2009,125 @@ body.dark-mode .sidebar-drawer {
   align-items: center;
   gap: 4px;
 }
+
+/* ==========================================================================
+   GLASSMORPHIC CARDS WITH PREMIUM DARK MODE OVERRIDES
+   ========================================================================== */
+
+/* ── WARDEN GLASS CARD ── */
+.warden-glass-card {
+  background: linear-gradient(135deg, rgba(239, 246, 255, 0.95) 0%, rgba(219, 234, 254, 0.7) 100%);
+  border: 1.5px solid rgba(37, 99, 235, 0.25);
+  border-radius: 26px;
+  padding: 22px 20px;
+  box-shadow: 0 10px 28px -4px rgba(37, 99, 235, 0.1);
+  backdrop-filter: blur(16px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.25s ease;
+}
+
+body.dark-mode .warden-glass-card {
+  background: linear-gradient(135deg, rgba(21, 29, 48, 0.95) 0%, rgba(15, 23, 42, 0.9) 100%);
+  border: 1.5px solid rgba(59, 130, 246, 0.3);
+  box-shadow: 0 10px 28px -4px rgba(0, 0, 0, 0.4);
+}
+
+/* ── SOLO DEV CARD GLASS ── */
+.solo-dev-card {
+  background: linear-gradient(135deg, rgba(239, 246, 255, 0.95) 0%, rgba(219, 234, 254, 0.7) 100%);
+  border: 1.5px solid rgba(37, 99, 235, 0.3);
+  border-radius: 28px;
+  padding: 28px 20px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 12px 32px -4px rgba(37, 99, 235, 0.15);
+  backdrop-filter: blur(16px);
+}
+
+body.dark-mode .solo-dev-card {
+  background: linear-gradient(135deg, rgba(21, 29, 48, 0.95) 0%, rgba(15, 23, 42, 0.9) 100%);
+  border: 1.5px solid rgba(59, 130, 246, 0.3);
+  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.4);
+}
+
+/* ── OVERVIEW GLASS CARD ── */
+.overview-glass-card {
+  background: linear-gradient(135deg, rgba(239, 246, 255, 0.85) 0%, rgba(219, 234, 254, 0.6) 100%);
+  border: 1.5px solid rgba(37, 99, 235, 0.2);
+  border-radius: 28px;
+  padding: 24px 20px;
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.06);
+  backdrop-filter: blur(16px);
+}
+
+body.dark-mode .overview-glass-card {
+  background: linear-gradient(135deg, rgba(21, 29, 48, 0.95) 0%, rgba(15, 23, 42, 0.9) 100%);
+  border: 1.5px solid rgba(59, 130, 246, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* Dark Mode Social Icon Buttons & Step Pills */
+.social-icon-btn-dev {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--bg-card);
+  border: 1.5px solid rgba(37, 99, 235, 0.25);
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+body.dark-mode .social-icon-btn-dev {
+  background: #1e293b !important;
+  border-color: rgba(59, 130, 246, 0.4) !important;
+  color: #60a5fa !important;
+}
+
+.overview-step-pill {
+  background: var(--bg-card);
+  border-radius: 18px;
+  padding: 14px 16px;
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+}
+
+body.dark-mode .overview-step-pill {
+  background: #151d30 !important;
+  border-color: rgba(59, 130, 246, 0.25) !important;
+}
+
+.overview-feature-pill {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  font-size: 11.5px;
+  font-weight: 800;
+  padding: 6px 14px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+body.dark-mode .overview-feature-pill {
+  background: #151d30 !important;
+  border-color: rgba(59, 130, 246, 0.25) !important;
+  color: #f8fafc !important;
+}
+
+body.dark-mode .contact-btn-warden {
+  background: #151d30 !important;
+  border-color: rgba(59, 130, 246, 0.3) !important;
+  color: #60a5fa !important;
+}
