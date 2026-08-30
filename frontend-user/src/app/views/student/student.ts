@@ -137,26 +137,26 @@ import { API_CONFIG } from '../../config/api.config';
       </div>
 
       <!-- CYBER COMMAND TOP HEADER BAR -->
-      <div class="cyber-top-bar" *ngIf="activeTab !== 'chat'">
+      <div class="cyber-top-bar" *ngIf="activeTab !== 'chat'" style="background: var(--bg-card); padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid var(--border-color); position: sticky; top: 0; z-index: 500; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);">
         <!-- Left Group: Hamburger + Avatar + Student Info -->
         <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; padding-right: 6px;">
-          <button type="button" class="hamburger-btn" (click)="toggleSidebar()" title="Open Navigation Menu">
+          <button type="button" (click)="toggleSidebar()" title="Open Navigation Menu" style="width: 36px; height: 36px; border-radius: 11px; background: rgba(37, 99, 235, 0.1); border: 1.5px solid rgba(37, 99, 235, 0.25); color: #2563eb; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
             <span>☰</span>
           </button>
 
           <div (click)="switchTab('my-profile')" style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex: 1; min-width: 0;">
-            <div style="position: relative; width: 40px; height: 40px; flex-shrink: 0;">
+            <div style="position: relative; width: 38px; height: 38px; flex-shrink: 0;">
               <div style="width: 100%; height: 100%; border-radius: 50%; border: 2px solid #2563eb; padding: 2px; display: flex; align-items: center; justify-content: center; background: var(--bg-card);">
                 <span class="avatar" *ngIf="!user?.profilePicUrl" style="font-size: 18px;">🎓</span>
                 <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" (error)="onAvatarError($event)" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
               </div>
-              <div class="online-pulse-dot"></div>
+              <div class="online-pulse-dot" style="width: 9px; height: 9px; border-width: 1.5px;"></div>
             </div>
             <div style="flex: 1; min-width: 0; overflow: hidden;">
               <h4 style="margin: 0; font-size: 14.5px; font-weight: 900; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;">
                 {{ user?.name }}
               </h4>
-              <p style="margin: 2px 0 0 0; font-size: 11px; font-weight: 700; color: #2563eb; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;">
+              <p style="margin: 2px 0 0 0; font-size: 11px; font-weight: 700; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;">
                 🏢 {{ user?.hostelBlock }} · Rm {{ user?.roomNumber }}
               </p>
             </div>
@@ -165,13 +165,14 @@ import { API_CONFIG } from '../../config/api.config';
 
         <!-- Right Group: Tickets Pill & Theme Toggle -->
         <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
-          <button (click)="switchTab('my-complaints')" class="header-tickets-btn" title="View Active Tickets">
-            <span class="tickets-badge-count">
+          <button (click)="switchTab('my-complaints')" title="View Active Tickets" style="background: #2563eb; color: #ffffff; border: none; padding: 6px 12px; border-radius: 20px; font-size: 11.5px; font-weight: 800; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); cursor: pointer; flex-shrink: 0;">
+            <span style="background: rgba(255, 255, 255, 0.25); color: #ffffff; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10.5px; font-weight: 900;">
               {{ getActiveTicketsCount() }}
             </span>
-            <span class="tickets-badge-text">TICKETS</span>
+            <span style="color: #ffffff; font-weight: 900; letter-spacing: 0.4px;">TICKETS</span>
           </button>
-          <button class="theme-toggle-btn" (click)="toggleDarkMode()" [title]="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'" style="width: 38px; height: 38px; border-radius: 12px; border: 1.5px solid var(--border-color); background: var(--bg-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--text-primary); flex-shrink: 0;">
+
+          <button (click)="toggleDarkMode()" [title]="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'" style="width: 36px; height: 36px; border-radius: 11px; border: 1.5px solid var(--border-color); background: var(--bg-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--text-primary); flex-shrink: 0;">
             {{ isDarkMode ? '☀️' : '🌙' }}
           </button>
         </div>
