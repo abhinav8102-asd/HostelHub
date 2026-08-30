@@ -1418,3 +1418,387 @@ body.dark-mode .dev-role-badge {
   color: var(--text-secondary);
   line-height: 1.5;
 }
+
+/* ==========================================================================
+   WORLD-CLASS 3D ANIMATED QUICK LAUNCHPAD & TOP HEADER BAR
+   ========================================================================== */
+
+/* Top Command Header Bar */
+.cyber-top-bar {
+  background: var(--bg-card);
+  padding: 12px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1.5px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 500;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.hamburger-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  border: 1.5px solid var(--border-color);
+  background: var(--bg-muted);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.hamburger-btn:hover {
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+  border-color: rgba(37, 99, 235, 0.3);
+}
+
+/* Online Status Pulse Dot */
+.online-pulse-dot {
+  width: 10px;
+  height: 10px;
+  background-color: #10b981;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+  animation: onlinePulse 2s infinite ease-in-out;
+}
+
+@keyframes onlinePulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* World-Class 3D Quick Action Grid */
+.action-grid-3d {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 480px) {
+  .action-grid-3d {
+    gap: 12px;
+  }
+}
+
+/* Launchpad 3D Glass Cards */
+.action-tile-3d {
+  border-radius: 24px;
+  padding: 20px 18px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 142px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+              box-shadow 0.25s ease, 
+              border-color 0.25s ease;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.action-tile-3d:active {
+  transform: scale(0.96) !important;
+  transition: transform 0.1s ease !important;
+}
+
+/* Color Variant 1: Blue Launchpad Tile (Raise Issue) */
+.tile-blue {
+  background: linear-gradient(135deg, rgba(239, 246, 255, 0.95) 0%, rgba(219, 234, 254, 0.8) 100%);
+  border: 1.5px solid rgba(37, 99, 235, 0.25);
+  box-shadow: 0 10px 24px -4px rgba(37, 99, 235, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+.tile-blue:hover {
+  transform: translateY(-6px) scale(1.02);
+  border-color: rgba(37, 99, 235, 0.45);
+  box-shadow: 0 16px 36px -4px rgba(37, 99, 235, 0.22);
+}
+body.dark-mode .tile-blue {
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.35) 0%, rgba(15, 23, 42, 0.8) 100%);
+  border: 1.5px solid rgba(59, 130, 246, 0.3);
+}
+
+/* Color Variant 2: Emerald Green Launchpad Tile (Mess Review) */
+.tile-green {
+  background: linear-gradient(135deg, rgba(236, 253, 245, 0.95) 0%, rgba(209, 250, 229, 0.8) 100%);
+  border: 1.5px solid rgba(16, 185, 129, 0.25);
+  box-shadow: 0 10px 24px -4px rgba(16, 185, 129, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+.tile-green:hover {
+  transform: translateY(-6px) scale(1.02);
+  border-color: rgba(16, 185, 129, 0.45);
+  box-shadow: 0 16px 36px -4px rgba(16, 185, 129, 0.22);
+}
+body.dark-mode .tile-green {
+  background: linear-gradient(135deg, rgba(6, 78, 59, 0.35) 0%, rgba(15, 23, 42, 0.8) 100%);
+  border: 1.5px solid rgba(52, 211, 153, 0.3);
+}
+
+/* Color Variant 3: Soft Purple Launchpad Tile (Hostel Notices) */
+.tile-purple {
+  background: linear-gradient(135deg, rgba(245, 243, 255, 0.95) 0%, rgba(237, 233, 254, 0.8) 100%);
+  border: 1.5px solid rgba(139, 92, 246, 0.25);
+  box-shadow: 0 10px 24px -4px rgba(139, 92, 246, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+.tile-purple:hover {
+  transform: translateY(-6px) scale(1.02);
+  border-color: rgba(139, 92, 246, 0.45);
+  box-shadow: 0 16px 36px -4px rgba(139, 92, 246, 0.22);
+}
+body.dark-mode .tile-purple {
+  background: linear-gradient(135deg, rgba(76, 29, 149, 0.35) 0%, rgba(15, 23, 42, 0.8) 100%);
+  border: 1.5px solid rgba(167, 139, 250, 0.3);
+}
+
+/* Color Variant 4: Warm Amber Launchpad Tile (My Tickets) */
+.tile-amber {
+  background: linear-gradient(135deg, rgba(254, 243, 199, 0.95) 0%, rgba(253, 230, 138, 0.8) 100%);
+  border: 1.5px solid rgba(245, 158, 11, 0.25);
+  box-shadow: 0 10px 24px -4px rgba(245, 158, 11, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+.tile-amber:hover {
+  transform: translateY(-6px) scale(1.02);
+  border-color: rgba(245, 158, 11, 0.45);
+  box-shadow: 0 16px 36px -4px rgba(245, 158, 11, 0.22);
+}
+body.dark-mode .tile-amber {
+  background: linear-gradient(135deg, rgba(120, 53, 15, 0.35) 0%, rgba(15, 23, 42, 0.8) 100%);
+  border: 1.5px solid rgba(251, 191, 36, 0.3);
+}
+
+/* Icon Badges & Floating 3D Micro Animations */
+.action-badge-floating {
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+  transition: transform 0.3s ease;
+}
+
+/* 🚀 Rocket Floating Animation */
+.tile-blue .action-badge-floating {
+  animation: floatRocket 3s infinite ease-in-out;
+}
+@keyframes floatRocket {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-5px) rotate(4deg); }
+}
+
+/* ⭐ Star Sparkle Pulse Animation */
+.tile-green .action-badge-floating {
+  animation: starPulse 2.5s infinite ease-in-out;
+}
+@keyframes starPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.6)); }
+}
+
+/* 📢 Megaphone Sway Animation */
+.tile-purple .action-badge-floating {
+  animation: noticeSway 3s infinite ease-in-out;
+}
+@keyframes noticeSway {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-6deg); }
+  75% { transform: rotate(6deg); }
+}
+
+/* 📋 Clipboard Bounce Animation */
+.tile-amber .action-badge-floating {
+  animation: ticketBounce 2.8s infinite ease-in-out;
+}
+@keyframes ticketBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.action-card-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-top: 14px;
+}
+
+.action-card-sub {
+  font-size: 11.5px;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+/* ── FUTURISTIC SIDEBAR GLASS DRAWER ── */
+.sidebar-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 9999;
+  display: flex;
+}
+
+.sidebar-drawer {
+  width: 310px;
+  max-width: 85vw;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(24px);
+  border-right: 1.5px solid rgba(37, 99, 235, 0.25);
+  box-shadow: 12px 0 40px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px 20px;
+  animation: slideRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body.dark-mode .sidebar-drawer {
+  background: rgba(15, 23, 42, 0.95);
+  border-right: 1.5px solid rgba(59, 130, 246, 0.25);
+}
+
+@keyframes slideRight {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sidebar-avatar-ring {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2.5px solid #2563eb;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-user-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.sidebar-user-role {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  display: block;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.sidebar-user-block {
+  font-size: 11px;
+  font-weight: 800;
+  color: #2563eb;
+  display: block;
+  margin-top: 2px;
+}
+
+.sidebar-close-btn {
+  background: var(--bg-muted);
+  border: 1px solid var(--border-color);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: var(--text-muted);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-nav-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 20px;
+  flex: 1;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  text-align: left;
+}
+
+.sidebar-nav-item:hover, .sidebar-nav-item.active {
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+}
+
+.sidebar-nav-icon {
+  font-size: 20px;
+}
+
+.sidebar-badge {
+  margin-left: auto;
+  background: #2563eb;
+  color: white;
+  font-size: 11px;
+  font-weight: 900;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.sidebar-logout-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1.5px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.08);
+  color: #ef4444;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.sidebar-logout-btn:hover {
+  background: #ef4444;
+  color: white;
+}

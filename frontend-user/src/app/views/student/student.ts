@@ -68,25 +68,108 @@ import { API_CONFIG } from '../../config/api.config';
         </div>
       </div>
 
-      <!-- HEADER -->
-      <div class="header" *ngIf="activeTab !== 'chat'">
-        <div class="user-info" (click)="switchTab('my-profile')" style="cursor: pointer;" title="View Profile">
-          <div class="avatar-ring">
-            <span class="avatar" *ngIf="!user?.profilePicUrl">🎓</span>
-            <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" (error)="onAvatarError($event)" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
+      <!-- FUTURISTIC SIDEBAR GLASS DRAWER OVERLAY -->
+      <div class="sidebar-backdrop" *ngIf="isSidebarOpen" (click)="closeSidebar()">
+        <div class="sidebar-drawer" (click)="$event.stopPropagation()">
+          <div class="sidebar-header">
+            <div class="sidebar-user-info">
+              <div class="sidebar-avatar-ring">
+                <span class="avatar" *ngIf="!user?.profilePicUrl" style="font-size: 24px;">🎓</span>
+                <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" (error)="onAvatarError($event)" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
+              </div>
+              <div>
+                <h4 class="sidebar-user-name">{{ user?.name }}</h4>
+                <span class="sidebar-user-role">🎓 Student · Room {{ user?.roomNumber }}</span>
+                <span class="sidebar-user-block">🏢 {{ user?.hostelBlock || 'Hostel' }}</span>
+              </div>
+            </div>
+            <button type="button" class="sidebar-close-btn" (click)="closeSidebar()">✕</button>
           </div>
-          <div>
-            <h3>{{ user?.name }}</h3>
-            <p class="user-meta">{{ user?.hostelBlock }} · Room {{ user?.roomNumber }}</p>
+
+          <!-- Navigation Links List -->
+          <div class="sidebar-nav-menu">
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'home'" (click)="switchTab('home'); closeSidebar()">
+              <span class="sidebar-nav-icon">🏠</span>
+              <span>Home Dashboard</span>
+            </button>
+
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'notices'" (click)="switchTab('notices'); closeSidebar()">
+              <span class="sidebar-nav-icon">📢</span>
+              <span>Official Notices</span>
+              <span class="sidebar-badge" *ngIf="getUnreadNoticesCount() > 0">{{ getUnreadNoticesCount() }}</span>
+            </button>
+
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'raise'" (click)="switchTab('raise'); closeSidebar()">
+              <span class="sidebar-nav-icon">🚀</span>
+              <span>Raise Complaint</span>
+            </button>
+
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'mess'" (click)="switchTab('mess'); closeSidebar()">
+              <span class="sidebar-nav-icon">🍴</span>
+              <span>Mess Food Reviews</span>
+            </button>
+
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'my-complaints'" (click)="switchTab('my-complaints'); closeSidebar()">
+              <span class="sidebar-nav-icon">📋</span>
+              <span>My Tickets Tracker</span>
+              <span class="sidebar-badge" *ngIf="getActiveTicketsCount() > 0">{{ getActiveTicketsCount() }}</span>
+            </button>
+
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'profile'" (click)="switchTab('profile'); closeSidebar()">
+              <span class="sidebar-nav-icon">🔔</span>
+              <span>Notifications & Alerts</span>
+              <span class="sidebar-badge" *ngIf="getUnreadNotificationsCount() > 0">{{ getUnreadNotificationsCount() }}</span>
+            </button>
+
+            <button type="button" class="sidebar-nav-item" [class.active]="activeTab === 'my-profile'" (click)="switchTab('my-profile'); closeSidebar()">
+              <span class="sidebar-nav-icon">👤</span>
+              <span>Account Profile</span>
+            </button>
+          </div>
+
+          <!-- Sidebar Footer Logout Button -->
+          <div class="sidebar-footer-box">
+            <button type="button" class="sidebar-logout-btn" (click)="logout()">
+              <span>🚪 Logout Account</span>
+            </button>
           </div>
         </div>
-        <div class="header-actions">
-          <button class="theme-toggle-btn" (click)="toggleDarkMode()" [title]="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
-            {{ isDarkMode ? '☀️' : '🌙' }}
+      </div>
+
+      <!-- CYBER COMMAND TOP HEADER BAR -->
+      <div class="cyber-top-bar" *ngIf="activeTab !== 'chat'">
+        <!-- Left: Hamburger Button -->
+        <button type="button" class="hamburger-btn" (click)="toggleSidebar()" title="Open Navigation Menu">
+          <span>☰</span>
+        </button>
+
+        <!-- Center/Left: User Profile & Online Indicator -->
+        <div (click)="switchTab('my-profile')" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+          <div style="position: relative; width: 44px; height: 44px;">
+            <div style="width: 100%; height: 100%; border-radius: 50%; border: 2px solid #2563eb; padding: 2px; display: flex; align-items: center; justify-content: center;">
+              <span class="avatar" *ngIf="!user?.profilePicUrl" style="font-size: 20px;">🎓</span>
+              <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" (error)="onAvatarError($event)" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
+            </div>
+            <div class="online-pulse-dot"></div>
+          </div>
+          <div>
+            <h4 style="margin: 0; font-size: 15px; font-weight: 800; color: var(--text-primary);">{{ user?.name }}</h4>
+            <p style="margin: 2px 0 0 0; font-size: 11px; font-weight: 700; color: #2563eb;">
+              🏢 {{ user?.hostelBlock }} · Room {{ user?.roomNumber }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Right: Tickets Pill & Theme Toggle -->
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button (click)="switchTab('my-complaints')" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; border: none; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 800; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(37,99,235,0.3); cursor: pointer;">
+            <span style="background: rgba(255,255,255,0.25); color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900;">
+              {{ getActiveTicketsCount() }}
+            </span>
+            <span>TICKETS</span>
           </button>
-          <button class="logout-btn" (click)="logout()">
-            <span>Logout</span>
-            <span>🚪</span>
+          <button class="theme-toggle-btn" (click)="toggleDarkMode()" style="width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--border-color); background: var(--bg-card); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+            {{ isDarkMode ? '☀️' : '🌙' }}
           </button>
         </div>
       </div>
@@ -94,34 +177,75 @@ import { API_CONFIG } from '../../config/api.config';
       <!-- MAIN TABS CONTAINER -->
       <div class="tab-content-area">
 
-        <!-- TAB 0: HOME / NOTICES -->
+        <!-- TAB 0: HOME / COMMAND CENTER -->
         <div *ngIf="activeTab === 'home'" class="tab-panel animate-fade">
           
-          <!-- 1. Student Profile Card (Top Widget) -->
-          <div class="card student-profile-card">
-            <div class="profile-card-pattern"></div>
-            <div class="profile-card-content">
-              <div class="profile-user-img-wrapper">
-                <span class="profile-avatar-emoji" *ngIf="!user?.profilePicUrl">🎓</span>
-                <img *ngIf="user?.profilePicUrl" [src]="getImageUrl(user.profilePicUrl)" class="profile-user-img" />
-              </div>
-              <div class="profile-user-details">
-                <div class="welcome-tag">Welcome back,</div>
-                <h4 class="profile-user-name">{{ user?.name }}</h4>
-                <div class="profile-pills">
-                  <span class="profile-pill block-pill">🏢 {{ user?.hostelBlock || 'N/A' }}</span>
-                  <span class="profile-pill room-pill">🔑 Room {{ user?.roomNumber || 'N/A' }}</span>
-                  <span class="profile-pill batch-pill">🎓 {{ user?.batch || 'Batch 2025' }}</span>
+          <!-- 1. Sleek Compact Glass Greeting Banner -->
+          <div style="background: linear-gradient(135deg, rgba(37,99,235,0.08) 0%, rgba(56,189,248,0.12) 100%); border-radius: 20px; padding: 16px 20px; border: 1.5px solid rgba(37,99,235,0.2); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 8px 24px rgba(37,99,235,0.06);">
+            <div>
+              <span style="font-size: 11px; font-weight: 800; color: #2563eb; letter-spacing: 0.6px; text-transform: uppercase; display: block; margin-bottom: 2px;">⚡ STUDENT COMMAND CENTER</span>
+              <h4 style="margin: 0; font-size: 18px; font-weight: 900; color: var(--text-primary);">Hello, {{ user?.name }}! 👋</h4>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <span style="background: #eff6ff; color: #2563eb; border: 1px solid rgba(37,99,235,0.2); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 800;">
+                🎓 {{ user?.batch || 'Batch 2025' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- 2. World-Class 3D Quick Action Grid Launchpad -->
+          <div style="margin-top: 10px; margin-bottom: 28px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <h4 style="margin: 0; font-size: 17px; font-weight: 900; color: var(--text-primary);">🚀 Quick Launchpad</h4>
+              <span style="font-size: 11.5px; font-weight: 800; color: #2563eb;">1-Tap Access</span>
+            </div>
+
+            <div class="action-grid-3d">
+              <!-- Action 1: Raise Complaint -->
+              <div class="action-tile-3d tile-blue" (click)="switchTab('raise')">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white;">🚀</div>
+                  <span style="font-size: 10.5px; font-weight: 800; color: #2563eb; background: rgba(37,99,235,0.12); padding: 3px 8px; border-radius: 10px;">URGENT</span>
+                </div>
+                <div>
+                  <div class="action-card-title">Raise Issue</div>
+                  <div class="action-card-sub" style="color: #475569;">Submit ticket to staff</div>
                 </div>
               </div>
-              <div class="profile-quick-stats">
-                <div class="stat-item clickable" (click)="switchTab('my-complaints')">
-                  <span class="stat-count">{{ complaints.length }}</span>
-                  <span class="stat-label">Total Tickets</span>
+
+              <!-- Action 2: Mess Review -->
+              <div class="action-tile-3d tile-green" (click)="switchTab('mess')">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #10b981, #059669); color: white;">⭐</div>
+                  <span style="font-size: 10.5px; font-weight: 800; color: #059669; background: rgba(16,185,129,0.12); padding: 3px 8px; border-radius: 10px;">DAILY</span>
                 </div>
-                <div class="stat-item resolved clickable" (click)="switchTab('my-complaints')">
-                  <span class="stat-count">{{ getResolvedCount() }}</span>
-                  <span class="stat-label">Resolved</span>
+                <div>
+                  <div class="action-card-title">Mess Review</div>
+                  <div class="action-card-sub" style="color: #047857;">Rate meal & upload photo</div>
+                </div>
+              </div>
+
+              <!-- Action 3: Notices & Broadcasts -->
+              <div class="action-tile-3d tile-purple" (click)="switchTab('notices')">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white;">📢</div>
+                  <span style="font-size: 10.5px; font-weight: 800; color: #6d28d9; background: rgba(139,92,246,0.12); padding: 3px 8px; border-radius: 10px;">{{ announcements.length }} NEW</span>
+                </div>
+                <div>
+                  <div class="action-card-title">Hostel Notices</div>
+                  <div class="action-card-sub" style="color: #5b21b6;">Warden official broadcasts</div>
+                </div>
+              </div>
+
+              <!-- Action 4: My Tickets -->
+              <div class="action-tile-3d tile-amber" (click)="switchTab('my-complaints')">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div class="action-badge-floating" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;">📋</div>
+                  <span style="font-size: 10.5px; font-weight: 800; color: #b45309; background: rgba(245,158,11,0.15); padding: 3px 8px; border-radius: 10px;">{{ getActiveTicketsCount() }} ACTIVE</span>
+                </div>
+                <div>
+                  <div class="action-card-title">My Tickets</div>
+                  <div class="action-card-sub" style="color: #78350f;">Track live repair progress</div>
                 </div>
               </div>
             </div>
@@ -1822,6 +1946,16 @@ import { API_CONFIG } from '../../config/api.config';
   `]
 })
 export class StudentDashboardComponent implements OnInit, OnDestroy {
+  isSidebarOpen = false;
+
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
+
+  closeSidebar() {
+    this.isSidebarOpen = false;
+  }
+
   getInitials(name: string): string {
     if (!name) return 'U';
     const parts = name.trim().split(' ');
@@ -1831,7 +1965,7 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     return name.substring(0, 2).toUpperCase();
   }
   user: User | null = null;
-  activeTab = 'home';
+  activeTab: any = 'home';
   complaints: any[] = [];
   announcements: any[] = [];
   notifications: any[] = [];
