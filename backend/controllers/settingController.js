@@ -78,36 +78,23 @@ exports.getPublicSettings = async (req, res) => {
       config[s.key] = s.value;
     });
 
-    if (typeof config.developer_team === 'string') {
-      try {
-        const parsed = JSON.parse(config.developer_team);
-        config.developer_team = parsed.map((d) => ({
-          ...d,
-          instagram: d.instagram || 'https://instagram.com'
-        }));
-      } catch (e) {
-        config.developer_team = [];
-      }
-    }
-
-    // Parse developer_team if it's stored as JSON
+    // Parse developer_team if stored as string/JSON
     try {
       let team = typeof config.developer_team === 'string' ? JSON.parse(config.developer_team) : config.developer_team;
       if (Array.isArray(team)) {
         team = team.map((dev, idx) => ({
-          name: dev.name || (idx === 0 ? 'Abhinav Kumar' : 'Saransh Singh'),
-          role: dev.role || (idx === 0 ? 'Lead Full-Stack Developer' : 'UI/UX Designer'),
-          description: dev.description || (idx === 0 ? 'Expert in Node.js, Express, Sequelize, and Angular architecture.' : 'Specializes in crafting premium dark/light mode interfaces and custom transitions.'),
-          pic: dev.pic || (idx === 0 ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80' : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80'),
-          github: dev.github || (idx === 0 ? 'https://github.com/abhinav8102-asd' : 'https://github.com'),
-          linkedin: dev.linkedin || 'https://linkedin.com',
-          instagram: dev.instagram || 'https://instagram.com',
-          twitter: dev.twitter || 'https://twitter.com',
-          email: dev.email || (idx === 0 ? 'mailto:abhinav@hostelhub.com' : 'mailto:saransh@hostelhub.com')
+          name: dev.name || (idx === 0 ? 'Abhinav Kumar' : 'Developer Member'),
+          role: dev.role || (idx === 0 ? 'Lead Full-Stack Developer' : 'Developer'),
+          description: dev.description || '',
+          pic: dev.pic || '',
+          github: dev.github || '',
+          linkedin: dev.linkedin || '',
+          instagram: dev.instagram || '',
+          twitter: dev.twitter || '',
+          email: dev.email || ''
         }));
-
-        // Persist complete team back to DB so social links are saved
-        await Setting.upsert({ key: 'developer_team', value: JSON.stringify(team) });
+      } else {
+        team = [];
       }
       config.developer_team = team;
     } catch (e) {

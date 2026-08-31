@@ -667,34 +667,83 @@ import { ComplaintService } from '../../services/complaint.service';
 
           <!-- Section 3: Developer Team Information -->
           <div class="card shadow-card" style="margin-bottom: 20px;">
-            <h5 class="card-section-title">👨‍💻 Meet the Developer Team Information</h5>
-            <div *ngFor="let dev of systemPublicSettings.developer_team; let i = index" class="card" style="background: var(--bg-muted); margin-bottom: 12px; border: 1px solid var(--border-color);">
-              <h6 style="margin: 0 0 10px 0; font-size: 14px; font-weight: 700; color: var(--text-primary);">Developer Member #{{ i + 1 }}</h6>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <h5 class="card-section-title" style="margin: 0;">👨‍💻 Meet the Developer Team Information</h5>
+              <button type="button" class="btn btn-primary" (click)="addDeveloperMember()" style="font-size: 12px; padding: 6px 14px;">
+                ➕ Add Developer
+              </button>
+            </div>
+
+            <div *ngFor="let dev of systemPublicSettings.developer_team; let i = index" class="card" style="background: var(--bg-muted); margin-bottom: 16px; border: 1px solid var(--border-color); padding: 16px; border-radius: 14px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h6 style="margin: 0; font-size: 14px; font-weight: 800; color: var(--text-primary);">Developer Member #{{ i + 1 }}</h6>
+                <button type="button" (click)="removeDeveloperMember(i)" style="background: #ef4444; color: white; border: none; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer;">
+                  🗑️ Remove
+                </button>
+              </div>
+
+              <!-- Profile Photo Upload -->
+              <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 14px; background: var(--bg-card); padding: 10px; border-radius: 12px; border: 1px solid var(--border-color);">
+                <div style="width: 50px; height: 50px; border-radius: 50%; background: #2563eb; color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; overflow: hidden; flex-shrink: 0;">
+                  <img *ngIf="dev.pic" [src]="getImageUrl(dev.pic)" style="width: 100%; height: 100%; object-fit: cover;" alt="Dev Photo" />
+                  <span *ngIf="!dev.pic">👨‍💻</span>
+                </div>
+                <div style="flex: 1;">
+                  <label class="form-label" style="margin-bottom: 4px;">PROFILE PHOTO</label>
+                  <input type="file" (change)="uploadDeveloperPhoto($event, i)" accept="image/*" style="font-size: 12px; color: var(--text-secondary);" />
+                </div>
+              </div>
+
+              <!-- Name & Role -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
                 <div>
                   <label class="form-label">Name</label>
-                  <input type="text" class="form-input" [(ngModel)]="dev.name" placeholder="Developer Name" />
+                  <input type="text" class="form-input" [(ngModel)]="dev.name" placeholder="e.g. Abhinav Kumar" />
                 </div>
                 <div>
                   <label class="form-label">Role Title</label>
                   <input type="text" class="form-input" [(ngModel)]="dev.role" placeholder="e.g. Lead Full-Stack Developer" />
                 </div>
               </div>
-              <div style="margin-bottom: 8px;">
+
+              <!-- Short Description -->
+              <div style="margin-bottom: 10px;">
                 <label class="form-label">Short Description / Bio</label>
-                <input type="text" class="form-input" [(ngModel)]="dev.description" placeholder="Description" />
+                <input type="text" class="form-input" [(ngModel)]="dev.description" placeholder="Bio description..." />
               </div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+
+              <!-- Social Links (GitHub, LinkedIn, Instagram, Twitter, Email) -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;">
                 <div>
-                  <label class="form-label">GitHub URL</label>
-                  <input type="text" class="form-input" [(ngModel)]="dev.github" placeholder="https://github.com/..." />
+                  <label class="form-label">GitHub URL / Username</label>
+                  <input type="text" class="form-input" [(ngModel)]="dev.github" placeholder="https://github.com/username" />
                 </div>
                 <div>
                   <label class="form-label">LinkedIn URL</label>
-                  <input type="text" class="form-input" [(ngModel)]="dev.linkedin" placeholder="https://linkedin.com/in/..." />
+                  <input type="text" class="form-input" [(ngModel)]="dev.linkedin" placeholder="https://linkedin.com/in/username" />
                 </div>
               </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                <div>
+                  <label class="form-label">Instagram URL</label>
+                  <input type="text" class="form-input" [(ngModel)]="dev.instagram" placeholder="https://instagram.com/username" />
+                </div>
+                <div>
+                  <label class="form-label">Twitter / X URL</label>
+                  <input type="text" class="form-input" [(ngModel)]="dev.twitter" placeholder="https://x.com/username" />
+                </div>
+                <div>
+                  <label class="form-label">Gmail / Email Address</label>
+                  <input type="text" class="form-input" [(ngModel)]="dev.email" placeholder="dev@gmail.com" />
+                </div>
+              </div>
+
             </div>
+
+            <button type="button" class="btn btn-secondary" (click)="addDeveloperMember()" style="width: 100%; border: 1.5px dashed #2563eb; color: #2563eb; font-weight: 800; padding: 10px; border-radius: 12px; margin-top: 4px;">
+              ➕ Add Another Developer Member
+            </button>
           </div>
 
           <!-- Save Button -->
@@ -1897,6 +1946,49 @@ export class AdminDashboardComponent implements OnInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  addDeveloperMember(): void {
+    if (!this.systemPublicSettings.developer_team) {
+      this.systemPublicSettings.developer_team = [];
+    }
+    this.systemPublicSettings.developer_team.push({
+      name: '',
+      role: '',
+      description: '',
+      pic: '',
+      github: '',
+      linkedin: '',
+      instagram: '',
+      twitter: '',
+      email: ''
+    });
+    this.cdr.detectChanges();
+  }
+
+  removeDeveloperMember(index: number): void {
+    if (this.systemPublicSettings.developer_team && this.systemPublicSettings.developer_team.length > index) {
+      this.systemPublicSettings.developer_team.splice(index, 1);
+      this.cdr.detectChanges();
+    }
+  }
+
+  uploadDeveloperPhoto(event: any, index: number): void {
+    if (event.target.files && event.target.files.length > 0) {
+      const file = event.target.files[0];
+      const formData = new FormData();
+      formData.append('pic', file);
+
+      this.complaintService.uploadDevPic(formData).subscribe({
+        next: (res: any) => {
+          if (res && res.url) {
+            this.systemPublicSettings.developer_team[index].pic = res.url;
+            this.cdr.detectChanges();
+          }
+        },
+        error: (err: any) => console.error('Upload dev pic error:', err)
+      });
+    }
   }
 
   logout(): void {

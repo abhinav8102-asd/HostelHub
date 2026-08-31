@@ -153,6 +153,12 @@ export class ComplaintService {
     });
   }
 
+  uploadDevPic(formData: FormData): Observable<any> {
+    return this.http.post(`${this.apiUrl}/settings/upload-dev-pic`, formData, {
+      headers: this.authService.getAuthHeaders()
+    });
+  }
+
   getStaffWorkload(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/complaints/staff-workload`, {
       headers: this.authService.getNoCacheHeaders()
