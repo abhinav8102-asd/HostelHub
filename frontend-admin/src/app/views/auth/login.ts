@@ -115,7 +115,7 @@ import { AuthService } from '../../services/auth.service';
       align-items: center;
       justify-content: center;
       box-sizing: border-box;
-      padding: 30px 16px 20px;
+      padding: 44px 16px 24px;
       font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
     }
     
