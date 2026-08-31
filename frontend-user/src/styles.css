@@ -150,6 +150,8 @@ body.dark-mode {
 
 html {
   scroll-behavior: smooth;
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -158,10 +160,11 @@ body {
   color: var(--text-primary);
   min-height: 100vh;
   margin: 0;
-  line-height: 1.5;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
 }
 
 /* ── SCROLLBAR ── */
