@@ -61,7 +61,7 @@ import { ComplaintService } from '../../services/complaint.service';
         </div>
 
         <!-- 1. DASHBOARD & REAL-TIME STATS -->
-        <div *ngIf="activeTab === 'stats'" class="tab-panel animate-fade">
+        <div *ngIf="activeTab === 'stats'" class="tab-panel">
           <h4 class="page-title">📊 Executive Real-Time Dashboard</h4>
 
           <!-- Real-Time Metrics Table Card (Interactive Cards!) -->
@@ -164,7 +164,7 @@ import { ComplaintService } from '../../services/complaint.service';
         </div>
 
         <!-- 2. COMPLETE WORK FLOW (COMPLAINTS MATRIX) -->
-        <div *ngIf="activeTab === 'workflow'" class="tab-panel animate-fade">
+        <div *ngIf="activeTab === 'workflow'" class="tab-panel">
           <h4 class="page-title">🛠️ Complete Complaint Work Flow</h4>
 
           <!-- Filter Matrix -->
@@ -215,7 +215,7 @@ import { ComplaintService } from '../../services/complaint.service';
         </div>
 
         <!-- 3. STAFF PERFORMANCE LEADERBOARD -->
-        <div *ngIf="activeTab === 'performance'" class="tab-panel animate-fade">
+        <div *ngIf="activeTab === 'performance'" class="tab-panel">
           <h4 class="page-title">👨‍🔧 Maintenance Staff Performance Leaderboard</h4>
 
           <div class="card shadow-card">
@@ -260,7 +260,7 @@ import { ComplaintService } from '../../services/complaint.service';
         </div>
 
         <!-- 5. FEEDBACK & REVIEWS (MESS FOOD REVIEWS) -->
-        <div *ngIf="activeTab === 'feedback'" class="tab-panel animate-fade">
+        <div *ngIf="activeTab === 'feedback'" class="tab-panel">
           <h4 class="page-title">⭐ Student Mess Food Quality & Reviews</h4>
 
           <!-- Rating Breakdown Header -->
@@ -373,7 +373,7 @@ import { ComplaintService } from '../../services/complaint.service';
         </div>
 
         <!-- NOTICES & BROADCASTS TAB (READ ONLY) -->
-        <div *ngIf="activeTab === 'notices'" class="tab-panel animate-fade">
+        <div *ngIf="activeTab === 'notices'" class="tab-panel">
           <h4 class="page-title">📢 Official Notices & Broadcasts</h4>
 
           <!-- All Active Notices Stream (Read Only View) -->
@@ -400,7 +400,7 @@ import { ComplaintService } from '../../services/complaint.service';
         </div>
 
         <!-- 6. LIVE ACTIVITY AUDIT TRAIL FEED -->
-        <div *ngIf="activeTab === 'activity'" class="tab-panel animate-fade">
+        <div *ngIf="activeTab === 'activity'" class="tab-panel">
           <h4 class="page-title">📜 Live System Activity & Audit Trail</h4>
 
           <div class="card shadow-card">
@@ -422,7 +422,7 @@ import { ComplaintService } from '../../services/complaint.service';
         </div>
 
         <!-- 8. STUDENTS & USERS MANAGEMENT DIRECTORY -->
-        <div *ngIf="activeTab === 'users'" class="tab-panel animate-fade">
+        <div *ngIf="activeTab === 'users'" class="tab-panel">
           <h4 class="page-title">👥 System Users & Batch Management</h4>
 
           <!-- Bulk Student Batch Import Section -->
@@ -494,7 +494,7 @@ import { ComplaintService } from '../../services/complaint.service';
         </div>
 
         <!-- CREATE ACCOUNT TAB (STUDENT, WARDEN, STAFF) -->
-        <div *ngIf="activeTab === 'create'" class="tab-panel animate-fade">
+        <div *ngIf="activeTab === 'create'" class="tab-panel">
           <h4 class="page-title">➕ Create User Account (Student, Warden, Staff)</h4>
           <div class="card shadow-card" style="max-width: 580px;">
             <form (ngSubmit)="onCreateSubmit()">
@@ -618,7 +618,7 @@ import { ComplaintService } from '../../services/complaint.service';
         </div>
 
         <!-- SETTINGS TAB (FULL APP & FOOTER CONTENT MANAGEMENT) -->
-        <div *ngIf="activeTab === 'settings'" class="tab-panel animate-fade">
+        <div *ngIf="activeTab === 'settings'" class="tab-panel">
           <h4 class="page-title">⚙️ System Settings & App Content Control Center</h4>
           <p class="card-sub-lbl" style="margin-bottom: 16px;">Edit User App Home Page overview, Footer contact details, and Developer Team info. All changes are saved permanently in PostgreSQL Database.</p>
 
@@ -705,7 +705,7 @@ import { ComplaintService } from '../../services/complaint.service';
         </div>
 
         <!-- PROFILE TAB -->
-        <div *ngIf="activeTab === 'my-profile'" class="tab-panel animate-fade">
+        <div *ngIf="activeTab === 'my-profile'" class="tab-panel">
           <h4 class="page-title">👤 Admin Profile</h4>
           <div class="card shadow-card">
             <p class="card-sub-lbl">Logged in as: <strong>{{ user?.email }}</strong></p>
@@ -716,7 +716,7 @@ import { ComplaintService } from '../../services/complaint.service';
     </div>
 
     <!-- INTERACTIVE METRIC DETAILS MODAL -->
-    <div *ngIf="showMetricDetailsModal" class="modal-overlay animate-fade">
+    <div *ngIf="showMetricDetailsModal" class="modal-overlay">
       <div class="modal-card modal-large">
         <div class="modal-header">
           <h3 style="margin: 0; font-size: 16px;">🔍 {{ metricModalTitle }}</h3>
@@ -759,7 +759,7 @@ import { ComplaintService } from '../../services/complaint.service';
     </div>
 
     <!-- INTERACTIVE COMPLAINT DETAIL MODAL -->
-    <div *ngIf="showComplaintDetailModal && selectedComplaintDetail" class="modal-overlay animate-fade">
+    <div *ngIf="showComplaintDetailModal && selectedComplaintDetail" class="modal-overlay">
       <div class="modal-card">
         <div class="modal-header">
           <h3 style="margin: 0; font-size: 16px;">📋 Complaint #HOST-{{ selectedComplaintDetail.id }} Details</h3>
@@ -801,7 +801,7 @@ import { ComplaintService } from '../../services/complaint.service';
     </div>
 
     <!-- INTERACTIVE STAFF DETAIL MODAL -->
-    <div *ngIf="showStaffDetailModal && selectedStaffDetail" class="modal-overlay animate-fade">
+    <div *ngIf="showStaffDetailModal && selectedStaffDetail" class="modal-overlay">
       <div class="modal-card">
         <div class="modal-header">
           <h3 style="margin: 0; font-size: 16px;">👤 Staff Member Profile</h3>
@@ -833,7 +833,7 @@ import { ComplaintService } from '../../services/complaint.service';
     </div>
 
     <!-- INTERACTIVE EDIT USER MODAL -->
-    <div *ngIf="showEditUserModal && selectedUserForEdit" class="modal-overlay animate-fade">
+    <div *ngIf="showEditUserModal && selectedUserForEdit" class="modal-overlay">
       <div class="modal-card" style="max-width: 500px;">
         <div class="modal-header">
           <h3 style="margin: 0; font-size: 16px;">✏️ Edit User Details (ID #{{ selectedUserForEdit.id }})</h3>
@@ -899,85 +899,162 @@ import { ComplaintService } from '../../services/complaint.service';
 
   `,
   styles: [`
-    .dashboard-container { padding: 16px; max-width: 1200px; margin: 0 auto; font-family: var(--font-sans); }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; background: var(--bg-card); padding: 14px 20px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); }
-    .user-info { display: flex; align-items: center; gap: 12px; }
-    .avatar-ring { width: 42px; height: 42px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; }
-    .header-actions { display: flex; gap: 8px; }
-    .admin-tab-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px; -webkit-overflow-scrolling: touch; }
-    .admin-tab-nav button { white-space: nowrap; padding: 8px 14px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-secondary); font-weight: 700; font-size: 12px; cursor: pointer; transition: all 0.2s; }
-    .admin-tab-nav button.active { background: var(--primary); color: white; border-color: var(--primary); }
+    .dashboard-container { padding: 18px 16px; max-width: 1280px; margin: 0 auto; font-family: var(--font-sans); }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      background: var(--bg-card);
+      padding: 16px 20px;
+      border-radius: 18px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+    }
+    .user-info { display: flex; align-items: center; gap: 14px; }
+    .avatar-ring {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #2563eb;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      border: 2px solid #3b82f6;
+      flex-shrink: 0;
+    }
+    .user-meta { font-size: 11.5px; color: var(--text-muted); font-weight: 600; margin: 2px 0 0 0; }
     
-    .page-title { font-weight: 900; font-size: 18px; margin-bottom: 14px; color: var(--text-primary); }
+    .header-actions { display: flex; align-items: center; gap: 10px; }
+    .theme-toggle-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--bg-muted);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .logout-btn {
+      background: #ef4444;
+      color: white;
+      border: none;
+      height: 40px;
+      padding: 0 16px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
+    }
+
+    .admin-tab-nav {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .admin-tab-nav::-webkit-scrollbar { display: none; }
+    .admin-tab-nav button {
+      white-space: nowrap;
+      padding: 10px 18px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .admin-tab-nav button.active {
+      background: #2563eb;
+      color: #ffffff;
+      border-color: #2563eb;
+      font-weight: 800;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+    
+    .page-title { font-weight: 900; font-size: 19px; margin-bottom: 16px; color: var(--text-primary); }
     .card-section-title { margin: 0 0 12px 0; color: var(--text-primary); font-size: 15px; font-weight: 800; }
     .card-sub-lbl { font-size: 11.5px; color: var(--text-secondary); }
     .font-bold { font-weight: 700; }
 
-    .ai-insight-banner { background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%); color: white; padding: 14px 18px; border-radius: 14px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; }
+    .ai-insight-banner { background: #1e3a8a; color: white; padding: 14px 18px; border-radius: 14px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; }
     .live-tag { background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 800; color: white; }
 
-    .shadow-card { background: var(--bg-card); color: var(--text-primary); padding: 18px; border-radius: 16px; border: 1px solid var(--border-color); margin-bottom: 20px; box-shadow: var(--shadow-sm); }
+    .shadow-card { background: var(--bg-card); color: var(--text-primary); padding: 20px; border-radius: 18px; border: 1px solid var(--border-color); margin-bottom: 20px; box-shadow: var(--shadow-sm); }
     
-    .metrics-grid-auto { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
-    .metric-box { background: var(--bg-muted); padding: 12px; border-radius: 10px; border-left: 4px solid var(--primary); transition: transform 0.2s; }
+    .metrics-grid-auto { display: grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: 12px; }
+    .metric-box { background: var(--bg-muted); padding: 14px; border-radius: 12px; border-left: 4px solid var(--primary); }
     .clickable-box { cursor: pointer; }
-    .clickable-box:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-    .clickable-hint { font-size: 11px; color: var(--primary); font-weight: 700; }
-    .detail-link-text { font-size: 10px; color: var(--primary); display: block; margin-top: 4px; font-weight: 700; }
+    .clickable-hint { font-size: 11px; color: #2563eb; font-weight: 700; }
+    .detail-link-text { font-size: 10.5px; color: #2563eb; display: block; margin-top: 6px; font-weight: 800; }
 
     .border-purple { border-left-color: #6366f1; }
     .border-green { border-left-color: #22c55e; }
     .border-yellow { border-left-color: #eab308; }
-    .border-blue { border-left-color: #3b82f6; }
+    .border-blue { border-left-color: #2563eb; }
     .border-red { border-left-color: #ef4444; }
-    .border-indigo { border-left-color: #a855f7; }
+    .border-indigo { border-left-color: #8b5cf6; }
     .border-teal { border-left-color: #14b8a6; }
     .border-orange { border-left-color: #f97316; }
 
-    .metric-lbl { font-size: 11px; color: var(--text-muted); display: block; }
-    .metric-val { font-size: 20px; font-weight: 900; }
-    .purple-text { color: #818cf8; }
-    .green-text { color: #4ade80; }
-    .yellow-text { color: #fde047; }
-    .blue-text { color: #60a5fa; }
-    .red-text { color: #fca5a5; }
-    .indigo-text { color: #c084fc; }
-    .teal-text { color: #2dd4bf; }
-    .orange-text { color: #fb923c; }
+    .metric-lbl { font-size: 11px; color: var(--text-muted); display: block; font-weight: 700; }
+    .metric-val { font-size: 22px; font-weight: 900; }
+    .purple-text { color: #6366f1; }
+    .green-text { color: #22c55e; }
+    .yellow-text { color: #eab308; }
+    .blue-text { color: #2563eb; }
+    .red-text { color: #ef4444; }
+    .indigo-text { color: #8b5cf6; }
+    .teal-text { color: #14b8a6; }
+    .orange-text { color: #f97316; }
 
     .card-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
-    .period-toggle-group { display: flex; background: var(--bg-muted); padding: 3px; border-radius: 8px; gap: 3px; }
-    .period-toggle-group button { background: transparent; color: var(--text-secondary); border: none; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; }
-    .period-toggle-group button.active { background: var(--primary); color: white; }
+    .period-toggle-group { display: flex; background: var(--bg-muted); padding: 4px; border-radius: 10px; gap: 4px; border: 1px solid var(--border-color); }
+    .period-toggle-group button { background: transparent; color: var(--text-secondary); border: none; padding: 6px 14px; border-radius: 8px; font-size: 11.5px; font-weight: 700; cursor: pointer; }
+    .period-toggle-group button.active { background: #2563eb; color: white; font-weight: 800; }
 
     .bar-chart-container { display: flex; align-items: flex-end; gap: 12px; height: 160px; padding: 10px 0; border-bottom: 1px solid var(--border-color); }
     .bar-item { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; gap: 6px; }
-    .bar-val-tag { font-size: 10px; color: var(--primary); font-weight: 800; }
-    .bar-fill { width: 100%; max-width: 32px; background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%); border-radius: 6px 6px 0 0; transition: height 0.4s ease; }
+    .bar-val-tag { font-size: 10px; color: #2563eb; font-weight: 800; }
+    .bar-fill { width: 100%; max-width: 32px; background: #2563eb; border-radius: 6px 6px 0 0; }
     .bar-label { font-size: 9.5px; color: var(--text-muted); font-weight: 600; white-space: nowrap; }
 
     .filter-matrix-card { background: var(--bg-card); padding: 14px; border-radius: 14px; margin-bottom: 16px; border: 1px solid var(--border-color); display: flex; gap: 10px; flex-wrap: wrap; }
     .filter-select { flex: 1; min-width: 130px; }
 
     .complaint-card-item { padding: 16px; border-radius: 14px; margin-bottom: 12px; background: var(--bg-card); border: 1px solid var(--border-color); }
-    .clickable-card { cursor: pointer; transition: border-color 0.2s, transform 0.2s; }
-    .clickable-card:hover { border-color: var(--primary); transform: translateY(-1px); }
+    .clickable-card { cursor: pointer; }
+    .clickable-card:hover { border-color: #2563eb; }
     .complaint-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
-    .ticket-badge { font-size: 11px; background: var(--primary-light); color: var(--primary); padding: 2px 8px; border-radius: 6px; font-weight: 800; }
+    .ticket-badge { font-size: 11px; background: #eff6ff; color: #2563eb; padding: 3px 10px; border-radius: 8px; font-weight: 800; }
     .complaint-item-title { margin: 4px 0 2px 0; color: var(--text-primary); font-size: 15px; font-weight: 700; }
     .complaint-student-info { font-size: 11px; color: var(--text-muted); }
     .complaint-desc-text { font-size: 12.5px; color: var(--text-secondary); margin-bottom: 10px; }
     .complaint-card-footer { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 8px; flex-wrap: wrap; gap: 6px; }
-    .staff-highlight { color: var(--primary); }
-    .view-detail-badge { font-size: 10.5px; color: var(--primary); font-weight: 700; }
+    .staff-highlight { color: #2563eb; font-weight: 700; }
+    .view-detail-badge { font-size: 10.5px; color: #2563eb; font-weight: 800; }
 
     .custom-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12.5px; min-width: 600px; }
-    .custom-table th { padding: 10px; border-bottom: 1.5px solid var(--border-color); color: var(--text-muted); }
-    .custom-table td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--text-primary); }
+    .custom-table th { padding: 12px 10px; border-bottom: 2px solid var(--border-color); color: var(--text-muted); font-weight: 800; text-transform: uppercase; font-size: 11px; }
+    .custom-table td { padding: 12px 10px; border-bottom: 1px solid var(--border-color); color: var(--text-primary); }
     .clickable-row { cursor: pointer; }
     .clickable-row:hover { background: var(--bg-muted); }
     .rating-star { color: #facc15; font-weight: 800; }
-    .status-tag { padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; }
+    .status-tag { padding: 4px 10px; border-radius: 8px; font-size: 10.5px; font-weight: 800; }
     .status-excellent { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
     .status-moderate { background: rgba(234, 179, 8, 0.15); color: #eab308; }
     .status-attention { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
@@ -992,7 +1069,7 @@ import { ComplaintService } from '../../services/complaint.service';
     .block-att-header { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; }
     .progress-track-bg { background: var(--bg-card); height: 8px; border-radius: 4px; overflow: hidden; }
     .progress-track-fill { height: 100%; border-radius: 4px; }
-    .green-fill { background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%); }
+    .green-fill { background: #22c55e; }
     .alert-block-text { margin-top: 6px; font-size: 10.5px; color: #ef4444; font-weight: 700; }
 
     .feedback-score-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
@@ -1014,17 +1091,15 @@ import { ComplaintService } from '../../services/complaint.service';
     .danger-alert { background: #450a0a; border: 1.5px solid #ef4444; }
     .warning-alert { background: #422006; border: 1.5px solid #eab308; }
 
-    .parsed-preview-box { margin-bottom: 12px; padding: 10px; background: var(--bg-muted); border-radius: 8px; border: 1px solid var(--primary); }
+    .parsed-preview-box { margin-bottom: 12px; padding: 10px; background: var(--bg-muted); border-radius: 8px; border: 1px solid #2563eb; }
     .danger-control-card { border: 1.5px solid #ef4444; padding: 18px; border-radius: 16px; background: rgba(239, 68, 68, 0.05); }
     .termination-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
     .termination-box { background: var(--bg-card); padding: 14px; border-radius: 12px; border: 1px solid var(--border-color); }
     .user-card-row { padding: 14px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
     .task-item-row { background: var(--bg-muted); padding: 12px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
 
-    .logout-btn { background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; font-size: 12px; }
-
-    /* MODAL STYLES */
-    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 16px; }
+    /* SOLID MODAL STYLES (No glass blur, no animations) */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.75); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 16px; }
     .modal-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 18px; padding: 20px; max-width: 500px; width: 100%; color: var(--text-primary); box-shadow: var(--shadow-lg); }
     .modal-large { max-width: 650px; }
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
