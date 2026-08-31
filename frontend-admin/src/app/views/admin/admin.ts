@@ -2045,18 +2045,19 @@ export class AdminDashboardComponent implements OnInit {
   uploadDeveloperPhoto(event: any, index: number): void {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
-      const formData = new FormData();
-      formData.append('pic', file);
 
-      this.complaintService.uploadDevPic(formData).subscribe({
-        next: (res: any) => {
-          if (res && res.url) {
-            this.systemPublicSettings.developer_team[index].pic = res.url;
-            this.cdr.detectChanges();
-          }
-        },
-        error: (err: any) => console.error('Upload dev pic error:', err)
-      });
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        const base64Url = e.target.result;
+        if (this.systemPublicSettings.developer_team && this.systemPublicSettings.developer_team[index]) {
+          this.systemPublicSettings.developer_team[index].pic = base64Url;
+          this.cdr.detectChanges();
+
+          // Auto-save immediately to DB table so photo is NEVER lost!
+          this.saveAllSystemSettings();
+        }
+      };
+      reader.readAsDataURL(file);
     }
   }
 
