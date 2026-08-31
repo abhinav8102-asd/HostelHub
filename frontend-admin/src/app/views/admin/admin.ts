@@ -1558,9 +1558,40 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  // Interactive Staff Detail Modal
+  // Interactive Staff & User Detail Modal
   openStaffDetail(staff: any): void {
-    this.selectedStaffDetail = staff;
+    if (!staff) return;
+    const id = staff.id;
+    const email = staff.email || '';
+    const name = staff.name || '';
+
+    // Match across loaded arrays
+    const perfMatch = (this.staffPerformanceList || []).find((s: any) => (id && s.id === id) || (email && s.email === email));
+    const userMatch = (this.users || []).find((u: any) => (id && u.id === id) || (email && u.email === email));
+
+    // Live compute from allComplaints fallback if needed
+    const userComplaints = (this.allComplaints || []).filter((c: any) => 
+      (id && (c.staffId === id || c.studentId === id || c.wardenId === id)) || 
+      (name && c.assignedStaff && c.assignedStaff.toLowerCase().includes(name.toLowerCase()))
+    );
+
+    const liveAssigned = userComplaints.length;
+    const liveResolved = userComplaints.filter((c: any) => c.status === 'resolved').length;
+    const livePending = userComplaints.filter((c: any) => c.status !== 'resolved').length;
+
+    const assigned = staff.assigned ?? perfMatch?.assigned ?? (userMatch as any)?.assigned ?? liveAssigned;
+    const resolved = staff.resolved ?? perfMatch?.resolved ?? (userMatch as any)?.resolved ?? liveResolved;
+    const pending = staff.pending ?? perfMatch?.pending ?? (userMatch as any)?.pending ?? livePending;
+
+    this.selectedStaffDetail = {
+      ...staff,
+      ...(perfMatch || {}),
+      category: staff.category || staff.bio || perfMatch?.category || userMatch?.bio || (staff.role === 'staff' ? 'Maintenance Staff' : staff.role),
+      assigned: typeof assigned === 'number' ? assigned : 0,
+      resolved: typeof resolved === 'number' ? resolved : 0,
+      pending: typeof pending === 'number' ? pending : 0
+    };
+
     this.showStaffDetailModal = true;
     this.cdr.detectChanges();
   }

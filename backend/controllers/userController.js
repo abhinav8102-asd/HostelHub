@@ -21,7 +21,37 @@ exports.getAllUsers = async (req, res) => {
       attributes: { exclude: ['password'] },
       order: [['createdAt', 'DESC']]
     });
-    res.status(200).json(users);
+
+    const enrichedUsers = await Promise.all(users.map(async (u) => {
+      const plainUser = u.toJSON();
+      let assigned = 0;
+      let resolved = 0;
+      let pending = 0;
+
+      if (u.role === 'staff') {
+        assigned = await Complaint.count({ where: { staffId: u.id } });
+        resolved = await Complaint.count({ where: { staffId: u.id, status: 'resolved' } });
+        pending = await Complaint.count({ where: { staffId: u.id, status: { [Op.ne]: 'resolved' } } });
+      } else if (u.role === 'student') {
+        assigned = await Complaint.count({ where: { studentId: u.id } });
+        resolved = await Complaint.count({ where: { studentId: u.id, status: 'resolved' } });
+        pending = await Complaint.count({ where: { studentId: u.id, status: { [Op.ne]: 'resolved' } } });
+      } else if (u.role === 'warden') {
+        assigned = await Complaint.count({ where: { wardenId: u.id } });
+        resolved = await Complaint.count({ where: { wardenId: u.id, status: 'resolved' } });
+        pending = await Complaint.count({ where: { wardenId: u.id, status: { [Op.ne]: 'resolved' } } });
+      }
+
+      return {
+        ...plainUser,
+        category: plainUser.bio || (plainUser.role === 'staff' ? 'Maintenance Staff' : plainUser.role),
+        assigned,
+        resolved,
+        pending
+      };
+    }));
+
+    res.status(200).json(enrichedUsers);
   } catch (error) {
     console.error('Get Users Error:', error);
     res.status(500).json({ message: 'Internal server error retrieving users.' });
