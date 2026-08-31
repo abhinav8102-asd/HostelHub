@@ -2053,8 +2053,19 @@ export class AdminDashboardComponent implements OnInit {
           this.systemPublicSettings.developer_team[index].pic = base64Url;
           this.cdr.detectChanges();
 
-          // Auto-save immediately to DB table so photo is NEVER lost!
-          this.saveAllSystemSettings();
+          // Save developer_team directly to backend public settings DB
+          this.complaintService.updatePublicSettings(this.systemPublicSettings).subscribe({
+            next: (res: any) => {
+              this.settingsSaveSuccess = '✅ Developer profile photo updated & saved permanently!';
+              this.cdr.detectChanges();
+              setTimeout(() => { this.settingsSaveSuccess = ''; this.cdr.detectChanges(); }, 3500);
+            },
+            error: (err: any) => {
+              console.error('Save public settings error:', err);
+              this.settingsSaveError = `❌ Failed to save photo: ${err.error?.message || 'Server error'}`;
+              this.cdr.detectChanges();
+            }
+          });
         }
       };
       reader.readAsDataURL(file);

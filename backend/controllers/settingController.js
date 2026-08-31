@@ -86,7 +86,7 @@ exports.getPublicSettings = async (req, res) => {
           name: dev.name || (idx === 0 ? 'Abhinav Kumar' : 'Developer Member'),
           role: dev.role || (idx === 0 ? 'Lead Full-Stack Developer' : 'Developer'),
           description: dev.description || '',
-          pic: dev.pic || '',
+          pic: dev.pic || (idx === 0 ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80' : ''),
           picPosition: dev.picPosition || 'center center',
           picZoom: dev.picZoom || 100,
           github: dev.github || '',
