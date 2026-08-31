@@ -87,6 +87,8 @@ exports.getPublicSettings = async (req, res) => {
           role: dev.role || (idx === 0 ? 'Lead Full-Stack Developer' : 'Developer'),
           description: dev.description || '',
           pic: dev.pic || '',
+          picPosition: dev.picPosition || 'center center',
+          picZoom: dev.picZoom || 100,
           github: dev.github || '',
           linkedin: dev.linkedin || '',
           instagram: dev.instagram || '',

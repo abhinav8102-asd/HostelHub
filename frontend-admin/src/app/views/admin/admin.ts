@@ -682,15 +682,51 @@ import { ComplaintService } from '../../services/complaint.service';
                 </button>
               </div>
 
-              <!-- Profile Photo Upload -->
-              <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 14px; background: var(--bg-card); padding: 10px; border-radius: 12px; border: 1px solid var(--border-color);">
-                <div style="width: 50px; height: 50px; border-radius: 50%; background: #2563eb; color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; overflow: hidden; flex-shrink: 0;">
-                  <img *ngIf="dev.pic" [src]="getImageUrl(dev.pic)" style="width: 100%; height: 100%; object-fit: cover;" alt="Dev Photo" />
-                  <span *ngIf="!dev.pic">👨‍💻</span>
+              <!-- Profile Photo Upload & Alignment Controls -->
+              <div style="background: var(--bg-card); padding: 12px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 14px;">
+                <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 10px;">
+                  <!-- High-Res Interactive Circle Preview -->
+                  <div (click)="dev.pic ? openPhotoModal(getImageUrl(dev.pic)) : null" title="Click to view full-resolution preview" style="width: 64px; height: 64px; border-radius: 50%; border: 3px solid #2563eb; background: var(--bg-muted); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; overflow: hidden; flex-shrink: 0; cursor: pointer; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);">
+                    <img *ngIf="dev.pic" [src]="getImageUrl(dev.pic)" [style.object-position]="dev.picPosition || 'center center'" [style.transform]="'scale(' + ((dev.picZoom || 100) / 100) + ')'" style="width: 100%; height: 100%; object-fit: cover; transform-origin: center center; image-rendering: -webkit-optimize-contrast;" alt="Dev Photo" />
+                    <span *ngIf="!dev.pic" style="font-size: 24px;">👨‍💻</span>
+                  </div>
+
+                  <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                      <label class="form-label" style="margin: 0; font-weight: 800;">PROFILE PHOTO (HIGH RESOLUTION)</label>
+                      <button *ngIf="dev.pic" type="button" (click)="openPhotoModal(getImageUrl(dev.pic))" style="background: #2563eb; color: white; border: none; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer;">
+                        👁️ Full Preview
+                      </button>
+                    </div>
+                    <input type="file" (change)="uploadDeveloperPhoto($event, i)" accept="image/*" style="font-size: 12px; color: var(--text-secondary);" />
+                  </div>
                 </div>
-                <div style="flex: 1;">
-                  <label class="form-label" style="margin-bottom: 4px;">PROFILE PHOTO</label>
-                  <input type="file" (change)="uploadDeveloperPhoto($event, i)" accept="image/*" style="font-size: 12px; color: var(--text-secondary);" />
+
+                <!-- Position & Zoom Adjustment Controls -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: var(--bg-muted); padding: 10px; border-radius: 10px; border: 1px solid var(--border-color);">
+                  <div>
+                    <label class="form-label" style="font-size: 10.5px;">🎯 FACE FOCUS / ALIGNMENT</label>
+                    <select class="form-input" [(ngModel)]="dev.picPosition" style="font-size: 12px; padding: 6px 10px;">
+                      <option value="center center">Center (Default)</option>
+                      <option value="top center">Top Focus (Face / Head)</option>
+                      <option value="bottom center">Bottom Focus</option>
+                      <option value="left center">Left Focus</option>
+                      <option value="right center">Right Focus</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label class="form-label" style="font-size: 10.5px;">🔍 ZOOM / CROP LEVEL</label>
+                    <select class="form-input" [(ngModel)]="dev.picZoom" style="font-size: 12px; padding: 6px 10px;">
+                      <option [ngValue]="100">100% (Original Fit)</option>
+                      <option [ngValue]="110">110% (Zoom 1.1x)</option>
+                      <option [ngValue]="125">125% (Zoom 1.25x)</option>
+                      <option [ngValue]="140">140% (Zoom 1.4x)</option>
+                      <option [ngValue]="160">160% (Zoom 1.6x)</option>
+                      <option [ngValue]="180">180% (Zoom 1.8x)</option>
+                      <option [ngValue]="200">200% (Zoom 2.0x)</option>
+                    </select>
+                  </div>
                 </div>
               </div>
 
@@ -1244,12 +1280,12 @@ export class AdminDashboardComponent implements OnInit {
     footer_copyright: '© 2026 HostelHub. All rights reserved.'
   };
 
-  systemPublicSettings = {
+  systemPublicSettings: { app_about: string; app_how_it_works: string; developer_team: any[] } = {
     app_about: '',
     app_how_it_works: '',
     developer_team: [
-      { name: 'Abhinav Kumar', role: 'Lead Full-Stack Developer', description: 'Expert in Node.js, Express, Sequelize, and Angular architecture.', pic: '', github: '', linkedin: '', instagram: '', twitter: '', email: '' },
-      { name: 'Saransh Singh', role: 'UI/UX Designer', description: 'Specializes in crafting premium dark/light mode interfaces and custom transitions.', pic: '', github: '', linkedin: '', instagram: '', twitter: '', email: '' }
+      { name: 'Abhinav Kumar', role: 'Lead Full-Stack Developer', description: 'Expert in Node.js, Express, Sequelize, and Angular architecture.', pic: '', picPosition: 'center center', picZoom: 100, github: '', linkedin: '', instagram: '', twitter: '', email: '' },
+      { name: 'Saransh Singh', role: 'UI/UX Designer', description: 'Specializes in crafting premium dark/light mode interfaces and custom transitions.', pic: '', picPosition: 'center center', picZoom: 100, github: '', linkedin: '', instagram: '', twitter: '', email: '' }
     ]
   };
 
@@ -1957,6 +1993,8 @@ export class AdminDashboardComponent implements OnInit {
       role: '',
       description: '',
       pic: '',
+      picPosition: 'center center',
+      picZoom: 100,
       github: '',
       linkedin: '',
       instagram: '',
