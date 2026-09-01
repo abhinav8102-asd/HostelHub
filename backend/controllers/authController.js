@@ -381,7 +381,7 @@ exports.sendRegistrationOTP = async (req, res) => {
     // 2. Dispatch email transmission via dual HTTPS API + Capped SMTP engine
     sendEmailEngine({
       to: cleanEmail,
-      subject: 'HostelHub - Registration Gmail Verification Code',
+      subject: `HostelHub Registration Code: ${otp}`,
       html: htmlContent
     }).catch(err => console.error('sendRegistrationOTP Engine Error:', err));
 
@@ -444,7 +444,7 @@ exports.forgotPassword = async (req, res) => {
 
     sendEmailEngine({
       to: targetEmail,
-      subject: 'HostelHub - Password Reset OTP Code',
+      subject: `HostelHub Password Reset Code: ${otp}`,
       html: htmlContent
     }).catch(err => console.error('forgotPassword Engine Error:', err));
 
