@@ -7,14 +7,15 @@ const { OAuth2Client } = require('google-auth-library');
 const { uploadFile } = require('../utils/storage');
 require('dotenv').config();
 
-// Setup Nodemailer transporter with family: 4 (IPv4 ONLY) for 100% Render network compatibility
+// Setup Nodemailer transporter with Port 587 STARTTLS + family: 4 (IPv4) for Render datacenter compatibility
 const rawEmailPass = process.env.EMAIL_PASSWORD || 'qmvhwedjipeyqstm';
 const cleanEmailPass = rawEmailPass.replace(/\s+/g, '');
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
+  port: 587,
+  secure: false,
+  requireTLS: true,
   family: 4,
   auth: {
     user: process.env.EMAIL_USER || 'hostelhub.rvsofficial@gmail.com',
