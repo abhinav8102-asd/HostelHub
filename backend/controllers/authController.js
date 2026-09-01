@@ -77,7 +77,7 @@ const sendEmailEngine = async ({ to, subject, html }) => {
           'api-key': process.env.BREVO_API_KEY
         },
         body: JSON.stringify({
-          sender: { name: 'HostelHub Support', email: process.env.EMAIL_USER || 'hostelhub.rvsofficial@gmail.com' },
+          sender: { name: 'HostelHub Support', email: process.env.BREVO_SENDER || 'abhinavkrs1111111@gmail.com' },
           to: [{ email: to }],
           subject,
           htmlContent: html
