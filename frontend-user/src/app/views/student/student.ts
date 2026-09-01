@@ -383,7 +383,7 @@ import { API_CONFIG } from '../../config/api.config';
               <!-- Avatar Circle with High-Res Crisp Rendering & Zoom Modal -->
               <div style="position: relative; width: 100px; height: 100px; margin: 0 auto 16px auto;">
                 <div (click)="dev.pic ? openPhotoModal(getImageUrl(dev.pic)) : null" title="Click for high-resolution preview" style="width: 100%; height: 100%; border-radius: 50%; border: 3.5px solid #2563eb; padding: 2px; background: var(--bg-card); box-shadow: 0 0 24px rgba(37, 99, 235, 0.35); overflow: hidden; cursor: pointer;">
-                  <img [src]="dev.pic ? getImageUrl(dev.pic) : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'" [style.object-position]="dev.picPosition || 'center center'" [style.transform]="'scale(' + ((dev.picZoom || 100) / 100) + ')'" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; transform-origin: center center; image-rendering: -webkit-optimize-contrast;" [alt]="dev.name || 'Developer'" />
+                  <img [src]="dev.pic ? getImageUrl(dev.pic) : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'" [style.object-position]="dev.picPosition || 'center center'" [style.transform]="'scale(' + ((dev.picZoom || 100) / 100) + ')'" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; transform-origin: center center; image-rendering: -webkit-optimize-contrast; display: block;" [alt]="dev.name || 'Developer'" (error)="onDevAvatarError($event)" />
                 </div>
                 <span class="online-pulse-dot" style="width: 15px; height: 15px; border-width: 2.5px; bottom: 3px; right: 3px;"></span>
               </div>
@@ -3128,6 +3128,14 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
         const el = document.getElementById('profilePicFile') as HTMLInputElement;
         if (el) el.click();
       }
+    }
+  }
+
+  onDevAvatarError(event: Event): void {
+    const target = event.target as HTMLImageElement;
+    if (target) {
+      target.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80';
+      target.style.display = 'block';
     }
   }
 

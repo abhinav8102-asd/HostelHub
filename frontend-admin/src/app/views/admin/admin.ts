@@ -2048,25 +2048,53 @@ export class AdminDashboardComponent implements OnInit {
 
       const reader = new FileReader();
       reader.onload = (e: any) => {
-        const base64Url = e.target.result;
-        if (this.systemPublicSettings.developer_team && this.systemPublicSettings.developer_team[index]) {
-          this.systemPublicSettings.developer_team[index].pic = base64Url;
-          this.cdr.detectChanges();
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxDim = 500;
+          let width = img.width;
+          let height = img.height;
 
-          // Save developer_team directly to backend public settings DB
-          this.complaintService.updatePublicSettings(this.systemPublicSettings).subscribe({
-            next: (res: any) => {
-              this.settingsSaveSuccess = '✅ Developer profile photo updated & saved permanently!';
-              this.cdr.detectChanges();
-              setTimeout(() => { this.settingsSaveSuccess = ''; this.cdr.detectChanges(); }, 3500);
-            },
-            error: (err: any) => {
-              console.error('Save public settings error:', err);
-              this.settingsSaveError = `❌ Failed to save photo: ${err.error?.message || 'Server error'}`;
-              this.cdr.detectChanges();
+          if (width > height) {
+            if (width > maxDim) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
             }
-          });
-        }
+          } else {
+            if (height > maxDim) {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.85);
+
+            if (this.systemPublicSettings.developer_team && this.systemPublicSettings.developer_team[index]) {
+              this.systemPublicSettings.developer_team[index].pic = compressedBase64;
+              this.cdr.detectChanges();
+
+              // Save developer_team directly to backend public settings DB
+              this.complaintService.updatePublicSettings(this.systemPublicSettings).subscribe({
+                next: (res: any) => {
+                  this.settingsSaveSuccess = '✅ Developer profile photo updated & saved permanently!';
+                  this.cdr.detectChanges();
+                  setTimeout(() => { this.settingsSaveSuccess = ''; this.cdr.detectChanges(); }, 3500);
+                },
+                error: (err: any) => {
+                  console.error('Save public settings error:', err);
+                  this.settingsSaveError = `❌ Failed to save photo: ${err.error?.message || 'Server error'}`;
+                  this.cdr.detectChanges();
+                }
+              });
+            }
+          }
+        };
+        img.src = e.target.result;
       };
       reader.readAsDataURL(file);
     }

@@ -371,11 +371,13 @@ import { API_CONFIG } from '../../config/api.config';
             <!-- Developer Glass Card (Matching Screenshot 2) -->
             <div class="solo-dev-card" style="margin-bottom: 0; padding: 28px 20px; border-radius: 28px;">
               <div style="position: relative; display: inline-block; margin-bottom: 14px;">
-                <div style="width: 76px; height: 76px; border-radius: 50%; border: 3px solid #2563eb; padding: 3px; margin: 0 auto; background: var(--bg-card); box-shadow: 0 0 24px rgba(37, 99, 235, 0.35); overflow: hidden;">
-                  <img [src]="getImageUrl(publicSettings.developer_team[0].pic || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80')" 
-                       style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" 
-                       [alt]="publicSettings.developer_team[0].name || 'Abhinav Kumar'" 
-                       (error)="onAvatarError($event)" />
+                <div style="width: 84px; height: 84px; border-radius: 50%; border: 3px solid #2563eb; padding: 3px; margin: 0 auto; background: var(--bg-card); box-shadow: 0 0 24px rgba(37, 99, 235, 0.35); overflow: hidden; position: relative;">
+                  <img [src]="publicSettings?.developer_team?.[0]?.pic ? getImageUrl(publicSettings.developer_team[0].pic) : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'" 
+                       [style.object-position]="publicSettings?.developer_team?.[0]?.picPosition || 'center center'" 
+                       [style.transform]="'scale(' + ((publicSettings?.developer_team?.[0]?.picZoom || 100) / 100) + ')'" 
+                       style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; transform-origin: center center; image-rendering: -webkit-optimize-contrast; display: block;" 
+                       [alt]="publicSettings?.developer_team?.[0]?.name || 'Abhinav Kumar'" 
+                       (error)="onDevAvatarError($event)" />
                 </div>
                 <div class="online-pulse-dot" style="width: 14px; height: 14px; right: 2px; bottom: 2px;"></div>
               </div>
@@ -3765,6 +3767,14 @@ export class WardenDashboardComponent implements OnInit, OnDestroy {
     }
     const cleanPath = url.startsWith('/') ? url : '/' + url;
     return API_CONFIG.baseUrl + cleanPath;
+  }
+
+  onDevAvatarError(event: Event): void {
+    const target = event.target as HTMLImageElement;
+    if (target) {
+      target.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80';
+      target.style.display = 'block';
+    }
   }
 
   onAvatarError(event: Event): void {
