@@ -34,12 +34,76 @@ import { AuthService } from '../../services/auth.service';
             </div>
           </div>
 
-          <!-- Email Address -->
+          <!-- Email Address & Inline Gmail OTP Verification -->
           <div class="field-container">
-            <span class="field-label">Email Address</span>
-            <div class="input-row">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span class="field-label" style="margin-bottom: 0;">Email Address</span>
+              <span *ngIf="isEmailVerified" style="color: #16a34a; font-weight: 800; font-size: 11px; background: #dcfce7; border: 1px solid #86efac; padding: 2px 10px; border-radius: 12px;">
+                ✅ Gmail Verified
+              </span>
+            </div>
+            
+            <div class="input-row" style="position: relative;">
               <div class="pink-icon-badge"><span>✉️</span></div>
-              <input type="email" name="email" class="form-input-box" placeholder="e.g. abhinav@gmail.com" [(ngModel)]="email" required email />
+              <input 
+                type="email" 
+                name="email" 
+                class="form-input-box" 
+                placeholder="e.g. abhinav@gmail.com" 
+                [(ngModel)]="email" 
+                (ngModelChange)="onEmailChange()" 
+                [readonly]="isEmailVerified"
+                required 
+                email 
+                style="padding-right: 105px;"
+              />
+              
+              <!-- Send OTP / Resend Button inside Email Box -->
+              <button 
+                type="button" 
+                (click)="sendInlineOTP()" 
+                [disabled]="!email || isEmailVerified || otpSending"
+                style="position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #ffffff; border: none; font-size: 11px; font-weight: 800; padding: 7px 12px; border-radius: 10px; cursor: pointer; box-shadow: 0 2px 6px rgba(37,99,235,0.3); transition: all 0.2s;"
+                *ngIf="!isEmailVerified">
+                <span *ngIf="!otpSending && !otpSent">Send OTP</span>
+                <span *ngIf="!otpSending && otpSent">Resend</span>
+                <span *ngIf="otpSending">Sending...</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Inline 6-Digit OTP Code Verification (Shown after Send OTP is clicked and before verification) -->
+          <div *ngIf="otpSent && !isEmailVerified" class="field-container" style="background: #f8fafc; border: 1.5px dashed #2563eb; padding: 14px; border-radius: 16px; margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-size: 12px; font-weight: 800; color: #1e3a8a;">📩 ENTER GMAIL OTP CODE</span>
+              <span style="font-size: 11px; color: #64748b;">Code sent to inbox</span>
+            </div>
+
+            <div style="display: flex; gap: 8px;">
+              <input 
+                type="text" 
+                name="otpCode" 
+                class="form-input-box" 
+                placeholder="6-Digit Code" 
+                [(ngModel)]="otpCode" 
+                maxlength="6"
+                style="text-align: center; font-size: 18px; font-weight: 900; letter-spacing: 4px; height: 44px; background: #ffffff; border: 1px solid #cbd5e1; flex: 1;"
+              />
+              <button 
+                type="button" 
+                (click)="verifyInlineOTP()" 
+                [disabled]="!otpCode || otpCode.length < 6 || otpVerifying"
+                style="background: #16a34a; color: #ffffff; border: none; font-size: 12px; font-weight: 800; padding: 0 16px; border-radius: 12px; cursor: pointer; white-space: nowrap; height: 44px;">
+                <span *ngIf="!otpVerifying">VERIFY OTP</span>
+                <span *ngIf="otpVerifying">Verifying...</span>
+              </button>
+            </div>
+
+            <div *ngIf="otpError" style="color: #dc2626; font-size: 11.5px; font-weight: 700; margin-top: 6px;">
+              ❌ {{ otpError }}
+            </div>
+            <div *ngIf="otpSuccess" style="color: #16a34a; font-size: 11.5px; font-weight: 700; margin-top: 6px;">
+              {{ otpSuccess }}
             </div>
           </div>
 
@@ -127,15 +191,16 @@ import { AuthService } from '../../services/auth.service';
             </div>
           </div>
 
-          <!-- Security Hint Box -->
-          <div class="security-box">
-            <span class="sec-icon">🛡️</span>
-            <span>Use a strong password for better security.</span>
+          <!-- Security Hint Box & Verification Lock Alert -->
+          <div class="security-box" style="border-radius: 14px; padding: 12px 14px;">
+            <span class="sec-icon">{{ isEmailVerified ? '🛡️' : '🔒' }}</span>
+            <span *ngIf="!isEmailVerified" style="color: #ea580c; font-weight: 700; font-size: 12px;">⚠️ Verify your Gmail OTP above to unlock SIGN UP.</span>
+            <span *ngIf="isEmailVerified" style="color: #16a34a; font-weight: 700; font-size: 12px;">✅ Gmail verified! Ready to register.</span>
           </div>
 
-          <button type="submit" class="btn btn-crimson" [disabled]="!registerForm.form.valid || loading">
+          <button type="submit" class="btn btn-crimson" [disabled]="!isEmailVerified || !registerForm.form.valid || loading" style="height: 52px; font-size: 15px; font-weight: 900; border-radius: 16px;">
             <span *ngIf="!loading">👤+ SIGN UP</span>
-            <span *ngIf="loading">Sending OTP to Gmail...</span>
+            <span *ngIf="loading">Creating student account...</span>
           </button>
         </form>
       </div>
@@ -160,48 +225,6 @@ import { AuthService } from '../../services/auth.service';
           <div class="feature-icon-gold">🔔</div>
           <div class="feature-title">Instant Alerts</div>
           <div class="feature-desc">Get updates on your complaints instantly</div>
-        </div>
-      </div>
-      <!-- GMAIL OTP VERIFICATION MODAL -->
-      <div *ngIf="showOtpModal" class="modal-overlay" style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 99999; padding: 16px;">
-        <div style="background: #ffffff; width: 100%; max-width: 440px; border-radius: 24px; padding: 28px 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); text-align: center;">
-          <div style="width: 64px; height: 64px; border-radius: 50%; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 16px auto;">📩</div>
-          <h3 style="margin: 0 0 6px 0; font-size: 20px; font-weight: 900; color: #0f172a;">Verify Gmail Inbox</h3>
-          <p style="margin: 0 0 20px 0; font-size: 13px; color: #64748b; line-height: 1.5;">
-            We sent a 6-digit verification code to <strong style="color: #2563eb;">{{ email }}</strong>. Please check your inbox or spam folder.
-          </p>
-
-          <div *ngIf="otpError" class="alert alert-danger" style="margin-bottom: 14px;">{{ otpError }}</div>
-          <div *ngIf="otpSuccess" class="alert alert-success" style="margin-bottom: 14px;">{{ otpSuccess }}</div>
-
-          <div style="margin-bottom: 20px;">
-            <input 
-              type="text" 
-              name="otpCode" 
-              class="form-input-box" 
-              placeholder="Enter 6-Digit OTP Code" 
-              [(ngModel)]="otpCode" 
-              maxlength="6"
-              style="text-align: center; font-size: 24px; font-weight: 900; letter-spacing: 6px; height: 52px; border: 2px solid #2563eb; background: #f8fafc;"
-              required 
-            />
-          </div>
-
-          <div style="display: flex; flex-direction: column; gap: 10px;">
-            <button type="button" (click)="onVerifyOTP()" class="btn btn-crimson" [disabled]="!otpCode || otpCode.length < 6 || verifyingOtp" style="height: 48px; font-size: 14px; font-weight: 800;">
-              <span *ngIf="!verifyingOtp">✅ VERIFY OTP & COMPLETE REGISTRATION</span>
-              <span *ngIf="verifyingOtp">Verifying code...</span>
-            </button>
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
-              <button type="button" (click)="resendOTP()" class="btn" style="background: transparent; color: #2563eb; font-size: 12px; font-weight: 700; border: none; cursor: pointer;">
-                🔄 Resend OTP Code
-              </button>
-              <button type="button" (click)="cancelOtpModal()" class="btn" style="background: transparent; color: #64748b; font-size: 12px; font-weight: 700; border: none; cursor: pointer;">
-                ❌ Cancel
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -443,9 +466,11 @@ export class RegisterComponent {
   error = '';
   success = '';
   showPassword = false;
-  showOtpModal = false;
+  isEmailVerified = false;
+  otpSent = false;
+  otpSending = false;
+  otpVerifying = false;
   otpCode = '';
-  verifyingOtp = false;
   otpError = '';
   otpSuccess = '';
 
@@ -460,95 +485,88 @@ export class RegisterComponent {
     this.cdr.detectChanges();
   }
 
-  onSubmit(): void {
-    this.loading = true;
-    this.error = '';
+  onEmailChange(): void {
+    if (!this.isEmailVerified) {
+      this.otpSent = false;
+      this.otpCode = '';
+      this.otpError = '';
+      this.otpSuccess = '';
+    }
+  }
 
-    // Step 1: Send Registration OTP to Gmail inbox first
+  sendInlineOTP(): void {
+    if (!this.email) return;
+    this.otpSending = true;
+    this.otpError = '';
+    this.otpSuccess = '';
+
     this.authService.sendRegistrationOTP({ email: this.email, rollNumber: this.rollNumber }).subscribe({
       next: (res: any) => {
-        this.loading = false;
-        this.showOtpModal = true;
-        this.otpSuccess = `✅ Verification code sent to ${this.email}!`;
+        this.otpSending = false;
+        this.otpSent = true;
+        this.otpSuccess = `✅ 6-Digit OTP sent to ${this.email}! Check your inbox.`;
         this.cdr.detectChanges();
       },
       error: (err: any) => {
-        this.loading = false;
-        this.error = err.error?.message || 'Failed to send OTP code to Gmail. Please try again.';
+        this.otpSending = false;
+        this.otpError = err.error?.message || 'Failed to send OTP to Gmail.';
         this.cdr.detectChanges();
       }
     });
   }
 
-  onVerifyOTP(): void {
+  verifyInlineOTP(): void {
     if (!this.otpCode || this.otpCode.length < 6) return;
-    this.verifyingOtp = true;
+    this.otpVerifying = true;
     this.otpError = '';
 
     this.authService.verifyOTP(this.email, this.otpCode).subscribe({
       next: () => {
-        // Step 2: OTP Verified! Proceed to create user account
-        const userData = {
-          name: this.name,
-          email: this.email,
-          role: 'student',
-          phone: this.phone,
-          roomNumber: this.roomNumber,
-          hostelBlock: this.hostelBlock,
-          rollNumber: this.rollNumber,
-          gender: this.gender,
-          batch: this.batch,
-          password: this.password
-        };
-
-        this.authService.register(userData).subscribe({
-          next: () => {
-            this.verifyingOtp = false;
-            this.showOtpModal = false;
-            this.success = '✅ Gmail Verified & Registration Successful! Waiting for Warden approval.';
-            this.cdr.detectChanges();
-            setTimeout(() => {
-              this.router.navigate(['/student/login']);
-            }, 3000);
-          },
-          error: (err: any) => {
-            this.verifyingOtp = false;
-            this.otpError = err.error?.message || 'Registration failed. Please try again.';
-            this.cdr.detectChanges();
-          }
-        });
+        this.otpVerifying = false;
+        this.isEmailVerified = true;
+        this.otpSuccess = '✅ Gmail verified successfully! Sign Up unlocked.';
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
-        this.verifyingOtp = false;
-        this.otpError = err.error?.message || 'Invalid or expired OTP code!';
+        this.otpVerifying = false;
+        this.otpError = err.error?.message || 'Invalid or expired 6-digit OTP code!';
         this.cdr.detectChanges();
       }
     });
   }
 
-  resendOTP(): void {
-    this.otpError = '';
-    this.otpSuccess = 'Sending new OTP code...';
-    this.cdr.detectChanges();
+  onSubmit(): void {
+    if (!this.isEmailVerified) return;
+    this.loading = true;
+    this.error = '';
 
-    this.authService.sendRegistrationOTP({ email: this.email, rollNumber: this.rollNumber }).subscribe({
+    const userData = {
+      name: this.name,
+      email: this.email,
+      role: 'student',
+      phone: this.phone,
+      roomNumber: this.roomNumber,
+      hostelBlock: this.hostelBlock,
+      rollNumber: this.rollNumber,
+      gender: this.gender,
+      batch: this.batch,
+      password: this.password
+    };
+
+    this.authService.register(userData).subscribe({
       next: () => {
-        this.otpSuccess = '✅ New OTP code sent to your Gmail inbox!';
+        this.loading = false;
+        this.success = '✅ Registration Successful! Submitted for Warden approval.';
         this.cdr.detectChanges();
+        setTimeout(() => {
+          this.router.navigate(['/student/login']);
+        }, 3000);
       },
       error: (err: any) => {
-        this.otpSuccess = '';
-        this.otpError = err.error?.message || 'Failed to resend OTP code.';
+        this.loading = false;
+        this.error = err.error?.message || 'Registration failed. Please try again.';
         this.cdr.detectChanges();
       }
     });
-  }
-
-  cancelOtpModal(): void {
-    this.showOtpModal = false;
-    this.otpCode = '';
-    this.otpError = '';
-    this.otpSuccess = '';
-    this.cdr.detectChanges();
   }
 }
