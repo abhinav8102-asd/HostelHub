@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
+const { Op } = require('sequelize');
 const { User, PasswordResetOTP } = require('../models');
 const { OAuth2Client } = require('google-auth-library');
 const { uploadFile } = require('../utils/storage');
