@@ -7,15 +7,19 @@ const { OAuth2Client } = require('google-auth-library');
 const { uploadFile } = require('../utils/storage');
 require('dotenv').config();
 
-// Setup Nodemailer transporter with dynamic environment values (free Gmail SMTP)
+// Setup Nodemailer transporter with Port 587 STARTTLS for 100% Cloud/Render compatibility
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
+  port: 587,
+  secure: false,
+  requireTLS: true,
   auth: {
     user: process.env.EMAIL_USER || 'hostelhub.rvsofficial@gmail.com',
     pass: process.env.EMAIL_PASSWORD || 'qmvh wedj ipey qstm'
+  },
+  tls: {
+    rejectUnauthorized: false
   }
 });
 
