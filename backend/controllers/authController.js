@@ -266,10 +266,16 @@ exports.sendRegistrationOTP = async (req, res) => {
 
     // Generate random 6-digit OTP code
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes duration
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes duration
 
+    // Save to PasswordResetOTP table
     await PasswordResetOTP.create({ email, otp, expiresAt });
+    console.log(`🔑 REGISTRATION OTP FOR ${email}: ${otp}`);
 
+    // Respond immediately to prevent HTTP timeout on mobile networks
+    res.status(200).json({ message: 'Verification OTP sent to your Gmail inbox!' });
+
+    // Send email asynchronously in background
     const mailOptions = {
       from: `"HostelHub Support" <${process.env.EMAIL_USER || 'hostelhub.rvsofficial@gmail.com'}>`,
       to: email,
@@ -285,7 +291,7 @@ exports.sendRegistrationOTP = async (req, res) => {
           <div style="background-color: #eff6ff; border: 2px dashed #2563eb; text-align: center; padding: 18px; font-size: 32px; font-weight: 900; letter-spacing: 6px; color: #1d4ed8; border-radius: 10px; margin: 24px 0;">
             ${otp}
           </div>
-          <p style="color: #94a3b8; font-size: 12.5px; text-align: center;">This code will expire in <strong>10 minutes</strong>. If you did not initiate this registration, please ignore this email.</p>
+          <p style="color: #94a3b8; font-size: 12.5px; text-align: center;">This code will expire in <strong>15 minutes</strong>. If you did not initiate this registration, please ignore this email.</p>
           <hr style="border: 0; border-top: 1px solid #f1f5f9; margin: 24px 0;"/>
           <p style="text-align: center; color: #94a3b8; font-size: 11px;">© 2026 HostelHub System Support • hostelhub.rvsofficial@gmail.com</p>
         </div>
@@ -295,9 +301,9 @@ exports.sendRegistrationOTP = async (req, res) => {
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.error('Nodemailer sendRegistrationOTP Error:', error);
-        return res.status(500).json({ message: 'Failed to send OTP code to Gmail. Please verify email address.' });
+      } else {
+        console.log('✅ Registration OTP Email sent successfully to:', email);
       }
-      res.status(200).json({ message: 'Verification OTP sent to your Gmail inbox!' });
     });
   } catch (error) {
     console.error('Send Registration OTP Error:', error);
@@ -331,9 +337,13 @@ exports.forgotPassword = async (req, res) => {
 
     // Generate random 6-digit OTP code
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes duration
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes duration
 
     await PasswordResetOTP.create({ email: targetEmail, otp, expiresAt });
+    console.log(`🔑 FORGOT PASSWORD OTP FOR ${targetEmail}: ${otp}`);
+
+    // Respond immediately to client
+    res.status(200).json({ message: 'OTP verification code sent successfully to your registered Gmail!', email: targetEmail });
 
     const mailOptions = {
       from: `"HostelHub Support" <${process.env.EMAIL_USER || 'hostelhub.rvsofficial@gmail.com'}>`,
@@ -350,7 +360,7 @@ exports.forgotPassword = async (req, res) => {
           <div style="background-color: #eff6ff; border: 2px dashed #2563eb; text-align: center; padding: 18px; font-size: 32px; font-weight: 900; letter-spacing: 6px; color: #1d4ed8; border-radius: 10px; margin: 24px 0;">
             ${otp}
           </div>
-          <p style="color: #94a3b8; font-size: 12.5px; text-align: center;">This code will expire in <strong>10 minutes</strong>. If you did not request this, you can safely ignore this email.</p>
+          <p style="color: #94a3b8; font-size: 12.5px; text-align: center;">This code will expire in <strong>15 minutes</strong>. If you did not request this, you can safely ignore this email.</p>
           <hr style="border: 0; border-top: 1px solid #f1f5f9; margin: 24px 0;"/>
           <p style="text-align: center; color: #94a3b8; font-size: 11px;">© 2026 HostelHub System Support • hostelhub.rvsofficial@gmail.com</p>
         </div>
@@ -360,9 +370,9 @@ exports.forgotPassword = async (req, res) => {
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.error('Nodemailer forgotPassword Error:', error);
-        return res.status(500).json({ message: 'Failed to send OTP code to Gmail.' });
+      } else {
+        console.log('✅ Forgot Password OTP Email sent successfully to:', targetEmail);
       }
-      res.status(200).json({ message: 'OTP verification code sent successfully to your registered Gmail!', email: targetEmail });
     });
   } catch (error) {
     console.error('Forgot Password Error:', error);

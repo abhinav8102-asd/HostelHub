@@ -135,7 +135,7 @@ import { AuthService } from '../../services/auth.service';
 
           <button type="submit" class="btn btn-crimson" [disabled]="!registerForm.form.valid || loading">
             <span *ngIf="!loading">👤+ SIGN UP</span>
-            <span *ngIf="loading">Creating account...</span>
+            <span *ngIf="loading">Sending OTP to Gmail...</span>
           </button>
         </form>
       </div>
