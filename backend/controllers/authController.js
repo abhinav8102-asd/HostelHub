@@ -275,10 +275,6 @@ exports.sendRegistrationOTP = async (req, res) => {
     await PasswordResetOTP.create({ email, otp, expiresAt });
     console.log(`🔑 REGISTRATION OTP FOR ${email}: ${otp}`);
 
-    // Respond immediately to prevent HTTP timeout on mobile networks
-    res.status(200).json({ message: 'Verification OTP sent to your Gmail inbox!' });
-
-    // Send email asynchronously in background
     const mailOptions = {
       from: `"HostelHub Support" <${process.env.EMAIL_USER || 'hostelhub.rvsofficial@gmail.com'}>`,
       to: email,
@@ -301,13 +297,15 @@ exports.sendRegistrationOTP = async (req, res) => {
       `
     };
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error('Nodemailer sendRegistrationOTP Error:', error);
-      } else {
-        console.log('✅ Registration OTP Email sent successfully to:', email);
-      }
-    });
+    // Await email delivery to guarantee SMTP socket completion on cloud hosts
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log('✅ Registration OTP Email sent successfully to:', email);
+    } catch (mailErr) {
+      console.error('Nodemailer sendRegistrationOTP Error:', mailErr);
+    }
+
+    res.status(200).json({ message: 'Verification OTP sent to your Gmail inbox!' });
   } catch (error) {
     console.error('Send Registration OTP Error:', error);
     res.status(500).json({ message: 'Internal server error sending registration OTP.' });
@@ -345,9 +343,6 @@ exports.forgotPassword = async (req, res) => {
     await PasswordResetOTP.create({ email: targetEmail, otp, expiresAt });
     console.log(`🔑 FORGOT PASSWORD OTP FOR ${targetEmail}: ${otp}`);
 
-    // Respond immediately to client
-    res.status(200).json({ message: 'OTP verification code sent successfully to your registered Gmail!', email: targetEmail });
-
     const mailOptions = {
       from: `"HostelHub Support" <${process.env.EMAIL_USER || 'hostelhub.rvsofficial@gmail.com'}>`,
       to: targetEmail,
@@ -370,13 +365,14 @@ exports.forgotPassword = async (req, res) => {
       `
     };
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error('Nodemailer forgotPassword Error:', error);
-      } else {
-        console.log('✅ Forgot Password OTP Email sent successfully to:', targetEmail);
-      }
-    });
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log('✅ Forgot Password OTP Email sent successfully to:', targetEmail);
+    } catch (mailErr) {
+      console.error('Nodemailer forgotPassword Error:', mailErr);
+    }
+
+    res.status(200).json({ message: 'OTP verification code sent successfully to your registered Gmail!', email: targetEmail });
   } catch (error) {
     console.error('Forgot Password Error:', error);
     res.status(500).json({ message: 'Internal server error during password reset request.' });
