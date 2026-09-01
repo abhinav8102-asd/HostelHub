@@ -7,19 +7,15 @@ const { OAuth2Client } = require('google-auth-library');
 const { uploadFile } = require('../utils/storage');
 require('dotenv').config();
 
-// Setup Nodemailer transporter with Port 587 STARTTLS for 100% Cloud/Render compatibility
+// Setup Nodemailer transporter with stripped App Password for 100% Gmail authentication
+const rawEmailPass = process.env.EMAIL_PASSWORD || 'qmvhwedjipeyqstm';
+const cleanEmailPass = rawEmailPass.replace(/\s+/g, '');
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false,
-  requireTLS: true,
   auth: {
     user: process.env.EMAIL_USER || 'hostelhub.rvsofficial@gmail.com',
-    pass: process.env.EMAIL_PASSWORD || 'qmvh wedj ipey qstm'
-  },
-  tls: {
-    rejectUnauthorized: false
+    pass: cleanEmailPass
   }
 });
 
@@ -391,23 +387,17 @@ exports.verifyOTP = async (req, res) => {
     const cleanEmail = email.trim().toLowerCase();
     const cleanOtp = otp.trim();
 
-    // Universal master OTP 123456 fallback for seamless testing
-    if (cleanOtp === '123456') {
-      console.log(`✅ MASTER OTP 123456 VERIFIED FOR ${cleanEmail}`);
-      return res.status(200).json({ message: 'Gmail code verified successfully!' });
-    }
-
     const record = await PasswordResetOTP.findOne({
       where: { email: cleanEmail, otp: cleanOtp },
       order: [['createdAt', 'DESC']]
     });
 
     if (!record) {
-      return res.status(400).json({ message: 'Invalid 6-digit verification code. Check your Gmail inbox or use 123456.' });
+      return res.status(400).json({ message: 'Invalid 6-digit verification code. Please check your Gmail inbox.' });
     }
 
     if (new Date() > record.expiresAt) {
-      return res.status(400).json({ message: 'Verification code has expired. Request a new one.' });
+      return res.status(400).json({ message: 'Verification code has expired. Click Resend for a new code.' });
     }
 
     res.status(200).json({ message: 'Gmail code verified successfully!' });

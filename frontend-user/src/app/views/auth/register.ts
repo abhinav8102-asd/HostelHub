@@ -505,7 +505,7 @@ export class RegisterComponent {
     this.authService.sendRegistrationOTP({ email: this.email }).subscribe({
       next: (res: any) => {
         this.otpSending = false;
-        this.otpSuccess = `✅ 6-Digit OTP sent to ${this.email}! Check your inbox (or use backup code: 123456).`;
+        this.otpSuccess = `✅ 6-Digit OTP code sent to ${this.email}! Check your inbox or spam folder.`;
         this.cdr.detectChanges();
       },
       error: (err: any) => {
