@@ -112,6 +112,14 @@ export class AuthService {
     });
   }
 
+  sendRegistrationOTP(data: { email: string; rollNumber?: string }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/send-registration-otp`, data);
+  }
+
+  verifyOTP(email: string, otp: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/verify-otp`, { email, otp });
+  }
+
   register(userData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/register`, userData).pipe(
       retry({ count: 2, delay: 1500 })

@@ -79,12 +79,25 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, loginId, userId, password } = req.body;
+    const loginInput = (email || loginId || userId || '').trim();
 
-    // Find user
-    const user = await User.findOne({ where: { email } });
+    if (!loginInput || !password) {
+      return res.status(400).json({ message: 'User ID / Gmail and password are required.' });
+    }
+
+    // Find user by Email OR Roll Number / User ID
+    const user = await User.findOne({
+      where: {
+        [Op.or]: [
+          { email: loginInput },
+          { rollNumber: loginInput }
+        ]
+      }
+    });
+
     if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials! Email not found.' });
+      return res.status(401).json({ message: 'Invalid credentials! User ID or Email not found.' });
     }
 
     // Custom messages based on verification status
@@ -229,51 +242,126 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-exports.forgotPassword = async (req, res) => {
+exports.sendRegistrationOTP = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, rollNumber } = req.body;
     if (!email) {
-      return res.status(400).json({ message: 'Email address is required.' });
+      return res.status(400).json({ message: 'Gmail address is required.' });
     }
 
-    const user = await User.findOne({ where: { email } });
-    if (!user) {
-      return res.status(404).json({ message: 'No registered user found with this email.' });
+    // Check if email already registered
+    const existingEmail = await User.findOne({ where: { email } });
+    if (existingEmail) {
+      return res.status(400).json({ message: 'This Gmail address is already registered!' });
+    }
+
+    // Check if roll number already registered
+    if (rollNumber) {
+      const existingRoll = await User.findOne({ where: { rollNumber } });
+      if (existingRoll) {
+        return res.status(400).json({ message: 'This Roll Number / User ID is already registered!' });
+      }
     }
 
     // Generate random 6-digit OTP code
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes duration
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes duration
 
-    // Save to PasswordResetOTP table
     await PasswordResetOTP.create({ email, otp, expiresAt });
 
-    // Send email via Nodemailer SMTP (uses Gmail App Password)
     const mailOptions = {
-      from: `"HostelHub Support" <${process.env.EMAIL_USER}>`,
+      from: `"HostelHub Support" <${process.env.EMAIL_USER || 'hostelhub.rvsofficial@gmail.com'}>`,
       to: email,
-      subject: 'HostelHub - Password Reset Verification Code',
+      subject: 'HostelHub - Registration Gmail Verification Code',
       html: `
-        <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 8px; max-width: 500px; margin: 0 auto;">
-          <h2 style="color: #4f46e5; text-align: center;">HostelHub Password Reset</h2>
-          <p>Hello,</p>
-          <p>We received a request to reset your password. Use the verification code below to complete the reset process:</p>
-          <div style="background-color: #f3f4f6; text-align: center; padding: 15px; font-size: 28px; font-weight: bold; letter-spacing: 4px; color: #111827; border-radius: 6px; margin: 20px 0;">
+        <div style="font-family: Arial, sans-serif; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; max-width: 500px; margin: 0 auto; background: #ffffff;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <h1 style="color: #2563eb; margin: 0; font-size: 26px;">🏨 HostelHub</h1>
+            <span style="color: #64748b; font-size: 13px;">Official Student Account Registration</span>
+          </div>
+          <p style="color: #334155; font-size: 15px;">Hello,</p>
+          <p style="color: #475569; font-size: 14px; line-height: 1.5;">Thank you for registering on HostelHub! Please enter the 6-digit Gmail verification code below to verify your email address:</p>
+          <div style="background-color: #eff6ff; border: 2px dashed #2563eb; text-align: center; padding: 18px; font-size: 32px; font-weight: 900; letter-spacing: 6px; color: #1d4ed8; border-radius: 10px; margin: 24px 0;">
             ${otp}
           </div>
-          <p style="color: #6b7280; font-size: 13px;">This code is valid for <strong>5 minutes</strong>. If you did not request this, you can safely ignore this email.</p>
-          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;"/>
-          <p style="text-align: center; color: #9ca3af; font-size: 11px;">🏨 HostelHub Management System</p>
+          <p style="color: #94a3b8; font-size: 12.5px; text-align: center;">This code will expire in <strong>10 minutes</strong>. If you did not initiate this registration, please ignore this email.</p>
+          <hr style="border: 0; border-top: 1px solid #f1f5f9; margin: 24px 0;"/>
+          <p style="text-align: center; color: #94a3b8; font-size: 11px;">© 2026 HostelHub System Support • hostelhub.rvsofficial@gmail.com</p>
         </div>
       `
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
-        console.error('Nodemailer sendMail Error:', error);
-        return res.status(500).json({ message: 'Failed to send OTP code to email. Please verify SMTP credentials.' });
+        console.error('Nodemailer sendRegistrationOTP Error:', error);
+        return res.status(500).json({ message: 'Failed to send OTP code to Gmail. Please verify email address.' });
       }
-      res.status(200).json({ message: 'OTP verification code sent successfully to your email!' });
+      res.status(200).json({ message: 'Verification OTP sent to your Gmail inbox!' });
+    });
+  } catch (error) {
+    console.error('Send Registration OTP Error:', error);
+    res.status(500).json({ message: 'Internal server error sending registration OTP.' });
+  }
+};
+
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email, identifier } = req.body;
+    const searchInput = (email || identifier || '').trim();
+    if (!searchInput) {
+      return res.status(400).json({ message: 'User ID / Roll No or Gmail address is required.' });
+    }
+
+    // Find user by email OR roll number / user ID
+    const user = await User.findOne({
+      where: {
+        [Op.or]: [
+          { email: searchInput },
+          { rollNumber: searchInput }
+        ]
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'No registered user found with this User ID or Gmail.' });
+    }
+
+    const targetEmail = user.email;
+
+    // Generate random 6-digit OTP code
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes duration
+
+    await PasswordResetOTP.create({ email: targetEmail, otp, expiresAt });
+
+    const mailOptions = {
+      from: `"HostelHub Support" <${process.env.EMAIL_USER || 'hostelhub.rvsofficial@gmail.com'}>`,
+      to: targetEmail,
+      subject: 'HostelHub - Password Reset OTP Code',
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; max-width: 500px; margin: 0 auto; background: #ffffff;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <h1 style="color: #2563eb; margin: 0; font-size: 26px;">🏨 HostelHub</h1>
+            <span style="color: #64748b; font-size: 13px;">Password Reset & Account Security</span>
+          </div>
+          <p style="color: #334155; font-size: 15px;">Hello ${user.name},</p>
+          <p style="color: #475569; font-size: 14px; line-height: 1.5;">We received a request to reset your HostelHub password. Use the verification code below to reset your password:</p>
+          <div style="background-color: #eff6ff; border: 2px dashed #2563eb; text-align: center; padding: 18px; font-size: 32px; font-weight: 900; letter-spacing: 6px; color: #1d4ed8; border-radius: 10px; margin: 24px 0;">
+            ${otp}
+          </div>
+          <p style="color: #94a3b8; font-size: 12.5px; text-align: center;">This code will expire in <strong>10 minutes</strong>. If you did not request this, you can safely ignore this email.</p>
+          <hr style="border: 0; border-top: 1px solid #f1f5f9; margin: 24px 0;"/>
+          <p style="text-align: center; color: #94a3b8; font-size: 11px;">© 2026 HostelHub System Support • hostelhub.rvsofficial@gmail.com</p>
+        </div>
+      `
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Nodemailer forgotPassword Error:', error);
+        return res.status(500).json({ message: 'Failed to send OTP code to Gmail.' });
+      }
+      res.status(200).json({ message: 'OTP verification code sent successfully to your registered Gmail!', email: targetEmail });
     });
   } catch (error) {
     console.error('Forgot Password Error:', error);

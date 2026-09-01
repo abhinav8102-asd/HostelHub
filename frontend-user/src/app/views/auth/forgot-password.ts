@@ -14,8 +14,8 @@ import { API_CONFIG } from '../../config/api.config';
       <div class="auth-header">
         <div class="logo">🏨 HostelHub</div>
         <h2>Reset Password</h2>
-        <p *ngIf="step === 1">Enter your registered email to receive an OTP code</p>
-        <p *ngIf="step === 2">We sent a 6-digit verification code to your email</p>
+        <p *ngIf="step === 1">Enter your User ID / Roll No or registered Gmail address</p>
+        <p *ngIf="step === 2">We sent a 6-digit verification code to your registered Gmail address</p>
         <p *ngIf="step === 3">Enter a new secure password for your account</p>
       </div>
 
@@ -23,19 +23,18 @@ import { API_CONFIG } from '../../config/api.config';
         <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
         <div *ngIf="success" class="alert alert-success">{{ success }}</div>
 
-        <!-- STEP 1: Enter Email -->
+        <!-- STEP 1: Enter Email or User ID -->
         <form *ngIf="step === 1" (ngSubmit)="sendOTP()" #emailForm="ngForm">
           <div class="form-group">
-            <label class="form-label" for="email">Email Address</label>
+            <label class="form-label" for="email">User ID / Roll No or Gmail</label>
             <input 
-              type="email" 
+              type="text" 
               id="email" 
               name="email" 
               class="form-input" 
-              placeholder="e.g. rohan@student.com"
+              placeholder="e.g. 2025CS101 or abhinav@gmail.com"
               [(ngModel)]="email" 
               required 
-              email
             />
           </div>
 
@@ -173,6 +172,7 @@ export class ForgotPasswordComponent {
   loading = false;
   error = '';
   success = '';
+  targetEmail = '';
 
   constructor(
     private http: HttpClient,
@@ -185,16 +185,17 @@ export class ForgotPasswordComponent {
     this.error = '';
     this.success = '';
 
-    this.http.post(`${API_CONFIG.baseUrl}/api/auth/forgot-password`, { email: this.email }).subscribe({
+    this.http.post(`${API_CONFIG.baseUrl}/api/auth/forgot-password`, { email: this.email, identifier: this.email }).subscribe({
       next: (res: any) => {
         this.loading = false;
+        this.targetEmail = res.email || this.email;
         this.success = res.message || 'OTP verification code sent successfully!';
         this.step = 2;
         this.cdr.detectChanges();
       },
       error: (err) => {
         this.loading = false;
-        this.error = err.error?.message || 'Failed to send OTP verification code. Verify your email.';
+        this.error = err.error?.message || 'Failed to send OTP verification code. Verify your User ID / Email.';
         this.cdr.detectChanges();
       }
     });
@@ -205,7 +206,7 @@ export class ForgotPasswordComponent {
     this.error = '';
     this.success = '';
 
-    this.http.post(`${API_CONFIG.baseUrl}/api/auth/verify-otp`, { email: this.email, otp: this.otp }).subscribe({
+    this.http.post(`${API_CONFIG.baseUrl}/api/auth/verify-otp`, { email: this.targetEmail || this.email, otp: this.otp }).subscribe({
       next: (res: any) => {
         this.loading = false;
         this.success = 'Code verified! You can now reset your password.';
@@ -226,7 +227,7 @@ export class ForgotPasswordComponent {
     this.success = '';
 
     const payload = {
-      email: this.email,
+      email: this.targetEmail || this.email,
       otp: this.otp,
       newPassword: this.newPassword
     };

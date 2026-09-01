@@ -25,22 +25,21 @@ import { AuthService } from '../../services/auth.service';
           <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
           <div *ngIf="success" class="alert alert-success">{{ success }}</div>
 
-          <!-- Email Input Field -->
+          <!-- User ID / Email Input Field -->
           <div class="field-container">
-            <span class="field-label">EMAIL ADDRESS</span>
+            <span class="field-label">USER ID OR GMAIL ADDRESS</span>
             <div class="input-row">
               <div class="pink-icon-badge">
-                <span>✉️</span>
+                <span>👤</span>
               </div>
               <input 
-                type="email" 
+                type="text" 
                 id="email" 
                 name="email" 
                 class="form-input-box" 
-                placeholder="e.g. admin@hostelhub.com"
+                placeholder="e.g. ADMIN01 or admin@hostelhub.com"
                 [(ngModel)]="email" 
                 required 
-                email
               />
             </div>
           </div>
