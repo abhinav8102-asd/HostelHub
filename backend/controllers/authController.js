@@ -47,7 +47,7 @@ const sendEmailEngine = async ({ to, subject, html }) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: 'HostelHub Support <onboarding@resend.dev>',
+          from: 'onboarding@resend.dev',
           to: [to],
           subject: subject,
           html: html
