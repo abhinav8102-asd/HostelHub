@@ -247,9 +247,13 @@ exports.updateProfile = async (req, res) => {
 };
 
 exports.sendRegistrationOTP = async (req, res) => {
+  const startTime = Date.now();
   try {
     const { email } = req.body;
+    console.log(`\n🔍 [OTP DEBUG STEP 1] Received sendRegistrationOTP request for email: "${email}" at ${new Date().toISOString()}`);
+
     if (!email) {
+      console.log(`❌ [OTP DEBUG STEP 1 ERROR] Gmail address missing in request body.`);
       return res.status(400).json({ message: 'Gmail address is required.' });
     }
 
@@ -258,6 +262,7 @@ exports.sendRegistrationOTP = async (req, res) => {
     // Check if email already registered
     const existingEmail = await User.findOne({ where: { email: cleanEmail } });
     if (existingEmail) {
+      console.log(`⚠️ [OTP DEBUG STEP 2] Gmail address "${cleanEmail}" is already registered in DB.`);
       return res.status(400).json({ message: 'This Gmail address is already registered in HostelHub!' });
     }
 
@@ -267,7 +272,7 @@ exports.sendRegistrationOTP = async (req, res) => {
 
     // Save to PasswordResetOTP table
     await PasswordResetOTP.create({ email: cleanEmail, otp, expiresAt });
-    console.log(`🔑 REGISTRATION OTP GENERATED FOR ${cleanEmail}: ${otp}`);
+    console.log(`🔑 [OTP DEBUG STEP 3] OTP Record created in DB for ${cleanEmail}: ${otp} (Duration: ${Date.now() - startTime}ms)`);
 
     const mailOptions = {
       from: `"HostelHub Support" <${process.env.EMAIL_USER || 'hostelhub.rvsofficial@gmail.com'}>`,
@@ -293,18 +298,20 @@ exports.sendRegistrationOTP = async (req, res) => {
 
     // Respond immediately to client (<50ms) so mobile app button never hangs on "Sending..."
     res.status(200).json({ message: 'Verification OTP sent to your Gmail inbox!', email: cleanEmail });
+    console.log(`⚡ [OTP DEBUG STEP 4] HTTP 200 Response sent to mobile client in ${Date.now() - startTime}ms!`);
 
     // Dispatch email asynchronously in setImmediate background task
     setImmediate(async () => {
       try {
+        console.log(`🚀 [OTP DEBUG STEP 5] Starting Nodemailer Gmail SMTP transmission to ${cleanEmail}...`);
         const info = await transporter.sendMail(mailOptions);
-        console.log('✅ Registration OTP Email sent successfully to:', cleanEmail, info.messageId);
+        console.log(`✅ [OTP DEBUG STEP 6] Gmail OTP Email DELIVERED SUCCESSFULLY to ${cleanEmail}! MessageID: ${info.messageId}`);
       } catch (mailErr) {
-        console.error('Nodemailer sendRegistrationOTP Error:', mailErr);
+        console.error(`❌ [OTP DEBUG STEP 6 ERROR] Nodemailer sendRegistrationOTP Error:`, mailErr);
       }
     });
   } catch (error) {
-    console.error('Send Registration OTP Error:', error);
+    console.error(`❌ [OTP DEBUG CRITICAL ERROR] Send Registration OTP Exception:`, error);
     return res.status(500).json({ message: 'Internal server error sending registration OTP.' });
   }
 };
