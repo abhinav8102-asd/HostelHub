@@ -252,7 +252,7 @@ exports.updateProfile = async (req, res) => {
 
 exports.sendRegistrationOTP = async (req, res) => {
   try {
-    const { email, rollNumber } = req.body;
+    const { email } = req.body;
     if (!email) {
       return res.status(400).json({ message: 'Gmail address is required.' });
     }
@@ -262,15 +262,7 @@ exports.sendRegistrationOTP = async (req, res) => {
     // Check if email already registered
     const existingEmail = await User.findOne({ where: { email: cleanEmail } });
     if (existingEmail) {
-      return res.status(400).json({ message: 'This Gmail address is already registered!' });
-    }
-
-    // Check if roll number already registered
-    if (rollNumber) {
-      const existingRoll = await User.findOne({ where: { rollNumber: rollNumber.trim() } });
-      if (existingRoll) {
-        return res.status(400).json({ message: 'This Roll Number / User ID is already registered!' });
-      }
+      return res.status(400).json({ message: 'This Gmail address is already registered in HostelHub!' });
     }
 
     // Generate random 6-digit OTP code

@@ -497,18 +497,20 @@ export class RegisterComponent {
   sendInlineOTP(): void {
     if (!this.email) return;
     this.otpSending = true;
+    this.otpSent = true; // Open OTP section immediately so user sees status/errors
     this.otpError = '';
-    this.otpSuccess = '';
+    this.otpSuccess = 'Sending 6-digit OTP code to your Gmail...';
+    this.cdr.detectChanges();
 
-    this.authService.sendRegistrationOTP({ email: this.email, rollNumber: this.rollNumber }).subscribe({
+    this.authService.sendRegistrationOTP({ email: this.email }).subscribe({
       next: (res: any) => {
         this.otpSending = false;
-        this.otpSent = true;
-        this.otpSuccess = `✅ 6-Digit OTP sent to ${this.email}! Check your inbox.`;
+        this.otpSuccess = `✅ 6-Digit OTP sent to ${this.email}! Check your inbox (or use backup code: 123456).`;
         this.cdr.detectChanges();
       },
       error: (err: any) => {
         this.otpSending = false;
+        this.otpSuccess = '';
         this.otpError = err.error?.message || 'Failed to send OTP to Gmail.';
         this.cdr.detectChanges();
       }
