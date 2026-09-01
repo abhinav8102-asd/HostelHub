@@ -33,19 +33,42 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// Dual Email Transmission Engine: HTTPS REST API (Primary) + Capped Nodemailer (Fallback)
+// Dual Email Transmission Engine: Resend HTTPS API (#1 Primary) + Brevo HTTPS API (#2) + Capped Nodemailer (#3 Fallback)
 const sendEmailEngine = async ({ to, subject, html }) => {
-  const mailOptions = {
-    from: `"HostelHub Support" <${process.env.EMAIL_USER || 'hostelhub.rvsofficial@gmail.com'}>`,
-    to,
-    subject,
-    html
-  };
+  // 1. Try Resend HTTPS REST API if RESEND_API_KEY is present
+  const resendApiKey = process.env.RESEND_API_KEY;
+  if (resendApiKey) {
+    try {
+      console.log(`🚀 [RESEND HTTPS API] Dispatching email to ${to} via Resend REST API...`);
+      const res = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${resendApiKey.trim()}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'HostelHub Support <onboarding@resend.dev>',
+          to: [to],
+          subject: subject,
+          html: html
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        console.log(`✅ [RESEND HTTPS SUCCESS] Email DELIVERED to ${to} via Resend REST API! MessageID:`, data.id);
+        return true;
+      } else {
+        console.error(`⚠️ [RESEND HTTPS WARN] Resend API status ${res.status}:`, data);
+      }
+    } catch (apiErr) {
+      console.error('❌ [RESEND HTTPS ERROR] Resend API Exception:', apiErr.message);
+    }
+  }
 
-  // 1. Try Brevo HTTPS REST API if BREVO_API_KEY is present
+  // 2. Try Brevo HTTPS REST API if BREVO_API_KEY is present
   if (process.env.BREVO_API_KEY) {
     try {
-      console.log(`🚀 [HTTPS EMAIL API] Dispatching via Brevo REST API to ${to}...`);
+      console.log(`🚀 [BREVO HTTPS API] Dispatching via Brevo REST API to ${to}...`);
       const res = await fetch('https://api.brevo.com/v3/smtp/email', {
         method: 'POST',
         headers: {
@@ -62,13 +85,13 @@ const sendEmailEngine = async ({ to, subject, html }) => {
       });
       const data = await res.json();
       if (res.ok) {
-        console.log(`✅ [HTTPS EMAIL API SUCCESS] Email delivered to ${to} via Brevo! MessageID:`, data.messageId);
+        console.log(`✅ [BREVO HTTPS SUCCESS] Email delivered to ${to} via Brevo! MessageID:`, data.messageId);
         return true;
       } else {
-        console.error(`⚠️ [HTTPS EMAIL API WARN] Brevo API status ${res.status}:`, data);
+        console.error(`⚠️ [BREVO HTTPS WARN] Brevo API status ${res.status}:`, data);
       }
     } catch (apiErr) {
-      console.error('❌ [HTTPS EMAIL API ERROR] Brevo API Exception:', apiErr.message);
+      console.error('❌ [BREVO HTTPS ERROR] Brevo API Exception:', apiErr.message);
     }
   }
 
