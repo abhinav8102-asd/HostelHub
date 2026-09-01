@@ -303,20 +303,16 @@ exports.sendRegistrationOTP = async (req, res) => {
       `
     };
 
-    // Respond immediately to client (<50ms) so mobile app button unlocks instantly to "Resend"
-    res.status(200).json({ message: 'Verification OTP sent to your Gmail inbox!', email: cleanEmail });
-    console.log(`⚡ [OTP DEBUG STEP 4] HTTP 200 Response sent to mobile client in ${Date.now() - startTime}ms!`);
+    // Send email via Nodemailer over IPv4 (awaited so Render keeps Node process alive until Google MTA receives the email)
+    try {
+      console.log(`🚀 [OTP DEBUG STEP 4] Transmitting Nodemailer Gmail SMTP email to ${cleanEmail}...`);
+      const info = await transporter.sendMail(mailOptions);
+      console.log(`✅ [OTP DEBUG STEP 5] Gmail OTP Email DELIVERED SUCCESSFULLY to ${cleanEmail}! MessageID: ${info.messageId}`);
+    } catch (mailErr) {
+      console.error(`❌ [OTP DEBUG STEP 5 ERROR] Nodemailer sendRegistrationOTP Error:`, mailErr);
+    }
 
-    // Dispatch email transmission asynchronously so client is never blocked
-    process.nextTick(async () => {
-      try {
-        console.log(`🚀 [OTP DEBUG STEP 5] Transmitting Nodemailer Gmail SMTP email to ${cleanEmail}...`);
-        const info = await transporter.sendMail(mailOptions);
-        console.log(`✅ [OTP DEBUG STEP 6] Gmail OTP Email DELIVERED SUCCESSFULLY to ${cleanEmail}! MessageID: ${info.messageId}`);
-      } catch (mailErr) {
-        console.error(`❌ [OTP DEBUG STEP 6 ERROR] Nodemailer sendRegistrationOTP Error:`, mailErr);
-      }
-    });
+    return res.status(200).json({ message: 'Verification OTP sent to your Gmail inbox!', email: cleanEmail });
   } catch (error) {
     console.error(`❌ [OTP DEBUG CRITICAL ERROR] Send Registration OTP Exception:`, error);
     return res.status(500).json({ message: 'Internal server error sending registration OTP.' });
@@ -376,18 +372,14 @@ exports.forgotPassword = async (req, res) => {
       `
     };
 
-    res.status(200).json({ message: 'OTP verification code sent successfully to your registered Gmail!', email: targetEmail });
+    try {
+      const info = await transporter.sendMail(mailOptions);
+      console.log('✅ Forgot Password OTP Email sent successfully to:', targetEmail, info.messageId);
+    } catch (mailErr) {
+      console.error('Nodemailer forgotPassword Error:', mailErr);
+    }
 
-    process.nextTick(async () => {
-      try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log('✅ Forgot Password OTP Email sent successfully to:', targetEmail, info.messageId);
-      } catch (mailErr) {
-        console.error('Nodemailer forgotPassword Error:', mailErr);
-      }
-    });
-
-    return;
+    return res.status(200).json({ message: 'OTP verification code sent successfully to your registered Gmail!', email: targetEmail });
   } catch (error) {
     console.error('Forgot Password Error:', error);
     return res.status(500).json({ message: 'Internal server error during password reset request.' });
