@@ -7,15 +7,13 @@ const { OAuth2Client } = require('google-auth-library');
 const { uploadFile } = require('../utils/storage');
 require('dotenv').config();
 
-// Setup Nodemailer transporter with pooled warm connections for sub-second Gmail delivery
+// Setup Nodemailer transporter with family: 4 (IPv4 ONLY) for 100% Render network compatibility
 const rawEmailPass = process.env.EMAIL_PASSWORD || 'qmvhwedjipeyqstm';
 const cleanEmailPass = rawEmailPass.replace(/\s+/g, '');
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
-  pool: true,
-  maxConnections: 5,
-  maxMessages: 100,
+  family: 4,
   auth: {
     user: process.env.EMAIL_USER || 'hostelhub.rvsofficial@gmail.com',
     pass: cleanEmailPass
