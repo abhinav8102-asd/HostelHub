@@ -21,18 +21,86 @@ const transporter = nodemailer.createTransport({
   requireTLS: true,
   lookup: (hostname, options, callback) => {
     dns.lookup(hostname, { family: 4 }, (err, address, family) => {
-      console.log(`🌐 [DNS LOOKUP] Forced IPv4 for ${hostname} -> ${address}`);
       callback(err, address, family);
     });
   },
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
-  socketTimeout: 10000,
+  connectionTimeout: 5000,
+  greetingTimeout: 5000,
+  socketTimeout: 5000,
   auth: {
     user: process.env.EMAIL_USER || 'hostelhub.rvsofficial@gmail.com',
     pass: cleanEmailPass
   }
 });
+
+// Dual Email Transmission Engine: HTTPS REST API (Primary) + Capped Nodemailer (Fallback)
+const sendEmailEngine = async ({ to, subject, html }) => {
+  const mailOptions = {
+    from: `"HostelHub Support" <${process.env.EMAIL_USER || 'hostelhub.rvsofficial@gmail.com'}>`,
+    to,
+    subject,
+    html
+  };
+
+  // 1. Try Brevo HTTPS REST API if BREVO_API_KEY is present
+  if (process.env.BREVO_API_KEY) {
+    try {
+      console.log(`🚀 [HTTPS EMAIL API] Dispatching via Brevo REST API to ${to}...`);
+      const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'content-type': 'application/json',
+          'api-key': process.env.BREVO_API_KEY
+        },
+        body: JSON.stringify({
+          sender: { name: 'HostelHub Support', email: process.env.EMAIL_USER || 'hostelhub.rvsofficial@gmail.com' },
+          to: [{ email: to }],
+          subject,
+          htmlContent: html
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        console.log(`✅ [HTTPS EMAIL API SUCCESS] Email delivered to ${to} via Brevo! MessageID:`, data.messageId);
+        return true;
+      } else {
+        console.error(`⚠️ [HTTPS EMAIL API WARN] Brevo API status ${res.status}:`, data);
+      }
+    } catch (apiErr) {
+      console.error('❌ [HTTPS EMAIL API ERROR] Brevo API Exception:', apiErr.message);
+    }
+  }
+
+  // 2. Nodemailer SMTP with strict 4-second timeout cap
+  return new Promise((resolve) => {
+    let completed = false;
+    const timer = setTimeout(() => {
+      if (!completed) {
+        completed = true;
+        console.error(`⚠️ [SMTP TIMEOUT] Nodemailer transmission capped at 4s timeout for ${to}`);
+        resolve(false);
+      }
+    }, 4000);
+
+    console.log(`🚀 [SMTP ENGINE] Transmitting via Nodemailer to ${to}...`);
+    transporter.sendMail(mailOptions).then(info => {
+      if (!completed) {
+        completed = true;
+        clearTimeout(timer);
+        console.log(`✅ [SMTP SUCCESS] Gmail OTP Email DELIVERED to ${to}! MessageID: ${info.messageId}`);
+        resolve(true);
+      }
+    }).catch(err => {
+      if (!completed) {
+        completed = true;
+        clearTimeout(timer);
+        console.error(`❌ [SMTP ERROR] Nodemailer Error for ${to}:`, err.message);
+        resolve(false);
+      }
+    });
+  });
+};
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -289,11 +357,7 @@ exports.sendRegistrationOTP = async (req, res) => {
     await PasswordResetOTP.create({ email: cleanEmail, otp, expiresAt });
     console.log(`🔑 [OTP DEBUG STEP 3] OTP Record created in DB for ${cleanEmail}: ${otp} (Duration: ${Date.now() - startTime}ms)`);
 
-    const mailOptions = {
-      from: `"HostelHub Support" <${process.env.EMAIL_USER || 'hostelhub.rvsofficial@gmail.com'}>`,
-      to: cleanEmail,
-      subject: 'HostelHub - Registration Gmail Verification Code',
-      html: `
+    const htmlContent = `
         <div style="font-family: Arial, sans-serif; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; max-width: 500px; margin: 0 auto; background: #ffffff;">
           <div style="text-align: center; margin-bottom: 20px;">
             <h1 style="color: #2563eb; margin: 0; font-size: 26px;">🏨 HostelHub</h1>
@@ -308,19 +372,20 @@ exports.sendRegistrationOTP = async (req, res) => {
           <hr style="border: 0; border-top: 1px solid #f1f5f9; margin: 24px 0;"/>
           <p style="text-align: center; color: #94a3b8; font-size: 11px;">© 2026 HostelHub System Support • hostelhub.rvsofficial@gmail.com</p>
         </div>
-      `
-    };
+      `;
 
-    // Send email via Nodemailer over IPv4 (awaited so Render keeps Node process alive until Google MTA receives the email)
-    try {
-      console.log(`🚀 [OTP DEBUG STEP 4] Transmitting Nodemailer Gmail SMTP email to ${cleanEmail}...`);
-      const info = await transporter.sendMail(mailOptions);
-      console.log(`✅ [OTP DEBUG STEP 5] Gmail OTP Email DELIVERED SUCCESSFULLY to ${cleanEmail}! MessageID: ${info.messageId}`);
-    } catch (mailErr) {
-      console.error(`❌ [OTP DEBUG STEP 5 ERROR] Nodemailer sendRegistrationOTP Error:`, mailErr);
-    }
+    // 1. Respond HTTP 200 immediately to mobile app (<50ms) so button unlocks instantly
+    res.status(200).json({ message: 'Verification OTP sent to your Gmail inbox!', email: cleanEmail });
+    console.log(`⚡ [OTP DEBUG STEP 4] HTTP 200 Response sent to mobile client in ${Date.now() - startTime}ms!`);
 
-    return res.status(200).json({ message: 'Verification OTP sent to your Gmail inbox!', email: cleanEmail });
+    // 2. Dispatch email transmission via dual HTTPS API + Capped SMTP engine
+    sendEmailEngine({
+      to: cleanEmail,
+      subject: 'HostelHub - Registration Gmail Verification Code',
+      html: htmlContent
+    }).catch(err => console.error('sendRegistrationOTP Engine Error:', err));
+
+    return;
   } catch (error) {
     console.error(`❌ [OTP DEBUG CRITICAL ERROR] Send Registration OTP Exception:`, error);
     return res.status(500).json({ message: 'Internal server error sending registration OTP.' });
@@ -358,11 +423,7 @@ exports.forgotPassword = async (req, res) => {
     await PasswordResetOTP.create({ email: targetEmail, otp, expiresAt });
     console.log(`🔑 FORGOT PASSWORD OTP FOR ${targetEmail}: ${otp}`);
 
-    const mailOptions = {
-      from: `"HostelHub Support" <${process.env.EMAIL_USER || 'hostelhub.rvsofficial@gmail.com'}>`,
-      to: targetEmail,
-      subject: 'HostelHub - Password Reset OTP Code',
-      html: `
+    const htmlContent = `
         <div style="font-family: Arial, sans-serif; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; max-width: 500px; margin: 0 auto; background: #ffffff;">
           <div style="text-align: center; margin-bottom: 20px;">
             <h1 style="color: #2563eb; margin: 0; font-size: 26px;">🏨 HostelHub</h1>
@@ -377,17 +438,17 @@ exports.forgotPassword = async (req, res) => {
           <hr style="border: 0; border-top: 1px solid #f1f5f9; margin: 24px 0;"/>
           <p style="text-align: center; color: #94a3b8; font-size: 11px;">© 2026 HostelHub System Support • hostelhub.rvsofficial@gmail.com</p>
         </div>
-      `
-    };
+      `;
 
-    try {
-      const info = await transporter.sendMail(mailOptions);
-      console.log('✅ Forgot Password OTP Email sent successfully to:', targetEmail, info.messageId);
-    } catch (mailErr) {
-      console.error('Nodemailer forgotPassword Error:', mailErr);
-    }
+    res.status(200).json({ message: 'OTP verification code sent successfully to your registered Gmail!', email: targetEmail });
 
-    return res.status(200).json({ message: 'OTP verification code sent successfully to your registered Gmail!', email: targetEmail });
+    sendEmailEngine({
+      to: targetEmail,
+      subject: 'HostelHub - Password Reset OTP Code',
+      html: htmlContent
+    }).catch(err => console.error('forgotPassword Engine Error:', err));
+
+    return;
   } catch (error) {
     console.error('Forgot Password Error:', error);
     return res.status(500).json({ message: 'Internal server error during password reset request.' });
