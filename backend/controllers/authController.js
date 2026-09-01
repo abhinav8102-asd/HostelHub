@@ -291,15 +291,13 @@ exports.sendRegistrationOTP = async (req, res) => {
       `
     };
 
-    // Race SMTP email delivery with a 3.5-second cap so event loop completes transmission on Render without HTTP hanging
-    const sendEmailPromise = transporter.sendMail(mailOptions).then(info => {
+    // Send email and wait for Nodemailer to finish transmission to Gmail SMTP
+    try {
+      const info = await transporter.sendMail(mailOptions);
       console.log('✅ Registration OTP Email sent successfully to:', cleanEmail, info.messageId);
-    }).catch(err => {
-      console.error('Nodemailer sendRegistrationOTP Error:', err);
-    });
-
-    const timeoutPromise = new Promise(resolve => setTimeout(resolve, 3500));
-    await Promise.race([sendEmailPromise, timeoutPromise]);
+    } catch (mailErr) {
+      console.error('Nodemailer sendRegistrationOTP Error:', mailErr);
+    }
 
     return res.status(200).json({ message: 'Verification OTP sent to your Gmail inbox!', email: cleanEmail });
   } catch (error) {
@@ -361,14 +359,12 @@ exports.forgotPassword = async (req, res) => {
       `
     };
 
-    const sendEmailPromise = transporter.sendMail(mailOptions).then(info => {
+    try {
+      const info = await transporter.sendMail(mailOptions);
       console.log('✅ Forgot Password OTP Email sent successfully to:', targetEmail, info.messageId);
-    }).catch(err => {
-      console.error('Nodemailer forgotPassword Error:', err);
-    });
-
-    const timeoutPromise = new Promise(resolve => setTimeout(resolve, 3500));
-    await Promise.race([sendEmailPromise, timeoutPromise]);
+    } catch (mailErr) {
+      console.error('Nodemailer forgotPassword Error:', mailErr);
+    }
 
     return res.status(200).json({ message: 'OTP verification code sent successfully to your registered Gmail!', email: targetEmail });
   } catch (error) {
