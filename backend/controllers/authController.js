@@ -10,7 +10,7 @@ const { OAuth2Client } = require('google-auth-library');
 const { uploadFile } = require('../utils/storage');
 require('dotenv').config();
 
-// Setup Nodemailer transporter with Port 587 STARTTLS + family: 4 (IPv4) for Render datacenter compatibility
+// Setup Nodemailer transporter with custom IPv4 lookup override for Render datacenter compatibility
 const rawEmailPass = process.env.EMAIL_PASSWORD || 'qmvhwedjipeyqstm';
 const cleanEmailPass = rawEmailPass.replace(/\s+/g, '');
 
@@ -19,7 +19,15 @@ const transporter = nodemailer.createTransport({
   port: 587,
   secure: false,
   requireTLS: true,
-  family: 4,
+  lookup: (hostname, options, callback) => {
+    dns.lookup(hostname, { family: 4 }, (err, address, family) => {
+      console.log(`🌐 [DNS LOOKUP] Forced IPv4 for ${hostname} -> ${address}`);
+      callback(err, address, family);
+    });
+  },
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 10000,
   auth: {
     user: process.env.EMAIL_USER || 'hostelhub.rvsofficial@gmail.com',
     pass: cleanEmailPass
